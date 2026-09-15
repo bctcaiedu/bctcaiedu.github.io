@@ -1,1 +1,692 @@
+<title>Day 1 실습 가이드 · 터미널 첫날</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#F6F8F5;--surface:#FFFFFF;--surface-2:#EDF1EC;--ink:#141A16;--ink-2:#3A453E;--muted:#5F6D65;
+    --line:#DBE2DC;--line-strong:#C3CFC6;--accent:#10684A;--accent-soft:#E2EFE8;--clay:#A94D30;--clay-soft:#F6E7E0;
+    --ask:#1F5E86;--ask-soft:#E1EDF5;
+    --term-bg:#10171A;--term-fg:#DCE6E3;--term-dim:#7C9A93;--term-p:#7FD1A8;--term-out:#B8C7C2;
+    --maxw:940px;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+      --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+      --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+    --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+    --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:22px}
+  h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:600;letter-spacing:-.01em}
+  p{margin:0}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+  header.top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .masthead{display:flex;flex-direction:column;gap:16px;padding-block:46px 28px}
+  .rule-tag{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .rule-tag .dash{flex:1;height:1px;background:var(--line-strong);min-width:24px}
+  h1{font-size:clamp(26px,4.4vw,40px);line-height:1.2;font-weight:700;letter-spacing:-.03em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .standfirst{max-width:60ch;color:var(--ink-2);font-size:15.5px;font-weight:300;line-height:1.75}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-top:24px}
+  .rule{background:var(--surface);padding:15px 17px}
+  .rule .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--accent)}
+  .rule h3{font-size:14.5px;font-weight:600;margin-top:4px}
+  .rule p{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.55}
+
+  section{padding-block:44px}
+  .part{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-top:2px solid var(--accent);padding-top:14px;margin-bottom:8px}
+  .part .pn{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;color:var(--accent)}
+  .part h2{font-size:clamp(20px,3vw,26px);font-weight:700;letter-spacing:-.02em;flex:1 1 200px}
+  .part .pt{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .lede{color:var(--muted);font-size:14px;max-width:62ch;margin-bottom:22px}
+
+  .stepc{border:1px solid var(--line);border-radius:4px;background:var(--surface);margin-bottom:16px;overflow:hidden}
+  .shead{display:flex;align-items:baseline;gap:12px;padding:13px 18px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+  .shead .sn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .shead h3{font-size:15px;font-weight:600}
+  .sbody{padding:16px 18px}
+  .sbody > p{font-size:14px;color:var(--ink-2);line-height:1.7}
+  .sbody > p + p{margin-top:9px}
+  .sbody ol,.sbody ul{margin:9px 0 0;padding-left:19px}
+  .sbody li{font-size:14px;color:var(--ink-2);margin-top:5px;line-height:1.65}
+
+  pre{margin:11px 0 0;background:var(--term-bg);color:var(--term-fg);border-radius:3px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+  pre .c{color:var(--term-dim)}
+  pre .p{color:var(--term-p)}
+  pre .o{color:var(--term-out)}
+  .prelbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-top:13px;display:block}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:1px 4px;border-radius:2px}
+  kbd{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:3px;padding:1px 5px;background:var(--surface);color:var(--ink)}
+
+  .box{margin-top:13px;border-radius:0 3px 3px 0;padding:11px 14px;display:flex;flex-direction:column;gap:5px}
+  .box.check{border-left:2px solid var(--accent);background:var(--accent-soft)}
+  .box.q{border-left:2px solid var(--ask);background:var(--ask-soft)}
+  .box.warn{border-left:2px solid var(--clay);background:var(--clay-soft)}
+  .box .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase}
+  .box.check .lbl{color:var(--accent)}
+  .box.q .lbl{color:var(--ask)}
+  .box.warn .lbl{color:var(--clay)}
+  .box p,.box li{font-size:13.5px;color:var(--ink-2);line-height:1.62}
+  .box ul{margin:0;padding-left:16px}
+  .box li{margin-top:3px}
+  .box code{background:rgba(0,0,0,.06)}
+
+  .mission{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;background:var(--surface);padding:16px 18px;margin-bottom:14px}
+  .mhead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .mhead .mn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .mhead h3{font-size:15px;font-weight:600;flex:1 1 180px}
+  .mission > p{font-size:14px;color:var(--ink-2);margin-top:7px;line-height:1.7}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;min-width:540px;font-size:13.5px}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--surface-2)}
+  tbody tr:last-child td{border-bottom:0}
+  td code{font-size:12px}
+
+  .selfcheck{border:1px solid var(--line-strong);border-radius:4px;background:var(--surface);overflow:hidden}
+  .selfcheck h3{padding:14px 18px;font-size:15px;background:var(--surface-2);border-bottom:1px solid var(--line-strong)}
+  .selfcheck ul{list-style:none;margin:0;padding:6px 18px 16px}
+  .selfcheck li{font-size:14px;color:var(--ink-2);padding:8px 0 8px 28px;border-bottom:1px solid var(--line);position:relative;line-height:1.6}
+  .selfcheck li:last-child{border-bottom:0}
+  .selfcheck li::before{content:"";position:absolute;left:0;top:13px;width:14px;height:14px;border:1.5px solid var(--line-strong);border-radius:2px}
+
+  footer{border-top:1px solid var(--line);background:var(--surface);padding-block:26px;margin-top:20px}
+  footer p{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+  @media (max-width:700px){
+    .sbody,.shead,.mission{padding-inline:14px}
+    .shead{gap:8px;flex-wrap:wrap}
+  }
+</style>
+
+<header class="top">
+  <div class="wrap masthead">
+    <div class="rule-tag">
+      <span class="eyebrow">한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과</span>
+      <span class="dash"></span>
+      <span class="eyebrow">학생용 실습 가이드</span>
+    </div>
+    <h1>Day 1 · <em>터미널 첫날</em></h1>
+    <p class="standfirst">
+      오늘 두 개의 리눅스를 여러분 PC에 만들고, 터미널에서 길을 잃지 않는 법을 배웁니다.
+      설치가 한 번에 되는 사람은 거의 없습니다. 막히는 게 정상이고, 막힌 지점을 읽어내는 것이 오늘의 진짜 실습입니다.
+    </p>
+    <div class="rules">
+      <div class="rule"><div class="n">RULE 1</div><h3>5분 넘게 혼자 헤매지 않는다</h3><p>막히면 손을 듭니다. 혼자 30분 쓰는 것보다 손 드는 5초가 낫습니다.</p></div>
+      <div class="rule"><div class="n">RULE 2</div><h3>에러 메시지를 먼저 읽는다</h3><p>지우고 다시 하기 전에 화면에 뜬 영어를 한 번은 읽습니다. 대부분 답이 거기 있습니다.</p></div>
+      <div class="rule"><div class="n">RULE 3</div><h3>비밀번호는 화면에 안 보인다</h3><p>리눅스는 비밀번호를 칠 때 <code>*</code>조차 표시하지 않습니다. 눌리고 있으니 그냥 치고 <kbd>Enter</kbd>.</p></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- PART 0 -->
+  <section>
+    <div class="part"><span class="pn">PART 0</span><h2>시작 전 점검</h2><span class="pt">13:00–13:15</span></div>
+    <p class="lede">여기서 막히면 오후 내내 막힙니다. 세 가지를 먼저 확인하세요.</p>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">CHECK 1</span><h3>CPU 가상화가 켜져 있는가</h3></div>
+      <div class="sbody">
+        <ol>
+          <li><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Esc</kbd>로 작업 관리자를 엽니다.</li>
+          <li><strong>성능</strong> 탭 → <strong>CPU</strong> 선택.</li>
+          <li>오른쪽 아래 <strong>가상화</strong> 항목이 <strong>사용</strong>인지 봅니다.</li>
+        </ol>
+        <div class="box warn">
+          <span class="lbl">"사용 안 함"이라면</span>
+          <p>BIOS에서 가상화(Intel VT-x / AMD-V)를 켜야 합니다. 혼자 하지 말고 <strong>지금 손을 드세요.</strong> 재부팅이 필요해서 점심시간에 조교와 함께 처리합니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">CHECK 2</span><h3>디스크 여유가 60GB 이상인가</h3></div>
+      <div class="sbody">
+        <p>파일 탐색기에서 C 드라이브 여유 공간을 확인합니다. 두 개의 리눅스와 앞으로 받을 모델 파일이 들어갈 자리입니다.</p>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">CHECK 3</span><h3>PowerShell이 관리자 권한으로 열리는가</h3></div>
+      <div class="sbody">
+        <p>시작 메뉴에서 <strong>PowerShell</strong>을 찾아 <strong>관리자 권한으로 실행</strong>을 선택합니다. 창 제목에 <strong>관리자</strong>가 붙어 있으면 성공입니다.</p>
+        <div class="box check">
+          <span class="lbl">PART 0 통과 조건</span>
+          <p>가상화 사용 · 여유 60GB 이상 · 관리자 PowerShell 열림 — 셋 다 되면 다음으로 갑니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PART 1 -->
+  <section>
+    <div class="part"><span class="pn">PART 1</span><h2>WSL2 설치 — 첫 번째 리눅스</h2><span class="pt">13:15–14:00</span></div>
+    <p class="lede">윈도우 안에서 도는 진짜 리눅스입니다. 앞으로 10일 중 6일을 여기서 보냅니다.</p>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">STEP 1</span><h3>설치 명령 실행</h3></div>
+      <div class="sbody">
+        <p>관리자 PowerShell에서 다음을 칩니다. 설치할 배포판 이름은 <strong>강사가 칠판에 적어 준 것</strong>을 사용하세요.</p>
+        <pre><span class="c"># 설치 가능한 배포판 목록 보기</span>
+<span class="p">PS></span> wsl --list --online
+
+<span class="c"># 강사가 지정한 배포판 설치 (예시 — 칠판의 이름으로 바꿀 것)</span>
+<span class="p">PS></span> wsl --install -d Ubuntu-24.04</pre>
+        <p>다운로드에 몇 분 걸립니다. 진행 막대가 멈춘 것처럼 보여도 기다리세요.</p>
+        <div class="box warn">
+          <span class="lbl">재부팅 안내가 뜨면</span>
+          <p>안내대로 PC를 재부팅합니다. 재부팅 후 우분투 창이 자동으로 뜹니다. 안 뜨면 시작 메뉴에서 <strong>Ubuntu</strong>를 찾아 실행하세요.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">STEP 2</span><h3>리눅스 계정 만들기</h3></div>
+      <div class="sbody">
+        <p>처음 실행하면 계정을 만들라고 합니다. 윈도우 계정과는 <strong>완전히 별개</strong>입니다.</p>
+        <pre><span class="o">Enter new UNIX username:</span> <span class="p">namo</span>
+<span class="o">New password:</span>
+<span class="o">Retype new password:</span>
+<span class="o">passwd: password updated successfully</span></pre>
+        <div class="box warn">
+          <span class="lbl">계정 이름 규칙 — 어기면 나중에 반드시 문제가 됩니다</span>
+          <ul>
+            <li><strong>영문 소문자만</strong>. 한글·대문자·공백·특수문자 금지</li>
+            <li>짧게. 앞으로 10일 동안 수백 번 보게 됩니다</li>
+            <li>비밀번호는 화면에 아무것도 안 보입니다. 정상입니다</li>
+            <li>비밀번호를 잊으면 곤란합니다. 기억할 수 있는 것으로</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">STEP 3</span><h3>제대로 설치됐는지 확인</h3></div>
+      <div class="sbody">
+        <p>PowerShell 창(우분투 창 말고)에서 확인합니다.</p>
+        <pre><span class="p">PS></span> wsl --list --verbose
+
+<span class="o">  NAME            STATE           VERSION</span>
+<span class="o">* Ubuntu-24.04    Running         2</span></pre>
+        <div class="box check">
+          <span class="lbl">확인</span>
+          <p><strong>VERSION 열이 2</strong>여야 합니다. 1이면 손을 드세요.</p>
+        </div>
+        <span class="prelbl">이제 우분투 창에서</span>
+        <pre><span class="p">$</span> whoami
+<span class="o">namo</span>
+
+<span class="p">$</span> uname -a
+<span class="o">Linux DESKTOP-XXXX 5.15.x-microsoft-standard-WSL2 ... x86_64 GNU/Linux</span></pre>
+        <div class="box q">
+          <span class="lbl">생각해 보기</span>
+          <p><code>uname</code>이 <strong>Linux</strong>라고 대답했습니다. 여러분은 윈도우 PC 앞에 앉아 있는데 말이죠. 이게 무슨 뜻일까요?</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">STEP 4</span><h3>패키지 목록 갱신</h3></div>
+      <div class="sbody">
+        <p>갓 설치한 리눅스는 "어떤 프로그램을 받을 수 있는지" 목록이 낡아 있습니다. 갱신합니다.</p>
+        <pre><span class="p">$</span> sudo apt update
+<span class="o">[sudo] password for namo:</span>   <span class="c">← STEP 2에서 만든 비밀번호. 안 보이는 게 정상</span>
+<span class="o">Hit:1 http://archive.ubuntu.com/ubuntu noble InRelease</span>
+<span class="o">...</span>
+<span class="o">All packages are up to date.</span>
+
+<span class="p">$</span> sudo apt upgrade -y</pre>
+        <p><code>sudo</code>는 "관리자 권한으로 실행"이라는 뜻입니다. Day 4에서 자세히 다룹니다. 지금은 "설치·변경에는 sudo가 붙는다" 정도로 넘어갑니다.</p>
+        <div class="box warn">
+          <span class="lbl">여기서 멈추거나 에러가 나면</span>
+          <p>학교 네트워크 문제일 수 있습니다. 혼자 재시도하지 말고 손을 드세요.</p>
+        </div>
+        <div class="box check">
+          <span class="lbl">PART 1 통과 조건</span>
+          <p><code>wsl --list --verbose</code>의 VERSION이 2 · <code>whoami</code>가 내 계정 출력 · <code>sudo apt update</code> 정상 완료</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PART 2 -->
+  <section>
+    <div class="part"><span class="pn">PART 2</span><h2>가상머신 — 두 번째 리눅스</h2><span class="pt">14:10–15:00</span></div>
+    <p class="lede">이번엔 화면 없는 서버입니다. 계정·방화벽·재부팅처럼 WSL2에서 못 해 보는 실험을 여기서 하고, 망가지면 스냅샷으로 되돌립니다.</p>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">STEP 1</span><h3>VirtualBox 설치</h3></div>
+      <div class="sbody">
+        <p>공유 폴더의 설치 파일을 실행하고 기본값으로 진행합니다. 중간에 네트워크가 잠깐 끊긴다는 경고가 나오는데 정상입니다.</p>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">STEP 2</span><h3>가상머신 만들기</h3></div>
+      <div class="sbody">
+        <p><strong>새로 만들기</strong>를 누르고 아래 값으로 설정합니다.</p>
+        <div class="tablewrap" style="margin-top:11px">
+          <table>
+            <thead><tr><th>항목</th><th>값</th><th>이유</th></tr></thead>
+            <tbody>
+              <tr><td>이름</td><td><code>ubuntu-server</code></td><td>영문으로. 한글 이름은 경로 문제를 일으킵니다</td></tr>
+              <tr><td>종류 / 버전</td><td>Linux / Ubuntu (64-bit)</td><td>64비트가 안 보이면 가상화가 꺼진 것입니다</td></tr>
+              <tr><td>메모리</td><td>4096 MB</td><td>내 PC RAM의 절반을 넘기지 마세요</td></tr>
+              <tr><td>프로세서</td><td>2 CPU</td><td>설정 → 시스템 → 프로세서에서</td></tr>
+              <tr><td>디스크</td><td>25 GB (동적 할당)</td><td>실제로는 쓴 만큼만 차지합니다</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">STEP 3</span><h3>ISO 넣고 부팅</h3></div>
+      <div class="sbody">
+        <ol>
+          <li>만든 VM 선택 → <strong>설정</strong> → <strong>저장소</strong>.</li>
+          <li>비어 있는 광학 드라이브를 클릭 → 오른쪽 디스크 아이콘 → 공유 폴더의 우분투 서버 ISO 선택.</li>
+          <li><strong>시작</strong>을 눌러 부팅.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">STEP 4</span><h3>우분투 서버 설치</h3></div>
+      <div class="sbody">
+        <p>파란 화면의 설치 마법사가 뜹니다. 마우스가 안 되는 게 정상입니다 — <kbd>Tab</kbd>과 화살표, <kbd>Enter</kbd>, <kbd>Space</kbd>로 움직입니다.</p>
+        <ol>
+          <li>언어 <strong>English</strong> — 에러 메시지를 검색하기 쉬워집니다.</li>
+          <li>키보드 배열, 설치 유형은 기본값.</li>
+          <li>네트워크 설정은 기본값(자동). 주소가 하나 잡히는지 눈으로 확인하세요.</li>
+          <li>프록시·미러는 비워 두거나 기본값.</li>
+          <li>저장소 설정: 디스크 전체 사용(기본값) → 확인 화면에서 <strong>Continue</strong>.</li>
+          <li>계정 만들기 — 이름, 서버 이름, 사용자명, 비밀번호. <strong>WSL2와 같은 사용자명</strong>을 쓰면 헷갈리지 않습니다.</li>
+          <li><strong style="color:var(--clay)">Install OpenSSH server 항목을 반드시 체크</strong> (<kbd>Space</kbd>로 선택).</li>
+          <li>추가 패키지는 아무것도 선택하지 않고 설치 시작.</li>
+        </ol>
+        <div class="box warn">
+          <span class="lbl">OpenSSH를 놓치면</span>
+          <p>Day 5의 원격 접속 실습을 할 수 없습니다. 지금 체크하는 편이 나중에 설치하는 것보다 훨씬 쉽습니다.</p>
+        </div>
+        <p style="margin-top:11px">설치에 10~20분 걸립니다. 그동안 <strong>PART 3의 미션 1~2를 WSL2 창에서 미리 해 보세요.</strong></p>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">STEP 5</span><h3>첫 로그인</h3></div>
+      <div class="sbody">
+        <p>설치가 끝나면 <strong>Reboot Now</strong>. "설치 매체를 제거하라"는 메시지가 나오면 그냥 <kbd>Enter</kbd>를 누릅니다.</p>
+        <pre><span class="o">ubuntu-server login:</span> <span class="p">namo</span>
+<span class="o">Password:</span>
+
+<span class="o">Welcome to Ubuntu ...</span>
+<span class="p">namo@ubuntu-server:~$</span></pre>
+        <div class="box q">
+          <span class="lbl">비교해 보기</span>
+          <p>WSL2 창과 이 VM 화면의 프롬프트를 나란히 놓고 보세요. 무엇이 같고 무엇이 다른가요?</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">STEP 6</span><h3>스냅샷 — 되돌릴 지점 만들기</h3></div>
+      <div class="sbody">
+        <p>VirtualBox 창 메뉴에서 <strong>머신 → 스냅샷 찍기</strong>를 선택하고 이름을 <code>clean-install</code>로 합니다.</p>
+        <p>이제 이 VM은 <strong>마음껏 망가뜨려도 됩니다.</strong> 앞으로 권한을 잘못 건드리거나 서비스를 못 살리게 되면 이 지점으로 되돌리면 됩니다. 실습에서 과감해지세요.</p>
+        <div class="box check">
+          <span class="lbl">PART 2 통과 조건</span>
+          <ul>
+            <li>VM에 로그인되어 프롬프트가 보인다</li>
+            <li><code>uname -a</code>가 출력된다</li>
+            <li>스냅샷 목록에 <code>clean-install</code>이 있다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PART 3 -->
+  <section>
+    <div class="part"><span class="pn">PART 3</span><h2>터미널 미션 10개</h2><span class="pt">15:10–17:10</span></div>
+    <p class="lede">여기부터는 <strong>WSL2 우분투 창</strong>에서 진행합니다. 각 미션 끝의 <em>확인 질문</em>에 스스로 답해 보고 넘어가세요. 답을 못 하면 다음 미션으로 가지 말고 한 번 더 해 봅니다.</p>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 01</span><h3>나는 지금 어디에 있는가</h3></div>
+      <p>터미널에서 길을 잃었을 때 가장 먼저 치는 명령입니다.</p>
+      <pre><span class="p">$</span> pwd
+<span class="o">/home/namo</span>
+
+<span class="p">$</span> ls
+<span class="c"># 아무것도 안 나옵니다. 빈 폴더니까요.</span>
+
+<span class="p">$</span> ls -al
+<span class="o">total 20</span>
+<span class="o">drwxr-x--- 2 namo namo 4096 Sep 14 09:12 .</span>
+<span class="o">drwxr-xr-x 3 root root 4096 Sep 14 09:10 ..</span>
+<span class="o">-rw-r--r-- 1 namo namo  220 Sep 14 09:10 .bash_logout</span>
+<span class="o">-rw-r--r-- 1 namo namo 3771 Sep 14 09:10 .bashrc</span>
+<span class="o">-rw-r--r-- 1 namo namo  807 Sep 14 09:10 .profile</span></pre>
+      <div class="box q">
+        <span class="lbl">확인 질문</span>
+        <ul>
+          <li><code>ls</code>는 아무것도 없다고 했는데 <code>ls -al</code>은 왜 여러 줄을 보여줄까요?</li>
+          <li>점(<code>.</code>)으로 시작하는 파일들의 공통점은 무엇일까요?</li>
+          <li><code>.</code>과 <code>..</code>는 각각 무엇을 가리킬까요?</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 02</span><h3>이동하기 — 절대경로와 상대경로</h3></div>
+      <p>각 명령을 치기 전에 <strong>어디로 갈지 먼저 예상하고</strong> 실행하세요.</p>
+      <pre><span class="p">$</span> cd /
+<span class="p">$</span> pwd
+<span class="o">/</span>
+
+<span class="p">$</span> ls
+<span class="o">bin  boot  dev  etc  home  lib  media  mnt  opt  proc  root  run</span>
+<span class="o">sbin  srv  sys  tmp  usr  var</span>
+
+<span class="p">$</span> cd home
+<span class="p">$</span> pwd
+<span class="o">/home</span>
+
+<span class="p">$</span> cd ..
+<span class="p">$</span> pwd
+<span class="o">/</span>
+
+<span class="p">$</span> cd            <span class="c"># 아무것도 안 붙이면 내 홈으로</span>
+<span class="p">$</span> pwd
+<span class="o">/home/namo</span>
+
+<span class="p">$</span> cd /etc
+<span class="p">$</span> cd -          <span class="c"># 직전 위치로 되돌아가기</span>
+<span class="o">/home/namo</span></pre>
+      <div class="box q">
+        <span class="lbl">확인 질문</span>
+        <ul>
+          <li><code>cd home</code>과 <code>cd /home</code>은 언제 다른 결과를 낼까요?</li>
+          <li><code>/</code>에서 <code>cd ..</code>를 치면 어디로 갈까요? 예상하고 해 보세요.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 03</span><h3>파일 읽기</h3></div>
+      <pre><span class="p">$</span> cat /etc/os-release
+<span class="o">PRETTY_NAME="Ubuntu 24.04 LTS"</span>
+<span class="o">NAME="Ubuntu"</span>
+<span class="o">VERSION_ID="24.04"</span>
+<span class="o">...</span>
+
+<span class="p">$</span> cat /etc/services     <span class="c"># 너무 길어서 화면이 넘어갑니다</span>
+
+<span class="p">$</span> less /etc/services    <span class="c"># 이럴 때 씁니다</span>
+<span class="c"># ↑↓ 로 이동, /문자 로 검색, n 으로 다음, q 로 종료</span></pre>
+      <div class="box warn">
+        <span class="lbl">중요</span>
+        <p><code>less</code>에서 빠져나오는 키는 <kbd>q</kbd>입니다. 이걸 모르면 창을 닫아야 합니다. 지금 한 번 연습하세요.</p>
+      </div>
+      <div class="box q">
+        <span class="lbl">확인 질문</span>
+        <p><code>/etc/os-release</code>를 읽으면 무엇을 알 수 있나요? 이 정보가 왜 중요할까요? (힌트: 오전에 배운 "버전 고정")</p>
+      </div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 04</span><h3>만들고 복사하고 옮기기</h3></div>
+      <pre><span class="p">$</span> cd ~
+<span class="p">$</span> mkdir -p practice/a/b/c
+<span class="p">$</span> ls practice
+<span class="o">a</span>
+
+<span class="p">$</span> cd practice
+<span class="p">$</span> echo "hello linux" > note.txt
+<span class="p">$</span> cat note.txt
+<span class="o">hello linux</span>
+
+<span class="p">$</span> cp note.txt note-copy.txt
+<span class="p">$</span> ls
+<span class="o">a  note-copy.txt  note.txt</span>
+
+<span class="p">$</span> mv note-copy.txt a/moved.txt
+<span class="p">$</span> ls a
+<span class="o">b  moved.txt</span>
+
+<span class="p">$</span> mv note.txt memo.txt     <span class="c"># 같은 자리에서 옮기면 = 이름 바꾸기</span>
+<span class="p">$</span> ls
+<span class="o">a  memo.txt</span></pre>
+      <div class="box q">
+        <span class="lbl">확인 질문</span>
+        <ul>
+          <li><code>mkdir -p a/b/c</code>에서 <code>-p</code>를 빼면 어떻게 될까요? 해 보세요.</li>
+          <li>"옮기기"와 "이름 바꾸기"가 왜 같은 명령일까요?</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 05</span><h3>지우기 — 가장 조심할 명령</h3></div>
+      <p>리눅스에는 <strong>휴지통이 없습니다.</strong> <code>rm</code>으로 지운 것은 돌아오지 않습니다.</p>
+      <pre><span class="p">$</span> cd ~/practice
+<span class="p">$</span> pwd                  <span class="c">← 지우기 전에 반드시 위치 확인</span>
+<span class="o">/home/namo/practice</span>
+
+<span class="p">$</span> ls                   <span class="c">← 무엇을 지우는지 눈으로 확인</span>
+<span class="o">a  memo.txt</span>
+
+<span class="p">$</span> rm memo.txt
+<span class="p">$</span> rm a                 <span class="c"># 디렉터리는 이렇게는 안 지워집니다</span>
+<span class="o">rm: cannot remove 'a': Is a directory</span>
+
+<span class="p">$</span> rm -r a              <span class="c"># -r 을 붙여야 폴더째로</span>
+<span class="p">$</span> ls
+<span class="c"># 비었습니다</span></pre>
+      <div class="box warn">
+        <span class="lbl">평생 지킬 세 가지</span>
+        <ul>
+          <li><code>rm -r</code> 치기 전에 <strong>반드시</strong> <code>pwd</code>와 <code>ls</code></li>
+          <li>경로 맨 앞의 <code>/</code> 하나 차이로 완전히 다른 곳을 지웁니다</li>
+          <li>서버에서 <code>sudo rm -rf</code>는 지금 수준에서 절대 치지 않습니다</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 06</span><h3>모르는 걸 스스로 찾기 — 오늘의 핵심</h3></div>
+      <p>앞으로 9일 동안 수십 개의 새 명령을 만납니다. 전부 외울 수는 없습니다. <strong>찾는 법</strong>을 익히는 게 오늘 가장 중요한 미션입니다.</p>
+      <p style="margin-top:9px"><strong>문제:</strong> <code>ls</code>로 파일 크기를 보면 <code>4096</code> 같은 숫자가 나옵니다. 이걸 <code>4.0K</code>처럼 사람이 읽기 쉽게 바꾸려면 어떤 옵션을 써야 할까요? 답을 검색하지 말고 아래 절차로 찾아내세요.</p>
+      <pre><span class="c"># 방법 1 — 도움말에서 걸러내기</span>
+<span class="p">$</span> ls --help | grep -i human
+<span class="o">  -h, --human-readable  with -l and -s, print sizes like 1K 234M 2G etc.</span>
+
+<span class="c"># 방법 2 — 설명서에서 검색</span>
+<span class="p">$</span> man ls
+<span class="c">#   /human   ← 슬래시 치고 검색어 입력 후 Enter</span>
+<span class="c">#   n        ← 다음 결과</span>
+<span class="c">#   q        ← 나가기</span>
+
+<span class="c"># 찾아낸 답을 적용</span>
+<span class="p">$</span> ls -alh /etc | head
+<span class="o">total 856K</span>
+<span class="o">drwxr-xr-x 96 root root  4.0K Sep 14 09:10 .</span>
+<span class="o">-rw-r--r--  1 root root  3.0K Mar 31  2024 adduser.conf</span>
+<span class="o">...</span></pre>
+      <div class="box check">
+        <span class="lbl">이 절차를 외우세요</span>
+        <p>모르는 명령을 만나면 → <code>명령 --help</code> → 그래도 모르면 <code>man 명령</code> → 그래도 모르면 손 들기. 검색은 그다음입니다.</p>
+      </div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 07</span><h3>타자를 줄이는 도구 — 이력과 탭</h3></div>
+      <pre><span class="p">$</span> history            <span class="c"># 지금까지 친 명령 전부</span>
+<span class="o">    1  pwd</span>
+<span class="o">    2  ls</span>
+<span class="o">    3  ls -al</span>
+<span class="o">  ...</span>
+
+<span class="p">$</span> !3                 <span class="c"># 3번 명령을 다시 실행</span>
+
+<span class="c"># Ctrl+R 을 누르고 ls 를 쳐 보세요 — 과거 명령을 거슬러 찾아줍니다</span>
+<span class="c"># ↑ ↓ 화살표로도 직전 명령들을 불러올 수 있습니다</span></pre>
+      <p style="margin-top:11px"><strong>탭 완성</strong>을 연습합니다. <code>cd /et</code>까지 치고 <kbd>Tab</kbd>을 눌러 보세요.</p>
+      <div class="box check">
+        <span class="lbl">탭은 오타 방지 도구가 아닙니다</span>
+        <p>탭을 눌렀는데 완성이 안 된다면 <strong>그 경로가 존재하지 않는다는 뜻</strong>입니다. 즉 탭은 "내가 친 경로가 맞는지 확인하는 도구"입니다. 이 감각을 오늘 붙여 두면 앞으로 9일이 편해집니다.</p>
+      </div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 08</span><h3>대소문자와 공백 — 윈도우와 다른 점</h3></div>
+      <pre><span class="p">$</span> cd ~
+<span class="p">$</span> mkdir Models models
+<span class="p">$</span> ls
+<span class="o">Models  models</span>       <span class="c">← 서로 다른 폴더입니다</span>
+
+<span class="p">$</span> rm -r Models models</pre>
+      <div class="box q">
+        <span class="lbl">확인 질문</span>
+        <p>윈도우에서 같은 이름의 폴더 두 개를 대소문자만 바꿔 만들 수 있나요? 이 차이가 나중에 어떤 문제를 일으킬까요?</p>
+      </div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 09</span><h3>내 컴퓨터 조사하기 — 과제 준비</h3></div>
+      <p>과제 01에서 쓸 명령들입니다. 각 명령이 <strong>무엇을 알려주는지</strong> 출력을 보며 파악하세요.</p>
+      <pre><span class="p">$</span> uname -a              <span class="c"># 커널</span>
+<span class="p">$</span> cat /etc/os-release   <span class="c"># 배포판과 버전</span>
+<span class="p">$</span> nproc                 <span class="c"># CPU 코어 수</span>
+<span class="p">$</span> free -h               <span class="c"># 메모리</span>
+<span class="p">$</span> df -h                 <span class="c"># 디스크 여유</span>
+<span class="p">$</span> whoami                <span class="c"># 내 계정</span></pre>
+      <div class="box q">
+        <span class="lbl">확인 질문</span>
+        <ul>
+          <li><code>free -h</code>와 <code>df -h</code> 둘 다 <code>-h</code>가 붙었습니다. 미션 6에서 찾아낸 그 옵션과 같은 뜻일까요?</li>
+          <li>CPU 모델명까지 알아내려면 어떤 명령을 써야 할까요? <strong>스스로 찾아보세요.</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 10</span><h3>10일간 쓸 작업공간 만들기</h3></div>
+      <p>오늘 만드는 이 폴더가 마지막 날 여러분의 LLM 서비스가 됩니다.</p>
+      <pre><span class="p">$</span> mkdir -p ~/ai-lab
+<span class="p">$</span> cd ~/ai-lab
+<span class="p">$</span> pwd
+<span class="o">/home/namo/ai-lab</span>
+
+<span class="p">$</span> ls -al
+<span class="o">total 8</span>
+<span class="o">drwxr-xr-x 2 namo namo 4096 Sep 14 16:55 .</span>
+<span class="o">drwxr-x--- 5 namo namo 4096 Sep 14 16:55 ..</span></pre>
+      <div class="box check">
+        <span class="lbl">오늘은 여기까지</span>
+        <p>하위 폴더 구조는 내일(Day 2) 설계합니다. 이 폴더를 지우지 마세요.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 오류 대응 -->
+  <section>
+    <div class="part"><span class="pn">부록 A</span><h2>이런 오류가 나면</h2></div>
+    <p class="lede">오늘 가장 많이 나오는 여섯 가지입니다. 여기 없는 오류는 손을 드세요.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>증상 · 메시지</th><th>원인</th><th>대응</th></tr></thead>
+        <tbody>
+          <tr><td>비밀번호가 안 쳐진다</td><td>정상 동작</td><td>화면에 표시만 안 될 뿐 입력되고 있습니다. 그냥 치고 <kbd>Enter</kbd></td></tr>
+          <tr><td><code>command not found</code></td><td>오타 또는 미설치</td><td>철자·대소문자 확인. 탭 완성으로 다시 쳐 보기</td></tr>
+          <tr><td><code>No such file or directory</code></td><td>경로가 틀림</td><td><code>pwd</code>로 위치 확인 후 <code>ls</code>로 이름 확인. 탭 완성 활용</td></tr>
+          <tr><td><code>Permission denied</code></td><td>권한 부족</td><td>설치·시스템 변경이면 앞에 <code>sudo</code>. 내 홈 안에서 났다면 손 들기</td></tr>
+          <tr><td><code>Is a directory</code></td><td>폴더에 파일용 명령 사용</td><td><code>rm</code>·<code>cp</code>에 <code>-r</code> 추가</td></tr>
+          <tr><td>화면에서 빠져나올 수 없다</td><td><code>less</code>·<code>man</code> 안에 있음</td><td><kbd>q</kbd>. 그래도 안 되면 <kbd>Ctrl</kbd>+<kbd>C</kbd></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 자가 점검 -->
+  <section>
+    <div class="part"><span class="pn">부록 B</span><h2>오늘 마치기 전 자가 점검</h2></div>
+    <p class="lede">전부 체크되면 오늘 목표를 달성한 것입니다. 안 되는 항목이 있으면 퇴실 전에 손을 드세요.</p>
+    <div class="selfcheck">
+      <h3>Day 1 체크리스트</h3>
+      <ul>
+        <li>WSL2 우분투에 로그인해 <code>whoami</code>가 내 계정을 출력한다</li>
+        <li><code>wsl --list --verbose</code>의 VERSION 열이 <strong>2</strong>다</li>
+        <li><code>sudo apt update</code>가 오류 없이 끝난다</li>
+        <li>VirtualBox의 우분투 서버에 로그인할 수 있다</li>
+        <li>VM 스냅샷 <code>clean-install</code>이 존재한다</li>
+        <li><code>pwd</code>로 내 위치를 확인하고 절대·상대 경로로 이동할 수 있다</li>
+        <li>파일을 만들고 복사·이동·삭제할 수 있고, <code>rm -r</code> 전에 확인하는 습관이 생겼다</li>
+        <li><code>less</code>와 <code>man</code>에서 <kbd>q</kbd>로 빠져나올 수 있다</li>
+        <li><code>--help</code>와 <code>man</code>으로 모르는 옵션을 스스로 찾아냈다</li>
+        <li>탭 완성과 <kbd>Ctrl</kbd>+<kbd>R</kbd>을 써 봤다</li>
+        <li><code>~/ai-lab</code> 폴더가 만들어져 있다</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 과제 -->
+  <section>
+    <div class="part"><span class="pn">과제 01</span><h2>내 실습 환경 스펙 조사서</h2><span class="pt">제출: 익일 09:00</span></div>
+    <p class="lede">아래 여섯 항목을 <strong>명령어로만</strong> 조사합니다. 윈도우 시스템 정보 화면이나 웹 검색으로 얻은 값은 인정하지 않습니다.</p>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">조사 항목</span><h3>각 항목마다 값과 사용한 명령을 함께 적을 것</h3></div>
+      <div class="sbody">
+        <ol>
+          <li>커널 버전</li>
+          <li>배포판 이름과 버전</li>
+          <li>CPU 모델명과 코어 수</li>
+          <li>메모리 총량</li>
+          <li>디스크 여유 공간</li>
+          <li>내 계정 이름</li>
+        </ol>
+        <span class="prelbl">제출 양식 예시</span>
+        <pre><span class="o">학번 / 이름 : 20261234 / 홍길동</span>
+<span class="o">조사 환경  : WSL2 Ubuntu</span>
+
+<span class="o">1. 커널 버전</span>
+<span class="o">   값   : 5.15.x-microsoft-standard-WSL2</span>
+<span class="o">   명령 : uname -r</span>
+
+<span class="o">2. 배포판</span>
+<span class="o">   값   : Ubuntu 24.04 LTS</span>
+<span class="o">   명령 : cat /etc/os-release</span>
+
+<span class="o">... (6번까지)</span></pre>
+        <div class="box check">
+          <span class="lbl">채점 기준</span>
+          <p>값의 정확성보다 <strong>스스로 찾아낸 흔적</strong>에 배점합니다. 수업에서 다루지 않은 명령을 <code>man</code>이나 <code>--help</code>로 찾아 쓴 항목이 있으면 가산점입니다. 3번의 CPU 모델명이 바로 그 항목입니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>Day 1 / 10 · 실습 가이드 · 리눅스 × LLM 서빙 70시간 과정</p>
+  </div>
+</footer>
 
