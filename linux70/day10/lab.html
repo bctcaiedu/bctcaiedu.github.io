@@ -1,0 +1,438 @@
+<title>Day 10 실습 가이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --bg:#F6F8F5;--surface:#FFFFFF;--surface-2:#EDF1EC;--ink:#141A16;--ink-2:#3A453E;--muted:#5F6D65;
+    --line:#DBE2DC;--line-strong:#C3CFC6;--accent:#10684A;--accent-soft:#E2EFE8;--clay:#A94D30;--clay-soft:#F6E7E0;
+    --ask:#1F5E86;--ask-soft:#E1EDF5;
+    --term-bg:#10171A;--term-fg:#DCE6E3;--term-dim:#7C9A93;--term-p:#7FD1A8;--term-out:#B8C7C2;
+    --maxw:940px;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+      --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+      --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+    --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+    --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:22px}
+  h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:600;letter-spacing:-.01em}
+  p{margin:0}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+  header.top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .masthead{display:flex;flex-direction:column;gap:16px;padding-block:46px 28px}
+  .rule-tag{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .rule-tag .dash{flex:1;height:1px;background:var(--line-strong);min-width:24px}
+  h1{font-size:clamp(26px,4.4vw,40px);line-height:1.2;font-weight:700;letter-spacing:-.03em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .standfirst{max-width:60ch;color:var(--ink-2);font-size:15.5px;font-weight:300;line-height:1.75}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-top:24px}
+  .rule{background:var(--surface);padding:15px 17px}
+  .rule .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--accent)}
+  .rule h3{font-size:14.5px;font-weight:600;margin-top:4px}
+  .rule p{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.55}
+
+  section{padding-block:44px}
+  .part{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-top:2px solid var(--accent);padding-top:14px;margin-bottom:8px}
+  .part .pn{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;color:var(--accent)}
+  .part h2{font-size:clamp(20px,3vw,26px);font-weight:700;letter-spacing:-.02em;flex:1 1 200px}
+  .part .pt{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .lede{color:var(--muted);font-size:14px;max-width:62ch;margin-bottom:22px}
+
+  .stepc{border:1px solid var(--line);border-radius:4px;background:var(--surface);margin-bottom:16px;overflow:hidden}
+  .shead{display:flex;align-items:baseline;gap:12px;padding:13px 18px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+  .shead .sn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .shead h3{font-size:15px;font-weight:600}
+  .sbody{padding:16px 18px}
+  .sbody > p{font-size:14px;color:var(--ink-2);line-height:1.7}
+  .sbody > p + p{margin-top:9px}
+  .sbody ol,.sbody ul{margin:9px 0 0;padding-left:19px}
+  .sbody li{font-size:14px;color:var(--ink-2);margin-top:5px;line-height:1.65}
+
+  pre{margin:11px 0 0;background:var(--term-bg);color:var(--term-fg);border-radius:3px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+  pre .c{color:var(--term-dim)}
+  pre .p{color:var(--term-p)}
+  pre .o{color:var(--term-out)}
+  .prelbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-top:13px;display:block}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:1px 4px;border-radius:2px}
+  kbd{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:3px;padding:1px 5px;background:var(--surface);color:var(--ink)}
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+
+  .box{margin-top:13px;border-radius:0 3px 3px 0;padding:11px 14px;display:flex;flex-direction:column;gap:5px}
+  .box.check{border-left:2px solid var(--accent);background:var(--accent-soft)}
+  .box.q{border-left:2px solid var(--ask);background:var(--ask-soft)}
+  .box.warn{border-left:2px solid var(--clay);background:var(--clay-soft)}
+  .box .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase}
+  .box.check .lbl{color:var(--accent)}
+  .box.q .lbl{color:var(--ask)}
+  .box.warn .lbl{color:var(--clay)}
+  .box p,.box li{font-size:13.5px;color:var(--ink-2);line-height:1.62}
+  .box ul{margin:0;padding-left:16px}
+  .box li{margin-top:3px}
+  .box code{background:rgba(0,0,0,.06)}
+
+  .mission{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;background:var(--surface);padding:16px 18px;margin-bottom:14px}
+  .mhead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .mhead .mn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .mhead h3{font-size:15px;font-weight:600;flex:1 1 180px}
+  .mission > p{font-size:14px;color:var(--ink-2);margin-top:7px;line-height:1.7}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;min-width:540px;font-size:13.5px}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--surface-2)}
+  tbody tr:last-child td{border-bottom:0}
+  td code{font-size:12px}
+
+  .selfcheck{border:1px solid var(--line-strong);border-radius:4px;background:var(--surface);overflow:hidden}
+  .selfcheck h3{padding:14px 18px;font-size:15px;background:var(--surface-2);border-bottom:1px solid var(--line-strong)}
+  .selfcheck ul{list-style:none;margin:0;padding:6px 18px 16px}
+  .selfcheck li{font-size:14px;color:var(--ink-2);padding:8px 0 8px 28px;border-bottom:1px solid var(--line);position:relative;line-height:1.6}
+  .selfcheck li:last-child{border-bottom:0}
+  .selfcheck li::before{content:"";position:absolute;left:0;top:13px;width:14px;height:14px;border:1.5px solid var(--line-strong);border-radius:2px}
+
+  footer{border-top:1px solid var(--line);background:var(--surface);padding-block:26px;margin-top:20px}
+  footer p{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+  @media (max-width:700px){
+    .sbody,.shead,.mission{padding-inline:14px}
+    .shead{gap:8px;flex-wrap:wrap}
+  }
+
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+</style>
+
+<header class="top">
+  <div class="wrap masthead">
+    <div class="rule-tag">
+      <span class="eyebrow">한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과</span>
+      <span class="dash"></span>
+      <span class="eyebrow">학생용 실습 가이드</span>
+    </div>
+    <h1>Day 10 · <em>통합 프로젝트</em></h1>
+    <p class="standfirst">오늘은 새 명령어를 배우지 않습니다. <strong>아흐레 동안 만든 것을 조립</strong>합니다. 배우지 않은 기술을 넣으면 오히려 감점입니다.</p>
+    <div class="rules">
+      <div class="rule"><div class="n">RULE 1</div><h3>깨끗한 환경에서 검증한다</h3><p>Day 1의 clean-install 스냅샷을 복원해 처음부터 돌려 보세요.</p></div>
+      <div class="rule"><div class="n">RULE 2</div><h3>하드코딩을 찾는다</h3><p>/home/ubuntu, 특정 IP, 내 계정명 — 전부 변수로 빼세요.</p></div>
+      <div class="rule"><div class="n">RULE 3</div><h3>문서 없는 코드는 미완성</h3><p>README가 없으면 채점하지 않습니다. 문서가 절반입니다.</p></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <div class="part"><span class="pn">PART 1</span><h2>구축</h2><span class="pt">09:00–12:00</span></div>
+    <p class="lede">요구사항 6개를 순서대로 구현합니다. 각 항목의 근거가 되는 일차를 함께 적어 두었습니다.</p>
+    
+    <div class="stepc">
+      <div class="shead"><span class="sn">REQ 1</span><h3>setup.sh — 한 번에 서는 설치</h3></div>
+      <div class="sbody">
+      <pre><span class="p">#!/usr/bin/env bash</span>
+set -euo pipefail
+
+<span class="c"># 설정 (하드코딩 금지)</span>
+SERVICE_USER="${SERVICE_USER:-llmsvc}"
+APP_DIR="${APP_DIR:-/opt/llmstack}"
+MODEL="${MODEL:-qwen2.5:0.5b}"
+
+log() { echo "[$(date +%T)] $*"; }
+
+<span class="c"># ① 패키지 (Day 5)</span>
+log "패키지 설치"
+sudo apt-get update -qq
+sudo apt-get install -y curl jq nginx
+
+<span class="c"># ② 계정·디렉터리 (Day 4) — 멱등하게</span>
+id "$SERVICE_USER" &amp;&gt;/dev/null || sudo useradd -r -s /usr/sbin/nologin "$SERVICE_USER"
+sudo mkdir -p "$APP_DIR"/{models,logs,scripts}
+sudo chown -R "$SERVICE_USER:$SERVICE_USER" "$APP_DIR"
+
+<span class="c"># ③ 설정 분리 (Day 7·9)</span>
+...
+<span class="c"># ⑥ 검증</span>
+log "검증 중..."
+curl -sf localhost/api/tags &gt;/dev/null &amp;&amp; log "✓ 설치 완료" || { log "✗ 실패"; exit 1; }</pre>
+      <div class="box check"><span class="lbl">멱등성 확인</span>
+        <p><code>./setup.sh</code>를 <strong>두 번 연속</strong> 실행하세요. 두 번째도 오류 없이 끝나야 합니다. <code>id ... || useradd</code> 패턴이 그 장치입니다.</p></div></div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">REQ 2</span><h3>상시 기동 — systemd 또는 compose</h3></div>
+      <div class="sbody">
+      <p>둘 중 <strong>하나만</strong> 고르세요. 둘 다 쓸 필요 없습니다.</p>
+      <div class="box check"><span class="lbl">검증 명령을 README에 적을 것</span>
+      <pre style="margin-top:8px"><span class="p">$</span> systemctl is-enabled 서비스명
+<span class="p">$</span> sudo reboot
+<span class="p">$</span> systemctl is-active 서비스명        <span class="c"># 재부팅 후</span>
+<span class="p">$</span> sudo pkill -f 프로세스 &amp;&amp; sleep 5
+<span class="p">$</span> systemctl is-active 서비스명        <span class="c"># 자동 복구</span></pre></div></div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">REQ 3</span><h3>프록시 뒤 노출</h3></div>
+      <div class="sbody">
+      <div class="box check"><span class="lbl">성공 조건은 두 줄입니다</span>
+      <pre style="margin-top:8px"><span class="p">$</span> curl -s localhost/api/tags | jq -r '.models[].name'   <span class="c"># 성공</span>
+<span class="p">$</span> curl -s --max-time 3 &lt;IP&gt;:11434/api/tags; echo $?     <span class="c"># 실패해야 정상</span></pre>
+      <p style="margin-top:8px">추론 서비스는 <code>127.0.0.1</code>에만 바인딩하고, 방화벽은 22·80만 엽니다 (Day 9).</p></div></div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">REQ 4</span><h3>권한 분리와 비밀값</h3></div>
+      <div class="sbody">
+      <pre><span class="p">$</span> systemctl show 서비스 -p User        <span class="c"># root 가 아니어야</span>
+<span class="p">$</span> ls -l /etc/llmstack/env               <span class="c"># 600 또는 640</span>
+<span class="p">$</span> grep -rn "TOKEN\|SECRET\|PASSWORD" ./ --include="*.sh" --include="*.yaml"
+<span class="c"># → 아무것도 안 나와야 합니다</span></pre></div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">REQ 5</span><h3>healthcheck.sh 와 예약</h3></div>
+      <div class="sbody">
+      <pre><span class="p">#!/usr/bin/env bash</span>
+set -uo pipefail          <span class="c"># 점검은 실패해도 계속 돌아야 하므로 -e 제외</span>
+LOG="${APP_DIR:-/opt/llmstack}/logs/health.log"
+ts() { date +'%F %T'; }
+
+msg=""
+curl -sf --max-time 5 localhost/api/tags &gt;/dev/null || msg+="API무응답 "
+systemctl is-active --quiet 서비스명 || msg+="서비스중지 "
+USE=$(df -h / | awk 'NR==2 {print $5+0}')
+[[ "$USE" -gt 80 ]] &amp;&amp; msg+="디스크${USE}% "
+
+if [[ -n "$msg" ]]; then
+    echo "$(ts) [경고] $msg" &gt;&gt; "$LOG"
+else
+    echo "$(ts) [정상]" &gt;&gt; "$LOG"
+fi</pre>
+      <div class="box warn"><span class="lbl">경고가 실제로 찍히는지 확인</span>
+        <p>서비스를 멈춘 뒤 점검을 돌려 <code>[경고]</code>가 남는지 보세요. "정상"만 찍히는 점검 스크립트는 아무 쓸모가 없습니다.</p></div></div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">REQ 6</span><h3>README 뼈대</h3></div>
+      <div class="sbody">
+      <pre># LLM 추론 스택
+
+## 1. 요구 사양
+- Ubuntu 24.04 LTS / RAM 8GB 이상 / 디스크 20GB 이상
+
+## 2. 구조
+사용자 → Nginx(80) → 추론 서비스(127.0.0.1:11434) → 모델
+
+## 3. 설치
+```
+git clone ... &amp;&amp; cd llmstack
+./setup.sh
+```
+
+## 4. 검증
+```
+curl -s localhost/api/tags | jq -r '.models[].name'
+systemctl is-active llmstack
+```
+
+## 5. 트러블슈팅
+### 5.1 502 Bad Gateway
+증상 / 확인 / 원인 / 조치
+
+### 5.2 ...
+### 5.3 ...</pre></div>
+    </div>
+    
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 2</span><h2>교차 재현</h2><span class="pt">13:00–15:00</span></div>
+    <p class="lede">옆 팀과 환경을 바꿉니다. 구두 설명 금지 — README만 보고 진행합니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 01</span><h3>깨끗한 환경 준비</h3></div>
+      
+      <p>VirtualBox에서 <strong>Day 1의 <code>clean-install</code> 스냅샷을 복원</strong>합니다.</p>
+      <pre><span class="c"># 머신 → 스냅샷 → clean-install 선택 → 복원</span>
+<span class="p">$</span> ls ~              <span class="c"># 비어 있어야 정상</span>
+<span class="p">$</span> which jq docker   <span class="c"># 없어야 정상</span></pre>
+      <div class="box check"><span class="lbl">열흘 전의 준비가 여기서</span>
+        <p>Day 1에 "마음껏 망가뜨려도 된다"고 한 이유가 이것입니다. 되돌릴 수 있는 지점이 있어야 검증이 가능합니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 02</span><h3>남의 문서만 보고 설치</h3></div>
+      
+      <div class="box warn"><span class="lbl">규칙</span>
+        <ul>
+          <li>상대 팀에게 <strong>질문하지 않습니다.</strong> 막히면 기록만 합니다</li>
+          <li>문서에 없는 명령은 치지 않습니다</li>
+          <li>막힌 시각과 증상을 그때그때 적습니다</li>
+        </ul></div>
+      <pre><span class="c"># 기록 양식</span>
+[14:12] setup.sh 실행 → jq: command not found
+        → 문서의 패키지 목록에 jq 누락
+[14:20] 서비스 기동 실패 → /home/ubuntu 경로 하드코딩
+        → 이 VM의 계정명이 달라서 실패</pre>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 03</span><h3>받은 피드백으로 고치기</h3></div>
+      
+      <p>옆 팀의 기록을 받아 돌아와서 고칩니다. 고친 뒤 <strong>다시 깨끗한 환경에서</strong> 검증합니다.</p>
+      <div class="box check"><span class="lbl">흔한 수정 사항</span>
+        <ul>
+          <li>패키지 목록 보강 — 내 환경에 원래 있던 것</li>
+          <li><code>/home/ubuntu</code> → <code>$HOME</code> 또는 변수</li>
+          <li>고정 IP → 변수 또는 자동 탐지</li>
+          <li>실행 순서 교정</li>
+          <li>사전 준비물을 README에 명시</li>
+        </ul></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 04</span><h3>최종 자가 점검 8단계</h3></div>
+      
+      <div class="selfcheck" style="margin-top:4px"><h3>제출 전 검증</h3><ul>
+        <li>깨끗한 환경에서 <code>setup.sh</code> 한 번으로 완료된다</li>
+        <li><code>setup.sh</code>를 두 번 실행해도 오류가 없다</li>
+        <li><code>curl localhost/api/...</code>가 응답한다</li>
+        <li>재부팅 후 자동 기동된다</li>
+        <li>추론 포트로 직접 접근하면 막힌다</li>
+        <li>프로세스를 죽이면 자동 복구된다</li>
+        <li>점검 스크립트가 경고를 실제로 찍는다</li>
+        <li>트러블슈팅 3건을 재현하고 복구할 수 있다</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 3</span><h2>시연 준비</h2><span class="pt">15:00–15:10</span></div>
+    
+    
+    <div class="stepc">
+      <div class="shead"><span class="sn">DEMO</span><h3>8분을 다섯 토막으로</h3></div>
+      <div class="sbody">
+      <div class="tablewrap" style="margin-top:8px"><table>
+        <thead><tr><th>시간</th><th>내용</th><th>준비물</th></tr></thead>
+        <tbody>
+          <tr><td class="num">1분</td><td>무엇을 만들었나</td><td>구조도 한 장</td></tr>
+          <tr><td class="num">2분</td><td>설치</td><td>터미널 (미리 돌려둔 로그도 가능)</td></tr>
+          <tr><td class="num">2분</td><td>동작</td><td>curl 호출</td></tr>
+          <tr><td class="num">2분</td><td>장애 복구</td><td>고장 낼 시나리오 1개</td></tr>
+          <tr><td class="num">1분</td><td>가장 어려웠던 점</td><td>—</td></tr>
+        </tbody>
+      </table></div>
+      <div class="box check"><span class="lbl">슬라이드보다 터미널</span>
+        <p>발표 자료를 만들지 마세요. 실제로 도는 화면이 가장 설득력 있습니다. 네 번째 항목에 가장 많은 점수가 걸려 있습니다.</p></div></div>
+    </div>
+    
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 A</span><h2>이런 오류가 나면</h2></div>
+    <p class="lede">오늘 가장 많이 나오는 것들입니다. 여기 없는 오류는 손을 드세요.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>증상 · 메시지</th><th>원인</th><th>대응</th></tr></thead>
+        <tbody>
+          <tr><td><code>setup.sh</code> 두 번째 실행에서 실패</td><td>멱등성 없음</td><td><code>id ... || useradd</code> 형태로 조건 추가</td></tr>
+          <tr><td>다른 계정에서 경로 오류</td><td><code>/home/ubuntu</code> 하드코딩</td><td><code>$HOME</code> 또는 변수로 치환</td></tr>
+          <tr><td>재부팅 후 서비스 없음</td><td><code>enable</code> 누락</td><td><code>setup.sh</code>에 <code>systemctl enable</code> 추가</td></tr>
+          <tr><td><code>502 Bad Gateway</code></td><td>백엔드 미기동 또는 주소 오류</td><td>Day 9 INCIDENT 5 절차대로</td></tr>
+          <tr><td>점검 스크립트가 항상 정상</td><td>조건식 오류</td><td>서비스를 멈추고 직접 확인</td></tr>
+          <tr><td>옆 팀 환경에서만 실패</td><td>문서 누락</td><td>그것이 바로 이 실습의 목적입니다 — 기록하고 고칩니다</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 B</span><h2>명령어 퀴즈</h2></div>
+    <p class="lede">미션을 마쳤으면 오늘 배운 것을 퀴즈로 점검합니다. 채점은 바로 나오고, 틀린 문제는 왜 틀렸는지 설명이 붙습니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">QUIZ</span><h3>Day 10 · 18문항</h3></div>
+      <div class="sbody">
+        <p>객관식과 직접 입력이 섞여 있습니다. 가이드를 다시 보지 말고 먼저 풀어 보고, 틀린 부분만 해당 미션으로 돌아가 확인하세요.</p>
+        <p style="margin-top:12px;font-size:16px"><a href="quiz.html">▶ 퀴즈 풀러 가기</a></p>
+        <div class="box check">
+          <span class="lbl">통과 기준</span>
+          <p>18문항 중 <strong>15문항 이상</strong>을 맞히면 오늘 분량을 소화한 것입니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 C</span><h2>오늘 마치기 전 자가 점검</h2></div>
+    <p class="lede">전부 체크되면 오늘 목표를 달성한 것입니다. 안 되는 항목이 있으면 퇴실 전에 손을 드세요.</p>
+    <div class="selfcheck">
+      <h3>Day 10 체크리스트</h3>
+      <ul>
+        <li>요구사항 6개를 모두 구현했다</li>
+        <li><code>setup.sh</code>를 두 번 실행해도 안전하다</li>
+        <li>하드코딩된 경로·IP·계정명이 없다</li>
+        <li>재부팅 후 자동 기동을 확인했다</li>
+        <li>추론 포트 직접 접근이 차단된다</li>
+        <li>비밀값이 코드와 분리돼 있다</li>
+        <li>점검 스크립트가 경고를 실제로 찍는다</li>
+        <li>README만 보고 옆 팀이 설치를 시도했다</li>
+        <li>교차 재현에서 나온 문제를 고쳤다</li>
+        <li>고친 뒤 깨끗한 환경에서 다시 검증했다</li>
+        <li>시연 5개 구간을 준비했다</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">과제 10</span><h2>최종 산출물 제출</h2><span class="pt">제출: 익일 09:00</span></div>
+    <p class="lede">코드와 문서를 함께 제출합니다. 문서가 없으면 코드는 채점되지 않습니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">제출 항목</span><h3>각 항목마다 값과 사용한 명령을 함께 적을 것</h3></div>
+      <div class="sbody">
+        <ol><li>setup.sh (한 번에 서는 설치)</li><li>서비스 정의 (unit 파일 또는 compose.yaml)</li><li>Nginx 설정과 방화벽 규칙</li><li>healthcheck.sh 와 예약 설정</li><li>README (사양·구조도·실행·검증·트러블슈팅 3건)</li><li>교차 재현 결과 보고 (어느 팀 환경에서, 무엇이 막혔고, 무엇을 고쳤는가)</li></ol>
+        <span class="prelbl">제출 양식 예시</span><pre><span class="o">6. 교차 재현 보고
+   대상 : B팀 VM (clean-install 스냅샷 복원 상태)
+   막힌 곳 ① : jq 미설치 → setup.sh 패키지 목록에 누락
+   막힌 곳 ② : /home/ubuntu 하드코딩 → $HOME 으로 수정
+   소요 : 최초 22분 → 수정 후 재시도 6분</span></pre>
+        <div class="box check"><span class="lbl">채점 기준</span><p>6번이 실질 배점의 가장 큰 항목입니다. <strong>문제가 하나도 없었다면 교차 재현을 제대로 하지 않은 것</strong>으로 봅니다.</p></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>Day 10 / 10 · 실습 가이드 · 리눅스 × LLM 서빙 70시간 과정</p>
+  </div>
+</footer>
+<script src="../nav.js"></script>

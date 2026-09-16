@@ -1,0 +1,529 @@
+<title>Day 9 실습 가이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --bg:#F6F8F5;--surface:#FFFFFF;--surface-2:#EDF1EC;--ink:#141A16;--ink-2:#3A453E;--muted:#5F6D65;
+    --line:#DBE2DC;--line-strong:#C3CFC6;--accent:#10684A;--accent-soft:#E2EFE8;--clay:#A94D30;--clay-soft:#F6E7E0;
+    --ask:#1F5E86;--ask-soft:#E1EDF5;
+    --term-bg:#10171A;--term-fg:#DCE6E3;--term-dim:#7C9A93;--term-p:#7FD1A8;--term-out:#B8C7C2;
+    --maxw:940px;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+      --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+      --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+    --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+    --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:22px}
+  h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:600;letter-spacing:-.01em}
+  p{margin:0}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+  header.top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .masthead{display:flex;flex-direction:column;gap:16px;padding-block:46px 28px}
+  .rule-tag{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .rule-tag .dash{flex:1;height:1px;background:var(--line-strong);min-width:24px}
+  h1{font-size:clamp(26px,4.4vw,40px);line-height:1.2;font-weight:700;letter-spacing:-.03em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .standfirst{max-width:60ch;color:var(--ink-2);font-size:15.5px;font-weight:300;line-height:1.75}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-top:24px}
+  .rule{background:var(--surface);padding:15px 17px}
+  .rule .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--accent)}
+  .rule h3{font-size:14.5px;font-weight:600;margin-top:4px}
+  .rule p{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.55}
+
+  section{padding-block:44px}
+  .part{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-top:2px solid var(--accent);padding-top:14px;margin-bottom:8px}
+  .part .pn{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;color:var(--accent)}
+  .part h2{font-size:clamp(20px,3vw,26px);font-weight:700;letter-spacing:-.02em;flex:1 1 200px}
+  .part .pt{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .lede{color:var(--muted);font-size:14px;max-width:62ch;margin-bottom:22px}
+
+  .stepc{border:1px solid var(--line);border-radius:4px;background:var(--surface);margin-bottom:16px;overflow:hidden}
+  .shead{display:flex;align-items:baseline;gap:12px;padding:13px 18px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+  .shead .sn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .shead h3{font-size:15px;font-weight:600}
+  .sbody{padding:16px 18px}
+  .sbody > p{font-size:14px;color:var(--ink-2);line-height:1.7}
+  .sbody > p + p{margin-top:9px}
+  .sbody ol,.sbody ul{margin:9px 0 0;padding-left:19px}
+  .sbody li{font-size:14px;color:var(--ink-2);margin-top:5px;line-height:1.65}
+
+  pre{margin:11px 0 0;background:var(--term-bg);color:var(--term-fg);border-radius:3px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+  pre .c{color:var(--term-dim)}
+  pre .p{color:var(--term-p)}
+  pre .o{color:var(--term-out)}
+  .prelbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-top:13px;display:block}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:1px 4px;border-radius:2px}
+  kbd{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:3px;padding:1px 5px;background:var(--surface);color:var(--ink)}
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+
+  .box{margin-top:13px;border-radius:0 3px 3px 0;padding:11px 14px;display:flex;flex-direction:column;gap:5px}
+  .box.check{border-left:2px solid var(--accent);background:var(--accent-soft)}
+  .box.q{border-left:2px solid var(--ask);background:var(--ask-soft)}
+  .box.warn{border-left:2px solid var(--clay);background:var(--clay-soft)}
+  .box .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase}
+  .box.check .lbl{color:var(--accent)}
+  .box.q .lbl{color:var(--ask)}
+  .box.warn .lbl{color:var(--clay)}
+  .box p,.box li{font-size:13.5px;color:var(--ink-2);line-height:1.62}
+  .box ul{margin:0;padding-left:16px}
+  .box li{margin-top:3px}
+  .box code{background:rgba(0,0,0,.06)}
+
+  .mission{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;background:var(--surface);padding:16px 18px;margin-bottom:14px}
+  .mhead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .mhead .mn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .mhead h3{font-size:15px;font-weight:600;flex:1 1 180px}
+  .mission > p{font-size:14px;color:var(--ink-2);margin-top:7px;line-height:1.7}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;min-width:540px;font-size:13.5px}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--surface-2)}
+  tbody tr:last-child td{border-bottom:0}
+  td code{font-size:12px}
+
+  .selfcheck{border:1px solid var(--line-strong);border-radius:4px;background:var(--surface);overflow:hidden}
+  .selfcheck h3{padding:14px 18px;font-size:15px;background:var(--surface-2);border-bottom:1px solid var(--line-strong)}
+  .selfcheck ul{list-style:none;margin:0;padding:6px 18px 16px}
+  .selfcheck li{font-size:14px;color:var(--ink-2);padding:8px 0 8px 28px;border-bottom:1px solid var(--line);position:relative;line-height:1.6}
+  .selfcheck li:last-child{border-bottom:0}
+  .selfcheck li::before{content:"";position:absolute;left:0;top:13px;width:14px;height:14px;border:1.5px solid var(--line-strong);border-radius:2px}
+
+  footer{border-top:1px solid var(--line);background:var(--surface);padding-block:26px;margin-top:20px}
+  footer p{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+  @media (max-width:700px){
+    .sbody,.shead,.mission{padding-inline:14px}
+    .shead{gap:8px;flex-wrap:wrap}
+  }
+
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+</style>
+
+<header class="top">
+  <div class="wrap masthead">
+    <div class="rule-tag">
+      <span class="eyebrow">한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과</span>
+      <span class="dash"></span>
+      <span class="eyebrow">학생용 실습 가이드</span>
+    </div>
+    <h1>Day 9 · <em>운영 · 보안 · 장애</em></h1>
+    <p class="standfirst">오전 실습은 <strong>WSL2</strong>, 프록시와 방화벽 실습은 <strong>VM</strong>에서 합니다. 방화벽은 잘못 켜면 스스로 잠기므로 VM에서 하는 것입니다.</p>
+    <div class="rules">
+      <div class="rule"><div class="n">RULE 1</div><h3>추측하지 말고 관측한다</h3><p>"아마 이것 때문일 것"으로 시작하면 두 배로 돌아갑니다. 명령으로 확인하세요.</p></div>
+      <div class="rule"><div class="n">RULE 2</div><h3>한 번에 하나만 바꾼다</h3><p>두 개를 동시에 고치면 무엇이 효과가 있었는지 모릅니다.</p></div>
+      <div class="rule"><div class="n">RULE 3</div><h3>ufw는 SSH부터 허용</h3><p>원격 서버에서 이 순서를 틀리면 다시 들어갈 수 없습니다.</p></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <div class="part"><span class="pn">PART 1</span><h2>자원 관측</h2><span class="pt">13:00–13:50</span></div>
+    
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 01</span><h3>디스크를 좁혀 들어가기</h3></div>
+      
+      <pre><span class="p">$</span> df -h
+<span class="p">$</span> df -i                                  <span class="c"># inode</span>
+<span class="p">$</span> du -sh /* 2&gt;/dev/null | sort -h | tail -5
+<span class="p">$</span> du -sh ~/* | sort -h | tail -5
+<span class="p">$</span> du -sh ~/.ollama/models 2&gt;/dev/null
+<span class="p">$</span> docker system df
+<span class="p">$</span> journalctl --disk-usage
+<span class="p">$</span> find / -size +500M -type f 2&gt;/dev/null | head</pre>
+      <div class="box check"><span class="lbl">좁혀 들어가는 순서</span>
+        <p>전체(<code>df</code>) → 최상위 디렉터리(<code>du /*</code>) → 의심 지점(<code>du 상세</code>). 한 번에 <code>du -sh /</code>를 치면 몇 분씩 걸립니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 02</span><h3>free 출력 제대로 읽기</h3></div>
+      
+      <pre><span class="p">$</span> free -h
+<span class="p">$</span> cat /proc/meminfo | head -5
+
+<span class="c"># 캐시를 채워 보기</span>
+<span class="p">$</span> cat /dev/zero | head -c 2G &gt; /tmp/big.bin
+<span class="p">$</span> free -h                                 <span class="c">← buff/cache 증가</span>
+<span class="p">$</span> rm /tmp/big.bin
+
+<span class="c"># OOM 기록 확인</span>
+<span class="p">$</span> dmesg -T 2&gt;/dev/null | grep -i "killed process" | tail -3
+<span class="p">$</span> journalctl -k 2&gt;/dev/null | grep -i oom | tail -3</pre>
+      <div class="box q"><span class="lbl">확인 질문</span><p><code>free</code>는 작은데 <code>available</code>은 큽니다. 이 서버는 메모리가 부족한 상태일까요?</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 03</span><h3>병목 판별 연습</h3></div>
+      
+      <pre><span class="p">$</span> nproc &amp;&amp; uptime
+
+<span class="c"># CPU 부하를 만들어 보기</span>
+<span class="p">$</span> for i in $(seq 1 $(nproc)); do (while :; do :; done) &amp; done
+<span class="p">$</span> sleep 20 &amp;&amp; uptime
+<span class="p">$</span> vmstat 1 3
+<span class="p">$</span> jobs -p | xargs kill
+
+<span class="c"># 디스크 부하</span>
+<span class="p">$</span> sudo apt install -y sysstat
+<span class="p">$</span> (dd if=/dev/zero of=/tmp/io.bin bs=1M count=2000 oflag=direct &amp;) ; iostat -x 1 3
+<span class="p">$</span> rm -f /tmp/io.bin</pre>
+      <div class="box check"><span class="lbl">구분 포인트</span>
+        <p>CPU 부하에서는 <code>vmstat</code>의 <code>r</code>이 커지고, 디스크 부하에서는 <code>wa</code>와 <code>%util</code>이 커집니다. 증상이 다릅니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 2</span><h2>프록시와 방화벽 (VM)</h2><span class="pt">13:50–15:00</span></div>
+    <p class="lede">여기부터는 VM에서 진행합니다. 방화벽 실습이 포함되기 때문입니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 04</span><h3>VM에 추론 서비스 준비</h3></div>
+      
+      <pre><span class="p">$</span> ssh gpu                                <span class="c"># Day 5의 별칭</span>
+<span class="p">$</span> curl -fsSL https://ollama.com/install.sh | sh
+<span class="p">$</span> ollama pull qwen2.5:0.5b
+<span class="p">$</span> ss -tlnp | grep 11434
+<span class="p">$</span> curl -s localhost:11434/api/tags | jq -r '.models[].name'</pre>
+      <div class="box warn"><span class="lbl">사양이 부족하면</span>
+        <p>VM 메모리가 4GB라면 0.5b 모델도 느립니다. 프록시 실습이 목적이므로, 모델 대신 <code>python3 -m http.server 11434</code>로 대체해도 됩니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 05</span><h3>Nginx 리버스 프록시</h3></div>
+      
+      <pre><span class="p">$</span> sudo apt install -y nginx
+<span class="p">$</span> sudo tee /etc/nginx/sites-available/llm &gt; /dev/null &lt;&lt;'EOF'
+server {
+    listen 80;
+    server_name _;
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:11434/api/;
+        proxy_set_header Host $host;
+        proxy_buffering off;
+        proxy_read_timeout 300s;
+    }
+
+    location / {
+        return 200 "LLM gateway\n";
+        add_header Content-Type text/plain;
+    }
+}
+EOF
+<span class="p">$</span> sudo ln -sf /etc/nginx/sites-available/llm /etc/nginx/sites-enabled/llm
+<span class="p">$</span> sudo rm -f /etc/nginx/sites-enabled/default
+<span class="p">$</span> sudo nginx -t
+<span class="p">$</span> sudo systemctl reload nginx
+
+<span class="p">$</span> curl -s localhost/
+<span class="p">$</span> curl -s localhost/api/tags | jq -r '.models[].name'</pre>
+      <div class="box check"><span class="lbl">nginx -t 를 습관으로</span>
+        <p>설정을 고친 뒤 <code>reload</code> 전에 항상 <code>nginx -t</code>로 문법을 검사하세요. 틀린 설정으로 reload하면 서비스가 죽습니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 06</span><h3>스트리밍 버퍼링 함정 확인</h3></div>
+      
+      <pre><span class="c"># 버퍼링을 켜 보기</span>
+<span class="p">$</span> sudo sed -i 's/proxy_buffering off;/proxy_buffering on;/' \
+     /etc/nginx/sites-available/llm
+<span class="p">$</span> sudo nginx -t &amp;&amp; sudo systemctl reload nginx
+<span class="p">$</span> time curl -sN localhost/api/generate -d '{"model":"qwen2.5:0.5b","prompt":"1부터 20까지 세어줘"}' | head -3
+
+<span class="c"># 다시 끄고 비교</span>
+<span class="p">$</span> sudo sed -i 's/proxy_buffering on;/proxy_buffering off;/' \
+     /etc/nginx/sites-available/llm
+<span class="p">$</span> sudo nginx -t &amp;&amp; sudo systemctl reload nginx
+<span class="p">$</span> time curl -sN localhost/api/generate -d '{"model":"qwen2.5:0.5b","prompt":"1부터 20까지 세어줘"}' | head -3</pre>
+      <div class="box check"><span class="lbl">차이가 보이나요</span>
+        <p>버퍼링을 켜면 첫 글자가 나오기까지 오래 걸립니다. LLM 서비스에서 사용자가 "멈춘 것 같다"고 느끼는 원인입니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 07</span><h3>방화벽 — 순서를 지켜서</h3></div>
+      
+      <pre><span class="p">$</span> sudo ufw status
+<span class="p">$</span> sudo ufw default deny incoming
+<span class="p">$</span> sudo ufw default allow outgoing
+<span class="p">$</span> sudo ufw allow 22/tcp        <span class="c">← 반드시 먼저!</span>
+<span class="p">$</span> sudo ufw allow 80/tcp
+<span class="p">$</span> sudo ufw enable
+<span class="p">$</span> sudo ufw status verbose
+
+<span class="c"># 11434는 열지 않았습니다 — 밖에서 직접 접근 불가</span>
+<span class="c"># WSL2에서:</span>
+<span class="p">$</span> curl -s --max-time 5 http://&lt;VM_IP&gt;/api/tags | jq -r '.models[].name'
+<span class="p">$</span> curl -s --max-time 5 http://&lt;VM_IP&gt;:11434/api/tags; echo "종료 $?"</pre>
+      <div class="box check"><span class="lbl">오늘 보안의 핵심</span>
+        <p>서비스는 <code>127.0.0.1</code>에만 묶고, 밖에는 프록시 포트만 엽니다. 추론 API가 직접 노출되지 않습니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 3</span><h2>SSH 하드닝과 비밀값</h2><span class="pt">15:00–15:30</span></div>
+    
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 08</span><h3>SSH 잠그기</h3></div>
+      
+      <pre><span class="p">$</span> sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+<span class="p">$</span> sudo tee /etc/ssh/sshd_config.d/99-hardening.conf &gt; /dev/null &lt;&lt;'EOF'
+PasswordAuthentication no
+PermitRootLogin no
+MaxAuthTries 3
+EOF
+<span class="p">$</span> sudo sshd -t                        <span class="c"># 문법 검사</span>
+<span class="p">$</span> sudo systemctl reload ssh
+
+<span class="c"># 반드시 새 터미널에서 접속을 확인하고 기존 창은 유지!</span>
+<span class="p">$</span> ssh gpu "echo 접속 성공"</pre>
+      <div class="box warn"><span class="lbl">절대 지켜야 할 순서</span>
+        <p>SSH 설정을 바꾼 뒤 <strong>기존 접속 창을 닫지 말고</strong> 새 창으로 접속을 확인하세요. 잘못 설정하면 다시 못 들어갑니다. Day 5에서 키 인증을 해 뒀기 때문에 안전합니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 09</span><h3>비밀값 분리와 점검</h3></div>
+      
+      <pre><span class="p">$</span> cd ~/ai-lab
+<span class="p">$</span> cat &gt; .env &lt;&lt;'EOF'
+OLLAMA_HOST=http://127.0.0.1:11434
+API_TOKEN=dev-only-not-a-real-secret
+EOF
+<span class="p">$</span> chmod 600 .env
+<span class="p">$</span> ls -l .env
+
+<span class="p">$</span> cat &gt; .gitignore &lt;&lt;'EOF'
+.env
+logs/
+models/
+envs/
+EOF
+
+<span class="c"># 내 코드에 비밀값이 박혀 있지 않은지 점검</span>
+<span class="p">$</span> grep -rn "API_KEY\|TOKEN\|PASSWORD\|SECRET" ~/ai-lab \
+     --include="*.sh" --include="*.py" --include="*.yaml" 2&gt;/dev/null
+
+<span class="c"># 스크립트에서 불러 쓰기</span>
+<span class="p">$</span> set -a; source .env; set +a; echo "$OLLAMA_HOST"</pre>
+      <div class="box check"><span class="lbl">Day 10 프로젝트 요구사항</span>
+        <p>"비밀값이 코드나 unit 파일 본문에 없을 것"이 내일 프로젝트의 채점 항목입니다. 지금 구조를 그대로 쓰세요.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 4</span><h2>FAULT LAB · 장애 5건</h2><span class="pt">15:40–17:10</span></div>
+    <p class="lede">각 사건마다 <strong>증상 · 확인 명령 · 원인 · 조치 · 재발 방지</strong>를 기록하세요. 그것이 과제입니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 10</span><h3>INCIDENT 1 — 서비스가 뜨지 않는다</h3></div>
+      
+      <p><strong>상황 만들기</strong> (WSL2)</p>
+      <pre><span class="p">$</span> python3 -m http.server 11434 &gt;/dev/null 2&gt;&amp;1 &amp;
+<span class="p">$</span> sudo systemctl restart myllm
+<span class="p">$</span> systemctl is-active myllm</pre>
+      <div class="box q"><span class="lbl">복구해 보세요</span>
+        <p>어떤 명령으로 원인을 찾을 수 있을까요? 힌트는 Day 7에서 배운 두 단계입니다.</p></div>
+      <details style="margin-top:12px"><summary style="cursor:pointer;font-size:13.5px;color:var(--muted)">막혔을 때만 열기</summary>
+      <pre style="margin-top:8px"><span class="p">$</span> systemctl status myllm --no-pager
+<span class="p">$</span> journalctl -u myllm -n 20 --no-pager | grep -i "address\|bind"
+<span class="p">$</span> ss -tlnp | grep 11434
+<span class="p">$</span> kill %1
+<span class="p">$</span> sudo systemctl restart myllm &amp;&amp; systemctl is-active myllm</pre></details>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 11</span><h3>INCIDENT 2 — 디스크가 가득 찼다</h3></div>
+      
+      <pre><span class="p">$</span> df -h ~ | tail -1
+<span class="p">$</span> mkdir -p ~/ai-lab/logs/flood
+<span class="p">$</span> for i in $(seq 1 20); do
+    head -c 200M /dev/zero &gt; ~/ai-lab/logs/flood/junk$i.log
+  done 2&gt;/dev/null
+<span class="p">$</span> df -h ~ | tail -1
+<span class="p">$</span> echo "테스트" &gt; ~/ai-lab/logs/newfile.txt</pre>
+      <div class="box q"><span class="lbl">복구해 보세요</span>
+        <p>무엇이 먹고 있는지 어떻게 좁혀 들어갈까요? Day 2의 <code>du | sort</code>와 Day 3의 <code>find</code>를 떠올리세요.</p></div>
+      <details style="margin-top:12px"><summary style="cursor:pointer;font-size:13.5px;color:var(--muted)">막혔을 때만 열기</summary>
+      <pre style="margin-top:8px"><span class="p">$</span> du -sh ~/* | sort -h | tail -3
+<span class="p">$</span> du -sh ~/ai-lab/* | sort -h | tail -3
+<span class="p">$</span> find ~/ai-lab -size +100M -type f | head
+<span class="p">$</span> rm -rf ~/ai-lab/logs/flood
+<span class="p">$</span> df -h ~ | tail -1</pre></details>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 12</span><h3>INCIDENT 3 — Permission denied</h3></div>
+      
+      <pre><span class="p">$</span> sudo chmod 700 /var/lib/myllm/models
+<span class="p">$</span> sudo chown root:root /var/lib/myllm/models
+<span class="p">$</span> sudo systemctl restart myllm
+<span class="p">$</span> sleep 3 &amp;&amp; curl -s --max-time 5 localhost:11434/api/tags; echo "종료 $?"</pre>
+      <div class="box q"><span class="lbl">복구해 보세요</span>
+        <p>서비스는 어떤 계정으로 돌고 있나요? 그 계정이 이 디렉터리에 들어갈 수 있나요? Day 4의 "디렉터리의 x"를 떠올리세요.</p></div>
+      <details style="margin-top:12px"><summary style="cursor:pointer;font-size:13.5px;color:var(--muted)">막혔을 때만 열기</summary>
+      <pre style="margin-top:8px"><span class="p">$</span> journalctl -u myllm -n 20 --no-pager | grep -i "permission\|denied"
+<span class="p">$</span> systemctl show myllm -p User
+<span class="p">$</span> ls -ld /var/lib/myllm/models
+<span class="p">$</span> sudo chown -R ollama:ollama /var/lib/myllm
+<span class="p">$</span> sudo chmod 755 /var/lib/myllm/models
+<span class="p">$</span> sudo systemctl restart myllm</pre></details>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 13</span><h3>INCIDENT 4 — unit 파일 오타</h3></div>
+      
+      <pre><span class="p">$</span> sudo sed -i 's/^Restart=always/Restart=alway/' \
+     /etc/systemd/system/myllm.service
+<span class="p">$</span> sudo systemctl daemon-reload
+<span class="p">$</span> sudo systemctl restart myllm</pre>
+      <div class="box q"><span class="lbl">복구해 보세요</span>
+        <p>이번에는 <code>systemctl status</code>보다 <code>daemon-reload</code> 출력과 <code>journalctl</code>에 힌트가 있습니다.</p></div>
+      <details style="margin-top:12px"><summary style="cursor:pointer;font-size:13.5px;color:var(--muted)">막혔을 때만 열기</summary>
+      <pre style="margin-top:8px"><span class="p">$</span> journalctl -u myllm -n 20 --no-pager
+<span class="p">$</span> systemd-analyze verify /etc/systemd/system/myllm.service
+<span class="p">$</span> sudo sed -i 's/^Restart=alway$/Restart=always/' \
+     /etc/systemd/system/myllm.service
+<span class="p">$</span> sudo systemctl daemon-reload &amp;&amp; sudo systemctl restart myllm</pre></details>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 14</span><h3>INCIDENT 5 — 프록시가 502</h3></div>
+      
+      <p>VM에서 진행합니다.</p>
+      <pre><span class="p">$</span> ssh gpu
+<span class="p">$</span> sudo sed -i 's|proxy_pass http://127.0.0.1:11434/api/;|proxy_pass http://127.0.0.1:11999/api/;|' \
+     /etc/nginx/sites-available/llm
+<span class="p">$</span> sudo nginx -t &amp;&amp; sudo systemctl reload nginx
+<span class="p">$</span> curl -s -o /dev/null -w "%{http_code}\n" localhost/api/tags</pre>
+      <div class="box q"><span class="lbl">복구해 보세요</span>
+        <p>502는 "프록시가 백엔드에 연결하지 못했다"는 뜻입니다. 백엔드가 죽은 걸까요, 주소가 틀린 걸까요? 어떻게 구분할까요?</p></div>
+      <details style="margin-top:12px"><summary style="cursor:pointer;font-size:13.5px;color:var(--muted)">막혔을 때만 열기</summary>
+      <pre style="margin-top:8px"><span class="p">$</span> sudo tail -5 /var/log/nginx/error.log
+<span class="p">$</span> ss -tlnp | grep -E "11434|11999"
+<span class="p">$</span> curl -s localhost:11434/api/tags &gt;/dev/null &amp;&amp; echo "백엔드는 살아 있음"
+<span class="p">$</span> grep proxy_pass /etc/nginx/sites-available/llm
+<span class="p">$</span> sudo sed -i 's|:11999|:11434|' /etc/nginx/sites-available/llm
+<span class="p">$</span> sudo nginx -t &amp;&amp; sudo systemctl reload nginx
+<span class="p">$</span> curl -s -o /dev/null -w "%{http_code}\n" localhost/api/tags</pre></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 A</span><h2>이런 오류가 나면</h2></div>
+    <p class="lede">오늘 가장 많이 나오는 것들입니다. 여기 없는 오류는 손을 드세요.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>증상 · 메시지</th><th>원인</th><th>대응</th></tr></thead>
+        <tbody>
+          <tr><td><code>No space left</code> (용량은 남음)</td><td>inode 고갈</td><td><code>df -i</code>로 확인, 작은 파일 대량 삭제</td></tr>
+          <tr><td><code>bind: address already in use</code></td><td>포트 중복</td><td><code>ss -tlnp | grep 포트</code>로 점유자 확인</td></tr>
+          <tr><td>nginx <code>502 Bad Gateway</code></td><td>백엔드 연결 실패</td><td><code>/var/log/nginx/error.log</code> → 백엔드 생존 확인</td></tr>
+          <tr><td>ufw 켠 뒤 SSH 접속 불가</td><td>22번 미허용</td><td>VM 콘솔로 직접 들어가 <code>sudo ufw allow 22/tcp</code></td></tr>
+          <tr><td>스트리밍이 한 번에 나온다</td><td>proxy_buffering on</td><td><code>proxy_buffering off</code>로 변경</td></tr>
+          <tr><td><code>nginx -t</code> 실패</td><td>설정 문법 오류</td><td>메시지의 줄 번호를 보고 수정 후 재검사</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 B</span><h2>명령어 퀴즈</h2></div>
+    <p class="lede">미션을 마쳤으면 오늘 배운 것을 퀴즈로 점검합니다. 채점은 바로 나오고, 틀린 문제는 왜 틀렸는지 설명이 붙습니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">QUIZ</span><h3>Day 9 · 18문항</h3></div>
+      <div class="sbody">
+        <p>객관식과 직접 입력이 섞여 있습니다. 가이드를 다시 보지 말고 먼저 풀어 보고, 틀린 부분만 해당 미션으로 돌아가 확인하세요.</p>
+        <p style="margin-top:12px;font-size:16px"><a href="quiz.html">▶ 퀴즈 풀러 가기</a></p>
+        <div class="box check">
+          <span class="lbl">통과 기준</span>
+          <p>18문항 중 <strong>15문항 이상</strong>을 맞히면 오늘 분량을 소화한 것입니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 C</span><h2>오늘 마치기 전 자가 점검</h2></div>
+    <p class="lede">전부 체크되면 오늘 목표를 달성한 것입니다. 안 되는 항목이 있으면 퇴실 전에 손을 드세요.</p>
+    <div class="selfcheck">
+      <h3>Day 9 체크리스트</h3>
+      <ul>
+        <li><code>df -h</code>와 <code>df -i</code>의 차이를 안다</li>
+        <li>디스크를 <code>df</code> → <code>du /*</code> → 상세 순으로 좁혀 들어갔다</li>
+        <li><code>free</code>에서 봐야 할 값이 <code>available</code>임을 안다</li>
+        <li><code>vmstat</code>으로 CPU 병목과 I/O 병목을 구분했다</li>
+        <li>Nginx 리버스 프록시로 API가 80번을 통해 접근된다</li>
+        <li><code>proxy_buffering</code> 차이를 직접 측정했다</li>
+        <li>ufw로 22·80만 열고 11434는 막았다</li>
+        <li>SSH 비밀번호 인증을 끄고 키로만 접속된다</li>
+        <li><code>.env</code>가 600이고 <code>.gitignore</code>에 등록돼 있다</li>
+        <li>장애 5건을 모두 복구했다</li>
+        <li>5건의 RCA 기록을 남겼다</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">과제 09</span><h2>장애 5건 원인 분석(RCA) 보고서</h2><span class="pt">제출: 익일 09:00</span></div>
+    <p class="lede">복구한 것으로 끝이 아닙니다. 다음에 같은 일이 없게 만드는 것까지가 일입니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">제출 항목</span><h3>각 항목마다 값과 사용한 명령을 함께 적을 것</h3></div>
+      <div class="sbody">
+        <ol><li>사건별 증상 (정확한 명령과 메시지)</li><li>확인에 사용한 명령과 그 출력</li><li>판단한 원인</li><li>취한 조치</li><li>재발 방지책</li><li>가장 오래 걸린 사건과 그 이유 (회고)</li></ol>
+        <span class="prelbl">제출 양식 예시</span><pre><span class="o">INCIDENT 1
+증상 : sudo systemctl start myllm 후 status 가 failed
+       journalctl 에 "bind: address already in use"
+확인 : ss -tlnp | grep 11434  →  PID 4821 (docker-proxy)
+원인 : Day 8 compose 스택이 같은 포트를 점유
+조치 : docker compose down 후 서비스 재시작
+방지 : 포트를 11435로 변경하거나 compose 를 stop 하는 절차를 README 에 명시</span></pre>
+        <div class="box check"><span class="lbl">채점 기준</span><p>6번이 가장 중요합니다. <strong>어디서 헤맸는지, 왜 그 방향으로 갔는지</strong>를 솔직하게 적으십시오. 잘못 짚은 가설도 기록 가치가 있습니다.</p></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>Day 9 / 10 · 실습 가이드 · 리눅스 × LLM 서빙 70시간 과정</p>
+  </div>
+</footer>
+<script src="../nav.js"></script>

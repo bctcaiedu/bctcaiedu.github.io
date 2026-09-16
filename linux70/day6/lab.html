@@ -1,0 +1,549 @@
+<title>Day 6 실습 가이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --bg:#F6F8F5;--surface:#FFFFFF;--surface-2:#EDF1EC;--ink:#141A16;--ink-2:#3A453E;--muted:#5F6D65;
+    --line:#DBE2DC;--line-strong:#C3CFC6;--accent:#10684A;--accent-soft:#E2EFE8;--clay:#A94D30;--clay-soft:#F6E7E0;
+    --ask:#1F5E86;--ask-soft:#E1EDF5;
+    --term-bg:#10171A;--term-fg:#DCE6E3;--term-dim:#7C9A93;--term-p:#7FD1A8;--term-out:#B8C7C2;
+    --maxw:940px;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+      --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+      --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+    --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+    --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:22px}
+  h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:600;letter-spacing:-.01em}
+  p{margin:0}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+  header.top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .masthead{display:flex;flex-direction:column;gap:16px;padding-block:46px 28px}
+  .rule-tag{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .rule-tag .dash{flex:1;height:1px;background:var(--line-strong);min-width:24px}
+  h1{font-size:clamp(26px,4.4vw,40px);line-height:1.2;font-weight:700;letter-spacing:-.03em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .standfirst{max-width:60ch;color:var(--ink-2);font-size:15.5px;font-weight:300;line-height:1.75}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-top:24px}
+  .rule{background:var(--surface);padding:15px 17px}
+  .rule .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--accent)}
+  .rule h3{font-size:14.5px;font-weight:600;margin-top:4px}
+  .rule p{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.55}
+
+  section{padding-block:44px}
+  .part{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-top:2px solid var(--accent);padding-top:14px;margin-bottom:8px}
+  .part .pn{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;color:var(--accent)}
+  .part h2{font-size:clamp(20px,3vw,26px);font-weight:700;letter-spacing:-.02em;flex:1 1 200px}
+  .part .pt{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .lede{color:var(--muted);font-size:14px;max-width:62ch;margin-bottom:22px}
+
+  .stepc{border:1px solid var(--line);border-radius:4px;background:var(--surface);margin-bottom:16px;overflow:hidden}
+  .shead{display:flex;align-items:baseline;gap:12px;padding:13px 18px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+  .shead .sn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .shead h3{font-size:15px;font-weight:600}
+  .sbody{padding:16px 18px}
+  .sbody > p{font-size:14px;color:var(--ink-2);line-height:1.7}
+  .sbody > p + p{margin-top:9px}
+  .sbody ol,.sbody ul{margin:9px 0 0;padding-left:19px}
+  .sbody li{font-size:14px;color:var(--ink-2);margin-top:5px;line-height:1.65}
+
+  pre{margin:11px 0 0;background:var(--term-bg);color:var(--term-fg);border-radius:3px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+  pre .c{color:var(--term-dim)}
+  pre .p{color:var(--term-p)}
+  pre .o{color:var(--term-out)}
+  .prelbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-top:13px;display:block}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:1px 4px;border-radius:2px}
+  kbd{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:3px;padding:1px 5px;background:var(--surface);color:var(--ink)}
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+
+  .box{margin-top:13px;border-radius:0 3px 3px 0;padding:11px 14px;display:flex;flex-direction:column;gap:5px}
+  .box.check{border-left:2px solid var(--accent);background:var(--accent-soft)}
+  .box.q{border-left:2px solid var(--ask);background:var(--ask-soft)}
+  .box.warn{border-left:2px solid var(--clay);background:var(--clay-soft)}
+  .box .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase}
+  .box.check .lbl{color:var(--accent)}
+  .box.q .lbl{color:var(--ask)}
+  .box.warn .lbl{color:var(--clay)}
+  .box p,.box li{font-size:13.5px;color:var(--ink-2);line-height:1.62}
+  .box ul{margin:0;padding-left:16px}
+  .box li{margin-top:3px}
+  .box code{background:rgba(0,0,0,.06)}
+
+  .mission{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;background:var(--surface);padding:16px 18px;margin-bottom:14px}
+  .mhead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .mhead .mn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .mhead h3{font-size:15px;font-weight:600;flex:1 1 180px}
+  .mission > p{font-size:14px;color:var(--ink-2);margin-top:7px;line-height:1.7}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;min-width:540px;font-size:13.5px}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--surface-2)}
+  tbody tr:last-child td{border-bottom:0}
+  td code{font-size:12px}
+
+  .selfcheck{border:1px solid var(--line-strong);border-radius:4px;background:var(--surface);overflow:hidden}
+  .selfcheck h3{padding:14px 18px;font-size:15px;background:var(--surface-2);border-bottom:1px solid var(--line-strong)}
+  .selfcheck ul{list-style:none;margin:0;padding:6px 18px 16px}
+  .selfcheck li{font-size:14px;color:var(--ink-2);padding:8px 0 8px 28px;border-bottom:1px solid var(--line);position:relative;line-height:1.6}
+  .selfcheck li:last-child{border-bottom:0}
+  .selfcheck li::before{content:"";position:absolute;left:0;top:13px;width:14px;height:14px;border:1.5px solid var(--line-strong);border-radius:2px}
+
+  footer{border-top:1px solid var(--line);background:var(--surface);padding-block:26px;margin-top:20px}
+  footer p{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+  @media (max-width:700px){
+    .sbody,.shead,.mission{padding-inline:14px}
+    .shead{gap:8px;flex-wrap:wrap}
+  }
+
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+</style>
+
+<header class="top">
+  <div class="wrap masthead">
+    <div class="rule-tag">
+      <span class="eyebrow">한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과</span>
+      <span class="dash"></span>
+      <span class="eyebrow">학생용 실습 가이드</span>
+    </div>
+    <h1>Day 6 · <em>셸 스크립팅과 자동화</em></h1>
+    <p class="standfirst">오늘 만드는 스크립트 두 개는 남은 나흘 동안 계속 씁니다. <strong>동작하는 것</strong>이 아니라 <strong>남이 써도 되는 것</strong>을 목표로 하세요.</p>
+    <div class="rules">
+      <div class="rule"><div class="n">RULE 1</div><h3>변수는 항상 큰따옴표</h3><p>"$FILE" 이지 $FILE 이 아닙니다. 공백 하나로 스크립트가 망가집니다.</p></div>
+      <div class="rule"><div class="n">RULE 2</div><h3>두 번째 줄은 set -euo pipefail</h3><p>모든 스크립트에 넣습니다. 조용히 망가지는 것을 막아 줍니다.</p></div>
+      <div class="rule"><div class="n">RULE 3</div><h3>-delete 전에 -print</h3><p>Day 3의 규칙입니다. 지우기 전에 목록을 눈으로 봅니다.</p></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <div class="part"><span class="pn">PART 1</span><h2>문법과 함정</h2><span class="pt">13:00–13:50</span></div>
+    
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 01</span><h3>첫 스크립트</h3></div>
+      
+      <pre><span class="p">$</span> cd ~/ai-lab/scripts
+<span class="p">$</span> cat &gt; hello.sh &lt;&lt;'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+NAME="${1:-세상}"
+echo "안녕하세요, $NAME"
+echo "오늘은 $(date +%F) 입니다"
+EOF
+<span class="p">$</span> bash hello.sh
+<span class="p">$</span> bash hello.sh 리눅스
+<span class="p">$</span> chmod +x hello.sh
+<span class="p">$</span> ./hello.sh 폴리텍</pre>
+      <div class="box check"><span class="lbl">기본값 문법</span>
+        <p><code>${1:-세상}</code>은 "1번 인자가 없으면 '세상'을 쓴다"는 뜻입니다. <code>set -u</code>와 함께 쓰면 안전합니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 02</span><h3>따옴표 함정 직접 겪기</h3></div>
+      
+      <pre><span class="p">$</span> cd /tmp &amp;&amp; mkdir -p quotetest &amp;&amp; cd quotetest
+<span class="p">$</span> touch "my data.txt" other.txt
+<span class="p">$</span> ls
+
+<span class="p">$</span> FILE="my data.txt"
+<span class="p">$</span> ls $FILE
+<span class="o">ls: cannot access 'my': No such file or directory
+ls: cannot access 'data.txt': No such file or directory</span>
+
+<span class="p">$</span> ls "$FILE"
+<span class="o">my data.txt</span></pre>
+      <div class="box warn"><span class="lbl">이것이 rm 이었다면</span>
+        <p><code>rm $FILE</code>은 <code>my</code>와 <code>data.txt</code>를 지우려 합니다. 우연히 그런 이름의 파일이 있으면 <strong>엉뚱한 파일이 사라집니다.</strong></p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 03</span><h3>조건과 반복</h3></div>
+      
+      <pre><span class="p">$</span> cd ~/ai-lab/scripts
+<span class="p">$</span> cat &gt; check.sh &lt;&lt;'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+TARGET="${1:?경로를 지정하세요}"
+
+if [[ -f "$TARGET" ]]; then
+    echo "파일: $TARGET ($(wc -l &lt; "$TARGET") 줄)"
+elif [[ -d "$TARGET" ]]; then
+    echo "디렉터리: $TARGET"
+    for f in "$TARGET"/*; do
+        [[ -e "$f" ]] || continue
+        echo "  - $(basename "$f")"
+    done
+else
+    echo "없습니다: $TARGET" &gt;&amp;2
+    exit 1
+fi
+EOF
+<span class="p">$</span> chmod +x check.sh
+<span class="p">$</span> ./check.sh ~/ai-lab
+<span class="p">$</span> ./check.sh ~/.bashrc
+<span class="p">$</span> ./check.sh /없는경로; echo "종료코드: $?"</pre>
+      <div class="box check"><span class="lbl">종료 코드</span>
+        <p>성공은 0, 실패는 0이 아닌 값입니다. <code>$?</code>로 확인합니다. 이게 있어야 다른 스크립트가 내 스크립트의 성공 여부를 판단할 수 있습니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 2</span><h2>안전장치</h2><span class="pt">13:50–14:30</span></div>
+    
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 04</span><h3>set -e 없을 때 vs 있을 때</h3></div>
+      
+      <pre><span class="p">$</span> cat &gt; unsafe.sh &lt;&lt;'EOF'
+#!/usr/bin/env bash
+cd /없는경로
+echo "여기까지 왔습니다 — 위험!"
+pwd
+EOF
+<span class="p">$</span> bash unsafe.sh
+
+<span class="p">$</span> cat &gt; safe.sh &lt;&lt;'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+cd /없는경로
+echo "여기는 실행되지 않습니다"
+EOF
+<span class="p">$</span> bash safe.sh; echo "종료코드: $?"</pre>
+      <div class="box warn"><span class="lbl">이 차이가 사고를 만듭니다</span>
+        <p>첫 스크립트는 <code>cd</code>가 실패했는데도 계속 진행해서 <strong>원래 있던 디렉터리에서</strong> 다음 명령을 실행합니다. 그다음 줄이 <code>rm -rf *</code>였다면?</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 05</span><h3>trap으로 뒷정리</h3></div>
+      
+      <pre><span class="p">$</span> cat &gt; trapdemo.sh &lt;&lt;'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+TMPDIR="$(mktemp -d)"
+cleanup() { rm -rf "$TMPDIR"; echo "정리 완료: $TMPDIR"; }
+trap cleanup EXIT
+
+echo "작업 디렉터리: $TMPDIR"
+touch "$TMPDIR/work.tmp"
+ls "$TMPDIR"
+sleep 5
+echo "정상 종료"
+EOF
+<span class="p">$</span> chmod +x trapdemo.sh
+<span class="p">$</span> ./trapdemo.sh                   <span class="c"># 끝까지</span>
+<span class="p">$</span> ./trapdemo.sh                   <span class="c"># 이번엔 Ctrl+C</span></pre>
+      <div class="box check"><span class="lbl">확인</span>
+        <p><kbd>Ctrl</kbd>+<kbd>C</kbd>로 끊어도 "정리 완료"가 출력됩니다. <code>ls /tmp | grep tmp.</code>로 임시 디렉터리가 남지 않았는지 확인하세요.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 3</span><h2>전처리 파이프라인 스크립트화</h2><span class="pt">14:30–15:40</span></div>
+    <p class="lede">Day 3에서 손으로 친 정제 명령을 도구로 승격합니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 06</span><h3>getopts로 옵션 받기</h3></div>
+      
+      <pre><span class="p">$</span> cat &gt; clean_dataset.sh &lt;&lt;'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    cat &lt;&lt;USAGE
+사용법: $0 -i 입력.jsonl -o 출력.jsonl [-m 최소길이]
+  -i  입력 JSONL 파일 (필수)
+  -o  출력 파일 (필수)
+  -m  최소 len 값 (기본 1)
+  -h  이 도움말
+USAGE
+    exit 1
+}
+
+MIN=1
+while getopts "i:o:m:h" opt; do
+  case "$opt" in
+    i) IN="$OPTARG" ;;
+    o) OUT="$OPTARG" ;;
+    m) MIN="$OPTARG" ;;
+    h|*) usage ;;
+  esac
+done
+
+[[ -z "${IN:-}" || -z "${OUT:-}" ]] &amp;&amp; usage
+[[ -f "$IN" ]] || { echo "[오류] 입력 파일 없음: $IN" &gt;&amp;2; exit 2; }
+
+BEFORE=$(wc -l &lt; "$IN")
+jq -c --argjson m "$MIN" \
+   'select(.response != "" and .len &gt;= $m)' "$IN" 2&gt;/dev/null \
+   | jq -s 'unique_by(.prompt) | .[]' -c &gt; "$OUT"
+AFTER=$(wc -l &lt; "$OUT")
+
+echo "정제 완료: $BEFORE → $AFTER 줄 (제거 $((BEFORE-AFTER)))"
+EOF
+<span class="p">$</span> chmod +x clean_dataset.sh
+<span class="p">$</span> ./clean_dataset.sh -h
+<span class="p">$</span> ./clean_dataset.sh -i ~/ai-lab/datasets/dirty.jsonl -o ~/ai-lab/datasets/clean2.jsonl
+<span class="p">$</span> ./clean_dataset.sh -i 없는파일.jsonl -o out.jsonl; echo "종료코드 $?"</pre>
+      <div class="box check"><span class="lbl">Day 3이 도구가 되었습니다</span>
+        <p>손으로 치던 jq 파이프라인이 이제 <strong>옵션을 받는 재사용 가능한 도구</strong>가 됐습니다. 중복 제거까지 한 번에 처리됩니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 07</span><h3>병렬 처리 측정</h3></div>
+      
+      <pre><span class="p">$</span> cd /tmp &amp;&amp; mkdir -p paratest &amp;&amp; cd paratest
+<span class="p">$</span> for i in $(seq 1 12); do echo "job $i" &gt; job$i.txt; done
+<span class="p">$</span> cat &gt; work.sh &lt;&lt;'EOF'
+#!/usr/bin/env bash
+sleep 2
+echo "완료: $1"
+EOF
+<span class="p">$</span> chmod +x work.sh
+
+<span class="p">$</span> nproc
+<span class="p">$</span> time (ls job*.txt | xargs -I{} ./work.sh {})          <span class="c"># 순차</span>
+<span class="p">$</span> time (ls job*.txt | xargs -P 4 -I{} ./work.sh {})     <span class="c"># 4병렬</span>
+<span class="p">$</span> time (ls job*.txt | xargs -P 12 -I{} ./work.sh {})    <span class="c"># 12병렬</span></pre>
+      <div class="box q"><span class="lbl">확인 질문</span>
+        <p>12병렬이 4병렬보다 훨씬 빠른가요? 코어 수를 넘어서면 왜 개선폭이 줄어들까요? (Day 4의 CPU 경합)</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 4</span><h2>AI LAB · 배치 러너와 정기 실행</h2><span class="pt">15:40–17:10</span></div>
+    
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 08</span><h3>배치 러너 뼈대</h3></div>
+      
+      <pre><span class="p">$</span> cd ~/ai-lab/scripts
+<span class="p">$</span> cat &gt; prompts.txt &lt;&lt;'EOF'
+리눅스에서 파일을 찾는 명령은?
+파이프란 무엇인가요?
+권한 644는 무슨 뜻인가요?
+EOF
+
+<span class="p">$</span> cat &gt; batch_runner.sh &lt;&lt;'SCRIPT'
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() { echo "사용법: $0 -p 프롬프트파일 -o 출력.csv [-n 반복]"; exit 1; }
+
+N=1
+while getopts "p:o:n:h" opt; do
+  case "$opt" in
+    p) PROMPTS="$OPTARG" ;;
+    o) OUT="$OPTARG" ;;
+    n) N="$OPTARG" ;;
+    h|*) usage ;;
+  esac
+done
+[[ -z "${PROMPTS:-}" || -z "${OUT:-}" ]] &amp;&amp; usage
+[[ -f "$PROMPTS" ]] || { echo "[오류] 파일 없음: $PROMPTS" &gt;&amp;2; exit 2; }
+
+FAILED="${OUT%.csv}_failed.txt"
+: &gt; "$FAILED"
+echo "prompt,round,elapsed,status" &gt; "$OUT"
+
+log() { echo "[$(date +%H:%M:%S)] $*"; }
+
+ask() {            # 내일 이 함수만 진짜 API로 바꿉니다
+    local q="$1"
+    sleep 1
+    [[ "${#q}" -gt 5 ]] || return 1
+    echo "응답"
+}
+
+TOTAL=$(wc -l &lt; "$PROMPTS"); OK=0; NG=0; i=0
+log "프롬프트 ${TOTAL}개 × ${N}회"
+
+while IFS= read -r line; do
+    [[ -z "$line" ]] &amp;&amp; continue
+    i=$((i+1))
+    for r in $(seq 1 "$N"); do
+        start=$(date +%s)
+        if ask "$line" &gt;/dev/null 2&gt;&amp;1; then
+            st=ok; OK=$((OK+1))
+        else
+            st=fail; NG=$((NG+1)); echo "$line" &gt;&gt; "$FAILED"
+        fi
+        el=$(( $(date +%s) - start ))
+        echo "\"$line\",$r,$el,$st" &gt;&gt; "$OUT"
+    done
+    log "$i/$TOTAL 완료"
+done &lt; "$PROMPTS"
+
+log "성공 $OK · 실패 $NG"
+[[ $NG -gt 0 ]] &amp;&amp; log "실패 목록: $FAILED"
+SCRIPT
+<span class="p">$</span> chmod +x batch_runner.sh
+<span class="p">$</span> ./batch_runner.sh -p prompts.txt -o ~/ai-lab/logs/result.csv -n 2
+<span class="p">$</span> column -s, -t &lt; ~/ai-lab/logs/result.csv</pre>
+      <div class="box check"><span class="lbl">내일 바꿔 끼울 곳</span>
+        <p><code>ask()</code> 함수 하나만 진짜 API 호출로 바꾸면 그대로 동작합니다. 이렇게 <strong>바뀔 부분을 함수로 격리</strong>하는 것이 좋은 설계입니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 09</span><h3>실패 케이스 만들어 보기</h3></div>
+      
+      <pre><span class="p">$</span> printf '짧음\n정상적인 긴 프롬프트입니다\n' &gt; mixed.txt
+<span class="p">$</span> ./batch_runner.sh -p mixed.txt -o ~/ai-lab/logs/mixed.csv
+<span class="p">$</span> cat ~/ai-lab/logs/mixed_failed.txt
+<span class="p">$</span> ./batch_runner.sh                      <span class="c"># 인자 없이</span>
+<span class="p">$</span> ./batch_runner.sh -p 없음.txt -o a.csv <span class="c"># 없는 파일</span></pre>
+      <div class="box check"><span class="lbl">과제 채점 포인트</span>
+        <p>세 가지 오류 상황에서 각각 다른 메시지와 종료 코드가 나와야 합니다. 이것이 과제의 핵심입니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 10</span><h3>정리 스크립트와 cron 등록</h3></div>
+      
+      <pre><span class="p">$</span> cat &gt; cleanup.sh &lt;&lt;'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+LAB="$HOME/ai-lab"
+LOG="$LAB/logs/cleanup.log"
+
+echo "===== $(date +%F' '%T) 정리 시작 =====" &gt;&gt; "$LOG"
+find "$LAB/logs" -name "*.log" -mtime +7 -print &gt;&gt; "$LOG"
+find "$LAB/logs" -name "*.log" -mtime +7 -delete
+find /tmp -maxdepth 1 -name "tmp.*" -mtime +1 -delete 2&gt;/dev/null || true
+du -sh "$LAB"/* &gt;&gt; "$LOG"
+echo "===== 정리 완료 =====" &gt;&gt; "$LOG"
+EOF
+<span class="p">$</span> chmod +x cleanup.sh
+<span class="p">$</span> ./cleanup.sh &amp;&amp; tail -10 ~/ai-lab/logs/cleanup.log
+
+<span class="c"># cron 등록 — 테스트를 위해 매분으로 먼저</span>
+<span class="p">$</span> crontab -e
+<span class="c"># 아래 한 줄 추가 (절대경로!)</span>
+<span class="c"># * * * * * /home/ubuntu/ai-lab/scripts/cleanup.sh</span>
+
+<span class="p">$</span> crontab -l
+<span class="p">$</span> sleep 70 &amp;&amp; tail -5 ~/ai-lab/logs/cleanup.log</pre>
+      <div class="box warn"><span class="lbl">확인 후 반드시 새벽으로 바꾸세요</span>
+        <pre style="margin-top:8px"><span class="c"># 0 3 * * * /home/ubuntu/ai-lab/scripts/cleanup.sh</span></pre>
+        <p>매분 실행을 그대로 두면 로그가 계속 쌓입니다. WSL2에서 cron이 안 돌면 <code>sudo service cron start</code>를 먼저 실행하세요.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 A</span><h2>이런 오류가 나면</h2></div>
+    <p class="lede">오늘 가장 많이 나오는 것들입니다. 여기 없는 오류는 손을 드세요.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>증상 · 메시지</th><th>원인</th><th>대응</th></tr></thead>
+        <tbody>
+          <tr><td><code>Syntax error near unexpected token</code></td><td>중괄호·따옴표 짝 안 맞음</td><td><code>bash -n script.sh</code>로 문법만 검사</td></tr>
+          <tr><td><code>command not found</code> (cron에서만)</td><td>cron의 PATH가 거의 빔</td><td>명령을 절대경로로 쓰거나 스크립트에 PATH 설정</td></tr>
+          <tr><td><code>unbound variable</code></td><td><code>set -u</code> + 미정의 변수</td><td><code>${VAR:-기본값}</code> 형태로 기본값 지정</td></tr>
+          <tr><td>파일 이름이 쪼개진다</td><td>변수에 따옴표 없음</td><td><code>"$VAR"</code>로 감쌉니다</td></tr>
+          <tr><td><code>Permission denied</code> (./script.sh)</td><td>실행 권한 없음</td><td><code>chmod +x script.sh</code></td></tr>
+          <tr><td>cron이 아예 안 돈다 (WSL2)</td><td>cron 서비스 미기동</td><td><code>sudo service cron start</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 B</span><h2>명령어 퀴즈</h2></div>
+    <p class="lede">미션을 마쳤으면 오늘 배운 것을 퀴즈로 점검합니다. 채점은 바로 나오고, 틀린 문제는 왜 틀렸는지 설명이 붙습니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">QUIZ</span><h3>Day 6 · 18문항</h3></div>
+      <div class="sbody">
+        <p>객관식과 직접 입력이 섞여 있습니다. 가이드를 다시 보지 말고 먼저 풀어 보고, 틀린 부분만 해당 미션으로 돌아가 확인하세요.</p>
+        <p style="margin-top:12px;font-size:16px"><a href="quiz.html">▶ 퀴즈 풀러 가기</a></p>
+        <div class="box check">
+          <span class="lbl">통과 기준</span>
+          <p>18문항 중 <strong>15문항 이상</strong>을 맞히면 오늘 분량을 소화한 것입니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 C</span><h2>오늘 마치기 전 자가 점검</h2></div>
+    <p class="lede">전부 체크되면 오늘 목표를 달성한 것입니다. 안 되는 항목이 있으면 퇴실 전에 손을 드세요.</p>
+    <div class="selfcheck">
+      <h3>Day 6 체크리스트</h3>
+      <ul>
+        <li>shebang과 <code>set -euo pipefail</code>이 들어간 스크립트를 만들었다</li>
+        <li>따옴표 없는 변수가 공백에서 쪼개지는 것을 직접 확인했다</li>
+        <li><code>if</code>/<code>for</code>/<code>while read</code>를 각각 써 봤다</li>
+        <li><code>trap</code>으로 Ctrl+C 상황에서도 뒷정리가 되는 것을 확인했다</li>
+        <li><code>getopts</code>로 옵션을 받는 스크립트를 만들었다</li>
+        <li><code>-h</code>로 사용법이 출력된다</li>
+        <li><code>xargs -P</code>로 병렬 처리 시간을 측정해 비교했다</li>
+        <li>배치 러너가 성공·실패를 구분해 기록한다</li>
+        <li><code>cleanup.sh</code>가 동작하고 로그를 남긴다</li>
+        <li>cron에 등록해 실제로 실행되는 것을 확인했다</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">과제 06</span><h2>재사용 가능한 배치 러너</h2><span class="pt">제출: 익일 09:00</span></div>
+    <p class="lede">옵션을 받고, 실패를 견디고, 남이 써도 되는 스크립트를 완성하십시오.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">제출 항목</span><h3>각 항목마다 값과 사용한 명령을 함께 적을 것</h3></div>
+      <div class="sbody">
+        <ol><li>-p(입력) -o(출력) -n(반복) -h(도움말) 옵션 처리</li><li>set -euo pipefail 과 trap 으로 안전장치</li><li>잘못된 인자 / 없는 파일 / 처리 실패 세 오류 처리</li><li>결과 CSV (입력, 결과, 소요시간, 성공여부)</li><li>실패 항목만 별도 파일로</li><li>-h 로 사용법 출력</li></ol>
+        <span class="prelbl">제출 양식 예시</span><pre><span class="o">$ ./batch_runner.sh
+사용법: ./batch_runner.sh -p 프롬프트파일 -o 출력파일 [-n 반복]
+
+$ ./batch_runner.sh -p 없는파일.txt
+[오류] 입력 파일을 찾을 수 없습니다: 없는파일.txt</span></pre>
+        <div class="box check"><span class="lbl">채점 기준</span><p>채점은 <strong>오류 상황 세 가지</strong>에서 스크립트가 어떻게 반응하는지로 합니다. 정상 동작은 기본이고, 실패했을 때 무엇을 남기는지가 실력입니다.</p></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>Day 6 / 10 · 실습 가이드 · 리눅스 × LLM 서빙 70시간 과정</p>
+  </div>
+</footer>
+<script src="../nav.js"></script>

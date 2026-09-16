@@ -1,0 +1,480 @@
+<title>Day 6 명령어 퀴즈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --bg:#F6F8F5;--surface:#FFFFFF;--surface-2:#EDF1EC;--ink:#141A16;--ink-2:#3A453E;--muted:#5F6D65;
+    --line:#DBE2DC;--line-strong:#C3CFC6;--accent:#10684A;--accent-soft:#E2EFE8;
+    --clay:#A94D30;--clay-soft:#F6E7E0;--term:#10171A;
+    --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+      --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;
+      --clay:#E08F6E;--clay-soft:#2A1E18;--term:#0A0F11;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+    --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;
+    --clay:#E08F6E;--clay-soft:#2A1E18;--term:#0A0F11;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.68;margin:0;
+       -webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding-inline:20px}
+  h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0}
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+
+  header{border-bottom:1px solid var(--line);background:var(--surface)}
+  .mast{padding-block:32px 22px;display:flex;flex-direction:column;gap:10px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  h1{font-size:clamp(24px,4vw,32px);font-weight:700;letter-spacing:-.025em}
+  .mast p{color:var(--ink-2);font-size:14.5px;font-weight:300;max-width:60ch}
+
+  .prog{height:3px;background:var(--surface-2)}
+  .prog i{display:block;height:100%;background:var(--accent);width:0;transition:width .35s}
+
+  main{padding-block:30px 60px}
+  .meta{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+  .meta .qn{font-family:var(--mono);font-size:11.5px;letter-spacing:.11em;color:var(--accent)}
+  .meta .sc{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+  .qcard{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:26px 24px}
+  .qtext{font-size:18px;font-weight:600;line-height:1.55;text-wrap:balance}
+  pre{background:var(--term);color:#DCE6E3;border-radius:4px;padding:14px 16px;margin:16px 0 0;
+      font-family:var(--mono);font-size:13px;line-height:1.7;overflow-x:auto}
+  pre .p{color:#7FD1A8}
+  pre .c{color:#7C9A93}
+  code{font-family:var(--mono);font-size:.9em;background:var(--surface-2);padding:1px 5px;border-radius:3px}
+
+  .opts{display:flex;flex-direction:column;gap:9px;margin-top:20px}
+  .opt{text-align:left;font-family:var(--sans);font-size:15px;line-height:1.5;color:var(--ink);
+       background:var(--surface);border:1px solid var(--line-strong);border-radius:5px;
+       padding:13px 16px;cursor:pointer;display:flex;gap:11px;align-items:flex-start;width:100%}
+  .opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
+  .opt:disabled{cursor:default}
+  .opt .mk{font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:2px;flex:0 0 auto}
+  .opt.right{border-color:var(--accent);background:var(--accent-soft)}
+  .opt.right .mk{color:var(--accent)}
+  .opt.wrong{border-color:var(--clay);background:var(--clay-soft)}
+  .opt.wrong .mk{color:var(--clay)}
+  .opt code{background:rgba(0,0,0,.06)}
+
+  .typed{display:flex;gap:9px;margin-top:20px;flex-wrap:wrap}
+  input[type=text]{flex:1 1 240px;font-family:var(--mono);font-size:15px;color:var(--ink);
+      background:var(--surface);border:1px solid var(--line-strong);border-radius:5px;padding:12px 14px}
+  input[type=text]:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  input[type=text]:disabled{opacity:.75}
+
+  button.go{font-family:var(--sans);font-size:15px;font-weight:600;color:#fff;background:var(--accent);
+      border:1px solid var(--accent);border-radius:5px;padding:12px 22px;cursor:pointer}
+  button.go:hover{filter:brightness(1.08)}
+  button.ghost{font-family:var(--sans);font-size:14px;font-weight:500;color:var(--ink-2);
+      background:var(--surface);border:1px solid var(--line-strong);border-radius:5px;padding:11px 18px;cursor:pointer}
+  button.ghost:hover{border-color:var(--accent);color:var(--accent)}
+  .actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+
+  .fb{margin-top:18px;border-left:3px solid var(--accent);background:var(--accent-soft);
+      border-radius:0 4px 4px 0;padding:14px 16px}
+  .fb.no{border-left-color:var(--clay);background:var(--clay-soft)}
+  .fb .v{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+         color:var(--accent);display:block;margin-bottom:5px}
+  .fb.no .v{color:var(--clay)}
+  .fb p{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .fb code{background:rgba(0,0,0,.06)}
+
+  /* result */
+  .res{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:32px 24px;text-align:center}
+  .res .big{font-family:var(--mono);font-size:56px;font-weight:600;line-height:1;color:var(--accent);
+            font-variant-numeric:tabular-nums}
+  .res .big.mid{color:#B08322}
+  .res .big.low{color:var(--clay)}
+  .res h2{font-size:20px;margin-top:14px}
+  .res p{color:var(--muted);font-size:14.5px;margin-top:8px;max-width:48ch;margin-inline:auto}
+  .res .actions{justify-content:center}
+  .missed{margin-top:26px;text-align:left;border-top:1px solid var(--line);padding-top:20px}
+  .missed h3{font-size:14px;color:var(--muted);font-family:var(--mono);letter-spacing:.11em;
+             text-transform:uppercase;font-weight:500;margin-bottom:12px}
+  .missed li{font-size:14px;color:var(--ink-2);line-height:1.6;margin-top:9px}
+  .missed li b{color:var(--ink)}
+
+  footer{border-top:1px solid var(--line);background:var(--surface);padding-block:22px}
+  footer p{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  @media (max-width:560px){ .qcard{padding:20px 16px} .qtext{font-size:16.5px} }
+
+</style>
+
+<header>
+  <div class="wrap mast">
+    <span class="eyebrow">Day 6 · 리눅스 × LLM 서빙 70시간 과정</span>
+    <h1>셸 스크립팅 퀴즈</h1>
+    <p>18문항 · 객관식과 직접 입력이 섞여 있습니다. 가이드를 다시 보지 말고 먼저 풀어 보세요. 15문항 이상이면 통과입니다.</p>
+  </div>
+</header>
+<div class="prog"><i id="prog"></i></div>
+
+<main class="wrap">
+  <div class="meta"><span class="qn" id="qn">Q 01 / 18</span><span class="sc" id="sc">정답 0</span></div>
+  <div id="area"></div>
+</main>
+
+<footer><div class="wrap"><p>Day 6 · <a href="lab.html">실습 가이드로 돌아가기</a></p></div></footer>
+
+<script>
+window.QUIZ = [
+  {
+    "q": "스크립트 첫 줄 <code>#!/usr/bin/env bash</code>를 무엇이라 부르나요?",
+    "o": [
+      "shebang",
+      "header",
+      "import",
+      "prologue"
+    ],
+    "a": 0,
+    "e": "이 파일을 어떤 인터프리터로 실행할지 알려 줍니다. <code>env</code>를 거치면 PATH에서 bash를 찾습니다."
+  },
+  {
+    "q": "변수 대입에서 <strong>틀린</strong> 것은?",
+    "o": [
+      "NAME = \"값\"",
+      "NAME=\"값\"",
+      "NAME=값",
+      "NAME=\"$OTHER\""
+    ],
+    "a": 0,
+    "e": "<code>=</code> 양옆에 공백을 넣으면 안 됩니다. 셸이 <code>NAME</code>을 명령으로 해석합니다."
+  },
+  {
+    "q": "<code>FILE=\"my data.txt\"</code>일 때 <code>rm $FILE</code>의 문제는?",
+    "o": [
+      "my 와 data.txt 두 개를 지우려 한다",
+      "따옴표 때문에 오류가 난다",
+      "아무 일도 안 일어난다",
+      "권한 오류가 난다"
+    ],
+    "a": 0,
+    "e": "변수는 <strong>항상</strong> 큰따옴표로 감싸세요. 오늘 가장 중요한 규칙입니다."
+  },
+  {
+    "q": "큰따옴표와 작은따옴표의 차이는?",
+    "o": [
+      "큰따옴표는 변수를 풀고, 작은따옴표는 글자 그대로 둔다",
+      "반대다",
+      "차이가 없다",
+      "작은따옴표만 공백을 보호한다"
+    ],
+    "a": 0,
+    "e": "<code>echo \"$NAME\"</code>과 <code>echo '$NAME'</code>을 직접 쳐 보면 바로 보입니다."
+  },
+  {
+    "q": "<code>set -e</code>가 하는 일은?",
+    "o": [
+      "명령이 실패하면 즉시 중단한다",
+      "에러를 화면에 출력한다",
+      "모든 명령을 출력한다",
+      "환경변수를 내보낸다"
+    ],
+    "a": 0,
+    "e": "errexit입니다. 이게 없으면 <code>cd</code> 실패 후에도 다음 줄이 엉뚱한 곳에서 실행됩니다."
+  },
+  {
+    "q": "<code>set -u</code>가 잡아 주는 실수는?",
+    "o": [
+      "정의하지 않은 변수 사용(오타 포함)",
+      "문법 오류",
+      "무한 루프",
+      "권한 문제"
+    ],
+    "a": 0,
+    "e": "nounset입니다. 변수 이름 오타를 조용히 넘어가지 않고 오류로 만듭니다."
+  },
+  {
+    "q": "스크립트가 어떻게 끝나든 뒷정리를 실행하게 하는 명령은? (직접 입력)",
+    "t": true,
+    "acc": [
+      "trap",
+      "trap cleanup EXIT"
+    ],
+    "ans": "trap",
+    "e": "정상 종료·오류·Ctrl+C 모두에서 실행됩니다. 임시 파일을 쓰는 스크립트에는 거의 필수입니다."
+  },
+  {
+    "q": "충돌하지 않는 임시 디렉터리를 만드는 명령은?",
+    "o": [
+      "mktemp -d",
+      "mkdir /tmp/work",
+      "tmpdir",
+      "newtemp"
+    ],
+    "a": 0,
+    "e": "고정 이름을 쓰면 두 개가 동시에 돌 때 서로의 파일을 덮어씁니다."
+  },
+  {
+    "q": "함수 안에서 <code>local</code>을 붙이지 않으면?",
+    "o": [
+      "함수 밖의 같은 이름 변수를 덮어쓴다",
+      "오류가 난다",
+      "함수가 실행되지 않는다",
+      "아무 차이 없다"
+    ],
+    "a": 0,
+    "e": "긴 스크립트에서 찾기 아주 어려운 버그가 됩니다. 함수 안 변수는 습관적으로 <code>local</code>을 붙이세요."
+  },
+  {
+    "q": "직전 명령의 성공 여부를 담고 있는 변수는?",
+    "o": [
+      "$?",
+      "$!",
+      "$#",
+      "$0"
+    ],
+    "a": 0,
+    "e": "0이면 성공, 0이 아니면 실패입니다. <code>$!</code>은 마지막 백그라운드 PID, <code>$#</code>은 인자 개수입니다."
+  },
+  {
+    "q": "스크립트에 전달된 <strong>인자 개수</strong>를 담은 변수는?",
+    "o": [
+      "$#",
+      "$@",
+      "$*",
+      "$0"
+    ],
+    "a": 0,
+    "e": "<code>$@</code>와 <code>$*</code>는 인자 전체, <code>$0</code>은 스크립트 이름입니다."
+  },
+  {
+    "q": "옵션(-m, -n 같은)을 처리하는 bash 내장 명령은? (직접 입력)",
+    "t": true,
+    "acc": [
+      "getopts"
+    ],
+    "ans": "getopts",
+    "e": "<code>while getopts \"m:n:h\" opt</code> 형태로 씁니다. 콜론이 붙은 글자는 값을 함께 받습니다."
+  },
+  {
+    "q": "<code>${1:-기본값}</code>의 뜻은?",
+    "o": [
+      "1번 인자가 없으면 기본값을 쓴다",
+      "1번 인자를 기본값으로 바꾼다",
+      "1번 인자를 삭제한다",
+      "문법 오류"
+    ],
+    "a": 0,
+    "e": "<code>set -u</code>와 함께 쓸 때 특히 유용합니다. <code>${1:?메시지}</code>는 없으면 오류로 종료합니다."
+  },
+  {
+    "q": "작업 4개를 동시에 돌리는 xargs 옵션은?",
+    "o": [
+      "-P 4",
+      "-n 4",
+      "-j 4",
+      "-c 4"
+    ],
+    "a": 0,
+    "e": "<code>-P</code>는 parallel입니다. <code>-n</code>은 한 번에 넘길 인자 개수로 뜻이 다릅니다."
+  },
+  {
+    "q": "병렬 개수를 코어 수보다 훨씬 크게 잡으면?",
+    "o": [
+      "CPU 경합으로 오히려 느려질 수 있다",
+      "항상 더 빨라진다",
+      "메모리만 늘어난다",
+      "아무 변화 없다"
+    ],
+    "a": 0,
+    "e": "Day 4에서 본 CPU 경합입니다. <code>nproc</code>으로 코어 수를 확인해 맞추세요."
+  },
+  {
+    "q": "cron에서 \"매일 새벽 3시\"를 뜻하는 표기는?",
+    "o": [
+      "0 3 * * *",
+      "3 0 * * *",
+      "* 3 * * *",
+      "0 0 3 * *"
+    ],
+    "a": 0,
+    "e": "순서는 <strong>분 시 일 월 요일</strong>입니다. 분이 먼저입니다."
+  },
+  {
+    "q": "손으로는 되던 명령이 cron에서만 <code>command not found</code>가 나는 이유는?",
+    "o": [
+      "cron의 PATH가 거의 비어 있다",
+      "cron은 sudo가 필요하다",
+      "파일 권한 문제",
+      "cron은 bash를 안 쓴다"
+    ],
+    "a": 0,
+    "e": "절대경로를 쓰거나 스크립트 안에서 PATH를 설정하세요. cron 디버깅의 1순위입니다."
+  },
+  {
+    "q": "배치 러너에서 <code>ask()</code>를 함수로 분리한 이유는?",
+    "o": [
+      "바뀔 부분을 격리해 나중에 교체하기 쉽게",
+      "속도를 높이려고",
+      "문법상 필요해서",
+      "병렬 처리를 위해"
+    ],
+    "a": 0,
+    "e": "내일 이 함수만 실제 API 호출로 바꾸면 나머지는 그대로 돕니다. 좋은 설계의 기본입니다."
+  }
+];
+window.PASS = 15;
+</script>
+<script>
+(function(){
+  const Q = window.QUIZ || [];
+
+  const $ = id => document.getElementById(id);
+  let i = 0, score = 0, missed = [], answered = false;
+
+  const norm = s => s.trim().toLowerCase().replace(/\s+/g,' ');
+
+  function render(){
+    answered = false;
+    const q = Q[i];
+    $('qn').textContent = 'Q ' + String(i+1).padStart(2,'0') + ' / ' + Q.length;
+    $('sc').textContent = '정답 ' + score;
+    $('prog').style.width = (i / Q.length * 100) + '%';
+
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.innerHTML = '<div class="qtext">' + q.q + '</div>' + (q.pre ? '<pre>' + q.pre + '</pre>' : '');
+
+    if (q.t){
+      const wrap = document.createElement('div');
+      wrap.className = 'typed';
+      wrap.innerHTML = '<input type="text" id="inp" autocomplete="off" autocapitalize="off" ' +
+                       'spellcheck="false" placeholder="명령을 그대로 입력하세요">' +
+                       '<button class="go" id="chk">확인</button>';
+      card.appendChild(wrap);
+      card.appendChild(mkFoot());
+      $('area').replaceChildren(card);
+      $('inp').focus();
+      $('chk').onclick = () => judgeTyped(q);
+      $('inp').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); answered ? nextQ() : judgeTyped(q); } });
+    } else {
+      const order = q.o.map((t,n) => n);
+      for (let k = order.length - 1; k > 0; k--){ const j = Math.floor(Math.random()*(k+1)); [order[k],order[j]] = [order[j],order[k]]; }
+      const box = document.createElement('div');
+      box.className = 'opts';
+      order.forEach((oi, pos) => {
+        const b = document.createElement('button');
+        b.className = 'opt'; b.type = 'button'; b.dataset.i = oi;
+        b.innerHTML = '<span class="mk">' + 'ABCD'[pos] + '</span><span>' + q.o[oi] + '</span>';
+        b.onclick = () => judgeChoice(q, b, box);
+        box.appendChild(b);
+      });
+      card.appendChild(box);
+      card.appendChild(mkFoot());
+      $('area').replaceChildren(card);
+    }
+  }
+
+  function mkFoot(){
+    const d = document.createElement('div');
+    d.id = 'foot';
+    return d;
+  }
+
+  function feedback(ok, q, extra){
+    answered = true;
+    score += ok ? 1 : 0;
+    if (!ok) missed.push(i);
+    $('sc').textContent = '정답 ' + score;
+    const f = document.createElement('div');
+    f.className = 'fb' + (ok ? '' : ' no');
+    f.innerHTML = '<span class="v">' + (ok ? '정답' : '오답') + '</span><p>' + (extra || '') + q.e + '</p>';
+    const act = document.createElement('div');
+    act.className = 'actions';
+    const b = document.createElement('button');
+    b.className = 'go';
+    b.textContent = (i === Q.length - 1) ? '결과 보기' : '다음 문제';
+    b.onclick = nextQ;
+    act.appendChild(b);
+    const foot = $('foot');
+    foot.replaceChildren(f, act);
+    b.focus();
+  }
+
+  function judgeChoice(q, btn, box){
+    if (answered) return;
+    const pick = +btn.dataset.i, ok = pick === q.a;
+    Array.from(box.children).forEach(el => {
+      el.disabled = true;
+      const n = +el.dataset.i;
+      if (n === q.a) el.classList.add('right');
+      else if (n === pick) el.classList.add('wrong');
+    });
+    feedback(ok, q, ok ? '' : '정답은 <code>' + q.o[q.a] + '</code> 입니다. ');
+  }
+
+  function judgeTyped(q){
+    if (answered) return;
+    const inp = $('inp');
+    const v = norm(inp.value);
+    if (!v){ inp.focus(); return; }
+    const ok = q.acc.some(a => norm(a) === v);
+    inp.disabled = true;
+    $('chk').disabled = true;
+    feedback(ok, q, ok ? '' : '정답은 <code>' + q.ans + '</code> 입니다. ');
+  }
+
+  function nextQ(){
+    i++;
+    if (i >= Q.length) result(); else render();
+  }
+
+  function result(){
+    $('prog').style.width = '100%';
+    $('qn').textContent = '완료';
+    $('sc').textContent = '정답 ' + score;
+    const pass = window.PASS || Math.ceil(Q.length*0.8);
+    const cls = score >= pass ? "" : (score >= pass - 3 ? " mid" : " low");
+    const msg = score >= pass
+      ? '통과입니다. 오늘 분량을 충분히 소화했습니다.'
+      : (score >= pass - 3
+        ? '조금 아쉽습니다. 틀린 항목의 미션으로 돌아가 한 번만 더 확인하고 다시 풀어 보세요.'
+        : '아직 손에 붙지 않았습니다. 실습 가이드의 미션 1번부터 다시 따라 해 보는 편이 빠릅니다.');
+
+    const d = document.createElement('div');
+    d.className = 'res';
+    d.innerHTML =
+      '<div class="big' + cls + '">' + score + ' / ' + Q.length + '</div>' +
+      '<h2>' + (score >= pass ? "통과" : "한 번 더") + '</h2>' +
+      '<p>' + msg + '</p>';
+
+    if (missed.length){
+      const m = document.createElement('div');
+      m.className = 'missed';
+      m.innerHTML = '<h3>다시 볼 문항</h3><ul>' +
+        missed.map(n => '<li><b>Q' + String(n+1).padStart(2,'0') + '</b> — ' +
+          Q[n].q.replace(/<[^>]+>/g,'') + '</li>').join('') + '</ul>';
+      d.appendChild(m);
+    }
+
+    const act = document.createElement('div');
+    act.className = 'actions';
+    const again = document.createElement('button');
+    again.className = 'go'; again.textContent = '처음부터 다시 풀기';
+    again.onclick = () => { i = 0; score = 0; missed = []; render(); window.scrollTo(0,0); };
+    act.appendChild(again);
+    const back = document.createElement('a');
+    back.href = 'lab.html'; back.className = 'ghost';
+    back.style.cssText = 'text-decoration:none;display:inline-flex;align-items:center;padding:12px 20px;border:1px solid var(--line-strong);border-radius:5px;color:var(--ink-2);font-weight:600;font-size:15px';
+    back.textContent = '실습 가이드로';
+    act.appendChild(back);
+    d.appendChild(act);
+
+    $('area').replaceChildren(d);
+  }
+
+  render();
+})();
+
+</script>
+<script src="../nav.js"></script>

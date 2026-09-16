@@ -1,0 +1,558 @@
+<title>Day 6 나레이션 슬라이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --ink:#0E1A15; --ink2:#18271F; --pine:#10684A; --pine-l:#3E9C74; --mint:#7FD1A8;
+    --light:#F4F7F4; --white:#FFF; --body:#3A453E; --muted:#6C7A72; --line:#D6DFD8;
+    --clay:#B85434; --sand:#F7E9E2; --soft:#E2EFE8; --shell:#0B100E;
+    --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Malgun Gothic",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--shell);color:var(--light);font-family:var(--sans);margin:0;
+       height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+  /* ---------- chrome ---------- */
+  .bar{display:flex;align-items:center;gap:10px;padding:8px 14px;flex-wrap:wrap;
+       background:#0F1613;border-bottom:1px solid #1E2A24;flex:0 0 auto}
+  .bar .brand{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--pine-l);margin-right:auto}
+  button,select{font-family:var(--sans);font-size:12.5px;color:#D7E2DC;background:#18241E;
+       border:1px solid #29372F;border-radius:4px;padding:6px 11px;cursor:pointer}
+  button:hover,select:hover{background:#203029;border-color:#3A4C42}
+  button:focus-visible,select:focus-visible{outline:2px solid var(--mint);outline-offset:1px}
+  button.on{background:var(--pine);border-color:var(--pine);color:#fff}
+  button.play{background:var(--pine);border-color:var(--pine);color:#fff;font-weight:600;min-width:92px}
+  button.play.playing{background:var(--clay);border-color:var(--clay)}
+  .count{font-family:var(--mono);font-size:12px;color:#7F918A;min-width:56px;text-align:center;
+         font-variant-numeric:tabular-nums}
+  .prog{height:2px;background:#1E2A24;flex:0 0 auto}
+  .prog i{display:block;height:100%;background:var(--mint);width:0;transition:width .3s}
+
+  /* ---------- stage ---------- */
+  .wrap{flex:1 1 auto;display:flex;align-items:center;justify-content:center;padding:14px;min-height:0}
+  .stage{width:100%;aspect-ratio:16/9;max-height:100%;max-width:calc(100% - 0px);
+         position:relative;border-radius:6px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+  .slide{position:absolute;inset:0;container-type:size;padding:5.5cqh 5cqw;
+         display:none;flex-direction:column;background:var(--light);color:var(--ink)}
+  .slide.show{display:flex}
+  .slide.dk{background:var(--ink);color:var(--white)}
+
+  .eb{font-family:var(--mono);font-size:1.9cqh;letter-spacing:.16em;color:var(--pine);
+      text-transform:uppercase;margin-bottom:1.4cqh}
+  .dk .eb{color:var(--pine-l)}
+  h1{font-size:8.4cqh;line-height:1.15;font-weight:700;letter-spacing:-.03em;margin:0;text-wrap:balance}
+  h2{font-size:6.2cqh;line-height:1.2;font-weight:700;letter-spacing:-.025em;margin:0;text-wrap:balance}
+  .sub{font-size:2.9cqh;color:var(--muted);margin-top:1.4cqh;line-height:1.55;max-width:62ch}
+  .dk .sub{color:#9FB3AA}
+  .lead{font-size:3.2cqh;color:var(--mint);margin-top:1.6cqh;font-weight:500}
+
+  .fill{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;min-height:0}
+  .foot{font-size:2.1cqh;color:var(--muted);font-style:italic;margin-top:auto;padding-top:1.6cqh}
+  .dk .foot{color:#7F918A}
+
+  .grid{display:grid;gap:1.6cqh 1.6cqw}
+  .g2{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:.8cqh;
+        padding:2.4cqh 2cqw;display:flex;flex-direction:column;gap:.8cqh;justify-content:center}
+  .dk .card{background:var(--ink2);border-color:#26332C}
+  .card .n{font-family:var(--mono);font-size:1.9cqh;color:var(--pine-l);letter-spacing:.08em}
+  .card .t{font-size:2.9cqh;font-weight:600;line-height:1.3}
+  .card .d{font-size:2.3cqh;color:var(--muted);line-height:1.5}
+  .dk .card .d{color:#93A69E}
+  .card.warn{background:var(--sand);border-color:#E7CDBF}
+  .card.warn .t,.card.warn .n{color:var(--clay)}
+  .card.warn .d{color:#7A4433}
+
+  .rowlist{display:flex;flex-direction:column;gap:1.2cqh}
+  .row{display:flex;align-items:center;gap:2cqw;background:var(--white);border:1px solid var(--line);
+       border-radius:.8cqh;padding:2cqh 2cqw}
+  .dk .row{background:var(--ink2);border-color:#26332C}
+  .dot{flex:0 0 auto;width:5.4cqh;height:5.4cqh;border-radius:50%;background:var(--soft);color:var(--pine);
+       display:flex;align-items:center;justify-content:center;font-family:var(--mono);
+       font-size:2.2cqh;font-weight:600}
+  .dk .dot{background:var(--pine);color:#fff}
+  .row .t{font-size:2.9cqh;font-weight:600;flex:0 0 auto}
+  .row .d{font-size:2.4cqh;color:var(--muted);line-height:1.45}
+  .dk .row .d{color:#93A69E}
+
+  .stack{display:flex;flex-direction:column;gap:.9cqh}
+  .lay{display:flex;align-items:center;gap:2cqw;border-radius:.6cqh;padding:1.8cqh 2cqw;
+       border:1px solid var(--line);background:var(--white)}
+  .lay b{font-size:2.9cqh;min-width:12cqw}
+  .lay span{font-size:2.4cqh;color:var(--muted)}
+
+  pre{background:var(--shell);color:#CFDCD6;border-radius:.7cqh;padding:2.4cqh 2cqw;margin:0;
+      font-family:var(--mono);font-size:2.35cqh;line-height:1.75;overflow:hidden;white-space:pre-wrap}
+  pre .p{color:var(--mint)}
+  pre .c{color:#7C9A93}
+  code{font-family:var(--mono);font-size:.92em;background:var(--soft);padding:.1em .35em;border-radius:.2em}
+  .dk code{background:#22312A;color:#CFE4DA}
+
+  .chips{display:flex;flex-wrap:wrap;gap:1cqh 1cqw}
+  .chip{font-family:var(--mono);font-size:2.3cqh;background:var(--white);border:1px solid var(--line);
+        border-radius:.5cqh;padding:.9cqh 1.2cqw;color:var(--pine);font-weight:500}
+  .chip.bad{background:var(--sand);border-color:#E7CDBF;color:var(--clay)}
+
+  .banner{background:var(--sand);color:var(--clay);border-radius:.7cqh;padding:2.2cqh 2cqw;
+          font-size:2.7cqh;font-weight:600;line-height:1.45}
+  .dk .banner{background:#2A1E18;color:#E0A288}
+  .bannerG{background:var(--soft);color:var(--pine);border-radius:.7cqh;padding:2.2cqh 2cqw;
+          font-size:2.7cqh;font-weight:600;line-height:1.45}
+
+  .tnote{margin-top:1.6cqh;border-left:.35cqh solid var(--clay);background:rgba(184,84,52,.07);
+         padding:1.4cqh 1.6cqw;font-size:2.1cqh;color:var(--body);line-height:1.5}
+  .dk .tnote{color:#C9B4AB;background:rgba(224,162,136,.08)}
+  .tnote b{font-family:var(--mono);font-size:1.7cqh;letter-spacing:.12em;color:var(--clay);
+           display:block;margin-bottom:.4cqh}
+  body:not(.notes) .tnote{display:none}
+
+  .nar{display:none}
+
+  /* ---------- caption ---------- */
+  .cap{flex:0 0 auto;min-height:62px;display:flex;align-items:center;justify-content:center;
+       padding:10px 18px 16px;background:var(--shell)}
+  .cap p{margin:0;max-width:1000px;text-align:center;font-size:15px;line-height:1.6;color:#B6C6BE}
+  .cap p.idle{color:#5C6D65;font-size:13px}
+  body.nocap .cap{display:none}
+
+  .toast{position:fixed;left:50%;bottom:88px;transform:translateX(-50%);background:var(--clay);
+         color:#fff;padding:9px 16px;border-radius:5px;font-size:13px;display:none;z-index:9}
+  .toast.show{display:block}
+  @media (max-width:760px){ .bar .brand{width:100%;margin-bottom:4px} .cap p{font-size:13.5px} }
+
+</style>
+
+<div class="bar">
+  <span class="brand">DAY 06 · 셸 스크립팅과 자동화 · 나레이션 슬라이드</span>
+  <button id="prev" title="이전 (←)">◀</button>
+  <span class="count" id="count">1 / 19</span>
+  <button id="next" title="다음 (→)">▶</button>
+  <button class="play" id="play" title="재생 / 정지 (Space)">▶ 재생</button>
+  <button id="auto" class="on" title="나레이션이 끝나면 자동으로 다음 장">자동 진행</button>
+  <select id="rate" title="말하기 속도">
+    <option value="0.85">0.85배</option>
+    <option value="1" selected>1.0배</option>
+    <option value="1.15">1.15배</option>
+    <option value="1.3">1.3배</option>
+    <option value="1.5">1.5배</option>
+  </select>
+  <select id="voice" title="목소리"></select>
+  <button id="cap" class="on" title="자막">자막</button>
+  <button id="full" title="전체화면 (F)">전체화면</button>
+</div>
+<div class="prog"><i id="prog"></i></div>
+
+<div class="wrap"><div class="stage" id="stage">
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과</div>
+      <h1>셸 스크립팅과 자동화</h1>
+      <div class="lead">실험은 손으로 돌리지 않는다</div>
+      <div class="sub" style="margin-top:3cqh">DAY 06 / 10 · 7시간 · 「LLM 서비스를 세워가며 배우는 리눅스」 70시간 과정</div>
+    </div>
+  <div class="nar">여섯째 날입니다. 지금까지 닷새 동안 손으로 명령을 쳤습니다. 오늘은 그것을 스크립트로 묶습니다. 인공지능 작업의 본질은 반복입니다. 하이퍼파라미터를 바꿔가며 수십 번 돌리고, 데이터를 매번 같은 방식으로 정제하고, 결과를 모읍니다. 손으로 하면 실수가 섞이고 재현이 안 됩니다. 오늘 그 반복을 기계에 넘깁니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Learning Objectives</div>
+    <h2>오늘 끝났을 때 할 수 있어야 하는 것</h2>
+    <div class="fill"><div class="grid g2" style="margin-top:2cqh">
+      <div class="card"><span class="n">01</span><span class="t">스크립트의 기본 문법을</span><span class="d">변수·조건·반복·함수까지 쓸 수 있다</span></div>
+      <div class="card"><span class="n">02</span><span class="t">인용부호 규칙을</span><span class="d">이해하고 공백이 든 값을 안전하게 다룰 수 있다</span></div>
+      <div class="card"><span class="n">03</span><span class="t">안전장치를</span><span class="d">set -euo pipefail 과 trap 으로 걸 수 있다</span></div>
+      <div class="card"><span class="n">04</span><span class="t">getopts로</span><span class="d">옵션을 받는 재사용 가능한 스크립트를 만들 수 있다</span></div>
+      <div class="card"><span class="n">05</span><span class="t">xargs -P 로</span><span class="d">여러 작업을 병렬로 돌릴 수 있다</span></div>
+      <div class="card"><span class="n">06</span><span class="t">cron과 timer로</span><span class="d">정기 작업을 예약하고 동작을 확인할 수 있다</span></div>
+    </div></div>
+  <div class="nar">목표는 여섯 개입니다. 문법을 익히고, 인용부호 규칙을 확실히 하고, 스크립트가 조용히 망가지지 않도록 안전장치를 걸고, 옵션을 받는 재사용 가능한 형태로 만들고, 병렬로 돌리고, 마지막으로 정기 실행을 예약합니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Today's Schedule</div>
+    <h2>오늘 하루 · 네 개의 블록</h2>
+    <div class="fill"><div class="grid g4" style="margin-top:2cqh">
+      <div class="card"><span class="n">09:00–11:00</span><span class="t">스크립트 문법</span><span class="d">변수 · 인용부호 · 조건 · 반복 · 함수</span></div>
+      <div class="card"><span class="n">11:10–12:00</span><span class="t">안전장치와 옵션</span><span class="d">set -euo · trap · getopts · xargs -P</span></div>
+      <div class="card"><span class="n" style="color:var(--clay)">13:00–15:00</span><span class="t">전처리 파이프라인 스크립트화</span><span class="d">Day 3의 한 줄을 도구로</span></div>
+      <div class="card"><span class="n" style="color:var(--clay)">15:10–17:10</span><span class="t">배치 러너와 정기 실행</span><span class="d">실험 자동화 + timer 등록</span></div>
+    </div></div>
+    <div class="foot">각 블록에 휴식 10분 포함 · 점심 12:00–13:00</div>
+  <div class="nar">오전에 문법과 안전장치를 배우고, 오후에는 실제로 쓸 도구 두 개를 만듭니다. 하나는 셋째 날 손으로 친 정제 파이프라인을 스크립트로 승격하는 것이고, 다른 하나는 프롬프트 목록을 읽어 반복 실행하는 배치 러너입니다.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">Block 1 · 09:00–11:00</div>
+      <h2>스크립트 문법</h2>
+      <div class="sub">새 언어를 배우는 게 아닙니다. 지금까지 친 명령을 파일에 담는 것입니다.</div>
+    </div>
+  <div class="nar">첫 번째 블록입니다. 겁먹지 마십시오. 셸 스크립트는 새로운 프로그래밍 언어가 아닙니다. 지금까지 터미널에 치던 명령을 파일에 순서대로 적어 두는 것이 전부이고, 거기에 변수와 조건과 반복이 조금 얹힐 뿐입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Anatomy</div>
+    <h2>스크립트의 뼈대</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.6cqh"><span class="p">#!/usr/bin/env bash</span>          <span class="c"># shebang — 무엇으로 실행할지</span>
+<span class="p">set -euo pipefail</span>             <span class="c"># 안전장치 (뒤에서 설명)</span>
+
+<span class="p">NAME="qwen2.5:1.5b"</span>           <span class="c"># 변수 — = 양옆에 공백 없음!</span>
+<span class="p">COUNT=5</span>
+
+<span class="p">echo "모델: $NAME, 횟수: $COUNT"</span>
+
+<span class="c"># 실행 권한을 주고 실행</span>
+<span class="c"># $ chmod +x run.sh</span>
+<span class="c"># $ ./run.sh</span></pre></div>
+    <div class="foot">변수 대입에서 = 양옆에 공백을 넣으면 오류입니다. 가장 흔한 첫 실수입니다.</div>
+  <div class="nar">스크립트의 첫 줄은 셔뱅이라고 부르는 특별한 주석입니다. 이 파일을 무엇으로 실행할지 알려 줍니다. 그다음 줄의 셋 명령이 안전장치인데 잠시 후에 설명합니다. 변수는 이름 등호 값 형태로 만드는데, 여기서 첫 번째 함정이 나옵니다. 등호 양옆에 공백을 넣으면 안 됩니다. 셸은 공백을 기준으로 단어를 나누기 때문에 공백이 들어가면 전혀 다른 뜻이 됩니다. 값을 쓸 때는 달러를 앞에 붙입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Quoting</div>
+    <h2>따옴표 하나로 스크립트가 망가진다</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.6cqh"><span class="p">FILE="my data.txt"</span>
+
+<span class="p">rm $FILE</span>      <span class="c"># 위험! "my" 와 "data.txt" 두 개로 쪼개집니다</span>
+<span class="p">rm "$FILE"</span>    <span class="c"># 안전. 하나의 이름으로 다룹니다</span>
+
+<span class="p">echo "값은 $NAME"</span>     <span class="c"># 큰따옴표: 변수가 풀립니다</span>
+<span class="p">echo '값은 $NAME'</span>     <span class="c"># 작은따옴표: 글자 그대로 $NAME</span></pre>
+      <div class="banner" style="margin-top:2cqh">규칙 하나만 기억하세요 — <strong>변수는 항상 큰따옴표로 감싼다.</strong></div></div>
+    <div class="foot">경로에 공백이 들어간 파일 하나 때문에 배치가 통째로 망가지는 일이 흔합니다.</div>
+  <div class="nar">여기가 오늘 가장 중요한 지점입니다. 파일 이름에 공백이 들어 있을 때, 변수를 따옴표 없이 쓰면 셸이 공백에서 잘라 두 개의 인자로 만들어 버립니다. 삭제 명령에서 이런 일이 벌어지면 엉뚱한 파일이 지워집니다. 규칙은 하나입니다. 변수는 항상 큰따옴표로 감싸십시오. 큰따옴표는 변수를 풀어 주고, 작은따옴표는 글자 그대로 둡니다. 이 차이도 함께 기억하십시오.</div>
+</section>
+<section class="slide">
+    <div class="eb">Control</div>
+    <h2>조건과 반복</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.6cqh"><span class="c"># 조건</span>
+<span class="p">if [[ -f "$FILE" ]]; then</span>
+    echo "파일이 있습니다"
+<span class="p">elif [[ -d "$FILE" ]]; then</span>
+    echo "디렉터리입니다"
+<span class="p">else</span>
+    echo "없습니다"; exit 1
+<span class="p">fi</span>
+
+<span class="c"># 반복</span>
+<span class="p">for f in ~/ai-lab/datasets/*.jsonl; do</span>
+    echo "처리 중: $f"
+<span class="p">done</span>
+
+<span class="p">for i in $(seq 1 5); do echo "회차 $i"; done</span>
+
+<span class="p">while read -r line; do echo "&gt; $line"; done &lt; prompts.txt</span></pre></div>
+    <div class="foot">-f 파일 존재, -d 디렉터리, -z 빈 문자열, -n 비지 않음 — 이 넷이면 충분합니다.</div>
+  <div class="nar">조건문은 이프 대괄호 두 개로 씁니다. 대시 에프는 파일이 있는지, 대시 디는 디렉터리인지, 대시 지는 문자열이 비었는지를 봅니다. 반복문은 세 가지 형태를 쓰게 됩니다. 파일 목록을 도는 포 문, 숫자를 도는 시퀀스, 그리고 파일을 한 줄씩 읽는 와일 리드입니다. 마지막 형태가 프롬프트 목록을 읽어 처리할 때 쓰는 패턴이라 오늘 오후에 실제로 씁니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Functions</div>
+    <h2>함수와 인자</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.6cqh"><span class="p">log() {</span>
+    echo "[$(date +%H:%M:%S)] $*"
+<span class="p">}</span>
+
+<span class="p">run_one() {</span>
+    local name="$1"          <span class="c"># 첫 번째 인자</span>
+    local count="$2"
+    log "실행: $name ($count회)"
+<span class="p">}</span>
+
+<span class="p">run_one "qwen" 3</span>
+
+<span class="c"># 스크립트 자체의 인자</span>
+<span class="c">$0  스크립트 이름    $1 $2  첫째·둘째 인자
+$#  인자 개수        $@     인자 전체
+$?  직전 명령의 종료 코드</span></pre></div>
+    <div class="foot">local 을 빼면 함수 밖 변수를 덮어씁니다 — 긴 스크립트에서 찾기 어려운 버그가 됩니다.</div>
+  <div class="nar">함수는 이름에 소괄호를 붙이고 중괄호로 감쌉니다. 함수 안에서 달러 일은 첫 번째 인자입니다. 변수를 선언할 때 로컬을 붙이는 습관을 들이십시오. 안 붙이면 함수 밖의 같은 이름 변수를 덮어써 버려서, 긴 스크립트에서 찾기 아주 어려운 버그가 됩니다. 로그 함수처럼 시각을 찍어 주는 작은 함수 하나를 만들어 두면 모든 스크립트가 읽기 편해집니다.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">Block 2 · 11:10–12:00</div>
+      <h2>안전장치와 옵션</h2>
+      <div class="sub">스크립트가 조용히 망가지는 것을 막습니다.</div>
+    </div>
+  <div class="nar">두 번째 블록입니다. 스크립트의 가장 무서운 점은 중간에 실패해도 그냥 다음 줄로 넘어간다는 것입니다. 그래서 절반만 처리된 데이터를 만들어 놓고 성공한 척합니다. 그걸 막는 장치를 겁니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">set -euo pipefail</div>
+    <h2>네 글자로 거는 안전장치</h2>
+    
+    
+    <div class="fill"><div class="rowlist" style="margin-top:1.6cqh">
+        <div class="row"><span class="dot">e</span><span class="t">errexit</span><span class="d">명령 하나라도 실패하면 즉시 중단</span></div>
+        <div class="row"><span class="dot">u</span><span class="t">nounset</span><span class="d">정의 안 된 변수를 쓰면 오류 — 오타를 잡아 줍니다</span></div>
+        <div class="row"><span class="dot">o</span><span class="t">pipefail</span><span class="d">파이프 중간이 실패해도 전체를 실패로 처리</span></div>
+      </div>
+      <pre style="margin-top:2cqh"><span class="c"># 없으면: 실패해도 계속 갑니다</span>
+cd /없는경로
+rm -rf *          <span class="c">← 엉뚱한 곳에서 실행됩니다!</span>
+
+<span class="c"># set -e 가 있으면 cd 에서 멈춥니다</span></pre></div>
+    <div class="foot">이 한 줄이 없어서 벌어진 사고가 실제로 많습니다. 모든 스크립트 두 번째 줄에 넣으세요.</div>
+  <div class="nar">셋 대시 이유오 파이프페일은 네 글자로 거는 안전장치입니다. 이는 명령이 하나라도 실패하면 즉시 중단하라는 뜻입니다. 유는 정의하지 않은 변수를 쓰면 오류를 내라는 뜻인데, 변수 이름 오타를 잡아 줍니다. 파이프페일은 파이프 중간에서 실패해도 전체를 실패로 처리합니다. 아래 예시를 보십시오. 존재하지 않는 경로로 이동을 시도하고 실패했는데 그냥 넘어가면, 다음 줄의 삭제 명령이 원래 있던 자리에서 실행됩니다. 이 한 줄이 없어서 벌어진 사고가 실제로 많습니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">trap</div>
+    <h2>trap — 어떻게 끝나든 뒷정리</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.6cqh"><span class="p">TMPDIR=$(mktemp -d)</span>
+<span class="p">cleanup() {</span>
+    rm -rf "$TMPDIR"
+    echo "임시 파일 정리 완료"
+<span class="p">}</span>
+<span class="p">trap cleanup EXIT</span>      <span class="c"># 정상 종료·오류·Ctrl+C 모두</span>
+
+<span class="c"># 이제 무슨 일이 있어도 TMPDIR 은 지워집니다</span></pre></div>
+    <div class="foot">mktemp -d 는 충돌하지 않는 임시 디렉터리를 만들어 줍니다. /tmp/mydir 같은 고정 이름은 쓰지 마세요.</div>
+  <div class="nar">트랩은 스크립트가 어떻게 끝나든 반드시 실행할 뒷정리를 등록합니다. 정상 종료든 오류든 사용자가 컨트롤 씨를 누르든 상관없이 실행됩니다. 임시 파일을 만드는 스크립트에는 거의 항상 필요합니다. 엠케이템프 대시 디는 다른 프로세스와 충돌하지 않는 임시 디렉터리를 만들어 줍니다. 고정된 이름을 쓰면 두 개가 동시에 돌 때 서로의 파일을 덮어쓰게 됩니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">getopts</div>
+    <h2>재사용 가능한 스크립트 만들기</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.6cqh"><span class="p">usage() { echo "사용법: $0 -m 모델 -n 횟수 [-o 출력]"; exit 1; }</span>
+
+<span class="p">OUT="result.csv"</span>
+<span class="p">while getopts "m:n:o:h" opt; do</span>
+  case "$opt" in
+    m) MODEL="$OPTARG" ;;
+    n) COUNT="$OPTARG" ;;
+    o) OUT="$OPTARG" ;;
+    h|*) usage ;;
+  esac
+<span class="p">done</span>
+<span class="p">[[ -z "${MODEL:-}" ]] &amp;&amp; usage</span>
+
+<span class="c"># $ ./run.sh -m qwen2.5:1.5b -n 10 -o out.csv</span></pre></div>
+    <div class="foot">내가 만든 도구도 남이 쓸 수 있어야 합니다. 사용법을 출력하는 것부터가 시작입니다.</div>
+  <div class="nar">겟옵츠는 대시 엠, 대시 엔 같은 옵션을 받게 해 줍니다. 콜론이 붙은 글자는 값을 함께 받는다는 뜻입니다. 이렇게 만들면 스크립트를 고치지 않고도 모델과 횟수를 바꿔 가며 쓸 수 있습니다. 여기서 좋은 습관 하나. 필수 옵션이 빠졌을 때 사용법을 출력하고 종료하게 만드십시오. 내가 만든 도구도 남이 쓸 수 있어야 하고, 사실 삼 개월 뒤의 나 자신이 바로 그 남입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Parallel</div>
+    <h2>xargs -P — 병렬로 돌리기</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.6cqh"><span class="c"># 순차: 10개 × 3초 = 30초</span>
+<span class="p">for f in *.jsonl; do process "$f"; done</span>
+
+<span class="c"># 병렬: 4개씩 동시에 = 약 8초</span>
+<span class="p">ls *.jsonl | xargs -P 4 -I{} ./process.sh {}</span>
+
+<span class="p">nproc</span>                    <span class="c"># 코어 수 확인</span>
+<span class="p">ls *.jsonl | xargs -P "$(nproc)" -I{} ./process.sh {}</span></pre>
+      <div class="banner" style="margin-top:2cqh">코어 수보다 많이 띄우면 오히려 느려집니다 — Day 4에서 본 CPU 경합입니다.</div></div>
+    
+  <div class="nar">엑스아그스에 대시 대문자 피를 주면 여러 개를 동시에 돌립니다. 열 개짜리 작업이 순차로는 삼십 초 걸리는데 네 개씩 병렬로 돌리면 팔 초에 끝납니다. 엔프록으로 코어 수를 확인하고 그 수에 맞추면 됩니다. 다만 코어 수보다 많이 띄우면 오히려 느려집니다. 넷째 날에 본 시피유 경합 때문입니다. 무작정 늘리는 게 답이 아니라는 것을 오후 실습에서 측정으로 확인합니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Scheduling</div>
+    <h2>cron과 systemd timer</h2>
+    
+    
+    <div class="fill"><div class="grid g2" style="margin-top:1.6cqh">
+        <div class="card"><span class="n">cron</span><span class="t">간단하고 어디에나 있다</span><span class="d">crontab -e 로 한 줄 추가<br>분 시 일 월 요일 명령<br><br>로그가 남지 않아 실패해도 모를 수 있습니다</span></div>
+        <div class="card"><span class="n">systemd timer</span><span class="t">로그와 상태가 남는다</span><span class="d">.service + .timer 두 파일<br>journalctl 로 실행 이력 확인<br><br>Day 7에서 systemd를 배우면 자연스럽게 이어집니다</span></div>
+      </div>
+      <pre style="margin-top:2cqh"><span class="c"># 매일 새벽 3시 정리</span>
+<span class="p">0 3 * * *  /home/ubuntu/ai-lab/scripts/cleanup.sh &gt;&gt; /home/ubuntu/ai-lab/logs/cron.log 2&gt;&amp;1</span></pre></div>
+    <div class="foot">cron은 PATH가 거의 비어 있습니다 — 명령을 절대경로로 쓰거나 스크립트 안에서 PATH를 설정하세요.</div>
+  <div class="nar">정기 실행에는 두 가지 방법이 있습니다. 크론은 간단하고 어디에나 있습니다. 분 시 일 월 요일 순서로 다섯 개 항목을 적고 명령을 씁니다. 단점은 로그가 남지 않아서 실패해도 모를 수 있다는 것입니다. 그래서 출력을 로그 파일로 보내는 습관이 중요합니다. 시스템디 타이머는 파일을 두 개 만들어야 해서 번거롭지만 실행 이력과 상태가 남습니다. 내일 시스템디를 배우면 자연스럽게 이어집니다. 크론에서 가장 흔한 함정은 패스입니다. 크론 환경에는 패스가 거의 비어 있어서 손으로는 되던 명령이 안 됩니다. 절대경로를 쓰십시오.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">Block 4 · AI LAB · 15:10–17:10</div>
+      <h2>배치 러너 만들기</h2>
+      <div class="sub">오늘 배운 것을 전부 합쳐 실제로 쓸 도구를 만듭니다.</div>
+    </div>
+  <div class="nar">마지막 블록입니다. 오늘 배운 문법과 안전장치와 옵션을 전부 합쳐서, 앞으로 계속 쓸 도구 두 개를 만듭니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">AI LAB</div>
+    <h2>만들 것 — 배치 러너</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.6cqh"><span class="p">$ ./batch_runner.sh -p prompts.txt -o results.csv -n 3</span>
+
+<span class="c">[14:20:01] 프롬프트 12개 로드
+[14:20:01] 1/12 처리 중...
+[14:20:04] 1/12 완료 (2.8초)
+...
+[14:21:30] 완료: 성공 11, 실패 1
+[14:21:30] 실패 항목은 failed.txt 에 기록</span></pre>
+      <div class="rowlist" style="margin-top:2cqh">
+        <div class="row"><span class="dot">1</span><span class="t">옵션으로 입력·출력·반복 지정</span><span class="d">getopts</span></div>
+        <div class="row"><span class="dot">2</span><span class="t">한 줄씩 읽어 처리</span><span class="d">while read</span></div>
+        <div class="row"><span class="dot">3</span><span class="t">소요 시간 측정과 CSV 적재</span><span class="d">date +%s</span></div>
+        <div class="row"><span class="dot">4</span><span class="t">실패한 항목만 따로 기록</span><span class="d">|| 로 분기</span></div>
+      </div></div>
+    <div class="foot">Day 7에서 실제 LLM API로 바꿔 끼우면 그대로 동작합니다.</div>
+  <div class="nar">배치 러너는 프롬프트 목록 파일을 읽어서 하나씩 처리하고, 결과와 소요 시간을 씨에스브이로 쌓고, 실패한 것만 따로 기록하는 도구입니다. 오늘은 실제 모델 대신 흉내 내는 명령으로 만들고, 내일 추론 서버를 띄우면 그 부분만 바꿔 끼웁니다. 도구를 만들 때 처음부터 실제 대상에 붙이지 않고 가짜로 먼저 만드는 것도 좋은 습관입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">AI LAB</div>
+    <h2>만들 것 — 정리 스크립트와 timer</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.6cqh"><span class="c"># cleanup.sh — 7일 지난 로그와 임시 파일 정리</span>
+<span class="p">find "$AI_LAB/logs" -name "*.log" -mtime +7 -print</span>   <span class="c"># 먼저 목록</span>
+<span class="p">find "$AI_LAB/logs" -name "*.log" -mtime +7 -delete</span>  <span class="c"># 확인 후 삭제</span>
+<span class="p">du -sh "$AI_LAB"/* | sort -h</span>                        <span class="c"># 정리 후 용량 기록</span></pre>
+      <div class="bannerG" style="margin-top:2cqh">Day 2에서 "지워도 되는가"를 기준으로 폴더를 나눈 이유가 여기서 드러납니다.</div></div>
+    <div class="foot">-delete 를 넣기 전에 반드시 -print 로 먼저 돌려 봅니다 (Day 3의 규칙).</div>
+  <div class="nar">두 번째 도구는 정리 스크립트입니다. 이레 지난 로그를 지우고 정리 후 용량을 기록합니다. 여기서 둘째 날에 폴더를 나눈 기준이 왜 중요했는지 드러납니다. 지워도 되는 것과 지우면 안 되는 것이 폴더로 구분돼 있으면 정리 스크립트를 안전하게 쓸 수 있습니다. 그리고 셋째 날의 규칙을 다시 지키십시오. 딜리트를 넣기 전에 프린트로 먼저 돌려서 무엇이 지워질지 눈으로 봅니다.</div>
+</section>
+<section class="slide dk">
+    <div class="eb">Assignment 06 · 제출 익일 09:00</div>
+    <h2>재사용 가능한 배치 러너</h2>
+    <div class="sub">옵션을 받고, 실패를 견디고, 남이 써도 되는 스크립트를 완성하십시오.</div>
+    <div class="fill"><div class="grid g3" style="margin-top:2cqh">
+      <div class="card"><span class="n">01</span><span class="t">-p(입력) -o(출력) -n(반복) -h(도움말) 옵션 처리</span></div>
+      <div class="card"><span class="n">02</span><span class="t">set -euo pipefail 과 trap 으로 안전장치</span></div>
+      <div class="card"><span class="n">03</span><span class="t">잘못된 인자 / 없는 파일 / 처리 실패 세 오류 처리</span></div>
+      <div class="card"><span class="n">04</span><span class="t">결과 CSV (입력, 결과, 소요시간, 성공여부)</span></div>
+      <div class="card"><span class="n">05</span><span class="t">실패 항목만 별도 파일로</span></div>
+      <div class="card"><span class="n">06</span><span class="t">-h 로 사용법 출력</span></div>
+    </div></div>
+    <div class="foot">채점은 <strong>오류 상황 세 가지</strong>에서 스크립트가 어떻게 반응하는지로 합니다. 정상 동작은 기본이고, 실패했을 때 무엇을 남기는지가 실력입니다.</div>
+  <div class="nar">과제입니다. 오늘 만든 배치 러너를 완성해 오십시오. 옵션 네 개를 처리하고, 안전장치를 걸고, 결과를 씨에스브이로 남기고, 실패 항목을 따로 기록해야 합니다. 채점은 정상 동작이 아니라 오류 상황 세 가지에서 어떻게 반응하는지로 합니다. 인자가 잘못됐을 때, 파일이 없을 때, 처리가 실패했을 때. 정상 동작은 기본이고 실패했을 때 무엇을 남기는지가 실력입니다.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">Wrap-up</div>
+      <h2>오늘 한 일</h2>
+      <div class="sub" style="font-size:3.4cqh;color:#D7E2DC;margin-top:2cqh">반복을 스크립트로 넘기고, 안전장치를 걸고, 정기 실행까지 예약했습니다.</div>
+      <div class="lead" style="margin-top:4cqh">내일 · Day 7 — LLM 추론 서버 올리기</div>
+      <div class="sub">드디어 모델을 띄웁니다. 오늘 만든 배치 러너의 가짜 부분을 진짜 API로 바꿔 끼웁니다.</div>
+    </div>
+  <div class="nar">오늘 한 일을 정리하겠습니다. 셸 스크립트의 문법을 익혔고, 따옴표 규칙이라는 가장 흔한 함정을 확인했고, 셋 대시 이유오 파이프페일과 트랩으로 안전장치를 걸었습니다. 그리고 옵션을 받는 배치 러너와 정리 스크립트를 만들어 정기 실행까지 등록했습니다. 내일은 드디어 모델을 띄웁니다. 오늘 만든 배치 러너에서 가짜로 둔 부분을 진짜 추론 에이피아이로 바꿔 끼우게 됩니다. 수고하셨습니다.</div>
+</section>
+</div></div>
+
+<div class="cap"><p id="capText" class="idle">▶ 재생을 누르면 나레이션이 시작됩니다 · ← → 슬라이드 이동 · Space 재생/정지 · F 전체화면</p></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const synth  = window.speechSynthesis;
+  const $ = id => document.getElementById(id);
+  let idx = 0, playing = false, auto = true, chunks = [], ci = 0, voices = [], voice = null;
+
+  $('count').textContent = '1 / ' + slides.length;
+
+  function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 3800); }
+
+  function narration(i){ const n = slides[i].querySelector('.nar'); return n ? n.textContent.trim() : ''; }
+  function splitSentences(t){
+    return t.split(/(?<=[.?!])\s+/).map(s=>s.trim()).filter(Boolean);
+  }
+
+  function show(i){
+    slides[idx].classList.remove('show');
+    idx = Math.max(0, Math.min(slides.length-1, i));
+    slides[idx].classList.add('show');
+    $('count').textContent = (idx+1) + ' / ' + slides.length;
+    $('prog').style.width = ((idx+1)/slides.length*100) + '%';
+  }
+
+  function setCap(text, idle){
+    const p = $('capText');
+    p.textContent = text;
+    p.classList.toggle('idle', !!idle);
+  }
+
+  function stop(){
+    playing = false; chunks = []; ci = 0;
+    try { synth.cancel(); } catch(e){}
+    $('play').textContent = '▶ 재생';
+    $('play').classList.remove('playing');
+    setCap('▶ 재생을 누르면 나레이션이 시작됩니다 · ← → 슬라이드 이동 · Space 재생/정지 · F 전체화면', true);
+  }
+
+  function speakNext(){
+    if (!playing) return;
+    if (ci >= chunks.length){
+      if (auto && idx < slides.length-1){ show(idx+1); startSpeaking(); }
+      else { stop(); }
+      return;
+    }
+    const u = new SpeechSynthesisUtterance(chunks[ci]);
+    u.lang = 'ko-KR';
+    if (voice) u.voice = voice;
+    u.rate = parseFloat($('rate').value);
+    u.onend = () => { ci++; speakNext(); };
+    u.onerror = () => { ci++; speakNext(); };
+    setCap(chunks[ci]);
+    synth.speak(u);
+  }
+
+  function startSpeaking(){
+    try { synth.cancel(); } catch(e){}
+    chunks = splitSentences(narration(idx)); ci = 0;
+    if (!chunks.length){ if (auto && idx < slides.length-1){ show(idx+1); setTimeout(startSpeaking,120); } else stop(); return; }
+    playing = true;
+    $('play').textContent = '❚❚ 정지';
+    $('play').classList.add('playing');
+    setTimeout(speakNext, 120);
+  }
+
+  function toggle(){ playing ? stop() : startSpeaking(); }
+  function go(d){ const was = playing; stop(); show(idx+d); if (was) setTimeout(startSpeaking, 150); }
+
+  /* voices */
+  function loadVoices(){
+    voices = synth.getVoices();
+    const ko = voices.filter(v => /^ko/i.test(v.lang));
+    const sel = $('voice');
+    sel.innerHTML = '';
+    const list = ko.length ? ko : voices;
+    if (!list.length){ sel.innerHTML = '<option>음성 없음</option>'; return; }
+    list.forEach((v,i) => {
+      const o = document.createElement('option');
+      o.value = voices.indexOf(v); o.textContent = v.name.replace(/Microsoft |Google /,'');
+      sel.appendChild(o);
+    });
+    voice = list[0];
+    sel.value = voices.indexOf(voice);
+    if (!ko.length) toast('한국어 음성이 없습니다 — Chrome 또는 Edge에서 열어 보세요');
+  }
+  loadVoices();
+  if (typeof synth.onvoiceschanged !== 'undefined') synth.onvoiceschanged = loadVoices;
+
+  /* controls */
+  $('play').onclick = toggle;
+  $('prev').onclick = () => go(-1);
+  $('next').onclick = () => go(1);
+  $('voice').onchange = e => { voice = voices[e.target.value]; if (playing){ const w=idx; stop(); show(w); startSpeaking(); } };
+  $('rate').onchange  = () => { if (playing){ const w=idx; stop(); show(w); startSpeaking(); } };
+  $('auto').onclick   = e => { auto = !auto; e.target.classList.toggle('on', auto); };
+  $('cap').onclick    = e => { document.body.classList.toggle('nocap'); e.target.classList.toggle('on', !document.body.classList.contains('nocap')); };
+  $('full').onclick   = () => { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); };
+
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'SELECT') return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown'){ e.preventDefault(); go(1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); go(-1); }
+    else if (e.key === ' '){ e.preventDefault(); toggle(); }
+    else if (e.key === 'f' || e.key === 'F'){ $('full').click(); }
+    else if (e.key === 'Home'){ go(-idx); }
+    else if (e.key === 'End'){ go(slides.length-1-idx); }
+  });
+  $('stage').addEventListener('click', e => { if (e.clientX > window.innerWidth/2) go(1); else go(-1); });
+  window.addEventListener('beforeunload', () => { try{ synth.cancel(); }catch(e){} });
+  window.deckGo = n => { const was = playing; stop(); show(n); if (was) setTimeout(startSpeaking, 150); };
+})();
+
+</script>
+<script src="../nav.js"></script>

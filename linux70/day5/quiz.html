@@ -1,0 +1,480 @@
+<title>Day 5 명령어 퀴즈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --bg:#F6F8F5;--surface:#FFFFFF;--surface-2:#EDF1EC;--ink:#141A16;--ink-2:#3A453E;--muted:#5F6D65;
+    --line:#DBE2DC;--line-strong:#C3CFC6;--accent:#10684A;--accent-soft:#E2EFE8;
+    --clay:#A94D30;--clay-soft:#F6E7E0;--term:#10171A;
+    --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+      --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;
+      --clay:#E08F6E;--clay-soft:#2A1E18;--term:#0A0F11;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+    --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;
+    --clay:#E08F6E;--clay-soft:#2A1E18;--term:#0A0F11;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.68;margin:0;
+       -webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding-inline:20px}
+  h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0}
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+
+  header{border-bottom:1px solid var(--line);background:var(--surface)}
+  .mast{padding-block:32px 22px;display:flex;flex-direction:column;gap:10px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  h1{font-size:clamp(24px,4vw,32px);font-weight:700;letter-spacing:-.025em}
+  .mast p{color:var(--ink-2);font-size:14.5px;font-weight:300;max-width:60ch}
+
+  .prog{height:3px;background:var(--surface-2)}
+  .prog i{display:block;height:100%;background:var(--accent);width:0;transition:width .35s}
+
+  main{padding-block:30px 60px}
+  .meta{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+  .meta .qn{font-family:var(--mono);font-size:11.5px;letter-spacing:.11em;color:var(--accent)}
+  .meta .sc{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+  .qcard{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:26px 24px}
+  .qtext{font-size:18px;font-weight:600;line-height:1.55;text-wrap:balance}
+  pre{background:var(--term);color:#DCE6E3;border-radius:4px;padding:14px 16px;margin:16px 0 0;
+      font-family:var(--mono);font-size:13px;line-height:1.7;overflow-x:auto}
+  pre .p{color:#7FD1A8}
+  pre .c{color:#7C9A93}
+  code{font-family:var(--mono);font-size:.9em;background:var(--surface-2);padding:1px 5px;border-radius:3px}
+
+  .opts{display:flex;flex-direction:column;gap:9px;margin-top:20px}
+  .opt{text-align:left;font-family:var(--sans);font-size:15px;line-height:1.5;color:var(--ink);
+       background:var(--surface);border:1px solid var(--line-strong);border-radius:5px;
+       padding:13px 16px;cursor:pointer;display:flex;gap:11px;align-items:flex-start;width:100%}
+  .opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
+  .opt:disabled{cursor:default}
+  .opt .mk{font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:2px;flex:0 0 auto}
+  .opt.right{border-color:var(--accent);background:var(--accent-soft)}
+  .opt.right .mk{color:var(--accent)}
+  .opt.wrong{border-color:var(--clay);background:var(--clay-soft)}
+  .opt.wrong .mk{color:var(--clay)}
+  .opt code{background:rgba(0,0,0,.06)}
+
+  .typed{display:flex;gap:9px;margin-top:20px;flex-wrap:wrap}
+  input[type=text]{flex:1 1 240px;font-family:var(--mono);font-size:15px;color:var(--ink);
+      background:var(--surface);border:1px solid var(--line-strong);border-radius:5px;padding:12px 14px}
+  input[type=text]:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  input[type=text]:disabled{opacity:.75}
+
+  button.go{font-family:var(--sans);font-size:15px;font-weight:600;color:#fff;background:var(--accent);
+      border:1px solid var(--accent);border-radius:5px;padding:12px 22px;cursor:pointer}
+  button.go:hover{filter:brightness(1.08)}
+  button.ghost{font-family:var(--sans);font-size:14px;font-weight:500;color:var(--ink-2);
+      background:var(--surface);border:1px solid var(--line-strong);border-radius:5px;padding:11px 18px;cursor:pointer}
+  button.ghost:hover{border-color:var(--accent);color:var(--accent)}
+  .actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+
+  .fb{margin-top:18px;border-left:3px solid var(--accent);background:var(--accent-soft);
+      border-radius:0 4px 4px 0;padding:14px 16px}
+  .fb.no{border-left-color:var(--clay);background:var(--clay-soft)}
+  .fb .v{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+         color:var(--accent);display:block;margin-bottom:5px}
+  .fb.no .v{color:var(--clay)}
+  .fb p{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .fb code{background:rgba(0,0,0,.06)}
+
+  /* result */
+  .res{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:32px 24px;text-align:center}
+  .res .big{font-family:var(--mono);font-size:56px;font-weight:600;line-height:1;color:var(--accent);
+            font-variant-numeric:tabular-nums}
+  .res .big.mid{color:#B08322}
+  .res .big.low{color:var(--clay)}
+  .res h2{font-size:20px;margin-top:14px}
+  .res p{color:var(--muted);font-size:14.5px;margin-top:8px;max-width:48ch;margin-inline:auto}
+  .res .actions{justify-content:center}
+  .missed{margin-top:26px;text-align:left;border-top:1px solid var(--line);padding-top:20px}
+  .missed h3{font-size:14px;color:var(--muted);font-family:var(--mono);letter-spacing:.11em;
+             text-transform:uppercase;font-weight:500;margin-bottom:12px}
+  .missed li{font-size:14px;color:var(--ink-2);line-height:1.6;margin-top:9px}
+  .missed li b{color:var(--ink)}
+
+  footer{border-top:1px solid var(--line);background:var(--surface);padding-block:22px}
+  footer p{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  @media (max-width:560px){ .qcard{padding:20px 16px} .qtext{font-size:16.5px} }
+
+</style>
+
+<header>
+  <div class="wrap mast">
+    <span class="eyebrow">Day 5 · 리눅스 × LLM 서빙 70시간 과정</span>
+    <h1>패키지와 원격 접속 퀴즈</h1>
+    <p>18문항 · 객관식과 직접 입력이 섞여 있습니다. 가이드를 다시 보지 말고 먼저 풀어 보세요. 15문항 이상이면 통과입니다.</p>
+  </div>
+</header>
+<div class="prog"><i id="prog"></i></div>
+
+<main class="wrap">
+  <div class="meta"><span class="qn" id="qn">Q 01 / 18</span><span class="sc" id="sc">정답 0</span></div>
+  <div id="area"></div>
+</main>
+
+<footer><div class="wrap"><p>Day 5 · <a href="lab.html">실습 가이드로 돌아가기</a></p></div></footer>
+
+<script>
+window.QUIZ = [
+  {
+    "q": "<code>sudo apt update</code>가 하는 일은?",
+    "o": [
+      "설치 가능한 패키지 목록을 갱신한다",
+      "설치된 패키지를 최신으로 올린다",
+      "새 패키지를 설치한다",
+      "캐시를 지운다"
+    ],
+    "a": 0,
+    "e": "업그레이드는 <code>apt upgrade</code>입니다. update는 \"목록만\" 갱신합니다."
+  },
+  {
+    "q": "<code>/usr/bin/jq</code>가 어느 패키지에서 왔는지 확인하는 명령은?",
+    "o": [
+      "dpkg -S /usr/bin/jq",
+      "dpkg -L jq",
+      "apt show jq",
+      "which jq"
+    ],
+    "a": 0,
+    "e": "<code>-S</code>는 search(파일→패키지), <code>-L</code>은 list(패키지→파일)입니다."
+  },
+  {
+    "q": "외부 저장소를 추가해 설치할 때의 표준 절차는?",
+    "o": [
+      "GPG 키 등록 → 저장소 추가 → apt update → apt install",
+      "apt install → GPG 키 등록",
+      "저장소 추가 → apt install",
+      "GPG 키만 등록하면 된다"
+    ],
+    "a": 0,
+    "e": "Docker, Ollama, NVIDIA 드라이버 설치가 전부 이 네 단계입니다."
+  },
+  {
+    "q": "<code>sudo pip install</code>을 하면 안 되는 이유는?",
+    "o": [
+      "시스템 도구가 쓰는 파이썬 패키지를 망가뜨릴 수 있다",
+      "느려서",
+      "권한 오류가 나서",
+      "인터넷을 많이 써서"
+    ],
+    "a": 0,
+    "e": "우분투의 여러 시스템 도구가 파이썬으로 만들어져 있습니다. 최근 버전은 아예 막아 놨습니다."
+  },
+  {
+    "q": "격리된 파이썬 환경을 만드는 명령은? (직접 입력)",
+    "t": true,
+    "acc": [
+      "python3 -m venv",
+      "python -m venv"
+    ],
+    "ans": "python3 -m venv",
+    "e": "뒤에 경로를 붙입니다. <code>python3 -m venv ~/ai-lab/envs/llm</code>"
+  },
+  {
+    "q": "venv를 활성화하면 실제로 무슨 일이 일어나나요?",
+    "o": [
+      "PATH 맨 앞에 그 환경의 bin이 추가된다",
+      "새 파이썬이 설치된다",
+      "시스템 파이썬이 교체된다",
+      "가상머신이 뜬다"
+    ],
+    "a": 0,
+    "e": "마법이 아니라 환경변수 조작입니다. 활성화 전후로 <code>echo $PATH</code>를 비교하면 보입니다."
+  },
+  {
+    "q": "설치된 패키지 목록을 파일로 고정하는 명령은?",
+    "o": [
+      "pip freeze > requirements.txt",
+      "pip list > requirements.txt",
+      "pip save",
+      "pip export"
+    ],
+    "a": 0,
+    "e": "<code>freeze</code>는 버전까지 고정된 형식으로 출력합니다. <code>list</code>는 사람이 보기 좋은 표 형식이라 재현용으로 부적합합니다."
+  },
+  {
+    "q": "<code>PATH</code>에 같은 이름의 명령이 두 곳에 있으면?",
+    "o": [
+      "앞쪽 디렉터리의 것이 실행된다",
+      "나중에 설치한 것이 실행된다",
+      "오류가 난다",
+      "둘 다 실행된다"
+    ],
+    "a": 0,
+    "e": "앞에서부터 찾아 처음 만난 것을 씁니다. <code>type -a 명령</code>으로 후보를 전부 볼 수 있습니다."
+  },
+  {
+    "q": "<code>./script.sh</code>와 <code>source script.sh</code>의 차이는?",
+    "o": [
+      "앞은 자식 셸에서, 뒤는 현재 셸에서 실행된다",
+      "앞이 더 빠르다",
+      "뒤는 권한이 필요하다",
+      "차이가 없다"
+    ],
+    "a": 0,
+    "e": "그래서 venv 활성화는 반드시 source여야 합니다. 실행하면 환경 변경이 사라집니다."
+  },
+  {
+    "q": "SSH 키 쌍에서 <strong>서버에 올리는</strong> 것은?",
+    "o": [
+      "공개키 (.pub)",
+      "개인키",
+      "둘 다",
+      "비밀번호"
+    ],
+    "a": 0,
+    "e": "개인키는 내 컴퓨터를 떠나면 안 됩니다. 유출되면 그 서버는 열린 것과 같습니다."
+  },
+  {
+    "q": "공개키를 서버에 자동으로 등록해 주는 명령은? (직접 입력)",
+    "t": true,
+    "acc": [
+      "ssh-copy-id"
+    ],
+    "ans": "ssh-copy-id",
+    "e": "서버의 <code>~/.ssh/authorized_keys</code>에 추가해 줍니다. 수동으로 붙여넣어도 결과는 같습니다."
+  },
+  {
+    "q": "키를 등록했는데도 비밀번호를 묻는다면 가장 먼저 볼 것은?",
+    "o": [
+      "~/.ssh 와 키 파일의 권한",
+      "네트워크 속도",
+      "서버 시간",
+      "PATH 설정"
+    ],
+    "a": 0,
+    "e": "SSH는 권한이 헐거우면 키를 무시합니다. <code>~/.ssh</code>는 700, 키 파일은 600이어야 합니다."
+  },
+  {
+    "q": "수 GB 모델 파일 전송에 <code>scp</code>보다 <code>rsync</code>가 나은 이유는?",
+    "o": [
+      "끊겨도 이어받을 수 있다",
+      "더 안전하다",
+      "압축을 안 한다",
+      "비밀번호가 필요 없다"
+    ],
+    "a": 0,
+    "e": "<code>--partial</code> 옵션이 핵심입니다. 40%에서 끊겨도 41%부터 이어갑니다."
+  },
+  {
+    "q": "<code>rsync --delete</code>를 쓰기 전에 반드시 할 일은?",
+    "o": [
+      "--dry-run으로 무엇이 지워질지 확인",
+      "sudo를 붙인다",
+      "압축을 끈다",
+      "백업 없이 바로 실행"
+    ],
+    "a": 0,
+    "e": "보내는 쪽에 없는 파일을 받는 쪽에서 지웁니다. <code>deleting</code> 줄이 있는지 먼저 봐야 합니다."
+  },
+  {
+    "q": "tmux에서 세션을 떼어내는(detach) 키는?",
+    "o": [
+      "Ctrl+b 그다음 d",
+      "Ctrl+d",
+      "Ctrl+b 그다음 x",
+      "Esc 그다음 q"
+    ],
+    "a": 0,
+    "e": "tmux의 모든 단축키는 <kbd>Ctrl</kbd>+<kbd>b</kbd>를 먼저 누르고 시작합니다. 이 하나만 알면 됩니다."
+  },
+  {
+    "q": "SSH 접속이 끊겼을 때 tmux 세션 안의 작업은?",
+    "o": [
+      "서버에서 계속 돈다",
+      "함께 종료된다",
+      "일시정지된다",
+      "처음부터 다시 시작된다"
+    ],
+    "a": 0,
+    "e": "Day 4의 <code>nohup</code>은 임시방편, tmux는 정식 해법입니다. 화면까지 그대로 되찾을 수 있습니다."
+  },
+  {
+    "q": "VM에 SSH 접속이 <code>Connection refused</code>로 실패할 때 가장 흔한 원인은?",
+    "o": [
+      "OpenSSH 서버가 설치·실행되지 않았다",
+      "비밀번호가 틀렸다",
+      "키가 없다",
+      "방화벽이 항상 원인이다"
+    ],
+    "a": 0,
+    "e": "Day 1 설치 때 OpenSSH 체크를 놓친 경우입니다. <code>sudo apt install -y openssh-server</code>로 해결됩니다."
+  },
+  {
+    "q": "<code>~/.ssh/config</code>에 별칭을 만들면 함께 편해지는 도구는?",
+    "o": [
+      "scp와 rsync",
+      "ping과 curl",
+      "apt와 pip",
+      "tmux와 nohup"
+    ],
+    "a": 0,
+    "e": "세 도구가 같은 설정을 읽습니다. 한 번 설정하면 <code>scp file gpu:~/</code>처럼 짧게 쓸 수 있습니다."
+  }
+];
+window.PASS = 15;
+</script>
+<script>
+(function(){
+  const Q = window.QUIZ || [];
+
+  const $ = id => document.getElementById(id);
+  let i = 0, score = 0, missed = [], answered = false;
+
+  const norm = s => s.trim().toLowerCase().replace(/\s+/g,' ');
+
+  function render(){
+    answered = false;
+    const q = Q[i];
+    $('qn').textContent = 'Q ' + String(i+1).padStart(2,'0') + ' / ' + Q.length;
+    $('sc').textContent = '정답 ' + score;
+    $('prog').style.width = (i / Q.length * 100) + '%';
+
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.innerHTML = '<div class="qtext">' + q.q + '</div>' + (q.pre ? '<pre>' + q.pre + '</pre>' : '');
+
+    if (q.t){
+      const wrap = document.createElement('div');
+      wrap.className = 'typed';
+      wrap.innerHTML = '<input type="text" id="inp" autocomplete="off" autocapitalize="off" ' +
+                       'spellcheck="false" placeholder="명령을 그대로 입력하세요">' +
+                       '<button class="go" id="chk">확인</button>';
+      card.appendChild(wrap);
+      card.appendChild(mkFoot());
+      $('area').replaceChildren(card);
+      $('inp').focus();
+      $('chk').onclick = () => judgeTyped(q);
+      $('inp').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); answered ? nextQ() : judgeTyped(q); } });
+    } else {
+      const order = q.o.map((t,n) => n);
+      for (let k = order.length - 1; k > 0; k--){ const j = Math.floor(Math.random()*(k+1)); [order[k],order[j]] = [order[j],order[k]]; }
+      const box = document.createElement('div');
+      box.className = 'opts';
+      order.forEach((oi, pos) => {
+        const b = document.createElement('button');
+        b.className = 'opt'; b.type = 'button'; b.dataset.i = oi;
+        b.innerHTML = '<span class="mk">' + 'ABCD'[pos] + '</span><span>' + q.o[oi] + '</span>';
+        b.onclick = () => judgeChoice(q, b, box);
+        box.appendChild(b);
+      });
+      card.appendChild(box);
+      card.appendChild(mkFoot());
+      $('area').replaceChildren(card);
+    }
+  }
+
+  function mkFoot(){
+    const d = document.createElement('div');
+    d.id = 'foot';
+    return d;
+  }
+
+  function feedback(ok, q, extra){
+    answered = true;
+    score += ok ? 1 : 0;
+    if (!ok) missed.push(i);
+    $('sc').textContent = '정답 ' + score;
+    const f = document.createElement('div');
+    f.className = 'fb' + (ok ? '' : ' no');
+    f.innerHTML = '<span class="v">' + (ok ? '정답' : '오답') + '</span><p>' + (extra || '') + q.e + '</p>';
+    const act = document.createElement('div');
+    act.className = 'actions';
+    const b = document.createElement('button');
+    b.className = 'go';
+    b.textContent = (i === Q.length - 1) ? '결과 보기' : '다음 문제';
+    b.onclick = nextQ;
+    act.appendChild(b);
+    const foot = $('foot');
+    foot.replaceChildren(f, act);
+    b.focus();
+  }
+
+  function judgeChoice(q, btn, box){
+    if (answered) return;
+    const pick = +btn.dataset.i, ok = pick === q.a;
+    Array.from(box.children).forEach(el => {
+      el.disabled = true;
+      const n = +el.dataset.i;
+      if (n === q.a) el.classList.add('right');
+      else if (n === pick) el.classList.add('wrong');
+    });
+    feedback(ok, q, ok ? '' : '정답은 <code>' + q.o[q.a] + '</code> 입니다. ');
+  }
+
+  function judgeTyped(q){
+    if (answered) return;
+    const inp = $('inp');
+    const v = norm(inp.value);
+    if (!v){ inp.focus(); return; }
+    const ok = q.acc.some(a => norm(a) === v);
+    inp.disabled = true;
+    $('chk').disabled = true;
+    feedback(ok, q, ok ? '' : '정답은 <code>' + q.ans + '</code> 입니다. ');
+  }
+
+  function nextQ(){
+    i++;
+    if (i >= Q.length) result(); else render();
+  }
+
+  function result(){
+    $('prog').style.width = '100%';
+    $('qn').textContent = '완료';
+    $('sc').textContent = '정답 ' + score;
+    const pass = window.PASS || Math.ceil(Q.length*0.8);
+    const cls = score >= pass ? "" : (score >= pass - 3 ? " mid" : " low");
+    const msg = score >= pass
+      ? '통과입니다. 오늘 분량을 충분히 소화했습니다.'
+      : (score >= pass - 3
+        ? '조금 아쉽습니다. 틀린 항목의 미션으로 돌아가 한 번만 더 확인하고 다시 풀어 보세요.'
+        : '아직 손에 붙지 않았습니다. 실습 가이드의 미션 1번부터 다시 따라 해 보는 편이 빠릅니다.');
+
+    const d = document.createElement('div');
+    d.className = 'res';
+    d.innerHTML =
+      '<div class="big' + cls + '">' + score + ' / ' + Q.length + '</div>' +
+      '<h2>' + (score >= pass ? "통과" : "한 번 더") + '</h2>' +
+      '<p>' + msg + '</p>';
+
+    if (missed.length){
+      const m = document.createElement('div');
+      m.className = 'missed';
+      m.innerHTML = '<h3>다시 볼 문항</h3><ul>' +
+        missed.map(n => '<li><b>Q' + String(n+1).padStart(2,'0') + '</b> — ' +
+          Q[n].q.replace(/<[^>]+>/g,'') + '</li>').join('') + '</ul>';
+      d.appendChild(m);
+    }
+
+    const act = document.createElement('div');
+    act.className = 'actions';
+    const again = document.createElement('button');
+    again.className = 'go'; again.textContent = '처음부터 다시 풀기';
+    again.onclick = () => { i = 0; score = 0; missed = []; render(); window.scrollTo(0,0); };
+    act.appendChild(again);
+    const back = document.createElement('a');
+    back.href = 'lab.html'; back.className = 'ghost';
+    back.style.cssText = 'text-decoration:none;display:inline-flex;align-items:center;padding:12px 20px;border:1px solid var(--line-strong);border-radius:5px;color:var(--ink-2);font-weight:600;font-size:15px';
+    back.textContent = '실습 가이드로';
+    act.appendChild(back);
+    d.appendChild(act);
+
+    $('area').replaceChildren(d);
+  }
+
+  render();
+})();
+
+</script>
+<script src="../nav.js"></script>

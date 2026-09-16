@@ -1,0 +1,524 @@
+<title>Day 8 나레이션 슬라이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --ink:#0E1A15; --ink2:#18271F; --pine:#10684A; --pine-l:#3E9C74; --mint:#7FD1A8;
+    --light:#F4F7F4; --white:#FFF; --body:#3A453E; --muted:#6C7A72; --line:#D6DFD8;
+    --clay:#B85434; --sand:#F7E9E2; --soft:#E2EFE8; --shell:#0B100E;
+    --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Malgun Gothic",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--shell);color:var(--light);font-family:var(--sans);margin:0;
+       height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+  /* ---------- chrome ---------- */
+  .bar{display:flex;align-items:center;gap:10px;padding:8px 14px;flex-wrap:wrap;
+       background:#0F1613;border-bottom:1px solid #1E2A24;flex:0 0 auto}
+  .bar .brand{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--pine-l);margin-right:auto}
+  button,select{font-family:var(--sans);font-size:12.5px;color:#D7E2DC;background:#18241E;
+       border:1px solid #29372F;border-radius:4px;padding:6px 11px;cursor:pointer}
+  button:hover,select:hover{background:#203029;border-color:#3A4C42}
+  button:focus-visible,select:focus-visible{outline:2px solid var(--mint);outline-offset:1px}
+  button.on{background:var(--pine);border-color:var(--pine);color:#fff}
+  button.play{background:var(--pine);border-color:var(--pine);color:#fff;font-weight:600;min-width:92px}
+  button.play.playing{background:var(--clay);border-color:var(--clay)}
+  .count{font-family:var(--mono);font-size:12px;color:#7F918A;min-width:56px;text-align:center;
+         font-variant-numeric:tabular-nums}
+  .prog{height:2px;background:#1E2A24;flex:0 0 auto}
+  .prog i{display:block;height:100%;background:var(--mint);width:0;transition:width .3s}
+
+  /* ---------- stage ---------- */
+  .wrap{flex:1 1 auto;display:flex;align-items:center;justify-content:center;padding:14px;min-height:0}
+  .stage{width:100%;aspect-ratio:16/9;max-height:100%;max-width:calc(100% - 0px);
+         position:relative;border-radius:6px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+  .slide{position:absolute;inset:0;container-type:size;padding:5.5cqh 5cqw;
+         display:none;flex-direction:column;background:var(--light);color:var(--ink)}
+  .slide.show{display:flex}
+  .slide.dk{background:var(--ink);color:var(--white)}
+
+  .eb{font-family:var(--mono);font-size:1.9cqh;letter-spacing:.16em;color:var(--pine);
+      text-transform:uppercase;margin-bottom:1.4cqh}
+  .dk .eb{color:var(--pine-l)}
+  h1{font-size:8.4cqh;line-height:1.15;font-weight:700;letter-spacing:-.03em;margin:0;text-wrap:balance}
+  h2{font-size:6.2cqh;line-height:1.2;font-weight:700;letter-spacing:-.025em;margin:0;text-wrap:balance}
+  .sub{font-size:2.9cqh;color:var(--muted);margin-top:1.4cqh;line-height:1.55;max-width:62ch}
+  .dk .sub{color:#9FB3AA}
+  .lead{font-size:3.2cqh;color:var(--mint);margin-top:1.6cqh;font-weight:500}
+
+  .fill{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;min-height:0}
+  .foot{font-size:2.1cqh;color:var(--muted);font-style:italic;margin-top:auto;padding-top:1.6cqh}
+  .dk .foot{color:#7F918A}
+
+  .grid{display:grid;gap:1.6cqh 1.6cqw}
+  .g2{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:.8cqh;
+        padding:2.4cqh 2cqw;display:flex;flex-direction:column;gap:.8cqh;justify-content:center}
+  .dk .card{background:var(--ink2);border-color:#26332C}
+  .card .n{font-family:var(--mono);font-size:1.9cqh;color:var(--pine-l);letter-spacing:.08em}
+  .card .t{font-size:2.9cqh;font-weight:600;line-height:1.3}
+  .card .d{font-size:2.3cqh;color:var(--muted);line-height:1.5}
+  .dk .card .d{color:#93A69E}
+  .card.warn{background:var(--sand);border-color:#E7CDBF}
+  .card.warn .t,.card.warn .n{color:var(--clay)}
+  .card.warn .d{color:#7A4433}
+
+  .rowlist{display:flex;flex-direction:column;gap:1.2cqh}
+  .row{display:flex;align-items:center;gap:2cqw;background:var(--white);border:1px solid var(--line);
+       border-radius:.8cqh;padding:2cqh 2cqw}
+  .dk .row{background:var(--ink2);border-color:#26332C}
+  .dot{flex:0 0 auto;width:5.4cqh;height:5.4cqh;border-radius:50%;background:var(--soft);color:var(--pine);
+       display:flex;align-items:center;justify-content:center;font-family:var(--mono);
+       font-size:2.2cqh;font-weight:600}
+  .dk .dot{background:var(--pine);color:#fff}
+  .row .t{font-size:2.9cqh;font-weight:600;flex:0 0 auto}
+  .row .d{font-size:2.4cqh;color:var(--muted);line-height:1.45}
+  .dk .row .d{color:#93A69E}
+
+  .stack{display:flex;flex-direction:column;gap:.9cqh}
+  .lay{display:flex;align-items:center;gap:2cqw;border-radius:.6cqh;padding:1.8cqh 2cqw;
+       border:1px solid var(--line);background:var(--white)}
+  .lay b{font-size:2.9cqh;min-width:12cqw}
+  .lay span{font-size:2.4cqh;color:var(--muted)}
+
+  pre{background:var(--shell);color:#CFDCD6;border-radius:.7cqh;padding:2.4cqh 2cqw;margin:0;
+      font-family:var(--mono);font-size:2.35cqh;line-height:1.75;overflow:hidden;white-space:pre-wrap}
+  pre .p{color:var(--mint)}
+  pre .c{color:#7C9A93}
+  code{font-family:var(--mono);font-size:.92em;background:var(--soft);padding:.1em .35em;border-radius:.2em}
+  .dk code{background:#22312A;color:#CFE4DA}
+
+  .chips{display:flex;flex-wrap:wrap;gap:1cqh 1cqw}
+  .chip{font-family:var(--mono);font-size:2.3cqh;background:var(--white);border:1px solid var(--line);
+        border-radius:.5cqh;padding:.9cqh 1.2cqw;color:var(--pine);font-weight:500}
+  .chip.bad{background:var(--sand);border-color:#E7CDBF;color:var(--clay)}
+
+  .banner{background:var(--sand);color:var(--clay);border-radius:.7cqh;padding:2.2cqh 2cqw;
+          font-size:2.7cqh;font-weight:600;line-height:1.45}
+  .dk .banner{background:#2A1E18;color:#E0A288}
+  .bannerG{background:var(--soft);color:var(--pine);border-radius:.7cqh;padding:2.2cqh 2cqw;
+          font-size:2.7cqh;font-weight:600;line-height:1.45}
+
+  .tnote{margin-top:1.6cqh;border-left:.35cqh solid var(--clay);background:rgba(184,84,52,.07);
+         padding:1.4cqh 1.6cqw;font-size:2.1cqh;color:var(--body);line-height:1.5}
+  .dk .tnote{color:#C9B4AB;background:rgba(224,162,136,.08)}
+  .tnote b{font-family:var(--mono);font-size:1.7cqh;letter-spacing:.12em;color:var(--clay);
+           display:block;margin-bottom:.4cqh}
+  body:not(.notes) .tnote{display:none}
+
+  .nar{display:none}
+
+  /* ---------- caption ---------- */
+  .cap{flex:0 0 auto;min-height:62px;display:flex;align-items:center;justify-content:center;
+       padding:10px 18px 16px;background:var(--shell)}
+  .cap p{margin:0;max-width:1000px;text-align:center;font-size:15px;line-height:1.6;color:#B6C6BE}
+  .cap p.idle{color:#5C6D65;font-size:13px}
+  body.nocap .cap{display:none}
+
+  .toast{position:fixed;left:50%;bottom:88px;transform:translateX(-50%);background:var(--clay);
+         color:#fff;padding:9px 16px;border-radius:5px;font-size:13px;display:none;z-index:9}
+  .toast.show{display:block}
+  @media (max-width:760px){ .bar .brand{width:100%;margin-bottom:4px} .cap p{font-size:13.5px} }
+
+</style>
+
+<div class="bar">
+  <span class="brand">DAY 08 · 컨테이너로 환경 재현 · 나레이션 슬라이드</span>
+  <button id="prev" title="이전 (←)">◀</button>
+  <span class="count" id="count">1 / 18</span>
+  <button id="next" title="다음 (→)">▶</button>
+  <button class="play" id="play" title="재생 / 정지 (Space)">▶ 재생</button>
+  <button id="auto" class="on" title="나레이션이 끝나면 자동으로 다음 장">자동 진행</button>
+  <select id="rate" title="말하기 속도">
+    <option value="0.85">0.85배</option>
+    <option value="1" selected>1.0배</option>
+    <option value="1.15">1.15배</option>
+    <option value="1.3">1.3배</option>
+    <option value="1.5">1.5배</option>
+  </select>
+  <select id="voice" title="목소리"></select>
+  <button id="cap" class="on" title="자막">자막</button>
+  <button id="full" title="전체화면 (F)">전체화면</button>
+</div>
+<div class="prog"><i id="prog"></i></div>
+
+<div class="wrap"><div class="stage" id="stage">
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과</div>
+      <h1>컨테이너로 환경 재현</h1>
+      <div class="lead">"제 컴퓨터에선 됐는데요"를 끝내기</div>
+      <div class="sub" style="margin-top:3cqh">DAY 08 / 10 · 7시간 · 「LLM 서비스를 세워가며 배우는 리눅스」 70시간 과정</div>
+    </div>
+  <div class="nar">여덟째 날입니다. 어제 서비스를 만들었습니다. 그런데 그 서비스를 다른 컴퓨터에 그대로 옮기려면 어떻게 해야 할까요. 설치 순서를 문서로 적어 주는 방법이 있겠죠. 하지만 문서는 반드시 어딘가 틀리거나 빠집니다. 오늘 배우는 컨테이너는 그 설치 과정 자체를 코드로 만들어 통째로 옮기는 기술입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Learning Objectives</div>
+    <h2>오늘 끝났을 때 할 수 있어야 하는 것</h2>
+    <div class="fill"><div class="grid g2" style="margin-top:2cqh">
+      <div class="card"><span class="n">01</span><span class="t">컨테이너와 가상머신의 차이를</span><span class="d">격리 원리로 설명할 수 있다</span></div>
+      <div class="card"><span class="n">02</span><span class="t">이미지·컨테이너·볼륨의 관계를</span><span class="d">실습으로 구분할 수 있다</span></div>
+      <div class="card"><span class="n">03</span><span class="t">Dockerfile을 작성해</span><span class="d">내 이미지를 빌드할 수 있다</span></div>
+      <div class="card"><span class="n">04</span><span class="t">레이어 캐시를 이해하고</span><span class="d">빌드 시간을 줄일 수 있다</span></div>
+      <div class="card"><span class="n">05</span><span class="t">compose로</span><span class="d">여러 서비스를 한 파일로 묶어 기동할 수 있다</span></div>
+      <div class="card"><span class="n">06</span><span class="t">전부 지운 뒤</span><span class="d">한 줄로 복원되는 것을 검증할 수 있다</span></div>
+    </div></div>
+  <div class="nar">목표는 여섯 개입니다. 컨테이너가 무엇인지 원리로 이해하고, 이미지와 컨테이너와 볼륨을 구분하고, 직접 이미지를 만들고, 빌드를 빠르게 하는 법을 익히고, 여러 서비스를 한 파일로 묶고, 마지막으로 전부 지운 다음 한 줄로 되살아나는지 검증합니다. 마지막 항목이 오늘의 진짜 목표입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Today's Schedule</div>
+    <h2>오늘 하루 · 네 개의 블록</h2>
+    <div class="fill"><div class="grid g4" style="margin-top:2cqh">
+      <div class="card"><span class="n">09:00–11:00</span><span class="t">격리의 원리와 Docker 기본</span><span class="d">네임스페이스 · cgroup · run 옵션</span></div>
+      <div class="card"><span class="n">11:10–12:00</span><span class="t">볼륨 · 네트워크 · Dockerfile</span><span class="d">데이터는 어디에 남는가</span></div>
+      <div class="card"><span class="n" style="color:var(--clay)">13:00–15:00</span><span class="t">이미지 빌드 실습</span><span class="d">레이어 캐시를 눈으로 측정</span></div>
+      <div class="card"><span class="n" style="color:var(--clay)">15:10–17:10</span><span class="t">추론 스택을 compose 한 파일로</span><span class="d">3개 서비스 묶고 복원 검증</span></div>
+    </div></div>
+    <div class="foot">각 블록에 휴식 10분 포함 · 점심 12:00–13:00</div>
+  <div class="nar">오전에는 컨테이너가 무엇인지 원리부터 봅니다. 마법이 아니라 리눅스 커널 기능의 조합이라는 것을 명령어로 확인합니다. 오후에는 직접 이미지를 만들고, 마지막 두 시간에 추론 서버와 웹 유아이와 클라이언트를 한 파일로 묶습니다.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">Block 1 · 09:00–11:00</div>
+      <h2>격리의 원리</h2>
+      <div class="sub">컨테이너는 마법이 아니라 커널 기능의 조합입니다.</div>
+    </div>
+  <div class="nar">첫 번째 블록입니다. 컨테이너를 신비한 기술로 생각하는 분이 많은데, 사실은 리눅스 커널이 원래 갖고 있던 기능 두 가지를 조합한 것입니다. 오늘 그 두 가지를 명령어로 직접 확인합니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">VM vs Container</div>
+    <h2>가상머신과 무엇이 다른가</h2>
+    
+    
+    <div class="fill"><div class="grid g2" style="margin-top:1.6cqh">
+        <div class="card"><span class="n">가상머신</span><span class="t">커널까지 통째로</span><span class="d">하드웨어를 흉내 내고 그 위에 별도의 커널과 OS를 올립니다.<br><br>무겁고 부팅에 수십 초. 대신 완전히 다른 OS도 가능합니다.</span></div>
+        <div class="card"><span class="n">컨테이너</span><span class="t">커널은 공유</span><span class="d">호스트의 커널을 그대로 쓰고 <strong>보이는 범위만</strong> 나눕니다.<br><br>가볍고 기동이 1초 미만. 대신 리눅스 위에서 리눅스만.</span></div>
+      </div>
+      <div class="bannerG" style="margin-top:2cqh">Day 1에 만든 VM은 진짜 서버를 흉내 내려고, 오늘의 컨테이너는 환경을 옮기려고 씁니다 — 목적이 다릅니다.</div></div>
+    
+  <div class="nar">가상머신은 하드웨어를 흉내 내고 그 위에 별도의 커널과 운영체제를 통째로 올립니다. 그래서 무겁고 부팅에 수십 초가 걸립니다. 컨테이너는 호스트의 커널을 그대로 쓰고 보이는 범위만 나눕니다. 그래서 가볍고 일 초도 안 걸려 뜹니다. 대신 리눅스 위에서 리눅스만 돌릴 수 있습니다. 첫날 만든 가상머신은 진짜 서버를 흉내 내려고 쓴 것이고, 오늘의 컨테이너는 환경을 옮기려고 쓰는 것입니다. 목적이 다릅니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Namespaces</div>
+    <h2>네임스페이스 — 보이는 범위를 자른다</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.6cqh"><span class="c"># 지금 내 셸이 보는 프로세스</span>
+<span class="p">$ ps aux | wc -l</span>
+<span class="c">142</span>
+
+<span class="c"># PID 네임스페이스를 새로 만들어 들어가 보면</span>
+<span class="p">$ sudo unshare --pid --fork --mount-proc ps aux</span>
+<span class="c">USER  PID  ... COMMAND
+root    1  ... ps aux</span>      <span class="c">← 자기 자신이 1번입니다</span></pre>
+      <div class="bannerG" style="margin-top:2cqh">같은 커널, 같은 컴퓨터인데 <strong>보이는 세상만</strong> 달라졌습니다. 이것이 컨테이너의 절반입니다.</div></div>
+    <div class="foot">PID·네트워크·마운트·사용자 등 종류별로 네임스페이스가 있습니다.</div>
+  <div class="nar">네임스페이스는 보이는 범위를 자르는 커널 기능입니다. 지금 셸에서 프로세스를 세면 백 개가 넘게 나옵니다. 그런데 언셰어 명령으로 새 피아이디 네임스페이스를 만들어 그 안에서 같은 명령을 실행하면, 자기 자신 하나만 보이고 그것이 일번이 됩니다. 같은 커널, 같은 컴퓨터인데 보이는 세상만 달라진 겁니다. 이것이 컨테이너의 절반입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">cgroups</div>
+    <h2>cgroup — 쓸 수 있는 양을 제한한다</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.6cqh"><span class="p">$ ls /sys/fs/cgroup/ | head</span>
+<span class="c">cpu.max  memory.max  memory.current  pids.max ...</span>
+
+<span class="c"># Docker가 하는 일도 결국 이것입니다</span>
+<span class="p">$ docker run --memory=512m --cpus=1 ubuntu ...</span></pre>
+      <div class="grid g2" style="margin-top:2cqh">
+        <div class="card"><span class="t">네임스페이스</span><span class="d">무엇이 <strong>보이는가</strong> — 프로세스·네트워크·파일시스템</span></div>
+        <div class="card"><span class="t">cgroup</span><span class="d">얼마나 <strong>쓸 수 있는가</strong> — CPU·메모리·I/O</span></div>
+      </div></div>
+    <div class="foot">컨테이너 = 네임스페이스(격리) + cgroup(제한) + 파일시스템 레이어. 그게 전부입니다.</div>
+  <div class="nar">씨그룹은 자원을 얼마나 쓸 수 있는지 제한하는 기능입니다. 도커에서 메모리 제한 옵션을 주면 결국 이 커널 기능을 설정하는 것입니다. 정리하면 이렇습니다. 네임스페이스가 무엇이 보이는지를 정하고, 씨그룹이 얼마나 쓸 수 있는지를 정하고, 여기에 파일시스템 레이어가 더해지면 그것이 컨테이너입니다. 그게 전부입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Docker basics</div>
+    <h2>이미지와 컨테이너는 다르다</h2>
+    
+    
+    <div class="fill"><div class="grid g2" style="margin-top:1.6cqh">
+        <div class="card"><span class="n">이미지</span><span class="t">설계도 · 붕어빵 틀</span><span class="d">읽기 전용. 한 번 만들면 안 바뀝니다.<br><code>docker images</code></span></div>
+        <div class="card"><span class="n">컨테이너</span><span class="t">실행 중인 것 · 붕어빵</span><span class="d">이미지로 만든 실행 인스턴스. 여러 개 만들 수 있습니다.<br><code>docker ps -a</code></span></div>
+      </div>
+      <pre style="margin-top:2cqh"><span class="p">$ docker run -d --name web -p 8080:80 nginx</span>
+<span class="c">  -d  백그라운드   --name 이름   -p 호스트:컨테이너 포트 연결</span>
+<span class="p">$ docker ps</span>
+<span class="p">$ docker logs -f web</span>
+<span class="p">$ docker exec -it web bash</span>     <span class="c"># 안으로 들어가 보기</span>
+<span class="p">$ docker stop web &amp;&amp; docker rm web</span></pre></div>
+    
+  <div class="nar">이미지와 컨테이너를 구분하는 것이 중요합니다. 이미지는 설계도이고 읽기 전용입니다. 컨테이너는 그 이미지로 만든 실행 중인 인스턴스입니다. 붕어빵 틀과 붕어빵의 관계라고 생각하시면 됩니다. 하나의 이미지로 컨테이너를 여러 개 만들 수 있습니다. 옵션 중 대시 피가 중요한데, 호스트의 포트와 컨테이너 안의 포트를 연결합니다. 이게 없으면 밖에서 접근할 수 없습니다. 도커 이그젝으로 컨테이너 안에 들어가 볼 수 있는데, 들어가 보면 완전히 다른 리눅스처럼 보입니다.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">Block 2 · 11:10–12:00</div>
+      <h2>볼륨과 Dockerfile</h2>
+      <div class="sub">컨테이너를 지우면 데이터는 어떻게 될까요?</div>
+    </div>
+  <div class="nar">두 번째 블록입니다. 아주 중요한 질문에서 시작합니다. 컨테이너를 지우면 그 안에서 만든 데이터는 어떻게 될까요. 답은 같이 사라진다입니다. 그래서 볼륨이 필요합니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Volumes</div>
+    <h2>데이터를 컨테이너 밖에 두기</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.6cqh"><span class="c"># 컨테이너 안에 만든 파일은 컨테이너와 함께 사라집니다</span>
+<span class="p">$ docker run --rm ubuntu bash -c "echo hi &gt; /tmp/a.txt; cat /tmp/a.txt"</span>
+
+<span class="c"># 볼륨: Docker가 관리하는 저장소</span>
+<span class="p">$ docker volume create mydata</span>
+<span class="p">$ docker run -v mydata:/data ubuntu bash -c "echo hi &gt; /data/a.txt"</span>
+<span class="p">$ docker run -v mydata:/data ubuntu cat /data/a.txt</span>   <span class="c">← 남아 있습니다</span>
+
+<span class="c"># 바인드 마운트: 내 디렉터리를 그대로 연결</span>
+<span class="p">$ docker run -v ~/ai-lab/datasets:/data ubuntu ls /data</span></pre></div>
+    <div class="foot">모델 캐시는 반드시 볼륨에 둡니다 — 컨테이너를 지울 때마다 수 GB를 다시 받을 수는 없습니다.</div>
+  <div class="nar">컨테이너 안에 만든 파일은 컨테이너를 지우면 함께 사라집니다. 그래서 남겨야 할 데이터는 밖에 둡니다. 두 가지 방법이 있습니다. 볼륨은 도커가 관리하는 저장소이고, 바인드 마운트는 내 컴퓨터의 디렉터리를 컨테이너 안에 그대로 연결하는 것입니다. 오늘 실습에서 모델 캐시를 반드시 볼륨에 둘 텐데, 이유는 명확합니다. 컨테이너를 지울 때마다 수 기가바이트짜리 모델을 다시 받을 수는 없기 때문입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Dockerfile</div>
+    <h2>이미지를 코드로 만들기</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.6cqh"><span class="p">FROM</span> python:3.12-slim          <span class="c"># 기반 이미지</span>
+<span class="p">WORKDIR</span> /app
+
+<span class="p">COPY</span> requirements.txt .        <span class="c"># ① 의존성 파일만 먼저</span>
+<span class="p">RUN</span> pip install --no-cache-dir -r requirements.txt
+
+<span class="p">COPY</span> . .                        <span class="c"># ② 소스는 나중에</span>
+<span class="p">ENV</span> OLLAMA_HOST=http://ollama:11434
+<span class="p">CMD</span> ["python", "client.py"]</pre>
+      <div class="bannerG" style="margin-top:2cqh">①과 ②의 순서가 핵심입니다. 소스만 고쳤을 때 pip install을 다시 하지 않게 됩니다.</div></div>
+    <div class="foot">각 줄이 하나의 레이어입니다. 바뀐 줄부터 아래만 다시 만들어집니다.</div>
+  <div class="nar">도커파일은 이미지를 만드는 설명서입니다. 여기서 오늘 가장 실용적인 지식이 나옵니다. 각 줄이 하나의 레이어가 되는데, 도커는 바뀌지 않은 레이어를 재사용합니다. 그래서 의존성 파일을 먼저 복사해서 설치하고, 소스 코드는 나중에 복사해야 합니다. 이 순서를 지키면 소스만 고쳤을 때 핍 인스톨을 다시 하지 않습니다. 순서를 반대로 하면 한 글자만 고쳐도 매번 몇 분씩 기다려야 합니다. 오후 실습에서 이걸 직접 측정해 봅니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">compose</div>
+    <h2>compose — 여러 서비스를 한 파일로</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.6cqh"><span class="c"># compose.yaml</span>
+<span class="p">services:</span>
+  ollama:
+    image: ollama/ollama
+    volumes: [ollama_models:/root/.ollama]
+    ports: ["11434:11434"]
+    restart: unless-stopped
+
+  webui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports: ["3000:8080"]
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+    depends_on: [ollama]
+
+<span class="p">volumes:</span>
+  ollama_models:</pre>
+      <div class="bannerG" style="margin-top:2cqh">같은 compose 네트워크 안에서는 <strong>서비스 이름이 곧 호스트 이름</strong>입니다.</div></div>
+    <div class="foot">docker compose up -d 한 줄로 전부 뜨고, down -v 한 줄로 전부 사라집니다.</div>
+  <div class="nar">컴포즈는 여러 서비스를 한 파일에 적어 두고 한 번에 띄우는 도구입니다. 여기서 중요한 것이 하나 있습니다. 같은 컴포즈 네트워크 안에서는 서비스 이름이 곧 호스트 이름이 됩니다. 웹 유아이가 올라마에 접근할 때 아이피가 아니라 올라마라는 이름으로 부를 수 있습니다. 컴포즈 업 대시 디 한 줄로 전부 뜨고, 다운 대시 브이 한 줄로 전부 사라집니다. 이 지우고 되살리는 사이클이 오늘의 마지막 검증입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">GPU</div>
+    <h2>GPU 컨테이너는 한 겹 더</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.6cqh"><span class="c"># 호스트에 드라이버 + nvidia-container-toolkit 설치 후</span>
+<span class="p">$ docker run --rm --gpus all nvidia/cuda:12.4.0-base nvidia-smi</span>
+
+<span class="c"># compose 에서</span>
+<span class="p">    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]</span></pre>
+      <div class="banner" style="margin-top:2cqh">드라이버는 <strong>호스트</strong>에, CUDA 런타임은 <strong>이미지</strong>에 — 이 구분이 GPU 컨테이너 오류의 대부분입니다.</div></div>
+    <div class="foot">GPU가 없는 환경에서는 개념만 보고 넘어갑니다. CPU로 오늘 실습은 전부 됩니다.</div>
+  <div class="nar">지피유를 컨테이너에서 쓰려면 한 겹이 더 필요합니다. 엔비디아 컨테이너 툴킷이라는 것을 호스트에 설치해야 컨테이너가 지피유를 볼 수 있습니다. 여기서 헷갈리기 쉬운 구분이 있습니다. 드라이버는 호스트에 있어야 하고, 쿠다 런타임은 이미지 안에 있어야 합니다. 어제 본 층 구조가 컨테이너에서는 이렇게 나뉩니다. 지피유 컨테이너 오류의 대부분이 이 구분을 몰라서 생깁니다.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">Block 4 · AI LAB · 15:10–17:10</div>
+      <h2>추론 스택을 한 파일로</h2>
+      <div class="sub">세 개의 서비스를 묶고, 전부 지운 뒤 되살립니다.</div>
+    </div>
+  <div class="nar">마지막 블록입니다. 추론 서버와 웹 유아이와 직접 만든 클라이언트, 세 개를 컴포즈 한 파일로 묶습니다. 그리고 전부 지운 다음 한 줄로 되살아나는지 검증합니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">AI LAB</div>
+    <h2>오늘의 코스</h2>
+    
+    
+    <div class="fill"><div class="rowlist" style="margin-top:1.6cqh">
+        <div class="row"><span class="dot">1</span><span class="t">Ollama 컨테이너 + 볼륨</span><span class="d">모델 캐시를 밖에 보관</span></div>
+        <div class="row"><span class="dot">2</span><span class="t">웹 UI 붙이기</span><span class="d">서비스 이름으로 통신</span></div>
+        <div class="row"><span class="dot">3</span><span class="t">클라이언트 이미지 직접 빌드</span><span class="d">Dockerfile 작성</span></div>
+        <div class="row"><span class="dot">4</span><span class="t">전부 지우기</span><span class="d">compose down (볼륨은 남김)</span></div>
+        <div class="row"><span class="dot">5</span><span class="t">한 줄로 복원</span><span class="d">모델을 다시 안 받는지 확인</span></div>
+      </div></div>
+    <div class="foot">5번에서 모델을 다시 받지 않는다면 볼륨 설계가 옳았다는 증거입니다.</div>
+  <div class="nar">다섯 단계입니다. 올라마 컨테이너를 볼륨과 함께 띄우고, 웹 유아이를 붙이고, 클라이언트 이미지를 직접 만들고, 전부 지운 다음, 한 줄로 복원합니다. 다섯 번째에서 확인할 것이 있습니다. 복원할 때 모델을 다시 받지 않아야 합니다. 다시 받는다면 볼륨 설계가 틀린 것입니다. 이 검증이 오늘의 결론입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Compare</div>
+    <h2>어제의 systemd와 오늘의 컨테이너</h2>
+    
+    
+    <div class="fill"><div class="grid g2" style="margin-top:2cqh">
+        <div class="card"><span class="n">Day 7 · systemd</span><span class="t">이 컴퓨터에서 확실하게</span><span class="d">호스트에 직접 설치<br>부팅 연동·자원 제어가 정교<br><br>다른 컴퓨터로 옮기려면 설치를 처음부터</span></div>
+        <div class="card"><span class="n">Day 8 · 컨테이너</span><span class="t">어느 컴퓨터에서든 똑같이</span><span class="d">이미지째로 이동<br>한 줄로 복원<br><br>커널·드라이버는 여전히 호스트 몫</span></div>
+      </div></div>
+    <div class="foot">둘은 경쟁 관계가 아닙니다 — Day 10 프로젝트에서는 둘 중 하나를 골라 쓰면 됩니다.</div>
+  <div class="nar">어제 배운 시스템디와 오늘의 컨테이너를 비교해 보겠습니다. 시스템디는 이 컴퓨터에서 확실하게 돌리는 데 강하고, 부팅 연동과 자원 제어가 정교합니다. 대신 다른 컴퓨터로 옮기려면 설치를 처음부터 해야 합니다. 컨테이너는 어느 컴퓨터에서든 똑같이 도는 데 강합니다. 대신 커널과 드라이버는 여전히 호스트 몫입니다. 둘은 경쟁 관계가 아니고, 열째 날 프로젝트에서는 둘 중 하나를 골라 쓰시면 됩니다.</div>
+</section>
+<section class="slide dk">
+    <div class="eb">Assignment 08 · 제출 익일 09:00</div>
+    <h2>3개 서비스 compose 스택과 README</h2>
+    <div class="sub">추론 서버 · 웹 UI · 클라이언트를 한 파일로 묶고, 처음 보는 사람이 따라 할 수 있게 문서화하십시오.</div>
+    <div class="fill"><div class="grid g3" style="margin-top:2cqh">
+      <div class="card"><span class="n">01</span><span class="t">compose.yaml 전문 (3개 서비스)</span></div>
+      <div class="card"><span class="n">02</span><span class="t">직접 작성한 Dockerfile</span></div>
+      <div class="card"><span class="n">03</span><span class="t">모델 캐시 볼륨 설계와 그 근거</span></div>
+      <div class="card"><span class="n">04</span><span class="t">down → up 복원 검증 기록</span></div>
+      <div class="card"><span class="n">05</span><span class="t">레이어 캐시 적용 전후 빌드 시간 비교</span></div>
+      <div class="card"><span class="n">06</span><span class="t">README (사양 요건 · 실행 명령 · 흔한 오류 3건)</span></div>
+    </div></div>
+    <div class="foot">4번과 6번이 배점의 절반입니다. <strong>처음 보는 사람이 README만 보고 실행할 수 있는가</strong>가 기준입니다. 옆 사람과 서로 README를 바꿔 실행해 보고 그 결과를 적으십시오.</div>
+  <div class="nar">과제입니다. 세 개의 서비스를 컴포즈 한 파일로 묶고, 처음 보는 사람이 따라 할 수 있게 문서를 쓰십시오. 배점의 절반은 네 번째와 여섯 번째입니다. 전부 지웠다가 복원되는지, 그리고 리드미만 보고 남이 실행할 수 있는지입니다. 옆 사람과 리드미를 서로 바꿔서 실행해 보고 그 결과를 적어 주십시오. 내 문서의 빈칸은 남이 실행해 봐야 보입니다.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">Wrap-up</div>
+      <h2>오늘 한 일</h2>
+      <div class="sub" style="font-size:3.4cqh;color:#D7E2DC;margin-top:2cqh">격리의 원리를 확인하고, 이미지를 만들고, 스택을 한 파일로 묶어 복원까지 검증했습니다.</div>
+      <div class="lead" style="margin-top:4cqh">내일 · Day 9 — 운영 · 보안 · 장애</div>
+      <div class="sub">띄우는 것보다 지키는 것이 어렵습니다. 오후에는 강사가 심어둔 장애 5건을 복구합니다.</div>
+    </div>
+  <div class="nar">오늘 한 일을 정리하겠습니다. 컨테이너가 네임스페이스와 씨그룹의 조합이라는 것을 명령어로 확인했고, 이미지와 컨테이너와 볼륨을 구분했고, 도커파일을 직접 써서 이미지를 만들었고, 레이어 캐시로 빌드 시간을 줄였습니다. 그리고 세 개의 서비스를 한 파일로 묶어 지웠다 되살리는 것까지 검증했습니다. 내일은 운영입니다. 띄우는 것보다 지키는 것이 어렵다는 이야기이고, 오후에는 제가 심어둔 장애 다섯 건을 여러분이 직접 복구하게 됩니다. 수고하셨습니다.</div>
+</section>
+</div></div>
+
+<div class="cap"><p id="capText" class="idle">▶ 재생을 누르면 나레이션이 시작됩니다 · ← → 슬라이드 이동 · Space 재생/정지 · F 전체화면</p></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const synth  = window.speechSynthesis;
+  const $ = id => document.getElementById(id);
+  let idx = 0, playing = false, auto = true, chunks = [], ci = 0, voices = [], voice = null;
+
+  $('count').textContent = '1 / ' + slides.length;
+
+  function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 3800); }
+
+  function narration(i){ const n = slides[i].querySelector('.nar'); return n ? n.textContent.trim() : ''; }
+  function splitSentences(t){
+    return t.split(/(?<=[.?!])\s+/).map(s=>s.trim()).filter(Boolean);
+  }
+
+  function show(i){
+    slides[idx].classList.remove('show');
+    idx = Math.max(0, Math.min(slides.length-1, i));
+    slides[idx].classList.add('show');
+    $('count').textContent = (idx+1) + ' / ' + slides.length;
+    $('prog').style.width = ((idx+1)/slides.length*100) + '%';
+  }
+
+  function setCap(text, idle){
+    const p = $('capText');
+    p.textContent = text;
+    p.classList.toggle('idle', !!idle);
+  }
+
+  function stop(){
+    playing = false; chunks = []; ci = 0;
+    try { synth.cancel(); } catch(e){}
+    $('play').textContent = '▶ 재생';
+    $('play').classList.remove('playing');
+    setCap('▶ 재생을 누르면 나레이션이 시작됩니다 · ← → 슬라이드 이동 · Space 재생/정지 · F 전체화면', true);
+  }
+
+  function speakNext(){
+    if (!playing) return;
+    if (ci >= chunks.length){
+      if (auto && idx < slides.length-1){ show(idx+1); startSpeaking(); }
+      else { stop(); }
+      return;
+    }
+    const u = new SpeechSynthesisUtterance(chunks[ci]);
+    u.lang = 'ko-KR';
+    if (voice) u.voice = voice;
+    u.rate = parseFloat($('rate').value);
+    u.onend = () => { ci++; speakNext(); };
+    u.onerror = () => { ci++; speakNext(); };
+    setCap(chunks[ci]);
+    synth.speak(u);
+  }
+
+  function startSpeaking(){
+    try { synth.cancel(); } catch(e){}
+    chunks = splitSentences(narration(idx)); ci = 0;
+    if (!chunks.length){ if (auto && idx < slides.length-1){ show(idx+1); setTimeout(startSpeaking,120); } else stop(); return; }
+    playing = true;
+    $('play').textContent = '❚❚ 정지';
+    $('play').classList.add('playing');
+    setTimeout(speakNext, 120);
+  }
+
+  function toggle(){ playing ? stop() : startSpeaking(); }
+  function go(d){ const was = playing; stop(); show(idx+d); if (was) setTimeout(startSpeaking, 150); }
+
+  /* voices */
+  function loadVoices(){
+    voices = synth.getVoices();
+    const ko = voices.filter(v => /^ko/i.test(v.lang));
+    const sel = $('voice');
+    sel.innerHTML = '';
+    const list = ko.length ? ko : voices;
+    if (!list.length){ sel.innerHTML = '<option>음성 없음</option>'; return; }
+    list.forEach((v,i) => {
+      const o = document.createElement('option');
+      o.value = voices.indexOf(v); o.textContent = v.name.replace(/Microsoft |Google /,'');
+      sel.appendChild(o);
+    });
+    voice = list[0];
+    sel.value = voices.indexOf(voice);
+    if (!ko.length) toast('한국어 음성이 없습니다 — Chrome 또는 Edge에서 열어 보세요');
+  }
+  loadVoices();
+  if (typeof synth.onvoiceschanged !== 'undefined') synth.onvoiceschanged = loadVoices;
+
+  /* controls */
+  $('play').onclick = toggle;
+  $('prev').onclick = () => go(-1);
+  $('next').onclick = () => go(1);
+  $('voice').onchange = e => { voice = voices[e.target.value]; if (playing){ const w=idx; stop(); show(w); startSpeaking(); } };
+  $('rate').onchange  = () => { if (playing){ const w=idx; stop(); show(w); startSpeaking(); } };
+  $('auto').onclick   = e => { auto = !auto; e.target.classList.toggle('on', auto); };
+  $('cap').onclick    = e => { document.body.classList.toggle('nocap'); e.target.classList.toggle('on', !document.body.classList.contains('nocap')); };
+  $('full').onclick   = () => { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); };
+
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'SELECT') return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown'){ e.preventDefault(); go(1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); go(-1); }
+    else if (e.key === ' '){ e.preventDefault(); toggle(); }
+    else if (e.key === 'f' || e.key === 'F'){ $('full').click(); }
+    else if (e.key === 'Home'){ go(-idx); }
+    else if (e.key === 'End'){ go(slides.length-1-idx); }
+  });
+  $('stage').addEventListener('click', e => { if (e.clientX > window.innerWidth/2) go(1); else go(-1); });
+  window.addEventListener('beforeunload', () => { try{ synth.cancel(); }catch(e){} });
+  window.deckGo = n => { const was = playing; stop(); show(n); if (was) setTimeout(startSpeaking, 150); };
+})();
+
+</script>
+<script src="../nav.js"></script>

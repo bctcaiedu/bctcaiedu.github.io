@@ -1,0 +1,502 @@
+<title>Day 10 나레이션 슬라이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --ink:#0E1A15; --ink2:#18271F; --pine:#10684A; --pine-l:#3E9C74; --mint:#7FD1A8;
+    --light:#F4F7F4; --white:#FFF; --body:#3A453E; --muted:#6C7A72; --line:#D6DFD8;
+    --clay:#B85434; --sand:#F7E9E2; --soft:#E2EFE8; --shell:#0B100E;
+    --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Malgun Gothic",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--shell);color:var(--light);font-family:var(--sans);margin:0;
+       height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+  /* ---------- chrome ---------- */
+  .bar{display:flex;align-items:center;gap:10px;padding:8px 14px;flex-wrap:wrap;
+       background:#0F1613;border-bottom:1px solid #1E2A24;flex:0 0 auto}
+  .bar .brand{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--pine-l);margin-right:auto}
+  button,select{font-family:var(--sans);font-size:12.5px;color:#D7E2DC;background:#18241E;
+       border:1px solid #29372F;border-radius:4px;padding:6px 11px;cursor:pointer}
+  button:hover,select:hover{background:#203029;border-color:#3A4C42}
+  button:focus-visible,select:focus-visible{outline:2px solid var(--mint);outline-offset:1px}
+  button.on{background:var(--pine);border-color:var(--pine);color:#fff}
+  button.play{background:var(--pine);border-color:var(--pine);color:#fff;font-weight:600;min-width:92px}
+  button.play.playing{background:var(--clay);border-color:var(--clay)}
+  .count{font-family:var(--mono);font-size:12px;color:#7F918A;min-width:56px;text-align:center;
+         font-variant-numeric:tabular-nums}
+  .prog{height:2px;background:#1E2A24;flex:0 0 auto}
+  .prog i{display:block;height:100%;background:var(--mint);width:0;transition:width .3s}
+
+  /* ---------- stage ---------- */
+  .wrap{flex:1 1 auto;display:flex;align-items:center;justify-content:center;padding:14px;min-height:0}
+  .stage{width:100%;aspect-ratio:16/9;max-height:100%;max-width:calc(100% - 0px);
+         position:relative;border-radius:6px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+  .slide{position:absolute;inset:0;container-type:size;padding:5.5cqh 5cqw;
+         display:none;flex-direction:column;background:var(--light);color:var(--ink)}
+  .slide.show{display:flex}
+  .slide.dk{background:var(--ink);color:var(--white)}
+
+  .eb{font-family:var(--mono);font-size:1.9cqh;letter-spacing:.16em;color:var(--pine);
+      text-transform:uppercase;margin-bottom:1.4cqh}
+  .dk .eb{color:var(--pine-l)}
+  h1{font-size:8.4cqh;line-height:1.15;font-weight:700;letter-spacing:-.03em;margin:0;text-wrap:balance}
+  h2{font-size:6.2cqh;line-height:1.2;font-weight:700;letter-spacing:-.025em;margin:0;text-wrap:balance}
+  .sub{font-size:2.9cqh;color:var(--muted);margin-top:1.4cqh;line-height:1.55;max-width:62ch}
+  .dk .sub{color:#9FB3AA}
+  .lead{font-size:3.2cqh;color:var(--mint);margin-top:1.6cqh;font-weight:500}
+
+  .fill{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;min-height:0}
+  .foot{font-size:2.1cqh;color:var(--muted);font-style:italic;margin-top:auto;padding-top:1.6cqh}
+  .dk .foot{color:#7F918A}
+
+  .grid{display:grid;gap:1.6cqh 1.6cqw}
+  .g2{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:.8cqh;
+        padding:2.4cqh 2cqw;display:flex;flex-direction:column;gap:.8cqh;justify-content:center}
+  .dk .card{background:var(--ink2);border-color:#26332C}
+  .card .n{font-family:var(--mono);font-size:1.9cqh;color:var(--pine-l);letter-spacing:.08em}
+  .card .t{font-size:2.9cqh;font-weight:600;line-height:1.3}
+  .card .d{font-size:2.3cqh;color:var(--muted);line-height:1.5}
+  .dk .card .d{color:#93A69E}
+  .card.warn{background:var(--sand);border-color:#E7CDBF}
+  .card.warn .t,.card.warn .n{color:var(--clay)}
+  .card.warn .d{color:#7A4433}
+
+  .rowlist{display:flex;flex-direction:column;gap:1.2cqh}
+  .row{display:flex;align-items:center;gap:2cqw;background:var(--white);border:1px solid var(--line);
+       border-radius:.8cqh;padding:2cqh 2cqw}
+  .dk .row{background:var(--ink2);border-color:#26332C}
+  .dot{flex:0 0 auto;width:5.4cqh;height:5.4cqh;border-radius:50%;background:var(--soft);color:var(--pine);
+       display:flex;align-items:center;justify-content:center;font-family:var(--mono);
+       font-size:2.2cqh;font-weight:600}
+  .dk .dot{background:var(--pine);color:#fff}
+  .row .t{font-size:2.9cqh;font-weight:600;flex:0 0 auto}
+  .row .d{font-size:2.4cqh;color:var(--muted);line-height:1.45}
+  .dk .row .d{color:#93A69E}
+
+  .stack{display:flex;flex-direction:column;gap:.9cqh}
+  .lay{display:flex;align-items:center;gap:2cqw;border-radius:.6cqh;padding:1.8cqh 2cqw;
+       border:1px solid var(--line);background:var(--white)}
+  .lay b{font-size:2.9cqh;min-width:12cqw}
+  .lay span{font-size:2.4cqh;color:var(--muted)}
+
+  pre{background:var(--shell);color:#CFDCD6;border-radius:.7cqh;padding:2.4cqh 2cqw;margin:0;
+      font-family:var(--mono);font-size:2.35cqh;line-height:1.75;overflow:hidden;white-space:pre-wrap}
+  pre .p{color:var(--mint)}
+  pre .c{color:#7C9A93}
+  code{font-family:var(--mono);font-size:.92em;background:var(--soft);padding:.1em .35em;border-radius:.2em}
+  .dk code{background:#22312A;color:#CFE4DA}
+
+  .chips{display:flex;flex-wrap:wrap;gap:1cqh 1cqw}
+  .chip{font-family:var(--mono);font-size:2.3cqh;background:var(--white);border:1px solid var(--line);
+        border-radius:.5cqh;padding:.9cqh 1.2cqw;color:var(--pine);font-weight:500}
+  .chip.bad{background:var(--sand);border-color:#E7CDBF;color:var(--clay)}
+
+  .banner{background:var(--sand);color:var(--clay);border-radius:.7cqh;padding:2.2cqh 2cqw;
+          font-size:2.7cqh;font-weight:600;line-height:1.45}
+  .dk .banner{background:#2A1E18;color:#E0A288}
+  .bannerG{background:var(--soft);color:var(--pine);border-radius:.7cqh;padding:2.2cqh 2cqw;
+          font-size:2.7cqh;font-weight:600;line-height:1.45}
+
+  .tnote{margin-top:1.6cqh;border-left:.35cqh solid var(--clay);background:rgba(184,84,52,.07);
+         padding:1.4cqh 1.6cqw;font-size:2.1cqh;color:var(--body);line-height:1.5}
+  .dk .tnote{color:#C9B4AB;background:rgba(224,162,136,.08)}
+  .tnote b{font-family:var(--mono);font-size:1.7cqh;letter-spacing:.12em;color:var(--clay);
+           display:block;margin-bottom:.4cqh}
+  body:not(.notes) .tnote{display:none}
+
+  .nar{display:none}
+
+  /* ---------- caption ---------- */
+  .cap{flex:0 0 auto;min-height:62px;display:flex;align-items:center;justify-content:center;
+       padding:10px 18px 16px;background:var(--shell)}
+  .cap p{margin:0;max-width:1000px;text-align:center;font-size:15px;line-height:1.6;color:#B6C6BE}
+  .cap p.idle{color:#5C6D65;font-size:13px}
+  body.nocap .cap{display:none}
+
+  .toast{position:fixed;left:50%;bottom:88px;transform:translateX(-50%);background:var(--clay);
+         color:#fff;padding:9px 16px;border-radius:5px;font-size:13px;display:none;z-index:9}
+  .toast.show{display:block}
+  @media (max-width:760px){ .bar .brand{width:100%;margin-bottom:4px} .cap p{font-size:13.5px} }
+
+</style>
+
+<div class="bar">
+  <span class="brand">DAY 10 · 통합 프로젝트와 시연 · 나레이션 슬라이드</span>
+  <button id="prev" title="이전 (←)">◀</button>
+  <span class="count" id="count">1 / 18</span>
+  <button id="next" title="다음 (→)">▶</button>
+  <button class="play" id="play" title="재생 / 정지 (Space)">▶ 재생</button>
+  <button id="auto" class="on" title="나레이션이 끝나면 자동으로 다음 장">자동 진행</button>
+  <select id="rate" title="말하기 속도">
+    <option value="0.85">0.85배</option>
+    <option value="1" selected>1.0배</option>
+    <option value="1.15">1.15배</option>
+    <option value="1.3">1.3배</option>
+    <option value="1.5">1.5배</option>
+  </select>
+  <select id="voice" title="목소리"></select>
+  <button id="cap" class="on" title="자막">자막</button>
+  <button id="full" title="전체화면 (F)">전체화면</button>
+</div>
+<div class="prog"><i id="prog"></i></div>
+
+<div class="wrap"><div class="stage" id="stage">
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과</div>
+      <h1>통합 프로젝트와 시연</h1>
+      <div class="lead">10일간 쌓은 것을 하나의 서비스로 묶기</div>
+      <div class="sub" style="margin-top:3cqh">DAY 10 / 10 · 7시간 · 「LLM 서비스를 세워가며 배우는 리눅스」 70시간 과정</div>
+    </div>
+  <div class="nar">마지막 날입니다. 오늘은 새로 배우는 것이 없습니다. 아흐레 동안 배운 것을 하나로 묶습니다. 조건이 하나 있는데, 그게 오늘의 전부입니다. 다른 팀의 깨끗한 환경에서 여러분이 쓴 문서만 보고 그대로 되살아나야 합니다. 내 컴퓨터에서 도는 것은 완성이 아닙니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Learning Objectives</div>
+    <h2>오늘 끝났을 때 할 수 있어야 하는 것</h2>
+    <div class="fill"><div class="grid g2" style="margin-top:2cqh">
+      <div class="card"><span class="n">01</span><span class="t">setup 스크립트 하나로</span><span class="d">의존성부터 모델까지 설치되게 만들 수 있다</span></div>
+      <div class="card"><span class="n">02</span><span class="t">서비스를</span><span class="d">재부팅 후에도 자동으로 기동되게 만들 수 있다</span></div>
+      <div class="card"><span class="n">03</span><span class="t">프록시 뒤에서</span><span class="d">필요한 포트만 열어 노출할 수 있다</span></div>
+      <div class="card"><span class="n">04</span><span class="t">전용 계정과 분리된 설정으로</span><span class="d">최소 권한 원칙을 지킬 수 있다</span></div>
+      <div class="card"><span class="n">05</span><span class="t">점검 스크립트를</span><span class="d">예약 실행해 스스로 돌보게 만들 수 있다</span></div>
+      <div class="card"><span class="n">06</span><span class="t">처음 보는 사람이</span><span class="d">따라 할 수 있는 문서를 쓸 수 있다</span></div>
+    </div></div>
+  <div class="nar">오늘의 목표는 요구사항 여섯 개입니다. 한 번에 서는 설치, 상시 기동, 프록시 뒤 노출, 권한 분리, 스스로 돌보기, 그리고 읽히는 문서입니다. 여섯 개 모두 아흐레 동안 배운 것이고, 오늘은 그것을 하나의 산출물로 조립하는 일만 합니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Today's Schedule</div>
+    <h2>오늘 하루 · 네 개의 블록</h2>
+    <div class="fill"><div class="grid g4" style="margin-top:2cqh">
+      <div class="card"><span class="n">09:00–12:00</span><span class="t">통합 프로젝트 구축</span><span class="d">팀별로 요구사항 6개 구현</span></div>
+      <div class="card"><span class="n">13:00–15:00</span><span class="t">마무리와 교차 재현</span><span class="d">README 완성 · 옆 팀 환경에서 검증</span></div>
+      <div class="card"><span class="n" style="color:var(--clay)">15:10–16:10</span><span class="t">시연</span><span class="d">팀당 8분 · 설치부터 장애 복구까지</span></div>
+      <div class="card"><span class="n" style="color:var(--clay)">16:10–17:10</span><span class="t">상호 평가와 총정리</span><span class="d">다음 학습 경로 안내</span></div>
+    </div></div>
+    <div class="foot">각 블록에 휴식 10분 포함 · 점심 12:00–13:00</div>
+  <div class="nar">오전 세 시간은 구축입니다. 오후 첫 두 시간에 문서를 완성하고 옆 팀 환경에서 실제로 돌려 봅니다. 여기서 대부분의 문제가 드러납니다. 그다음 시연을 하고, 마지막에 열흘을 정리하고 다음 학습 경로를 안내합니다.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">Block 1 · 09:00–12:00</div>
+      <h2>통합 프로젝트</h2>
+      <div class="sub">2~3인 팀 · 요구사항 6개 · 다른 환경에서 복원되어야 합니다.</div>
+    </div>
+  <div class="nar">첫 번째 블록입니다. 이삼 인 팀으로 진행합니다. 요구사항은 여섯 개이고 전부 아흐레 동안 배운 것입니다. 새로운 기술을 배워서 넣을 필요가 없습니다. 오히려 배우지 않은 것을 넣으면 감점입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">REQ 1</div>
+    <h2>한 번에 서는 설치</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.6cqh"><span class="c"># setup.sh — 한 번 실행으로 끝나야 합니다</span>
+<span class="p">#!/usr/bin/env bash</span>
+<span class="p">set -euo pipefail</span>
+
+<span class="c">① 필수 패키지 설치      (Day 5)
+② 전용 계정 · 디렉터리   (Day 4)
+③ 설정 파일 배치         (Day 7)
+④ 서비스 등록 · 기동     (Day 7 또는 Day 8)
+⑤ 모델 준비              (Day 7)
+⑥ 동작 검증 후 결과 출력</span></pre>
+      <div class="bannerG" style="margin-top:2cqh">중간에 사람 손이 한 번이라도 들어가면 실패입니다. 두 번 실행해도 안전해야 합니다.</div></div>
+    <div class="foot">같은 스크립트를 두 번 돌려도 깨지지 않는 성질을 멱등성이라고 합니다.</div>
+  <div class="nar">첫 번째 요구사항은 셋업 스크립트 하나로 설치가 끝나는 것입니다. 중간에 사람 손이 한 번이라도 들어가면 실패입니다. 그리고 한 가지 더 중요한 성질이 있습니다. 같은 스크립트를 두 번 돌려도 깨지지 않아야 합니다. 이미 있는 계정을 또 만들려다 실패하거나, 이미 받은 모델을 또 받느라 오래 걸리면 안 됩니다. 이 성질을 멱등성이라고 부릅니다. 여섯째 날에 배운 조건문으로 이미 있는지 먼저 확인하면 됩니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">REQ 2 · 3</div>
+    <h2>상시 기동과 프록시 노출</h2>
+    
+    
+    <div class="fill"><div class="grid g2" style="margin-top:1.6cqh">
+        <div class="card"><span class="n">REQ 2</span><span class="t">상시 기동</span><span class="d">systemd(Day 7) 또는 compose(Day 8) 중 하나<br>재부팅 후 자동 시작<br>프로세스를 죽여도 되살아날 것</span></div>
+        <div class="card"><span class="n">REQ 3</span><span class="t">프록시 뒤 노출</span><span class="d">Nginx를 거쳐 접근(Day 9)<br>추론 포트는 직접 열지 않을 것<br>방화벽은 필요한 것만</span></div>
+      </div>
+      <pre style="margin-top:2cqh"><span class="c"># 검증 방법을 README에 적어 두세요</span>
+<span class="p">$ sudo reboot</span>  →  <span class="p">$ systemctl is-active 서비스</span>
+<span class="p">$ curl -s localhost/api/tags</span>            <span class="c"># 80번으로 성공</span>
+<span class="p">$ curl -s --max-time 3 IP:11434/api/tags</span>  <span class="c"># 직접 접근은 실패해야</span></pre></div>
+    
+  <div class="nar">두 번째와 세 번째 요구사항입니다. 상시 기동은 시스템디나 컴포즈 중 하나를 고르면 됩니다. 둘 다 쓸 필요는 없습니다. 재부팅 후 자동으로 뜨고, 프로세스를 강제로 죽여도 되살아나야 합니다. 세 번째는 프록시 뒤 노출입니다. 여든번 포트로는 접근되고 만천사백삼십사번으로는 직접 접근이 안 되어야 합니다. 이 두 줄의 검증 명령을 리드미에 꼭 적어 두십시오. 심사할 때 그대로 칩니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">REQ 4 · 5</div>
+    <h2>권한 분리와 스스로 돌보기</h2>
+    
+    
+    <div class="fill"><div class="grid g2" style="margin-top:1.6cqh">
+        <div class="card"><span class="n">REQ 4</span><span class="t">권한 분리</span><span class="d">전용 서비스 계정으로 구동(Day 4)<br>비밀값은 <code>.env</code> 또는 <code>EnvironmentFile</code>에<br>코드·unit 본문에 비밀값 없을 것(Day 9)</span></div>
+        <div class="card"><span class="n">REQ 5</span><span class="t">스스로 돌보기</span><span class="d">디스크·헬스 점검 스크립트(Day 6)<br>cron 또는 timer로 예약<br>결과가 로그로 남을 것</span></div>
+      </div>
+      <pre style="margin-top:2cqh"><span class="c"># healthcheck.sh 예시 구조</span>
+<span class="p">curl -sf localhost/api/tags &gt;/dev/null || echo "[경고] API 응답 없음"</span>
+<span class="p">df -h / | awk 'NR==2 &amp;&amp; $5+0 &gt; 80 {print "[경고] 디스크 " $5}'</span>
+<span class="p">systemctl is-active 서비스 | grep -q active || echo "[경고] 서비스 중지"</span></pre></div>
+    <div class="foot">점검 스크립트가 "이상 없음"만 찍는다면 반쪽입니다 — 이상을 만들어 경고가 나오는지 확인하세요.</div>
+  <div class="nar">네 번째는 권한 분리입니다. 루트가 아닌 전용 계정으로 서비스가 돌아야 하고, 비밀값이 코드나 유닛 파일 본문에 있으면 안 됩니다. 다섯 번째는 스스로 돌보기입니다. 디스크와 서비스 상태를 점검하는 스크립트를 만들고 예약 실행해서 결과를 로그로 남깁니다. 여기서 한 가지 당부드립니다. 점검 스크립트가 이상 없음만 찍는다면 반쪽입니다. 일부러 서비스를 멈추거나 디스크를 채워서 경고가 실제로 나오는지 확인하십시오.</div>
+</section>
+<section class="slide">
+    <div class="eb">REQ 6</div>
+    <h2>읽히는 문서 — 배점의 절반</h2>
+    
+    
+    <div class="fill"><div class="rowlist" style="margin-top:1.6cqh">
+        <div class="row"><span class="dot">1</span><span class="t">사양 요건</span><span class="d">메모리·디스크·OS 버전</span></div>
+        <div class="row"><span class="dot">2</span><span class="t">구조도</span><span class="d">무엇이 어디서 어떻게 연결되는가</span></div>
+        <div class="row"><span class="dot">3</span><span class="t">설치와 실행</span><span class="d">복사해서 붙여넣을 수 있는 형태로</span></div>
+        <div class="row"><span class="dot">4</span><span class="t">검증 방법</span><span class="d">성공했는지 어떻게 아는가</span></div>
+        <div class="row"><span class="dot">5</span><span class="t">트러블슈팅 3건</span><span class="d">증상 → 확인 → 조치 (Day 9의 RCA 형식)</span></div>
+      </div></div>
+    <div class="foot">"저희 팀은 됩니다"는 통과 기준이 아닙니다. 옆 팀 환경에서 되어야 합니다.</div>
+  <div class="nar">여섯 번째 요구사항이자 배점의 절반이 문서입니다. 사양 요건, 구조도, 설치와 실행, 검증 방법, 그리고 트러블슈팅 세 건. 아홉째 날에 쓴 알씨에이 형식을 그대로 쓰시면 됩니다. 명심하실 것은 저희 팀은 됩니다가 통과 기준이 아니라는 점입니다. 옆 팀 환경에서 되어야 합니다.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">Block 2 · 13:00–15:00</div>
+      <h2>교차 재현</h2>
+      <div class="sub">내 문서의 빈칸은 남이 실행해 봐야 보입니다.</div>
+    </div>
+  <div class="nar">두 번째 블록입니다. 이 시간이 오늘 가장 값진 두 시간입니다. 옆 팀과 환경을 바꿔서 서로의 문서만 보고 설치를 시도합니다. 여기서 드러나는 문제가 실무에서 여러분이 겪게 될 문제와 똑같습니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Cross-test</div>
+    <h2>교차 재현에서 반드시 드러나는 것들</h2>
+    
+    
+    <div class="fill"><div class="grid g2" style="margin-top:1.6cqh">
+        <div class="card warn"><span class="t">"제 컴퓨터엔 이미 있었어요"</span><span class="d">설치 목록에서 빠진 패키지. 내 환경에 원래 있던 것은 눈에 안 보입니다.</span></div>
+        <div class="card warn"><span class="t">"경로가 제 계정 이름이네요"</span><span class="d">하드코딩된 <code>/home/ubuntu</code>. 계정명이 다르면 깨집니다.</span></div>
+        <div class="card warn"><span class="t">"이 파일은 어디서 받나요"</span><span class="d">문서에 없는 사전 준비물.</span></div>
+        <div class="card warn"><span class="t">"순서가 반대인데요"</span><span class="d">실제로는 A를 먼저 해야 하는데 문서에는 B가 먼저.</span></div>
+      </div></div>
+    <div class="foot">네 가지 중 최소 두 가지는 반드시 나옵니다. 나오는 게 정상이고, 그것을 고치는 것이 오늘의 일입니다.</div>
+  <div class="nar">교차 재현을 하면 네 가지가 거의 반드시 드러납니다. 내 컴퓨터엔 이미 깔려 있어서 설치 목록에서 빠진 패키지, 하드코딩된 내 계정 경로, 문서에 없는 사전 준비물, 그리고 실제 순서와 다른 문서. 최소 두 가지는 반드시 나옵니다. 나오는 게 정상입니다. 그걸 발견하고 고치는 것이 오늘 오후의 일입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Checklist</div>
+    <h2>제출 전 자가 점검</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.6cqh"><span class="c"># 이 순서로 직접 돌려 보세요</span>
+<span class="p">1.</span> 깨끗한 환경(스냅샷 복원)에서 시작
+<span class="p">2.</span> README만 보고 setup.sh 실행
+<span class="p">3.</span> curl 로 API 응답 확인
+<span class="p">4.</span> 재부팅 → 자동 기동 확인
+<span class="p">5.</span> 추론 포트 직접 접근이 막히는지 확인
+<span class="p">6.</span> 서비스 강제 종료 → 자동 복구 확인
+<span class="p">7.</span> 점검 스크립트 로그 확인
+<span class="p">8.</span> 트러블슈팅 3건을 실제로 재현</pre>
+      <div class="bannerG" style="margin-top:2cqh">Day 1에 찍어 둔 <code>clean-install</code> 스냅샷이 여기서 쓰입니다.</div></div>
+    
+  <div class="nar">제출 전에 이 여덟 단계를 직접 돌려 보십시오. 첫날에 찍어 둔 클린 인스톨 스냅샷을 복원해서 시작합니다. 열흘 전에 찍어 둔 그 스냅샷이 오늘 마지막 날에 쓰입니다. 그때 마음껏 망가뜨려도 된다고 말씀드린 이유가 이것입니다.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">Block 3 · 15:10–16:10</div>
+      <h2>시연</h2>
+      <div class="sub">팀당 8분. 설치부터 장애 복구까지 한 흐름으로.</div>
+    </div>
+  <div class="nar">세 번째 블록은 시연입니다. 팀당 팔 분입니다. 슬라이드를 만들지 마시고 터미널을 보여 주십시오.</div>
+</section>
+<section class="slide">
+    <div class="eb">Demo</div>
+    <h2>8분 시연 구성</h2>
+    
+    
+    <div class="fill"><div class="rowlist" style="margin-top:1.6cqh">
+        <div class="row"><span class="dot">1</span><span class="t">1분 — 무엇을 만들었나</span><span class="d">구조도 한 장</span></div>
+        <div class="row"><span class="dot">2</span><span class="t">2분 — 설치</span><span class="d">setup.sh 실행 (미리 돌려둔 화면도 가능)</span></div>
+        <div class="row"><span class="dot">3</span><span class="t">2분 — 동작</span><span class="d">curl 호출과 응답</span></div>
+        <div class="row"><span class="dot">4</span><span class="t">2분 — 장애 복구</span><span class="d">일부러 고장 내고 고치기</span></div>
+        <div class="row"><span class="dot">5</span><span class="t">1분 — 가장 어려웠던 점</span><span class="d">솔직하게</span></div>
+      </div></div>
+    <div class="foot">4번이 가장 중요합니다 — 잘 도는 것보다 고장 났을 때 대응할 수 있는 것이 실력입니다.</div>
+  <div class="nar">팔 분을 다섯 토막으로 나눕니다. 무엇을 만들었는지 일 분, 설치 이 분, 동작 이 분, 장애 복구 이 분, 그리고 가장 어려웠던 점 일 분입니다. 네 번째가 가장 중요합니다. 잘 도는 것을 보여 주는 것보다 고장 났을 때 대응할 수 있다는 것을 보여 주는 것이 실력입니다. 다섯 번째도 형식적으로 넘기지 마십시오. 어디서 막혔고 어떻게 풀었는지가 다른 팀에게 가장 도움이 되는 정보입니다.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">Block 4 · 16:10–17:10</div>
+      <h2>총정리</h2>
+      <div class="sub">열흘 동안 무엇을 했고, 여기서 어디로 가는가.</div>
+    </div>
+  <div class="nar">마지막 블록입니다. 열흘 동안 무엇을 했는지 정리하고, 여기서 어디로 갈 수 있는지 안내하겠습니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Review</div>
+    <h2>열흘의 흐름</h2>
+    
+    
+    <div class="fill"><div class="grid g2" style="margin-top:1.6cqh">
+        <div class="card"><span class="n">Day 1–3</span><span class="t">다루기</span><span class="d">환경 · 파일시스템 · 파이프 · 텍스트 처리<br>10만 줄에서 답을 뽑아내는 능력</span></div>
+        <div class="card"><span class="n">Day 4–6</span><span class="t">움직이기</span><span class="d">권한 · 프로세스 · 원격 · 자동화<br>손으로 하던 일을 기계에 넘기는 능력</span></div>
+        <div class="card"><span class="n">Day 7–8</span><span class="t">세우기</span><span class="d">서비스 · 컨테이너<br>한 번 만든 것을 어디서든 되살리는 능력</span></div>
+        <div class="card"><span class="n">Day 9–10</span><span class="t">지키기</span><span class="d">운영 · 보안 · 장애 · 통합<br>만든 것을 살려 두는 능력</span></div>
+      </div></div>
+    
+  <div class="nar">열흘을 네 덩어리로 보시면 됩니다. 처음 사흘은 다루기였습니다. 파일과 텍스트를 다뤄 십만 줄에서 답을 뽑아내는 능력. 그다음 사흘은 움직이기였습니다. 권한과 프로세스와 원격과 자동화, 손으로 하던 일을 기계에 넘기는 능력. 일곱째와 여덟째 날은 세우기였습니다. 서비스와 컨테이너, 한 번 만든 것을 어디서든 되살리는 능력. 그리고 마지막 이틀은 지키기였습니다. 만든 것을 살려 두는 능력입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Next</div>
+    <h2>여기서 어디로</h2>
+    
+    
+    <div class="fill"><div class="rowlist" style="margin-top:1.6cqh">
+        <div class="row"><span class="dot">1</span><span class="t">추론 성능</span><span class="d">vLLM · 배치 처리 · 양자화 심화 — 처리량을 높이는 쪽</span></div>
+        <div class="row"><span class="dot">2</span><span class="t">규모 확장</span><span class="d">쿠버네티스 · 로드밸런싱 — 서버가 여러 대가 될 때</span></div>
+        <div class="row"><span class="dot">3</span><span class="t">환경 코드화</span><span class="d">Ansible · Terraform — setup.sh의 정식 버전</span></div>
+        <div class="row"><span class="dot">4</span><span class="t">관측</span><span class="d">Prometheus · Grafana — Day 9 점검 스크립트의 정식 버전</span></div>
+      </div>
+      <div class="bannerG" style="margin-top:2cqh">네 가지 모두 오늘 만든 것의 <strong>정식 버전</strong>입니다. 여러분은 이미 원리를 손으로 만들어 봤습니다.</div></div>
+    <div class="foot">도구 이름이 바뀔 뿐, 오늘 배운 질문("무엇이 돌고 있나, 왜 안 되나, 어떻게 재현하나")은 그대로입니다.</div>
+  <div class="nar">여기서 갈 수 있는 길이 네 가지입니다. 추론 성능을 높이는 쪽, 서버가 여러 대가 될 때의 규모 확장, 환경을 코드로 관리하는 쪽, 그리고 관측입니다. 여기서 한 가지 말씀드리고 싶은 것이 있습니다. 네 가지 모두 여러분이 오늘 만든 것의 정식 버전입니다. 앤서블은 셋업 스크립트의 정식 버전이고, 프로메테우스는 점검 스크립트의 정식 버전입니다. 여러분은 이미 원리를 손으로 만들어 봤습니다. 도구 이름이 바뀔 뿐, 오늘 배운 질문은 그대로입니다. 무엇이 돌고 있나, 왜 안 되나, 어떻게 재현하나. 열흘 동안 수고 많으셨습니다.</div>
+</section>
+<section class="slide dk">
+    <div class="eb">Assignment 10 · 제출 익일 09:00</div>
+    <h2>최종 산출물 제출</h2>
+    <div class="sub">코드와 문서를 함께 제출합니다. 문서가 없으면 코드는 채점되지 않습니다.</div>
+    <div class="fill"><div class="grid g3" style="margin-top:2cqh">
+      <div class="card"><span class="n">01</span><span class="t">setup.sh (한 번에 서는 설치)</span></div>
+      <div class="card"><span class="n">02</span><span class="t">서비스 정의 (unit 파일 또는 compose.yaml)</span></div>
+      <div class="card"><span class="n">03</span><span class="t">Nginx 설정과 방화벽 규칙</span></div>
+      <div class="card"><span class="n">04</span><span class="t">healthcheck.sh 와 예약 설정</span></div>
+      <div class="card"><span class="n">05</span><span class="t">README (사양·구조도·실행·검증·트러블슈팅 3건)</span></div>
+      <div class="card"><span class="n">06</span><span class="t">교차 재현 결과 보고 (어느 팀 환경에서, 무엇이 막혔고, 무엇을 고쳤는가)</span></div>
+    </div></div>
+    <div class="foot">6번이 실질 배점의 가장 큰 항목입니다. <strong>문제가 하나도 없었다면 교차 재현을 제대로 하지 않은 것</strong>으로 봅니다.</div>
+  <div class="nar">최종 제출물입니다. 셋업 스크립트, 서비스 정의, 프록시와 방화벽 설정, 점검 스크립트, 리드미, 그리고 교차 재현 결과 보고입니다. 여섯 번째가 실질 배점에서 가장 큰 항목입니다. 그리고 한 가지 분명히 말씀드립니다. 문제가 하나도 없었다고 적으면 교차 재현을 제대로 하지 않은 것으로 봅니다. 반드시 무언가 나옵니다.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">Wrap-up</div>
+      <h2>오늘 한 일</h2>
+      <div class="sub" style="font-size:3.4cqh;color:#D7E2DC;margin-top:2cqh">열흘 동안 명령어를 외운 게 아니라, 시스템을 세우고 지키는 방법을 익혔습니다.</div>
+      <div class="lead" style="margin-top:4cqh">수고하셨습니다</div>
+      <div class="sub">앞으로 어떤 도구를 만나든 질문은 같습니다 — 무엇이 돌고 있나, 왜 안 되나, 어떻게 재현하나.</div>
+    </div>
+  <div class="nar">열흘이 끝났습니다. 여러분은 명령어를 외운 것이 아니라 시스템을 세우고 지키는 방법을 익혔습니다. 첫날 터미널 프롬프트 하나에서 시작해서, 오늘 재현 가능한 서비스를 만들어 냈습니다. 앞으로 새로운 도구를 만나게 될 텐데, 질문은 항상 같습니다. 무엇이 돌고 있나. 왜 안 되나. 어떻게 재현하나. 이 세 가지를 물을 수 있으면 어떤 도구든 익힐 수 있습니다. 수고하셨습니다.</div>
+</section>
+</div></div>
+
+<div class="cap"><p id="capText" class="idle">▶ 재생을 누르면 나레이션이 시작됩니다 · ← → 슬라이드 이동 · Space 재생/정지 · F 전체화면</p></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const synth  = window.speechSynthesis;
+  const $ = id => document.getElementById(id);
+  let idx = 0, playing = false, auto = true, chunks = [], ci = 0, voices = [], voice = null;
+
+  $('count').textContent = '1 / ' + slides.length;
+
+  function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 3800); }
+
+  function narration(i){ const n = slides[i].querySelector('.nar'); return n ? n.textContent.trim() : ''; }
+  function splitSentences(t){
+    return t.split(/(?<=[.?!])\s+/).map(s=>s.trim()).filter(Boolean);
+  }
+
+  function show(i){
+    slides[idx].classList.remove('show');
+    idx = Math.max(0, Math.min(slides.length-1, i));
+    slides[idx].classList.add('show');
+    $('count').textContent = (idx+1) + ' / ' + slides.length;
+    $('prog').style.width = ((idx+1)/slides.length*100) + '%';
+  }
+
+  function setCap(text, idle){
+    const p = $('capText');
+    p.textContent = text;
+    p.classList.toggle('idle', !!idle);
+  }
+
+  function stop(){
+    playing = false; chunks = []; ci = 0;
+    try { synth.cancel(); } catch(e){}
+    $('play').textContent = '▶ 재생';
+    $('play').classList.remove('playing');
+    setCap('▶ 재생을 누르면 나레이션이 시작됩니다 · ← → 슬라이드 이동 · Space 재생/정지 · F 전체화면', true);
+  }
+
+  function speakNext(){
+    if (!playing) return;
+    if (ci >= chunks.length){
+      if (auto && idx < slides.length-1){ show(idx+1); startSpeaking(); }
+      else { stop(); }
+      return;
+    }
+    const u = new SpeechSynthesisUtterance(chunks[ci]);
+    u.lang = 'ko-KR';
+    if (voice) u.voice = voice;
+    u.rate = parseFloat($('rate').value);
+    u.onend = () => { ci++; speakNext(); };
+    u.onerror = () => { ci++; speakNext(); };
+    setCap(chunks[ci]);
+    synth.speak(u);
+  }
+
+  function startSpeaking(){
+    try { synth.cancel(); } catch(e){}
+    chunks = splitSentences(narration(idx)); ci = 0;
+    if (!chunks.length){ if (auto && idx < slides.length-1){ show(idx+1); setTimeout(startSpeaking,120); } else stop(); return; }
+    playing = true;
+    $('play').textContent = '❚❚ 정지';
+    $('play').classList.add('playing');
+    setTimeout(speakNext, 120);
+  }
+
+  function toggle(){ playing ? stop() : startSpeaking(); }
+  function go(d){ const was = playing; stop(); show(idx+d); if (was) setTimeout(startSpeaking, 150); }
+
+  /* voices */
+  function loadVoices(){
+    voices = synth.getVoices();
+    const ko = voices.filter(v => /^ko/i.test(v.lang));
+    const sel = $('voice');
+    sel.innerHTML = '';
+    const list = ko.length ? ko : voices;
+    if (!list.length){ sel.innerHTML = '<option>음성 없음</option>'; return; }
+    list.forEach((v,i) => {
+      const o = document.createElement('option');
+      o.value = voices.indexOf(v); o.textContent = v.name.replace(/Microsoft |Google /,'');
+      sel.appendChild(o);
+    });
+    voice = list[0];
+    sel.value = voices.indexOf(voice);
+    if (!ko.length) toast('한국어 음성이 없습니다 — Chrome 또는 Edge에서 열어 보세요');
+  }
+  loadVoices();
+  if (typeof synth.onvoiceschanged !== 'undefined') synth.onvoiceschanged = loadVoices;
+
+  /* controls */
+  $('play').onclick = toggle;
+  $('prev').onclick = () => go(-1);
+  $('next').onclick = () => go(1);
+  $('voice').onchange = e => { voice = voices[e.target.value]; if (playing){ const w=idx; stop(); show(w); startSpeaking(); } };
+  $('rate').onchange  = () => { if (playing){ const w=idx; stop(); show(w); startSpeaking(); } };
+  $('auto').onclick   = e => { auto = !auto; e.target.classList.toggle('on', auto); };
+  $('cap').onclick    = e => { document.body.classList.toggle('nocap'); e.target.classList.toggle('on', !document.body.classList.contains('nocap')); };
+  $('full').onclick   = () => { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); };
+
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'SELECT') return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown'){ e.preventDefault(); go(1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); go(-1); }
+    else if (e.key === ' '){ e.preventDefault(); toggle(); }
+    else if (e.key === 'f' || e.key === 'F'){ $('full').click(); }
+    else if (e.key === 'Home'){ go(-idx); }
+    else if (e.key === 'End'){ go(slides.length-1-idx); }
+  });
+  $('stage').addEventListener('click', e => { if (e.clientX > window.innerWidth/2) go(1); else go(-1); });
+  window.addEventListener('beforeunload', () => { try{ synth.cancel(); }catch(e){} });
+  window.deckGo = n => { const was = playing; stop(); show(n); if (was) setTimeout(startSpeaking, 150); };
+})();
+
+</script>
+<script src="../nav.js"></script>

@@ -16,15 +16,51 @@
         { f: 'lab.html',   label: '실습 가이드' },
         { f: 'quiz.html',  label: '명령어 퀴즈',  tag: '18문항' }
       ] },
-    { n: 2,  dir: 'day2',  title: '파일시스템과 파이프',      soon: true },
-    { n: 3,  dir: 'day3',  title: '텍스트 처리와 데이터 해부', soon: true },
-    { n: 4,  dir: 'day4',  title: '사용자 · 권한 · 프로세스',  soon: true },
-    { n: 5,  dir: 'day5',  title: '패키지 · 환경 · 원격 접속', soon: true },
-    { n: 6,  dir: 'day6',  title: '셸 스크립팅과 자동화',      soon: true },
-    { n: 7,  dir: 'day7',  title: 'LLM 추론 서버 올리기',      soon: true },
-    { n: 8,  dir: 'day8',  title: '컨테이너로 환경 재현',      soon: true },
-    { n: 9,  dir: 'day9',  title: '운영 · 보안 · 장애',        soon: true },
-    { n: 10, dir: 'day10', title: '통합 프로젝트와 시연',      soon: true }
+    { n: 2,  dir: 'day2',  title: '파일시스템과 파이프', items: [
+        { f: 'index.html', label: '강의 슬라이드', tag: '나레이션' },
+        { f: 'lab.html',   label: '실습 가이드' },
+        { f: 'quiz.html',  label: '퀴즈',  tag: '18문항' }
+      ] },
+    { n: 3,  dir: 'day3',  title: '텍스트 처리와 데이터 해부', items: [
+        { f: 'index.html', label: '강의 슬라이드', tag: '나레이션' },
+        { f: 'lab.html',   label: '실습 가이드' },
+        { f: 'quiz.html',  label: '퀴즈',  tag: '18문항' }
+      ] },
+    { n: 4,  dir: 'day4',  title: '사용자 · 권한 · 프로세스', items: [
+        { f: 'index.html', label: '강의 슬라이드', tag: '나레이션' },
+        { f: 'lab.html',   label: '실습 가이드' },
+        { f: 'quiz.html',  label: '퀴즈',  tag: '18문항' }
+      ] },
+    { n: 5,  dir: 'day5',  title: '패키지 · 환경 · 원격 접속', items: [
+        { f: 'index.html', label: '강의 슬라이드', tag: '나레이션' },
+        { f: 'lab.html',   label: '실습 가이드' },
+        { f: 'quiz.html',  label: '퀴즈',  tag: '18문항' }
+      ] },
+    { n: 6,  dir: 'day6',  title: '셸 스크립팅과 자동화', items: [
+        { f: 'index.html', label: '강의 슬라이드', tag: '나레이션' },
+        { f: 'lab.html',   label: '실습 가이드' },
+        { f: 'quiz.html',  label: '퀴즈',  tag: '18문항' }
+      ] },
+    { n: 7,  dir: 'day7',  title: 'LLM 추론 서버 올리기', items: [
+        { f: 'index.html', label: '강의 슬라이드', tag: '나레이션' },
+        { f: 'lab.html',   label: '실습 가이드' },
+        { f: 'quiz.html',  label: '퀴즈',  tag: '18문항' }
+      ] },
+    { n: 8,  dir: 'day8',  title: '컨테이너로 환경 재현', items: [
+        { f: 'index.html', label: '강의 슬라이드', tag: '나레이션' },
+        { f: 'lab.html',   label: '실습 가이드' },
+        { f: 'quiz.html',  label: '퀴즈',  tag: '18문항' }
+      ] },
+    { n: 9,  dir: 'day9',  title: '운영 · 보안 · 장애', items: [
+        { f: 'index.html', label: '강의 슬라이드', tag: '나레이션' },
+        { f: 'lab.html',   label: '실습 가이드' },
+        { f: 'quiz.html',  label: '퀴즈',  tag: '18문항' }
+      ] },
+    { n: 10, dir: 'day10', title: '통합 프로젝트와 시연', items: [
+        { f: 'index.html', label: '강의 슬라이드', tag: '나레이션' },
+        { f: 'lab.html',   label: '실습 가이드' },
+        { f: 'quiz.html',  label: '퀴즈',  tag: '18문항' }
+      ] }
   ];
   /* ================================================================ */
 

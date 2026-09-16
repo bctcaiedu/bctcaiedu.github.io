@@ -1,0 +1,483 @@
+<title>Day 2 명령어 퀴즈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --bg:#F6F8F5;--surface:#FFFFFF;--surface-2:#EDF1EC;--ink:#141A16;--ink-2:#3A453E;--muted:#5F6D65;
+    --line:#DBE2DC;--line-strong:#C3CFC6;--accent:#10684A;--accent-soft:#E2EFE8;
+    --clay:#A94D30;--clay-soft:#F6E7E0;--term:#10171A;
+    --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+      --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;
+      --clay:#E08F6E;--clay-soft:#2A1E18;--term:#0A0F11;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+    --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;
+    --clay:#E08F6E;--clay-soft:#2A1E18;--term:#0A0F11;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.68;margin:0;
+       -webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding-inline:20px}
+  h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0}
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+
+  header{border-bottom:1px solid var(--line);background:var(--surface)}
+  .mast{padding-block:32px 22px;display:flex;flex-direction:column;gap:10px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  h1{font-size:clamp(24px,4vw,32px);font-weight:700;letter-spacing:-.025em}
+  .mast p{color:var(--ink-2);font-size:14.5px;font-weight:300;max-width:60ch}
+
+  .prog{height:3px;background:var(--surface-2)}
+  .prog i{display:block;height:100%;background:var(--accent);width:0;transition:width .35s}
+
+  main{padding-block:30px 60px}
+  .meta{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+  .meta .qn{font-family:var(--mono);font-size:11.5px;letter-spacing:.11em;color:var(--accent)}
+  .meta .sc{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+  .qcard{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:26px 24px}
+  .qtext{font-size:18px;font-weight:600;line-height:1.55;text-wrap:balance}
+  pre{background:var(--term);color:#DCE6E3;border-radius:4px;padding:14px 16px;margin:16px 0 0;
+      font-family:var(--mono);font-size:13px;line-height:1.7;overflow-x:auto}
+  pre .p{color:#7FD1A8}
+  pre .c{color:#7C9A93}
+  code{font-family:var(--mono);font-size:.9em;background:var(--surface-2);padding:1px 5px;border-radius:3px}
+
+  .opts{display:flex;flex-direction:column;gap:9px;margin-top:20px}
+  .opt{text-align:left;font-family:var(--sans);font-size:15px;line-height:1.5;color:var(--ink);
+       background:var(--surface);border:1px solid var(--line-strong);border-radius:5px;
+       padding:13px 16px;cursor:pointer;display:flex;gap:11px;align-items:flex-start;width:100%}
+  .opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
+  .opt:disabled{cursor:default}
+  .opt .mk{font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:2px;flex:0 0 auto}
+  .opt.right{border-color:var(--accent);background:var(--accent-soft)}
+  .opt.right .mk{color:var(--accent)}
+  .opt.wrong{border-color:var(--clay);background:var(--clay-soft)}
+  .opt.wrong .mk{color:var(--clay)}
+  .opt code{background:rgba(0,0,0,.06)}
+
+  .typed{display:flex;gap:9px;margin-top:20px;flex-wrap:wrap}
+  input[type=text]{flex:1 1 240px;font-family:var(--mono);font-size:15px;color:var(--ink);
+      background:var(--surface);border:1px solid var(--line-strong);border-radius:5px;padding:12px 14px}
+  input[type=text]:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  input[type=text]:disabled{opacity:.75}
+
+  button.go{font-family:var(--sans);font-size:15px;font-weight:600;color:#fff;background:var(--accent);
+      border:1px solid var(--accent);border-radius:5px;padding:12px 22px;cursor:pointer}
+  button.go:hover{filter:brightness(1.08)}
+  button.ghost{font-family:var(--sans);font-size:14px;font-weight:500;color:var(--ink-2);
+      background:var(--surface);border:1px solid var(--line-strong);border-radius:5px;padding:11px 18px;cursor:pointer}
+  button.ghost:hover{border-color:var(--accent);color:var(--accent)}
+  .actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+
+  .fb{margin-top:18px;border-left:3px solid var(--accent);background:var(--accent-soft);
+      border-radius:0 4px 4px 0;padding:14px 16px}
+  .fb.no{border-left-color:var(--clay);background:var(--clay-soft)}
+  .fb .v{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+         color:var(--accent);display:block;margin-bottom:5px}
+  .fb.no .v{color:var(--clay)}
+  .fb p{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .fb code{background:rgba(0,0,0,.06)}
+
+  /* result */
+  .res{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:32px 24px;text-align:center}
+  .res .big{font-family:var(--mono);font-size:56px;font-weight:600;line-height:1;color:var(--accent);
+            font-variant-numeric:tabular-nums}
+  .res .big.mid{color:#B08322}
+  .res .big.low{color:var(--clay)}
+  .res h2{font-size:20px;margin-top:14px}
+  .res p{color:var(--muted);font-size:14.5px;margin-top:8px;max-width:48ch;margin-inline:auto}
+  .res .actions{justify-content:center}
+  .missed{margin-top:26px;text-align:left;border-top:1px solid var(--line);padding-top:20px}
+  .missed h3{font-size:14px;color:var(--muted);font-family:var(--mono);letter-spacing:.11em;
+             text-transform:uppercase;font-weight:500;margin-bottom:12px}
+  .missed li{font-size:14px;color:var(--ink-2);line-height:1.6;margin-top:9px}
+  .missed li b{color:var(--ink)}
+
+  footer{border-top:1px solid var(--line);background:var(--surface);padding-block:22px}
+  footer p{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  @media (max-width:560px){ .qcard{padding:20px 16px} .qtext{font-size:16.5px} }
+
+</style>
+
+<header>
+  <div class="wrap mast">
+    <span class="eyebrow">Day 2 · 리눅스 × LLM 서빙 70시간 과정</span>
+    <h1>파일시스템과 파이프 퀴즈</h1>
+    <p>18문항 · 객관식과 직접 입력이 섞여 있습니다. 가이드를 다시 보지 말고 먼저 풀어 보세요. 15문항 이상이면 통과입니다.</p>
+  </div>
+</header>
+<div class="prog"><i id="prog"></i></div>
+
+<main class="wrap">
+  <div class="meta"><span class="qn" id="qn">Q 01 / 18</span><span class="sc" id="sc">정답 0</span></div>
+  <div id="area"></div>
+</main>
+
+<footer><div class="wrap"><p>Day 2 · <a href="lab.html">실습 가이드로 돌아가기</a></p></div></footer>
+
+<script>
+window.QUIZ = [
+  {
+    "q": "설정 파일들이 모여 있는 디렉터리는?",
+    "o": [
+      "/etc",
+      "/var",
+      "/usr",
+      "/opt"
+    ],
+    "a": 0,
+    "e": "<code>/etc</code>는 시스템과 서비스의 설정 파일 자리입니다. Day 7의 systemd 설정도 여기서 다룹니다."
+  },
+  {
+    "q": "로그가 쌓여서 디스크를 가장 자주 채우는 곳은?",
+    "o": [
+      "/var",
+      "/etc",
+      "/home",
+      "/proc"
+    ],
+    "a": 0,
+    "e": "<code>/var</code>는 변하는 데이터의 자리이고 <code>/var/log</code>에 로그가 쌓입니다. Day 9에서 다시 만납니다."
+  },
+  {
+    "q": "<code>ls -l</code> 출력의 맨 앞 글자가 <code>l</code>이면?",
+    "o": [
+      "심볼릭 링크",
+      "잠긴 파일",
+      "큰 파일",
+      "로그 파일"
+    ],
+    "a": 0,
+    "e": "<code>-</code> 일반 파일, <code>d</code> 디렉터리, <code>l</code> 링크입니다."
+  },
+  {
+    "q": "<code>/proc/uptime</code>의 크기가 0인데 <code>cat</code>하면 내용이 나오는 이유는?",
+    "o": [
+      "디스크에 없고 커널이 읽는 순간 만들어 준다",
+      "파일이 손상됐다",
+      "권한이 없어서 크기가 숨겨졌다",
+      "압축되어 있다"
+    ],
+    "a": 0,
+    "e": "<code>/proc</code>은 가상 파일시스템입니다. \"모든 것이 파일이다\"라는 말이 실제로 구현된 모습입니다."
+  },
+  {
+    "q": "원본을 가리키는 이름표를 만드는 명령은? (직접 입력 — 옵션 포함)",
+    "t": true,
+    "acc": [
+      "ln -s",
+      "ln -s 원본 링크"
+    ],
+    "ans": "ln -s",
+    "e": "<code>-s</code>는 symbolic입니다. 링크는 데이터가 아니라 \"경로 문자열\"을 저장합니다."
+  },
+  {
+    "q": "압축 아카이브를 <strong>풀지 않고</strong> 내용 목록만 보려면?",
+    "o": [
+      "tar -tzf a.tar.gz",
+      "tar -xzf a.tar.gz",
+      "tar -czf a.tar.gz",
+      "tar -lzf a.tar.gz"
+    ],
+    "a": 0,
+    "e": "<code>t</code>는 list입니다. 남이 준 아카이브는 풀기 전에 목록을 먼저 확인하는 것이 안전합니다."
+  },
+  {
+    "q": "폴더를 묶고 gzip으로 압축해 <code>logs.tar.gz</code>를 만드는 명령은? (직접 입력)",
+    "t": true,
+    "acc": [
+      "tar -czf logs.tar.gz logs",
+      "tar -czf logs.tar.gz logs/",
+      "tar czf logs.tar.gz logs",
+      "tar czf logs.tar.gz logs/"
+    ],
+    "ans": "tar -czf logs.tar.gz logs/",
+    "e": "c는 create, z는 gzip, f는 뒤에 파일 이름이 온다는 표시입니다."
+  },
+  {
+    "q": "명령에 있는 세 개의 통로가 아닌 것은?",
+    "o": [
+      "stdlog",
+      "stdin",
+      "stdout",
+      "stderr"
+    ],
+    "a": 0,
+    "e": "입력 하나(stdin), 출력 둘(stdout, stderr)입니다. 로그 전용 통로는 없습니다."
+  },
+  {
+    "q": "아래에서 <code>out.txt</code>가 비어 있는 이유는?",
+    "pre": "<span class='p'>$</span> ls /없는경로 &gt; out.txt\n<span class='c'>ls: cannot access '/없는경로': No such file or directory</span>",
+    "o": [
+      "오류 메시지는 표준 에러로 나가서 &gt; 에 잡히지 않는다",
+      "경로가 없으면 파일도 안 만들어진다",
+      "&gt; 는 디렉터리에만 쓸 수 있다",
+      "권한이 부족하다"
+    ],
+    "a": 0,
+    "e": "오류를 파일로 보내려면 <code>2&gt;</code>를 써야 합니다. 오늘 가장 중요한 지점입니다."
+  },
+  {
+    "q": "정상 출력과 오류를 <strong>한 파일에 합쳐</strong> 담는 표기는?",
+    "o": [
+      "&gt; out.txt 2&gt;&amp;1",
+      "&gt; out.txt 2&gt; out.txt",
+      "&gt;&gt; out.txt",
+      "1&gt;2 out.txt"
+    ],
+    "a": 0,
+    "e": "<code>2&gt;&amp;1</code>은 \"2번 통로를 1번이 가는 곳으로 함께 보내라\"는 뜻입니다. 순서가 중요해서 <code>&gt;</code> 뒤에 씁니다."
+  },
+  {
+    "q": "<code>/dev/null</code>은 무엇인가요?",
+    "o": [
+      "보낸 것이 사라지는 곳",
+      "기본 로그 파일",
+      "임시 폴더",
+      "휴지통"
+    ],
+    "a": 0,
+    "e": "리눅스의 블랙홀입니다. 필요 없는 출력을 버릴 때 씁니다. Day 6의 자동 실행 스크립트에서 자주 만납니다."
+  },
+  {
+    "q": "<code>&gt;</code>와 <code>&gt;&gt;</code>의 차이는?",
+    "o": [
+      "&gt; 는 덮어쓰기, &gt;&gt; 는 이어붙이기",
+      "&gt; 는 파일, &gt;&gt; 는 폴더",
+      "&gt; 는 출력, &gt;&gt; 는 에러",
+      "차이가 없다"
+    ],
+    "a": 0,
+    "e": "<code>&gt;</code>는 기존 내용을 지웁니다. 중요한 파일 이름을 잘못 쓰면 그 자리에서 사라집니다."
+  },
+  {
+    "q": "<code>/usr/bin</code>에 명령이 몇 개 있는지 세는 한 줄은? (직접 입력)",
+    "t": true,
+    "acc": [
+      "ls /usr/bin | wc -l",
+      "ls /usr/bin|wc -l"
+    ],
+    "ans": "ls /usr/bin | wc -l",
+    "e": "목록을 만들어 줄 수를 세는 전형적인 2단 파이프입니다."
+  },
+  {
+    "q": "파일로도 저장하면서 동시에 다음 명령으로 흘려보내는 명령은?",
+    "o": [
+      "tee",
+      "cat",
+      "split",
+      "dup"
+    ],
+    "a": 0,
+    "e": "물을 갈라 보내는 T자 관에서 온 이름입니다. 중간 결과를 남기며 파이프라인을 이어갈 때 씁니다."
+  },
+  {
+    "q": "<code>/var/log</code>에서 용량이 큰 상위 5개를 뽑는 파이프라인 순서로 알맞은 것은?",
+    "o": [
+      "du -sh /var/log/* | sort -hr | head -5",
+      "du -sh /var/log/* | head -5 | sort -hr",
+      "sort -hr /var/log/* | du -sh | head -5",
+      "head -5 /var/log/* | du -sh | sort"
+    ],
+    "a": 0,
+    "e": "재고 → 정렬 → 자르기 순서입니다. 자르기를 먼저 하면 정렬 전의 임의의 5개만 남습니다."
+  },
+  {
+    "q": "긴 파이프라인을 만드는 올바른 태도는?",
+    "o": [
+      "한 칸씩 붙이며 중간 결과를 확인한다",
+      "한 번에 완성한 뒤 결과만 본다",
+      "먼저 검색해서 통째로 복사한다",
+      "길수록 좋으니 최대한 이어 붙인다"
+    ],
+    "a": 0,
+    "e": "중간 결과를 확인하지 않고 쌓으면 어디서 틀렸는지 찾을 수 없습니다."
+  },
+  {
+    "q": "<code>~/ai-lab</code>의 다섯 폴더 중 <strong>지워도 다시 만들 수 있는</strong> 쪽에 가까운 것은?",
+    "o": [
+      "logs",
+      "scripts",
+      "datasets",
+      "전부 지우면 안 된다"
+    ],
+    "a": 0,
+    "e": "로그는 계속 쌓이고 주기적으로 지워야 합니다. 반면 <code>scripts</code>는 내가 만든 것이라 지우면 복구가 어렵습니다. 이 기준이 Day 9 디스크 관리의 근거가 됩니다."
+  },
+  {
+    "q": "다섯 개 폴더를 한 줄로 만드는 표기는?",
+    "o": [
+      "mkdir -p ~/ai-lab/{models,datasets,scripts,logs,envs}",
+      "mkdir -p ~/ai-lab/[models,datasets]",
+      "mkdir -a ~/ai-lab/*",
+      "mkdir ~/ai-lab/models datasets"
+    ],
+    "a": 0,
+    "e": "중괄호 확장은 bash의 기능입니다. <code>echo</code>로 먼저 펼쳐 보면 무슨 일이 일어나는지 눈으로 확인할 수 있습니다."
+  }
+];
+window.PASS = 15;
+</script>
+<script>
+(function(){
+  const Q = window.QUIZ || [];
+
+  const $ = id => document.getElementById(id);
+  let i = 0, score = 0, missed = [], answered = false;
+
+  const norm = s => s.trim().toLowerCase().replace(/\s+/g,' ');
+
+  function render(){
+    answered = false;
+    const q = Q[i];
+    $('qn').textContent = 'Q ' + String(i+1).padStart(2,'0') + ' / ' + Q.length;
+    $('sc').textContent = '정답 ' + score;
+    $('prog').style.width = (i / Q.length * 100) + '%';
+
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.innerHTML = '<div class="qtext">' + q.q + '</div>' + (q.pre ? '<pre>' + q.pre + '</pre>' : '');
+
+    if (q.t){
+      const wrap = document.createElement('div');
+      wrap.className = 'typed';
+      wrap.innerHTML = '<input type="text" id="inp" autocomplete="off" autocapitalize="off" ' +
+                       'spellcheck="false" placeholder="명령을 그대로 입력하세요">' +
+                       '<button class="go" id="chk">확인</button>';
+      card.appendChild(wrap);
+      card.appendChild(mkFoot());
+      $('area').replaceChildren(card);
+      $('inp').focus();
+      $('chk').onclick = () => judgeTyped(q);
+      $('inp').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); answered ? nextQ() : judgeTyped(q); } });
+    } else {
+      const order = q.o.map((t,n) => n);
+      for (let k = order.length - 1; k > 0; k--){ const j = Math.floor(Math.random()*(k+1)); [order[k],order[j]] = [order[j],order[k]]; }
+      const box = document.createElement('div');
+      box.className = 'opts';
+      order.forEach((oi, pos) => {
+        const b = document.createElement('button');
+        b.className = 'opt'; b.type = 'button'; b.dataset.i = oi;
+        b.innerHTML = '<span class="mk">' + 'ABCD'[pos] + '</span><span>' + q.o[oi] + '</span>';
+        b.onclick = () => judgeChoice(q, b, box);
+        box.appendChild(b);
+      });
+      card.appendChild(box);
+      card.appendChild(mkFoot());
+      $('area').replaceChildren(card);
+    }
+  }
+
+  function mkFoot(){
+    const d = document.createElement('div');
+    d.id = 'foot';
+    return d;
+  }
+
+  function feedback(ok, q, extra){
+    answered = true;
+    score += ok ? 1 : 0;
+    if (!ok) missed.push(i);
+    $('sc').textContent = '정답 ' + score;
+    const f = document.createElement('div');
+    f.className = 'fb' + (ok ? '' : ' no');
+    f.innerHTML = '<span class="v">' + (ok ? '정답' : '오답') + '</span><p>' + (extra || '') + q.e + '</p>';
+    const act = document.createElement('div');
+    act.className = 'actions';
+    const b = document.createElement('button');
+    b.className = 'go';
+    b.textContent = (i === Q.length - 1) ? '결과 보기' : '다음 문제';
+    b.onclick = nextQ;
+    act.appendChild(b);
+    const foot = $('foot');
+    foot.replaceChildren(f, act);
+    b.focus();
+  }
+
+  function judgeChoice(q, btn, box){
+    if (answered) return;
+    const pick = +btn.dataset.i, ok = pick === q.a;
+    Array.from(box.children).forEach(el => {
+      el.disabled = true;
+      const n = +el.dataset.i;
+      if (n === q.a) el.classList.add('right');
+      else if (n === pick) el.classList.add('wrong');
+    });
+    feedback(ok, q, ok ? '' : '정답은 <code>' + q.o[q.a] + '</code> 입니다. ');
+  }
+
+  function judgeTyped(q){
+    if (answered) return;
+    const inp = $('inp');
+    const v = norm(inp.value);
+    if (!v){ inp.focus(); return; }
+    const ok = q.acc.some(a => norm(a) === v);
+    inp.disabled = true;
+    $('chk').disabled = true;
+    feedback(ok, q, ok ? '' : '정답은 <code>' + q.ans + '</code> 입니다. ');
+  }
+
+  function nextQ(){
+    i++;
+    if (i >= Q.length) result(); else render();
+  }
+
+  function result(){
+    $('prog').style.width = '100%';
+    $('qn').textContent = '완료';
+    $('sc').textContent = '정답 ' + score;
+    const pass = window.PASS || Math.ceil(Q.length*0.8);
+    const cls = score >= pass ? "" : (score >= pass - 3 ? " mid" : " low");
+    const msg = score >= pass
+      ? '통과입니다. 오늘 분량을 충분히 소화했습니다.'
+      : (score >= pass - 3
+        ? '조금 아쉽습니다. 틀린 항목의 미션으로 돌아가 한 번만 더 확인하고 다시 풀어 보세요.'
+        : '아직 손에 붙지 않았습니다. 실습 가이드의 미션 1번부터 다시 따라 해 보는 편이 빠릅니다.');
+
+    const d = document.createElement('div');
+    d.className = 'res';
+    d.innerHTML =
+      '<div class="big' + cls + '">' + score + ' / ' + Q.length + '</div>' +
+      '<h2>' + (score >= pass ? "통과" : "한 번 더") + '</h2>' +
+      '<p>' + msg + '</p>';
+
+    if (missed.length){
+      const m = document.createElement('div');
+      m.className = 'missed';
+      m.innerHTML = '<h3>다시 볼 문항</h3><ul>' +
+        missed.map(n => '<li><b>Q' + String(n+1).padStart(2,'0') + '</b> — ' +
+          Q[n].q.replace(/<[^>]+>/g,'') + '</li>').join('') + '</ul>';
+      d.appendChild(m);
+    }
+
+    const act = document.createElement('div');
+    act.className = 'actions';
+    const again = document.createElement('button');
+    again.className = 'go'; again.textContent = '처음부터 다시 풀기';
+    again.onclick = () => { i = 0; score = 0; missed = []; render(); window.scrollTo(0,0); };
+    act.appendChild(again);
+    const back = document.createElement('a');
+    back.href = 'lab.html'; back.className = 'ghost';
+    back.style.cssText = 'text-decoration:none;display:inline-flex;align-items:center;padding:12px 20px;border:1px solid var(--line-strong);border-radius:5px;color:var(--ink-2);font-weight:600;font-size:15px';
+    back.textContent = '실습 가이드로';
+    act.appendChild(back);
+    d.appendChild(act);
+
+    $('area').replaceChildren(d);
+  }
+
+  render();
+})();
+
+</script>
+<script src="../nav.js"></script>

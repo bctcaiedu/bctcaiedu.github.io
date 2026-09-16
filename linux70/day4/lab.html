@@ -1,0 +1,454 @@
+<title>Day 4 실습 가이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --bg:#F6F8F5;--surface:#FFFFFF;--surface-2:#EDF1EC;--ink:#141A16;--ink-2:#3A453E;--muted:#5F6D65;
+    --line:#DBE2DC;--line-strong:#C3CFC6;--accent:#10684A;--accent-soft:#E2EFE8;--clay:#A94D30;--clay-soft:#F6E7E0;
+    --ask:#1F5E86;--ask-soft:#E1EDF5;
+    --term-bg:#10171A;--term-fg:#DCE6E3;--term-dim:#7C9A93;--term-p:#7FD1A8;--term-out:#B8C7C2;
+    --maxw:940px;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+      --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+      --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+    --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+    --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:22px}
+  h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:600;letter-spacing:-.01em}
+  p{margin:0}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+  header.top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .masthead{display:flex;flex-direction:column;gap:16px;padding-block:46px 28px}
+  .rule-tag{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .rule-tag .dash{flex:1;height:1px;background:var(--line-strong);min-width:24px}
+  h1{font-size:clamp(26px,4.4vw,40px);line-height:1.2;font-weight:700;letter-spacing:-.03em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .standfirst{max-width:60ch;color:var(--ink-2);font-size:15.5px;font-weight:300;line-height:1.75}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-top:24px}
+  .rule{background:var(--surface);padding:15px 17px}
+  .rule .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--accent)}
+  .rule h3{font-size:14.5px;font-weight:600;margin-top:4px}
+  .rule p{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.55}
+
+  section{padding-block:44px}
+  .part{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-top:2px solid var(--accent);padding-top:14px;margin-bottom:8px}
+  .part .pn{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;color:var(--accent)}
+  .part h2{font-size:clamp(20px,3vw,26px);font-weight:700;letter-spacing:-.02em;flex:1 1 200px}
+  .part .pt{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .lede{color:var(--muted);font-size:14px;max-width:62ch;margin-bottom:22px}
+
+  .stepc{border:1px solid var(--line);border-radius:4px;background:var(--surface);margin-bottom:16px;overflow:hidden}
+  .shead{display:flex;align-items:baseline;gap:12px;padding:13px 18px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+  .shead .sn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .shead h3{font-size:15px;font-weight:600}
+  .sbody{padding:16px 18px}
+  .sbody > p{font-size:14px;color:var(--ink-2);line-height:1.7}
+  .sbody > p + p{margin-top:9px}
+  .sbody ol,.sbody ul{margin:9px 0 0;padding-left:19px}
+  .sbody li{font-size:14px;color:var(--ink-2);margin-top:5px;line-height:1.65}
+
+  pre{margin:11px 0 0;background:var(--term-bg);color:var(--term-fg);border-radius:3px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+  pre .c{color:var(--term-dim)}
+  pre .p{color:var(--term-p)}
+  pre .o{color:var(--term-out)}
+  .prelbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-top:13px;display:block}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:1px 4px;border-radius:2px}
+  kbd{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:3px;padding:1px 5px;background:var(--surface);color:var(--ink)}
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+
+  .box{margin-top:13px;border-radius:0 3px 3px 0;padding:11px 14px;display:flex;flex-direction:column;gap:5px}
+  .box.check{border-left:2px solid var(--accent);background:var(--accent-soft)}
+  .box.q{border-left:2px solid var(--ask);background:var(--ask-soft)}
+  .box.warn{border-left:2px solid var(--clay);background:var(--clay-soft)}
+  .box .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase}
+  .box.check .lbl{color:var(--accent)}
+  .box.q .lbl{color:var(--ask)}
+  .box.warn .lbl{color:var(--clay)}
+  .box p,.box li{font-size:13.5px;color:var(--ink-2);line-height:1.62}
+  .box ul{margin:0;padding-left:16px}
+  .box li{margin-top:3px}
+  .box code{background:rgba(0,0,0,.06)}
+
+  .mission{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;background:var(--surface);padding:16px 18px;margin-bottom:14px}
+  .mhead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .mhead .mn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .mhead h3{font-size:15px;font-weight:600;flex:1 1 180px}
+  .mission > p{font-size:14px;color:var(--ink-2);margin-top:7px;line-height:1.7}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;min-width:540px;font-size:13.5px}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--surface-2)}
+  tbody tr:last-child td{border-bottom:0}
+  td code{font-size:12px}
+
+  .selfcheck{border:1px solid var(--line-strong);border-radius:4px;background:var(--surface);overflow:hidden}
+  .selfcheck h3{padding:14px 18px;font-size:15px;background:var(--surface-2);border-bottom:1px solid var(--line-strong)}
+  .selfcheck ul{list-style:none;margin:0;padding:6px 18px 16px}
+  .selfcheck li{font-size:14px;color:var(--ink-2);padding:8px 0 8px 28px;border-bottom:1px solid var(--line);position:relative;line-height:1.6}
+  .selfcheck li:last-child{border-bottom:0}
+  .selfcheck li::before{content:"";position:absolute;left:0;top:13px;width:14px;height:14px;border:1.5px solid var(--line-strong);border-radius:2px}
+
+  footer{border-top:1px solid var(--line);background:var(--surface);padding-block:26px;margin-top:20px}
+  footer p{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+  @media (max-width:700px){
+    .sbody,.shead,.mission{padding-inline:14px}
+    .shead{gap:8px;flex-wrap:wrap}
+  }
+
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+</style>
+
+<header class="top">
+  <div class="wrap masthead">
+    <div class="rule-tag">
+      <span class="eyebrow">한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과</span>
+      <span class="dash"></span>
+      <span class="eyebrow">학생용 실습 가이드</span>
+    </div>
+    <h1>Day 4 · <em>사용자 · 권한 · 프로세스</em></h1>
+    <p class="standfirst">오늘 PART 1–2는 <strong>가상머신</strong>에서, PART 3–4는 <strong>WSL2</strong>에서 합니다. 계정을 만들고 권한을 시험하는 일은 망가뜨려도 되는 곳에서 해야 하기 때문입니다.</p>
+    <div class="rules">
+      <div class="rule"><div class="n">RULE 1</div><h3>VM은 망가뜨려도 된다</h3><p>Day 1에 찍은 clean-install 스냅샷이 있습니다. 과감하게 실험하세요.</p></div>
+      <div class="rule"><div class="n">RULE 2</div><h3>kill -9 는 마지막에</h3><p>먼저 그냥 kill을 보내고 3초 기다린 뒤에도 안 죽으면 그때 -9입니다.</p></div>
+      <div class="rule"><div class="n">RULE 3</div><h3>내 홈에서 sudo가 필요하면 의심</h3><p>홈 디렉터리 안 작업에 sudo가 필요하다면 무언가 잘못된 것입니다.</p></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <div class="part"><span class="pn">PART 1</span><h2>계정과 권한 읽기</h2><span class="pt">13:00–13:40</span></div>
+    <p class="lede">여기부터 PART 2까지는 VirtualBox의 Ubuntu Server에서 진행합니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 01</span><h3>나는 누구인가</h3></div>
+      
+      <pre><span class="p">$</span> whoami
+<span class="p">$</span> id
+<span class="o">uid=1000(ubuntu) gid=1000(ubuntu) groups=1000(ubuntu),27(sudo)</span>
+<span class="p">$</span> groups
+<span class="p">$</span> grep "^ubuntu" /etc/passwd
+<span class="p">$</span> sudo grep "^ubuntu" /etc/shadow | cut -c1-40</pre>
+      <div class="box q"><span class="lbl">확인 질문</span><ul>
+        <li><code>id</code> 출력에 <code>sudo</code> 그룹이 보이나요? 그게 무엇을 뜻할까요?</li>
+        <li><code>/etc/shadow</code>는 왜 <code>sudo</code> 없이 못 읽을까요? 직접 확인해 보세요.</li>
+      </ul></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 02</span><h3>rwx 아홉 글자 해부</h3></div>
+      
+      <pre><span class="p">$</span> cd ~ &amp;&amp; mkdir -p permtest &amp;&amp; cd permtest
+<span class="p">$</span> echo "내용" &gt; a.txt
+<span class="p">$</span> ls -l a.txt
+<span class="o">-rw-r--r-- 1 ubuntu ubuntu 7 Sep 17 13:05 a.txt</span>
+
+<span class="p">$</span> chmod 600 a.txt &amp;&amp; ls -l a.txt
+<span class="p">$</span> chmod 644 a.txt &amp;&amp; ls -l a.txt
+<span class="p">$</span> chmod 755 a.txt &amp;&amp; ls -l a.txt
+<span class="p">$</span> chmod u-w a.txt &amp;&amp; ls -l a.txt
+<span class="p">$</span> echo "추가" &gt;&gt; a.txt</pre>
+      <div class="box check"><span class="lbl">마지막 줄에서 무슨 일이</span>
+        <p>쓰기 권한을 뺐더니 <code>Permission denied</code>가 납니다. <strong>내 파일인데도</strong> 권한이 없으면 못 씁니다. 소유권과 권한은 별개입니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 03</span><h3>디렉터리의 x는 "들어가기"</h3></div>
+      
+      <pre><span class="p">$</span> mkdir -p dirtest &amp;&amp; echo hi &gt; dirtest/inside.txt
+<span class="p">$</span> chmod 644 dirtest          <span class="c"># r 만 주고 x 를 뺍니다</span>
+<span class="p">$</span> ls dirtest                 <span class="c"># 목록은 보입니다</span>
+<span class="p">$</span> cd dirtest                 <span class="c"># 들어갈 수 없습니다</span>
+<span class="p">$</span> cat dirtest/inside.txt     <span class="c"># 읽을 수도 없습니다</span>
+<span class="p">$</span> chmod 755 dirtest &amp;&amp; cd dirtest &amp;&amp; pwd</pre>
+      <div class="box warn"><span class="lbl">실무에서 가장 흔한 권한 사고</span>
+        <p>"목록은 보이는데 파일을 못 연다"는 증상은 거의 항상 <strong>디렉터리의 x 권한</strong> 문제입니다. Day 9 장애 대응에서 다시 만납니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 2</span><h2>그룹과 공유 디렉터리</h2><span class="pt">13:40–15:00</span></div>
+    <p class="lede">오늘의 핵심 실습입니다. 여러 명이 함께 쓰는 폴더를 실제로 만들어 봅니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 04</span><h3>계정과 그룹 만들기</h3></div>
+      
+      <pre><span class="p">$</span> sudo groupadd mlteam
+<span class="p">$</span> sudo useradd -m -s /bin/bash -G mlteam student1
+<span class="p">$</span> sudo useradd -m -s /bin/bash -G mlteam student2
+<span class="p">$</span> sudo passwd student1        <span class="c"># 비밀번호 설정 (student1 로)</span>
+<span class="p">$</span> sudo passwd student2
+
+<span class="p">$</span> id student1
+<span class="p">$</span> grep mlteam /etc/group</pre>
+      <div class="box check"><span class="lbl">옵션의 뜻</span>
+        <p><code>-m</code> 홈 디렉터리 생성, <code>-s</code> 로그인 셸 지정, <code>-G</code> 추가 그룹. <code>-m</code>을 빼면 홈이 없는 계정이 만들어져 로그인 후 바로 문제가 생깁니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 05</span><h3>setgid 없이 만들어 보기 (실패 체험)</h3></div>
+      
+      <pre><span class="p">$</span> sudo mkdir -p /srv/models
+<span class="p">$</span> sudo chgrp mlteam /srv/models
+<span class="p">$</span> sudo chmod 775 /srv/models
+<span class="p">$</span> ls -ld /srv/models
+
+<span class="p">$</span> sudo su - student1
+<span class="p">$</span> touch /srv/models/from_s1.bin
+<span class="p">$</span> ls -l /srv/models
+<span class="o">-rw-rw-r-- 1 student1 student1 0 ... from_s1.bin</span>   <span class="c">← 그룹이 student1 입니다!</span>
+<span class="p">$</span> exit
+
+<span class="p">$</span> sudo su - student2
+<span class="p">$</span> echo test &gt;&gt; /srv/models/from_s1.bin
+<span class="o">bash: /srv/models/from_s1.bin: Permission denied</span>
+<span class="p">$</span> exit</pre>
+      <div class="box warn"><span class="lbl">문제를 눈으로 확인했습니다</span>
+        <p>같은 팀 폴더에 넣었는데 student2가 고칠 수 없습니다. 파일의 그룹이 <code>mlteam</code>이 아니라 <code>student1</code>로 생성됐기 때문입니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 06</span><h3>setgid로 해결하기</h3></div>
+      
+      <pre><span class="p">$</span> sudo chmod 2775 /srv/models
+<span class="p">$</span> ls -ld /srv/models
+<span class="o">drwxrwsr-x 3 root mlteam 4096 ... /srv/models</span>   <span class="c">← x 자리에 s</span>
+
+<span class="p">$</span> sudo su - student1
+<span class="p">$</span> touch /srv/models/from_s1_v2.bin
+<span class="p">$</span> ls -l /srv/models/from_s1_v2.bin
+<span class="o">-rw-rw-r-- 1 student1 mlteam 0 ... from_s1_v2.bin</span>   <span class="c">← 그룹이 mlteam!</span>
+<span class="p">$</span> exit
+
+<span class="p">$</span> sudo su - student2
+<span class="p">$</span> echo test &gt;&gt; /srv/models/from_s1_v2.bin &amp;&amp; echo 성공
+<span class="p">$</span> exit</pre>
+      <div class="box check"><span class="lbl">오늘 가장 중요한 실습</span>
+        <p>앞자리 <code>2</code>가 setgid입니다. 이 디렉터리에서 만들어지는 파일은 부모 디렉터리의 그룹을 물려받습니다. 공유 폴더 설계의 필수 요소입니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 3</span><h2>프로세스 다루기</h2><span class="pt">15:10–16:00</span></div>
+    <p class="lede">여기부터는 WSL2에서 진행합니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 07</span><h3>무엇이 돌고 있나</h3></div>
+      
+      <pre><span class="p">$</span> ps
+<span class="p">$</span> ps aux | head -5
+<span class="p">$</span> ps aux | wc -l
+<span class="p">$</span> ps -ef --forest | head -20
+<span class="p">$</span> ps aux --sort=-%mem | head -5
+<span class="p">$</span> ps aux --sort=-%cpu | head -5</pre>
+      <div class="box q"><span class="lbl">확인 질문</span><p>PID 1번은 무엇인가요? 모든 프로세스의 조상이 하나라는 사실이 왜 중요할까요?</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 08</span><h3>kill 과 kill -9 의 차이</h3></div>
+      
+      <pre><span class="p">$</span> sleep 600 &amp;
+<span class="o">[1] 51234</span>
+<span class="p">$</span> jobs
+<span class="p">$</span> ps -p 51234
+<span class="p">$</span> kill 51234
+<span class="p">$</span> ps -p 51234                  <span class="c"># 사라졌습니다</span>
+
+<span class="c"># 신호를 무시하는 프로세스 만들기</span>
+<span class="p">$</span> bash -c 'trap "" TERM; sleep 600' &amp;
+<span class="o">[2] 51240</span>
+<span class="p">$</span> kill 51240
+<span class="p">$</span> ps -p 51240                  <span class="c">← 아직 살아 있습니다</span>
+<span class="p">$</span> kill -9 51240
+<span class="p">$</span> ps -p 51240</pre>
+      <div class="box check"><span class="lbl">순서를 몸에 붙이세요</span>
+        <p><code>kill</code> → 확인 → 그래도 살아 있으면 <code>kill -9</code>. 처음부터 <code>-9</code>를 쓰면 쓰던 파일이 깨질 수 있습니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 09</span><h3>우선순위 조정</h3></div>
+      
+      <pre><span class="p">$</span> nice -n 10 sleep 300 &amp;
+<span class="p">$</span> ps -o pid,ni,cmd -p $!
+<span class="o">  PID  NI CMD
+51250  10 sleep 300</span>
+
+<span class="p">$</span> renice -n 5 -p $!
+<span class="p">$</span> ps -o pid,ni,cmd -p $!
+<span class="p">$</span> kill $!</pre>
+      <div class="box check"><span class="lbl">NI 값</span>
+        <p>-20이 가장 높은 우선순위, 19가 가장 낮습니다. 양보한다는 뜻이라 "nice"입니다. 우선순위를 <strong>올리려면</strong> sudo가 필요합니다 — 왜일까요?</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 4</span><h2>AI LAB · 공용 서버 시뮬레이션</h2><span class="pt">16:00–17:10</span></div>
+    
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 10</span><h3>장시간 작업 띄우고 추적하기</h3></div>
+      
+      <pre><span class="p">$</span> cd ~/ai-lab
+<span class="p">$</span> nohup bash -c 'for i in $(seq 1 600); do
+    echo "[$(date +%T)] step $i"; sleep 1; done' \
+    &gt; logs/preprocess.log 2&gt;&amp;1 &amp;
+<span class="o">[1] 51300</span>
+
+<span class="p">$</span> tail -f logs/preprocess.log      <span class="c"># Ctrl+C 로 보기 중단</span>
+<span class="p">$</span> ps -p 51300                      <span class="c">← 여전히 살아 있습니다</span>
+<span class="p">$</span> wc -l logs/preprocess.log        <span class="c"># 계속 늘어납니다</span></pre>
+      <div class="box check"><span class="lbl">"보기"와 "실행"은 별개</span>
+        <p><kbd>Ctrl</kbd>+<kbd>C</kbd>는 <code>tail</code>을 끝낼 뿐 작업은 계속 돕니다. 이걸 헷갈려서 작업을 다시 돌리는 일이 자주 생깁니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 11</span><h3>메모리 폭주 프로세스 처리</h3></div>
+      
+      <pre><span class="p">$</span> free -h                          <span class="c"># 먼저 현재 상태</span>
+<span class="p">$</span> python3 -c "
+a=[]
+while True: a.append(' '*10**7)
+" &amp;
+
+<span class="p">$</span> sleep 5
+<span class="p">$</span> ps aux --sort=-%mem | head -3
+<span class="p">$</span> free -h                          <span class="c"># 줄어드는 것을 확인</span>
+<span class="p">$</span> kill %2                          <span class="c"># job 번호로도 됩니다</span>
+<span class="p">$</span> free -h</pre>
+      <div class="box warn"><span class="lbl">주의</span>
+        <p>메모리가 적은 PC에서는 시스템이 잠깐 느려질 수 있습니다. 5초 안에 종료하세요. 멈춘 것 같으면 새 터미널을 열어 <code>pkill -9 python3</code>를 칩니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 12</span><h3>모델 디렉터리 그룹 권한 (WSL2 버전)</h3></div>
+      
+      <pre><span class="p">$</span> mkdir -p ~/ai-lab/models/shared
+<span class="p">$</span> chmod 2775 ~/ai-lab/models/shared
+<span class="p">$</span> ls -ld ~/ai-lab/models/shared
+<span class="p">$</span> touch ~/ai-lab/models/shared/test.bin
+<span class="p">$</span> ls -l ~/ai-lab/models/shared
+
+<span class="c"># 비밀값은 반대로 — 나만 읽게</span>
+<span class="p">$</span> echo "API_KEY=abcd1234" &gt; ~/ai-lab/.env
+<span class="p">$</span> chmod 600 ~/ai-lab/.env
+<span class="p">$</span> ls -l ~/ai-lab/.env</pre>
+      <div class="box check"><span class="lbl">Day 9 예고</span>
+        <p><code>600</code>으로 지킨 이 <code>.env</code> 파일이 아홉째 날 API 키 관리 실습의 출발점이 됩니다. 지우지 마세요.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 A</span><h2>이런 오류가 나면</h2></div>
+    <p class="lede">오늘 가장 많이 나오는 것들입니다. 여기 없는 오류는 손을 드세요.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>증상 · 메시지</th><th>원인</th><th>대응</th></tr></thead>
+        <tbody>
+          <tr><td><code>Permission denied</code> (내 홈 안)</td><td>권한을 잘못 뺐다</td><td>sudo로 덮지 말고 <code>ls -l</code>로 원인을 먼저 봅니다</td></tr>
+          <tr><td>목록은 보이는데 <code>cd</code>가 안 된다</td><td>디렉터리 x 권한 없음</td><td><code>chmod +x 디렉터리</code></td></tr>
+          <tr><td>공유 폴더에서 남의 파일을 못 고친다</td><td>setgid 없음</td><td><code>chmod 2775</code>로 그룹 상속</td></tr>
+          <tr><td><code>kill</code>했는데 안 죽는다</td><td>신호를 무시하는 프로세스</td><td>3초 기다린 뒤 <code>kill -9</code></td></tr>
+          <tr><td>터미널을 닫았더니 작업이 죽었다</td><td>SIGHUP</td><td><code>nohup ... &amp;</code> 또는 Day 5의 tmux</td></tr>
+          <tr><td><code>useradd</code> 후 로그인하면 홈이 없다</td><td><code>-m</code> 누락</td><td><code>sudo useradd -m ...</code>로 다시 만듭니다</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 B</span><h2>명령어 퀴즈</h2></div>
+    <p class="lede">미션을 마쳤으면 오늘 배운 것을 퀴즈로 점검합니다. 채점은 바로 나오고, 틀린 문제는 왜 틀렸는지 설명이 붙습니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">QUIZ</span><h3>Day 4 · 18문항</h3></div>
+      <div class="sbody">
+        <p>객관식과 직접 입력이 섞여 있습니다. 가이드를 다시 보지 말고 먼저 풀어 보고, 틀린 부분만 해당 미션으로 돌아가 확인하세요.</p>
+        <p style="margin-top:12px;font-size:16px"><a href="quiz.html">▶ 퀴즈 풀러 가기</a></p>
+        <div class="box check">
+          <span class="lbl">통과 기준</span>
+          <p>18문항 중 <strong>15문항 이상</strong>을 맞히면 오늘 분량을 소화한 것입니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 C</span><h2>오늘 마치기 전 자가 점검</h2></div>
+    <p class="lede">전부 체크되면 오늘 목표를 달성한 것입니다. 안 되는 항목이 있으면 퇴실 전에 손을 드세요.</p>
+    <div class="selfcheck">
+      <h3>Day 4 체크리스트</h3>
+      <ul>
+        <li><code>/etc/passwd</code> 한 줄의 각 칸을 설명할 수 있다</li>
+        <li>rwx를 숫자와 기호 양쪽으로 바꿀 수 있다</li>
+        <li>디렉터리의 x가 "들어가기"라는 것을 실패 체험으로 확인했다</li>
+        <li>그룹을 만들고 계정을 넣어 봤다</li>
+        <li>setgid 없이 실패하고, 2775로 해결하는 과정을 직접 겪었다</li>
+        <li><code>ps aux --sort=-%mem</code>로 메모리 상위 프로세스를 찾았다</li>
+        <li><code>kill</code>과 <code>kill -9</code>의 차이를 실험으로 확인했다</li>
+        <li><code>nohup</code>으로 띄운 작업이 tail 중단 후에도 도는 것을 확인했다</li>
+        <li><code>~/ai-lab/.env</code>를 600 권한으로 만들었다</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">과제 04</span><h2>연구실 GPU 서버 권한 설계서</h2><span class="pt">제출: 익일 09:00</span></div>
+    <p class="lede">교수·대학원생·학부생 세 역할이 하나의 서버를 나눠 씁니다. 권한을 설계하고 근거를 적으십시오.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">제출 항목</span><h3>각 항목마다 값과 사용한 명령을 함께 적을 것</h3></div>
+      <div class="sbody">
+        <ol><li>역할별 계정·그룹 구성표</li><li>디렉터리 4개(모델·데이터·결과·개인)의 권한 값</li><li>각 권한을 그렇게 준 근거 (한 문단씩)</li><li>setgid가 필요한 디렉터리와 그 이유</li><li>VM에서 실제로 만들고 검증한 명령 기록</li><li>다른 계정으로 접근을 시험한 결과</li></ol>
+        <span class="prelbl">제출 양식 예시</span><pre><span class="o">디렉터리 : /srv/models
+권한     : 2775 (drwxrwsr-x), 소유 root:mlteam
+근거     : 대학원생은 모델을 추가해야 하므로 그룹 쓰기 필요.
+           학부생은 읽기만. setgid로 그룹 소유권 유지.
+검증     : student2로 su 후 touch 성공 / 삭제는 실패</span></pre>
+        <div class="box check"><span class="lbl">채점 기준</span><p>표만 그리면 절반입니다. <strong>실제로 만들고, 다른 계정으로 접근해 보고, 실패하거나 성공한 결과</strong>를 붙여야 완성입니다.</p></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>Day 4 / 10 · 실습 가이드 · 리눅스 × LLM 서빙 70시간 과정</p>
+  </div>
+</footer>
+<script src="../nav.js"></script>
