@@ -340,7 +340,7 @@
     <pre style="margin-top:2cqh"><span class="p">PS&gt; wsl --list --verbose</span>
     * Ubuntu-24.04   Running   2      <span class="c">← VERSION 이 2 여야 합니다</span>
 <span class="p">$   whoami</span>
-    namo                              <span class="c">← 내 계정 이름</span>
+    ubuntu                              <span class="c">← 내 계정 이름</span>
 <span class="p">$   uname -a</span>
     Linux ... WSL2 ... GNU/Linux       <span class="c">← 진짜 리눅스라는 증거</span></pre>
   </div>
@@ -390,9 +390,9 @@
   <div class="eb">Shell</div>
   <h2>프롬프트가 말해주는 네 가지</h2>
   <div class="fill">
-    <pre style="margin-top:1.6cqh"><span class="p">namo@poly-01:~/ai-lab$</span> ls -al</pre>
+    <pre style="margin-top:1.6cqh"><span class="p">ubuntu@poly-01:~/ai-lab$</span> ls -al</pre>
     <div class="grid g4" style="margin-top:2cqh">
-      <div class="card"><span class="n">namo</span><span class="t">사용자 이름</span><span class="d">내가 누구로 로그인해 있는가</span></div>
+      <div class="card"><span class="n">ubuntu</span><span class="t">사용자 이름</span><span class="d">내가 누구로 로그인해 있는가</span></div>
       <div class="card"><span class="n">poly-01</span><span class="t">컴퓨터 이름</span><span class="d">원격 접속하면 여기가 바뀐다</span></div>
       <div class="card"><span class="n">~/ai-lab</span><span class="t">현재 위치</span><span class="d">~ 는 내 홈 디렉터리</span></div>
       <div class="card"><span class="n">$</span><span class="t">권한 표시</span><span class="d"># 이면 관리자(root)</span></div>
@@ -408,7 +408,7 @@
   <div class="sub">터미널에서 길을 잃는 이유의 9할이 이 둘을 섞어 쓰기 때문입니다.</div>
   <div class="fill"><div class="grid g2" style="margin-top:1.6cqh">
     <div class="card"><span class="t" style="color:var(--pine)">절대경로</span><span class="d">/ 로 시작 · 어디서 쳐도 같은 곳</span>
-      <pre style="margin-top:1cqh;font-size:2.2cqh">/home/namo/ai-lab
+      <pre style="margin-top:1cqh;font-size:2.2cqh">/home/ubuntu/ai-lab
 /etc/os-release</pre></div>
     <div class="card"><span class="t" style="color:var(--clay)">상대경로</span><span class="d">지금 내 위치 기준 · 어디서 치느냐에 따라 달라짐</span>
       <pre style="margin-top:1cqh;font-size:2.2cqh">ai-lab   현재 위치 아래
@@ -458,7 +458,7 @@
     <pre style="margin-top:2cqh"><span class="p">$ mkdir -p ~/ai-lab</span>
 <span class="p">$ cd ~/ai-lab</span>
 <span class="p">$ pwd</span>
-/home/namo/ai-lab</pre>
+/home/ubuntu/ai-lab</pre>
     <div class="bannerG" style="margin-top:2.5cqh">오늘 만드는 이 폴더가 마지막 날 여러분의 LLM 서비스가 됩니다. 지우지 마세요.</div>
   </div>
   <div class="nar">마지막으로 열흘간 쓸 작업공간을 만듭니다. 엠케이디아이알 대시 피를 쓰고 물결표 슬래시 에이아이 대시 랩이라고 칩니다. 대시 피 옵션은 중간 경로까지 한 번에 만들어 주는 옵션입니다. 그다음 그 안으로 들어가서 피더블유디로 위치를 확인합니다. 오늘은 여기까지입니다. 하위 폴더 구조는 내일 설계합니다. 이 폴더가 마지막 날 여러분의 언어 모델 서비스가 되니까, 절대 지우지 마십시오.</div>
@@ -609,6 +609,7 @@
   });
   $('stage').addEventListener('click', e => { if (e.clientX > window.innerWidth/2) go(1); else go(-1); });
   window.addEventListener('beforeunload', () => { try{ synth.cancel(); }catch(e){} });
+  window.deckGo = n => { const was = playing; stop(); show(n); if (was) setTimeout(startSpeaking, 150); };
 })();
 </script>
-
+<script src="../nav.js"></script>
