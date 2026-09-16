@@ -1,0 +1,474 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 6 실습 가이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --bg:#F6F8F5;--surface:#FFFFFF;--surface-2:#EDF1EC;--ink:#141A16;--ink-2:#3A453E;--muted:#5F6D65;
+    --line:#DBE2DC;--line-strong:#C3CFC6;--accent:#10684A;--accent-soft:#E2EFE8;--clay:#A94D30;--clay-soft:#F6E7E0;
+    --ask:#1F5E86;--ask-soft:#E1EDF5;
+    --term-bg:#10171A;--term-fg:#DCE6E3;--term-dim:#7C9A93;--term-p:#7FD1A8;--term-out:#B8C7C2;
+    --maxw:940px;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+      --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+      --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+    --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+    --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:22px}
+  h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:600;letter-spacing:-.01em}
+  p{margin:0}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+  header.top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .masthead{display:flex;flex-direction:column;gap:16px;padding-block:46px 28px}
+  .rule-tag{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .rule-tag .dash{flex:1;height:1px;background:var(--line-strong);min-width:24px}
+  h1{font-size:clamp(26px,4.4vw,40px);line-height:1.2;font-weight:700;letter-spacing:-.03em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .standfirst{max-width:60ch;color:var(--ink-2);font-size:15.5px;font-weight:300;line-height:1.75}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-top:24px}
+  .rule{background:var(--surface);padding:15px 17px}
+  .rule .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--accent)}
+  .rule h3{font-size:14.5px;font-weight:600;margin-top:4px}
+  .rule p{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.55}
+
+  section{padding-block:44px}
+  .part{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-top:2px solid var(--accent);padding-top:14px;margin-bottom:8px}
+  .part .pn{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;color:var(--accent)}
+  .part h2{font-size:clamp(20px,3vw,26px);font-weight:700;letter-spacing:-.02em;flex:1 1 200px}
+  .part .pt{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .lede{color:var(--muted);font-size:14px;max-width:62ch;margin-bottom:22px}
+
+  .stepc{border:1px solid var(--line);border-radius:4px;background:var(--surface);margin-bottom:16px;overflow:hidden}
+  .shead{display:flex;align-items:baseline;gap:12px;padding:13px 18px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+  .shead .sn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .shead h3{font-size:15px;font-weight:600}
+  .sbody{padding:16px 18px}
+  .sbody > p{font-size:14px;color:var(--ink-2);line-height:1.7}
+  .sbody > p + p{margin-top:9px}
+  .sbody ol,.sbody ul{margin:9px 0 0;padding-left:19px}
+  .sbody li{font-size:14px;color:var(--ink-2);margin-top:5px;line-height:1.65}
+
+  pre{margin:11px 0 0;background:var(--term-bg);color:var(--term-fg);border-radius:3px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+  pre .c{color:var(--term-dim)}
+  pre .p{color:var(--term-p)}
+  pre .o{color:var(--term-out)}
+  .prelbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-top:13px;display:block}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:1px 4px;border-radius:2px}
+  kbd{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:3px;padding:1px 5px;background:var(--surface);color:var(--ink)}
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+
+  .box{margin-top:13px;border-radius:0 3px 3px 0;padding:11px 14px;display:flex;flex-direction:column;gap:5px}
+  .box.check{border-left:2px solid var(--accent);background:var(--accent-soft)}
+  .box.q{border-left:2px solid var(--ask);background:var(--ask-soft)}
+  .box.warn{border-left:2px solid var(--clay);background:var(--clay-soft)}
+  .box .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase}
+  .box.check .lbl{color:var(--accent)}
+  .box.q .lbl{color:var(--ask)}
+  .box.warn .lbl{color:var(--clay)}
+  .box p,.box li{font-size:13.5px;color:var(--ink-2);line-height:1.62}
+  .box ul{margin:0;padding-left:16px}
+  .box li{margin-top:3px}
+  .box code{background:rgba(0,0,0,.06)}
+
+  .mission{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;background:var(--surface);padding:16px 18px;margin-bottom:14px}
+  .mhead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .mhead .mn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .mhead h3{font-size:15px;font-weight:600;flex:1 1 180px}
+  .mission > p{font-size:14px;color:var(--ink-2);margin-top:7px;line-height:1.7}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;min-width:540px;font-size:13.5px}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--surface-2)}
+  tbody tr:last-child td{border-bottom:0}
+  td code{font-size:12px}
+
+  .selfcheck{border:1px solid var(--line-strong);border-radius:4px;background:var(--surface);overflow:hidden}
+  .selfcheck h3{padding:14px 18px;font-size:15px;background:var(--surface-2);border-bottom:1px solid var(--line-strong)}
+  .selfcheck ul{list-style:none;margin:0;padding:6px 18px 16px}
+  .selfcheck li{font-size:14px;color:var(--ink-2);padding:8px 0 8px 28px;border-bottom:1px solid var(--line);position:relative;line-height:1.6}
+  .selfcheck li:last-child{border-bottom:0}
+  .selfcheck li::before{content:"";position:absolute;left:0;top:13px;width:14px;height:14px;border:1.5px solid var(--line-strong);border-radius:2px}
+
+  footer{border-top:1px solid var(--line);background:var(--surface);padding-block:26px;margin-top:20px}
+  footer p{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+  @media (max-width:700px){
+    .sbody,.shead,.mission{padding-inline:14px}
+    .shead{gap:8px;flex-wrap:wrap}
+  }
+
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+</style>
+
+<header class="top">
+  <div class="wrap masthead">
+    <div class="rule-tag">
+      <span class="eyebrow">한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과</span>
+      <span class="dash"></span>
+      <span class="eyebrow">학생용 실습 가이드</span>
+    </div>
+    <h1>Day 6 · <em>강화학습과 Isaac · 스스로 배우는 로봇</em></h1>
+    <p class="standfirst">마지막 날입니다. 오전에는 어제 걸어 둔 학습을 회수하고, 보상을 바꿔 행동이 달라지는 것을 실험합니다. 오후에는 Isaac으로 올라갔다가, 마지막 블록에서 6일간의 부품을 하나로 묶습니다. <strong>Isaac Sim이 안 돌아가도 MJX로 같은 개념을 실습할 수 있습니다.</strong></p>
+    <div class="rules">
+      <div class="rule"><div class="n">RULE 1</div><h3>보상을 의심한다</h3><p>학습이 안 되면 알고리즘을 바꾸기 전에 보상 설계를 먼저 의심하세요. 대부분 거기에 원인이 있습니다.</p></div>
+      <div class="rule"><div class="n">RULE 2</div><h3>개념을 옮겨 탄다</h3><p>Isaac은 이름만 다르지 Day 3~4에 한 것과 같습니다. 대응표를 만들며 따라가세요.</p></div>
+      <div class="rule"><div class="n">RULE 3</div><h3>한계를 적는다</h3><p>최종 프로젝트 배점의 상당 부분이 "무엇이 안 되는가"입니다. 6일 내내 연습한 태도입니다.</p></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <div class="part"><span class="pn">PART 1</span><h2>RL 결과 회수와 보상 설계</h2><span class="pt">09:00–10:50</span></div>
+    <p class="lede">어제 걸어 둔 학습부터 확인합니다. rl 환경으로 전환하세요.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 01</span><h3>치타 회수하기</h3></div>
+      
+      <pre><span class="p">$</span> conda activate rl
+<span class="p">$</span> cd RL실습폴더경로
+<span class="p">$</span> python rl_enjoy.py --env HalfCheetah-v5 --algo sac</pre>
+      <p>어제 학습 전(<code>rl_understand_env.py</code>)과 비교하세요.</p>
+      <pre><span class="o">학습 전 (무작위)  평균 보상  -300 ~ 0
+학습 후 (SAC)     평균 보상  2000 ~ 5000</span></pre>
+      <pre><span class="c"># 수업 자료용 영상으로 저장</span>
+<span class="p">$</span> python rl_enjoy.py --env HalfCheetah-v5 --algo sac --record</pre>
+      <div class="box q"><span class="lbl">관찰</span>
+        <p>치타가 달리는 자세가 <strong>사람 눈에는 이상해 보이나요?</strong> 보상이 "전진 속도"뿐이라면 보기 좋을 이유가 없습니다. 이것이 다음 미션의 출발점입니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 02</span><h3>학습 곡선 읽기</h3></div>
+      
+      <p>학습 로그의 <code>ep_rew_mean</code> 추이를 보고 <strong>어떤 모양인지</strong> 판단하세요.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">꾸준히 ↗</span><span class="v">정상 — 더 돌리면 더 오를 여지가 있는지 기울기를 본다</span></div>
+        <div class="dlrow"><span class="k">평평 (낮음)</span><span class="v">보상 설계 문제 또는 알고리즘 부적합<small>steps만 늘려도 안 됩니다</small></span></div>
+        <div class="dlrow"><span class="k">올랐다 무너짐</span><span class="v">학습률 과다 / 불안정<small>PPO로 바꾸거나 학습률↓</small></span></div>
+        <div class="dlrow"><span class="k">심한 진동</span><span class="v">보상 스케일 과다 또는 환경 불안정</span></div>
+      </div>
+      <div class="box check"><span class="lbl">핵심</span>
+        <p>"보상이 안 오른다"는 <strong>하나의 증상에 처방이 네 가지</strong>입니다. 곡선 모양을 봐야 처방이 정해집니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 03</span><h3>보상을 바꿔 행동 바꾸기 ★ 오늘 오전의 핵심</h3></div>
+      
+      <p>Gymnasium 환경을 감싸(wrapper) 보상을 수정합니다. 짧게 학습시켜 <strong>행동이 달라지는지</strong>만 보면 됩니다.</p>
+      <pre><span class="c">import</span> gymnasium <span class="c">as</span> gym
+
+<span class="c">class</span> RewardTweak(gym.Wrapper):
+    <span class="c">def</span> step(self, action):
+        obs, rew, term, trunc, info = self.env.step(action)
+        <span class="c"># ① 에너지 페널티 — 토크를 적게 쓰게</span>
+        rew -= 0.1 * (action ** 2).sum()
+        <span class="c"># ② 자세 페널티 — 몸통이 흔들리면 감점</span>
+        <span class="c"># rew -= 0.5 * abs(obs[1])</span>
+        <span class="c">return</span> obs, rew, term, trunc, info</pre>
+      <div class="box q"><span class="lbl">실험</span><ul>
+        <li>에너지 페널티를 넣으면 달리는 자세가 어떻게 바뀌나요?</li>
+        <li>페널티 계수를 크게(1.0) 하면? — 아예 안 움직이지 않나요?</li>
+      </ul></div>
+      <div class="box warn"><span class="lbl">보상 해킹 (Reward Hacking)</span>
+        <p>"넘어지지 않으면 +1"이라고만 주면 로봇은 <strong>그냥 가만히 서 있습니다.</strong> 목표를 달성한 것이니 틀린 것도 아닙니다.<br>
+        <strong>보상 설계 = 문제 정의</strong> — 강화학습에서 가장 어려운 일입니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 2</span><h2>NVIDIA Isaac Sim</h2><span class="pt">11:00–12:50</span></div>
+    <p class="lede">설치본은 강사가 미리 배포했습니다. 첫 실행은 셰이더 컴파일로 수 분 걸립니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 04</span><h3>실행과 UI 익히기</h3></div>
+      
+      <pre><span class="p">$</span> conda activate isaac
+<span class="p">$</span> python lab_isaac1_hello.py     <span class="c"># 빈 월드 + 바닥</span></pre>
+      <div class="dl">
+        <div class="dlrow"><span class="k">Viewport</span><span class="v">3D 장면 — 마우스로 회전·확대·이동</span></div>
+        <div class="dlrow"><span class="k">Stage</span><span class="v">씬 구조 트리<small>MuJoCo에서 XML로 보던 것을 트리로 봅니다</small></span></div>
+        <div class="dlrow"><span class="k">Property</span><span class="v">선택한 Prim의 속성 편집<small>MuJoCo에서 XML 값 고치던 것</small></span></div>
+        <div class="dlrow"><span class="k">Play</span><span class="v">누르면 물리 시작<small>mj_step에 해당</small></span></div>
+      </div>
+      <div class="box warn"><span class="lbl">가장 흔한 실수</span>
+        <p><code>SimulationApp</code>을 <strong>다른 import보다 먼저</strong> 실행해야 합니다. 순서가 바뀌면 오류가 납니다.</p>
+        <pre style="margin-top:8px">from isaacsim import SimulationApp
+app = SimulationApp({"headless": False})   # ← 여기가 먼저
+from isaacsim.core.api import World        # ← 그다음</pre></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 05</span><h3>MuJoCo ↔ Isaac 대응표 만들기 ★</h3></div>
+      
+      <pre><span class="p">$</span> python lab_isaac2_load_robot.py    <span class="c"># Franka 로봇팔 로드</span>
+<span class="p">$</span> python lab_isaac3_joint_control.py  <span class="c"># 관절 제어</span>
+<span class="p">$</span> python lab_isaac4_camera.py         <span class="c"># 카메라 센서</span></pre>
+      <p>Day 3~4에 MuJoCo로 한 것과 <strong>같은 순서</strong>입니다. 스스로 대응표를 채워 보세요.</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>하는 일</th><th>MuJoCo</th><th>Isaac Sim</th></tr></thead>
+          <tbody>
+            <tr><td>씬 기술</td><td><code>MJCF (.xml)</code></td><td><code>USD</code> (Stage / Prim)</td></tr>
+            <tr><td>물체 하나</td><td><code>body</code></td><td><code>Prim</code> (<code>/World/Franka</code>)</td></tr>
+            <tr><td>로봇 로드</td><td><code>from_xml_path</code></td><td><code>add_reference_to_stage</code></td></tr>
+            <tr><td>관절 제어</td><td><code>data.ctrl[i]</code></td><td><code>set_joint_positions</code></td></tr>
+            <tr><td>한 스텝</td><td><code>mj_step</code></td><td><code>world.step()</code></td></tr>
+            <tr><td>카메라</td><td><code>mujoco.Renderer</code></td><td><code>Camera</code> + <code>get_rgba()</code></td></tr>
+            <tr><td>물리 엔진</td><td>MuJoCo</td><td>PhysX 5</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="box check"><span class="lbl">오늘 느껴야 할 것</span>
+        <p><strong>개념이 같으면 도구는 바꿔 탈 수 있습니다.</strong> 새 도구를 만났을 때 이 대응 관계를 얼마나 빨리 찾느냐가 학습 속도를 결정합니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 06</span><h3>Replicator 합성 데이터 (시연·선택)</h3></div>
+      
+      <p>Day 4에서 MuJoCo로 한 합성 데이터를 <strong>실사급</strong>으로 만듭니다.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">RGB</span><span class="v">RTX 레이트레이싱 — 실제 사진과 구분이 어려운 수준</span></div>
+        <div class="dlrow"><span class="k">라벨</span><span class="v">Bounding Box · Segmentation · Normal<small>YOLO 형식으로 바로 내보내기</small></span></div>
+        <div class="dlrow"><span class="k">랜덤화</span><span class="v">조명·재질·배경·카메라를 무작위로<small>수만 장 자동 생성</small></span></div>
+      </div>
+      <div class="box check"><span class="lbl">4일간의 이야기</span>
+        <p>Day 2 — 100장 라벨링에 <strong>40분</strong> · Day 4 — 시뮬로 자동 생성 · Day 6 — 실사급으로 <strong>수만 장</strong></p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 3</span><h2>대규모 학습과 Sim-to-Real</h2><span class="pt">13:50–15:40</span></div>
+    <p class="lede">Isaac Lab이 안 되면 MJX 경로로 진행하세요. 배우는 것은 같습니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 07</span><h3>병렬 환경 학습 ★</h3></div>
+      
+      <pre><span class="c"># Isaac Lab (권장)</span>
+<span class="p">$</span> python scripts/reinforcement_learning/rsl_rl/train.py \
+      --task Isaac-Cartpole-v0 --num_envs <span class="o">512</span>
+<span class="p">$</span> python scripts/reinforcement_learning/rsl_rl/play.py --task Isaac-Cartpole-v0</pre>
+      <div class="box q"><span class="lbl">어제와 비교</span>
+        <p>어제는 <strong>환경 1개</strong>로 30만 스텝에 수십 분이 걸렸습니다. 지금은 <strong>512개</strong>가 동시에 돕니다. 화면에서 카트폴이 몇 개나 보이나요?</p></div>
+      <div class="box warn"><span class="lbl">RTX 4070 12GB 튜닝</span><ul>
+        <li><code>CUDA out of memory</code> → <code>--num_envs 256</code>으로 낮추기</li>
+        <li>다른 GPU 앱(브라우저 영상, 게임) 종료</li>
+        <li>렌더 품질 프리셋 낮추기 / <code>--headless</code>로 실행</li>
+      </ul></div>
+      <div class="box check"><span class="lbl">대안 경로 — MJX</span>
+        <p>Isaac Sim이 안 돌아가면 <strong>MuJoCo MJX / Playground</strong>로 동일한 개념을 실습합니다. MuJoCo를 JAX로 다시 써서 GPU에서 수천 환경을 병렬로 굴립니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 08</span><h3>도메인 랜덤화 설계해 보기</h3></div>
+      
+      <p>코드를 다 짜지 않아도 됩니다. <strong>무엇을 흔들지 목록으로 설계</strong>하는 것이 미션입니다.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">물리</span><span class="v">마찰 · 질량 · 모터 지연<small>환경마다 다른 값 → 어떤 값이든 버티는 정책</small></span></div>
+        <div class="dlrow"><span class="k">시각</span><span class="v">조명 · 재질 · 배경<small>Day 4 합성 데이터에서 한 것과 같은 아이디어</small></span></div>
+        <div class="dlrow"><span class="k">센서</span><span class="v">노이즈 · 지연 주입<small>깨끗한 관측에 의존하지 않게</small></span></div>
+        <div class="dlrow"><span class="k">외란</span><span class="v">학습 중에 로봇을 툭툭 밀기<small>지형도 바꿔 줍니다</small></span></div>
+      </div>
+      <div class="box check"><span class="lbl">발상의 전환</span>
+        <p>현실과 똑같은 <strong>하나의 완벽한 시뮬</strong>을 만들려 애쓰는 대신, <strong>수많은 불완전한 시뮬</strong>을 만듭니다. 그러면 현실이 "겪어 본 경우 중 하나"가 됩니다.</p></div>
+      <div class="box q"><span class="lbl">과제</span>
+        <p>내 최종 프로젝트를 실물 로봇에 올린다면 무엇을 랜덤화해야 할까요? 3가지를 적으세요.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 09</span><h3>Day 3의 로봇개로 돌아가기</h3></div>
+      
+      <p>셋째 날 <code>robot_zoo.py dog</code>에서 쓰러지던 Unitree Go2를 기억하세요.</p>
+      <div class="box check"><span class="lbl">이제 답을 말할 수 있습니다</span><ol>
+        <li>왜 쓰러졌나 → 균형은 정해진 각도가 아니라 <strong>매 순간의 반응</strong>이라서</li>
+        <li>어떻게 해결하나 → 보상을 주고 <strong>강화학습</strong>으로 정책을 만든다</li>
+        <li>얼마나 걸리나 → 병렬 환경 수천 개로 <strong>수 시간~수일</strong></li>
+        <li>실물에 올리려면 → <strong>도메인 랜덤화</strong>로 리얼리티 갭을 좁힌다</li>
+      </ol></div>
+      <p>실제 Go2 보행 학습은 Isaac Lab의 <code>unitree_rl_lab</code>에서 할 수 있습니다. 관심 있는 분은 수료 후 이어서 해 보세요.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 4</span><h2>최종 프로젝트</h2><span class="pt">15:50–17:40</span></div>
+    <p class="lede">60분 제작 + 40분 발표. 완성도보다 통합 범위와 한계 인식을 봅니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 10</span><h3>주제 선택과 제작</h3></div>
+      
+      <div class="dl">
+        <div class="dlrow"><span class="k">①</span><span class="v"><strong>제스처 조종 로봇팔</strong> — MediaPipe 손 좌표 → IK 목표<small>Day 2 + Day 4 · 손목 랜드마크를 로봇 작업 반경으로 매핑</small></span></div>
+        <div class="dlrow"><span class="k">②</span><span class="v"><strong>자연어 분류 로봇</strong> — "빨간 건 왼쪽, 파란 건 오른쪽"<small>Day 5 · 다중 명령을 순서대로 처리, 없는 색은 거부</small></span></div>
+        <div class="dlrow"><span class="k">③</span><span class="v"><strong>합성 데이터 파이프라인</strong> — 수집 → YOLO 학습 → 시뮬 인식<small>Day 2 + Day 4 · 6일간의 순환이 완성됩니다</small></span></div>
+        <div class="dlrow"><span class="k">④</span><span class="v"><strong>커스텀 보상 RL</strong> — 보상을 바꿔 의도한 행동 만들기<small>Day 5 + Day 6 · 미션 3을 확장</small></span></div>
+        <div class="dlrow"><span class="k">⑤</span><span class="v"><strong>자유 주제</strong> — 현업 과제 연계 제안<small>시작 전 강사와 범위를 합의하세요</small></span></div>
+      </div>
+      <div class="box warn"><span class="lbl">20분 규칙</span>
+        <p><strong>20분 안에 최소 버전</strong>을 돌아가게 만드세요. 예: ①번이면 "손을 좌우로 움직이면 로봇팔 x좌표가 바뀐다"까지. 나머지 40분에 확장합니다.</p></div>
+      <div class="box check"><span class="lbl">①번 스타터 힌트</span>
+        <pre style="margin-top:8px"># 손목 랜드마크(0번)의 정규화 좌표 → 로봇 작업 반경으로 매핑
+x = 0.26 + lm[0].x * (0.48 - 0.26)     # 반경 0.26~0.48 m
+y = (lm[0].y - 0.5) * 0.4              # 좌우 ±0.2 m
+z = 0.10                               # 높이 고정으로 시작
+ik(target=[x, y, z])</pre></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 11</span><h3>한계 찾고 발표 준비 ★</h3></div>
+      
+      <p>6일 내내 해 온 일을 마지막으로 한 번 더 합니다. <strong>무엇이 안 되는가.</strong></p>
+      <div class="box q"><span class="lbl">발표 4분 구성</span><ol>
+        <li><strong>무엇을 만들었나</strong> — 한 문장 (20초)</li>
+        <li><strong>라이브 시연</strong> — 실제로 돌립니다 (90초)</li>
+        <li><strong>기술 요소</strong> — 인식/판단/행동 중 무엇을 담았나 (30초)</li>
+        <li><strong>안 되는 부분과 이유</strong> — 배점 있음 (60초)</li>
+        <li><strong>실무 적용 시 더 필요한 것</strong> — 배점 있음 (40초)</li>
+      </ol></div>
+      <div class="box check"><span class="lbl">좋은 답의 예</span>
+        <p>"손이 화면 밖으로 나가면 로봇팔이 마지막 좌표로 튑니다. 랜드마크 미검출 시 이전 값을 그대로 쓰기 때문입니다. 실무라면 <strong>좌표 스무딩, 작업 반경 밖 요청 거부, 비상 정지</strong>가 반드시 있어야 합니다."</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 12</span><h3>6일 회고</h3></div>
+      
+      <p>마지막으로 스스로 답해 보세요. 수료 후에도 남을 질문들입니다.</p>
+      <div class="box q"><span class="lbl">회고</span><ol>
+        <li>6일 중 <strong>가장 인상 깊었던 실패</strong>는 무엇이었나요? (Haar가 무너진 순간? 로봇개가 쓰러진 순간?)</li>
+        <li>지금 현업 과제 하나를 고른다면, 이 중 무엇을 먼저 적용해 보겠습니까?</li>
+        <li>"인식 · 판단 · 행동" 중 내가 가장 약한 부분은 어디인가요?</li>
+      </ol></div>
+      <div class="box check"><span class="lbl">다음 단계</span>
+        <p><strong>ROS 2</strong>(이 과정에서 유일하게 다루지 못한 조각) · <strong>Isaac Lab 심화</strong>(Go2 보행·모방학습) · <strong>로봇 파운데이션 모델</strong>(GR00T·Cosmos·VLA) · <strong>엣지 배포</strong>(Jetson·TensorRT) · <strong>실물 로봇</strong>(저가 6축 로봇팔로 Sim-to-Real)</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 A</span><h2>이런 오류가 나면</h2></div>
+    <p class="lede">오늘 가장 많이 나오는 것들입니다. 여기 없는 오류는 손을 드세요.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>증상 · 메시지</th><th>원인</th><th>대응</th></tr></thead>
+        <tbody>
+          <tr><td><code>isaacsim</code> 명령 없음 (pip 설치)</td><td>환경 미활성 또는 파이썬 버전</td><td><code>conda activate isaac</code> · Python 3.11인지 확인</td></tr>
+          <tr><td>첫 실행이 멈춘 듯 매우 느림</td><td>셰이더 캐시 생성 중</td><td>최초 1회 수 분 걸립니다. 정상입니다</td></tr>
+          <tr><td>검은 화면 / Vulkan 오류</td><td>드라이버 또는 WSL에서 실행</td><td>GeForce 드라이버 최신화 · <strong>네이티브</strong>로 실행 · NVIDIA GPU 사용 확인</td></tr>
+          <tr><td><code>CUDA out of memory</code></td><td>VRAM 부족</td><td>씬 단순화 · 렌더 품질↓ · <code>--num_envs</code>↓ · 다른 GPU 앱 종료</td></tr>
+          <tr><td><code>ImportError</code> (모듈 경로)</td><td>Isaac Sim/Lab 버전 차이</td><td>버전에 맞는 import인지 공식 문서 확인. 버전마다 경로가 다릅니다</td></tr>
+          <tr><td><code>SimulationApp</code> 관련 오류</td><td>import 순서</td><td><code>SimulationApp</code>을 <strong>다른 import보다 먼저</strong> 실행</td></tr>
+          <tr><td>에셋 다운로드 느림/실패</td><td>NVIDIA 계정·네트워크</td><td>로그인 확인. 강사 배포본이 있으면 그것을 사용</td></tr>
+          <tr><td>Isaac Sim이 전혀 안 돌아감</td><td>GPU 요건 미달</td><td><strong>MJX / MuJoCo Playground</strong>로 대체 — 배우는 개념은 동일합니다</td></tr>
+          <tr><td>보상을 바꿨는데 변화가 없음</td><td>wrapper가 적용 안 됨</td><td><code>gym.make</code> 후 wrapper로 감쌌는지, 학습에 그 env를 넘겼는지 확인</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 B</span><h2>오늘의 퀴즈</h2></div>
+    <p class="lede">미션을 마쳤으면 오늘 배운 것을 퀴즈로 점검합니다. 채점은 바로 나오고, 틀린 문제는 왜 틀렸는지 설명이 붙습니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">QUIZ</span><h3>Day 6 · 18문항</h3></div>
+      <div class="sbody">
+        <p>객관식과 직접 입력이 섞여 있습니다. 가이드를 다시 보지 말고 먼저 풀어 보고, 틀린 부분만 해당 미션으로 돌아가 확인하세요.</p>
+        <p style="margin-top:12px;font-size:16px"><a href="quiz.html">▶ 퀴즈 풀러 가기</a></p>
+        <div class="box check">
+          <span class="lbl">통과 기준</span>
+          <p>18문항 중 <strong>15문항 이상</strong>을 맞히면 오늘 분량을 소화한 것입니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 C</span><h2>오늘 마치기 전 자가 점검</h2></div>
+    <p class="lede">전부 체크되면 오늘 목표를 달성한 것입니다. 안 되는 항목이 있으면 퇴실 전에 손을 드세요.</p>
+    <div class="selfcheck">
+      <h3>Day 6 체크리스트</h3>
+      <ul>
+        <li>어제 학습한 HalfCheetah 정책을 재생하고 학습 전후를 비교했다</li>
+        <li>학습 곡선 모양별 처방 4가지를 구분할 수 있다</li>
+        <li><strong>보상을 바꿔 행동이 달라지는 것</strong>을 직접 확인했다</li>
+        <li>보상 해킹이 무엇인지 예를 들어 설명할 수 있다</li>
+        <li>Isaac Sim에서 씬 생성 · 로봇 로드 · 관절 제어 · 카메라를 실행했다</li>
+        <li><strong>MuJoCo ↔ Isaac 대응표</strong>를 스스로 채울 수 있다</li>
+        <li><code>SimulationApp</code>을 먼저 실행해야 하는 이유를 안다</li>
+        <li>병렬 환경 학습을 실행하고 VRAM에 맞게 규모를 조절했다</li>
+        <li>어제(환경 1개)와 오늘(환경 512개)의 차이를 설명할 수 있다</li>
+        <li>리얼리티 갭이 생기는 원인 3가지를 말할 수 있다</li>
+        <li>도메인 랜덤화의 발상을 한 문장으로 설명할 수 있다</li>
+        <li>Day 3의 쓰러지던 로봇개 문제에 <strong>끝까지 답할 수 있다</strong></li>
+        <li>최종 프로젝트가 돌아가고, 인식/판단/행동 중 담은 요소를 표시했다</li>
+        <li><strong>안 되는 부분과 그 이유</strong>를 말할 수 있다</li>
+        <li>실무 적용 시 추가로 필요한 것을 3가지 이상 적었다</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">과제 06</span><h2>최종 프로젝트 제출</h2><span class="pt">제출: 당일 17:00</span></div>
+    <p class="lede">6일간 배운 것을 하나로 묶어 만든 결과물을 제출합니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">제출 항목</span><h3>인식 · 판단 · 행동 중 몇 개를 담았는지 스스로 표시할 것</h3></div>
+      <div class="sbody">
+        <ol><li>실행되는 코드 일체 (README 포함)</li><li>30~60초 시연 영상</li><li>5장 이내 발표자료</li><li>사용한 기술 요소 표시 (인식/판단/행동)</li><li>동작하지 않는 부분과 그 이유</li><li>실무에 적용한다면 무엇이 더 필요한지</li></ol>
+        <span class="prelbl">제출 양식 예시</span><pre><span class="o">학번 / 이름 : 20261234 / 홍길동
+주제 : ① 제스처 조종 로봇팔
+
+기술 요소 : 인식(MediaPipe hands) ✓  판단(손가락 개수→모드 전환) ✓  행동(IK+그리퍼) ✓
+
+동작하지 않는 부분
+  - 손이 화면 밖으로 나가면 로봇팔이 마지막 좌표로 튐
+  - 원인 : 랜드마크 미검출 시 이전 값을 그대로 쓰기 때문
+  - 해결안 : 미검출 N프레임 이상이면 정지 상태로 전환
+
+실무 적용 시 필요한 것
+  - 좌표 스무딩(저역통과 필터), 작업 반경 밖 요청 거부, 비상 정지</span></pre>
+        <div class="box check"><span class="lbl">채점 기준</span><p>5번과 6번에 배점이 있습니다. 완벽한 척하는 것보다 한계를 정확히 아는 것이 이 과정 6일간의 핵심 태도였습니다.</p></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>Day 6 / 6 · 실습 가이드 · 영상 AI × 피지컬 AI 48시간 과정</p>
+  </div>
+</footer>
+<script src="../nav.js"></script>

@@ -1,0 +1,433 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 3 실습 가이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --bg:#F6F8F5;--surface:#FFFFFF;--surface-2:#EDF1EC;--ink:#141A16;--ink-2:#3A453E;--muted:#5F6D65;
+    --line:#DBE2DC;--line-strong:#C3CFC6;--accent:#10684A;--accent-soft:#E2EFE8;--clay:#A94D30;--clay-soft:#F6E7E0;
+    --ask:#1F5E86;--ask-soft:#E1EDF5;
+    --term-bg:#10171A;--term-fg:#DCE6E3;--term-dim:#7C9A93;--term-p:#7FD1A8;--term-out:#B8C7C2;
+    --maxw:940px;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+      --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+      --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+    --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+    --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:22px}
+  h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:600;letter-spacing:-.01em}
+  p{margin:0}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+  header.top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .masthead{display:flex;flex-direction:column;gap:16px;padding-block:46px 28px}
+  .rule-tag{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .rule-tag .dash{flex:1;height:1px;background:var(--line-strong);min-width:24px}
+  h1{font-size:clamp(26px,4.4vw,40px);line-height:1.2;font-weight:700;letter-spacing:-.03em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .standfirst{max-width:60ch;color:var(--ink-2);font-size:15.5px;font-weight:300;line-height:1.75}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-top:24px}
+  .rule{background:var(--surface);padding:15px 17px}
+  .rule .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--accent)}
+  .rule h3{font-size:14.5px;font-weight:600;margin-top:4px}
+  .rule p{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.55}
+
+  section{padding-block:44px}
+  .part{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-top:2px solid var(--accent);padding-top:14px;margin-bottom:8px}
+  .part .pn{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;color:var(--accent)}
+  .part h2{font-size:clamp(20px,3vw,26px);font-weight:700;letter-spacing:-.02em;flex:1 1 200px}
+  .part .pt{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .lede{color:var(--muted);font-size:14px;max-width:62ch;margin-bottom:22px}
+
+  .stepc{border:1px solid var(--line);border-radius:4px;background:var(--surface);margin-bottom:16px;overflow:hidden}
+  .shead{display:flex;align-items:baseline;gap:12px;padding:13px 18px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+  .shead .sn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .shead h3{font-size:15px;font-weight:600}
+  .sbody{padding:16px 18px}
+  .sbody > p{font-size:14px;color:var(--ink-2);line-height:1.7}
+  .sbody > p + p{margin-top:9px}
+  .sbody ol,.sbody ul{margin:9px 0 0;padding-left:19px}
+  .sbody li{font-size:14px;color:var(--ink-2);margin-top:5px;line-height:1.65}
+
+  pre{margin:11px 0 0;background:var(--term-bg);color:var(--term-fg);border-radius:3px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+  pre .c{color:var(--term-dim)}
+  pre .p{color:var(--term-p)}
+  pre .o{color:var(--term-out)}
+  .prelbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-top:13px;display:block}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:1px 4px;border-radius:2px}
+  kbd{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:3px;padding:1px 5px;background:var(--surface);color:var(--ink)}
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+
+  .box{margin-top:13px;border-radius:0 3px 3px 0;padding:11px 14px;display:flex;flex-direction:column;gap:5px}
+  .box.check{border-left:2px solid var(--accent);background:var(--accent-soft)}
+  .box.q{border-left:2px solid var(--ask);background:var(--ask-soft)}
+  .box.warn{border-left:2px solid var(--clay);background:var(--clay-soft)}
+  .box .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase}
+  .box.check .lbl{color:var(--accent)}
+  .box.q .lbl{color:var(--ask)}
+  .box.warn .lbl{color:var(--clay)}
+  .box p,.box li{font-size:13.5px;color:var(--ink-2);line-height:1.62}
+  .box ul{margin:0;padding-left:16px}
+  .box li{margin-top:3px}
+  .box code{background:rgba(0,0,0,.06)}
+
+  .mission{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;background:var(--surface);padding:16px 18px;margin-bottom:14px}
+  .mhead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .mhead .mn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .mhead h3{font-size:15px;font-weight:600;flex:1 1 180px}
+  .mission > p{font-size:14px;color:var(--ink-2);margin-top:7px;line-height:1.7}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;min-width:540px;font-size:13.5px}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--surface-2)}
+  tbody tr:last-child td{border-bottom:0}
+  td code{font-size:12px}
+
+  .selfcheck{border:1px solid var(--line-strong);border-radius:4px;background:var(--surface);overflow:hidden}
+  .selfcheck h3{padding:14px 18px;font-size:15px;background:var(--surface-2);border-bottom:1px solid var(--line-strong)}
+  .selfcheck ul{list-style:none;margin:0;padding:6px 18px 16px}
+  .selfcheck li{font-size:14px;color:var(--ink-2);padding:8px 0 8px 28px;border-bottom:1px solid var(--line);position:relative;line-height:1.6}
+  .selfcheck li:last-child{border-bottom:0}
+  .selfcheck li::before{content:"";position:absolute;left:0;top:13px;width:14px;height:14px;border:1.5px solid var(--line-strong);border-radius:2px}
+
+  footer{border-top:1px solid var(--line);background:var(--surface);padding-block:26px;margin-top:20px}
+  footer p{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+  @media (max-width:700px){
+    .sbody,.shead,.mission{padding-inline:14px}
+    .shead{gap:8px;flex-wrap:wrap}
+  }
+
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+</style>
+
+<header class="top">
+  <div class="wrap masthead">
+    <div class="rule-tag">
+      <span class="eyebrow">한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과</span>
+      <span class="dash"></span>
+      <span class="eyebrow">학생용 실습 가이드</span>
+    </div>
+    <h1>Day 3 · <em>가상의 몸 · 시뮬레이터와 MJCF</em></h1>
+    <p class="standfirst">오늘부터 무대가 바뀝니다. 웹캠 대신 3D 창이 뜨고, 이미지 대신 XML을 고칩니다. 가장 먼저 열어 볼 파일은 코드가 아니라 <code>assets/arm_scene.xml</code>입니다. 이 XML을 이해하면 오늘의 절반은 끝난 것입니다.</p>
+    <div class="rules">
+      <div class="rule"><div class="n">RULE 1</div><h3>XML부터 연다</h3><p>스크립트를 실행하기 전에 씬 XML을 먼저 열어 보세요. 무엇이 있는지 알고 실행하는 것과 아닌 것은 전혀 다릅니다.</p></div>
+      <div class="rule"><div class="n">RULE 2</div><h3>값을 바꿔 보고 되돌린다</h3><p>숫자를 바꿔 실행하고 원래대로 되돌리세요. 바꾼 채 다음 미션으로 가면 원인 모를 오류가 생깁니다.</p></div>
+      <div class="rule"><div class="n">RULE 3</div><h3>Alt+Tab을 기억한다</h3><p>조작 패널(슬라이더 창)은 3D 창 뒤에 숨습니다. 오늘 가장 많이 나올 질문입니다.</p></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <div class="part"><span class="pn">PART 1</span><h2>설치와 첫 실행</h2><span class="pt">09:00–10:50</span></div>
+    <p class="lede">MuJoCo 설치는 한 줄입니다. 컴파일러도 GPU도 필요 없습니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 01</span><h3>설치와 확인</h3></div>
+      
+      <pre><span class="p">$</span> conda activate physicalai
+<span class="p">$</span> pip install mujoco robot_descriptions
+<span class="p">$</span> python -c "import mujoco; print(mujoco.__version__)"
+<span class="o">3.x.x</span></pre>
+      <p>실습 파일 폴더로 이동하고 설치 검증 스크립트를 실행합니다.</p>
+      <pre><span class="p">$</span> cd MuJoCo실습폴더경로
+<span class="p">$</span> python verify_setup.py</pre>
+      <div class="box warn"><span class="lbl">중요</span>
+        <p>반드시 <strong>실습 파일이 있는 폴더로 <code>cd</code></strong> 한 뒤 실행하세요. <code>mj_helpers.py</code>를 같은 폴더에서 찾기 때문에, 다른 위치에서 실행하면 <code>ModuleNotFoundError</code>가 납니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 02</span><h3>XML을 먼저 열어 본다 ★</h3></div>
+      
+      <p>코드보다 먼저 <code>assets/arm_scene.xml</code>을 엽니다. 다음 다섯 가지를 찾으세요.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">option</span><span class="v">gravity와 timestep<small>중력 -9.81, 한 스텝의 시간 간격</small></span></div>
+        <div class="dlrow"><span class="k">body</span><span class="v">몇 개가 중첩되어 있나<small>body 안의 body가 팔의 관절 구조입니다</small></span></div>
+        <div class="dlrow"><span class="k">joint</span><span class="v">type이 hinge인지 slide인지<small>회전 관절 6개 + 그리퍼 slide 2개</small></span></div>
+        <div class="dlrow"><span class="k">geom</span><span class="v">type · size · rgba<small>모양·크기·색. 부딪히는 것도 geom입니다</small></span></div>
+        <div class="dlrow"><span class="k">actuator</span><span class="v">position 모터가 몇 개인가<small>이게 있어야 data.ctrl로 명령할 수 있습니다</small></span></div>
+      </div>
+      <div class="box q"><span class="lbl">확인 질문</span><ul>
+        <li>큐브(빨간 상자)에는 <code>joint</code>가 있나요? 있다면 type은 무엇인가요?</li>
+        <li>바닥(plane)에는 왜 <code>joint</code>가 없을까요?</li>
+      </ul></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 03</span><h3>첫 시뮬레이션</h3></div>
+      
+      <pre><span class="p">$</span> python lab2_1_first_sim.py</pre>
+      <p>3D 창이 열리고 바닥 위의 로봇·공·상자가 중력에 의해 떨어집니다.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">드래그</span><span class="v">시점 회전</span></div>
+        <div class="dlrow"><span class="k">휠</span><span class="v">확대 / 축소</span></div>
+        <div class="dlrow"><span class="k">Space</span><span class="v">일시정지 / 재개</span></div>
+      </div>
+      <div class="box check"><span class="lbl">코드 3줄만 보세요</span>
+        <pre style="margin-top:8px">model = mujoco.MjModel.from_xml_path(...)   # 설계도
+data  = mujoco.MjData(model)                # 상태
+mujoco.mj_step(model, data)                 # 시간 한 칸</pre>
+        <p>모든 MuJoCo 프로그램이 이 셋으로 되어 있습니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 2</span><h2>MJCF와 물리 실험</h2><span class="pt">11:00–12:50</span></div>
+    <p class="lede">값을 바꾸고 실행하고 관찰합니다. 바꾼 값은 반드시 기록해 두세요.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 04</span><h3>무중력 만들기</h3></div>
+      
+      <p><code>lab2_1_first_sim.py</code>에서 중력 설정 줄을 찾아 0으로 바꿉니다.</p>
+      <pre>model.opt.gravity[:] = [0, 0, <span class="o">-9.81</span>]   <span class="c"># 원래</span>
+model.opt.gravity[:] = [0, 0, <span class="o">0</span>]       <span class="c"># 무중력</span>
+model.opt.gravity[:] = [0, 0, <span class="o">-1.62</span>]   <span class="c"># 달 중력</span></pre>
+      <div class="box q"><span class="lbl">확인 질문</span>
+        <p>무중력에서 공은 어떻게 되나요? <strong>가만히 떠 있나요, 아니면 처음 속도대로 계속 가나요?</strong> 왜 그럴까요?</p></div>
+      <div class="box warn"><span class="lbl">되돌리기</span><p>다음 미션 전에 <code>-9.81</code>로 되돌려 놓으세요.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 05</span><h3>XML을 직접 고쳐 나만의 씬 만들기 ★</h3></div>
+      
+      <p><code>assets/hello_scene.xml</code>을 열고 <code>&lt;geom&gt;</code>의 값을 바꿔 봅니다.</p>
+      <pre>&lt;geom type="box" size="<span class="o">0.05 0.05 0.05</span>" rgba="<span class="o">1 0 0 1</span>" pos="<span class="o">0.3 0 0.2</span>"/&gt;
+<span class="c">&lt;!--        ↑크기(반지름)          ↑색 R G B A       ↑위치 x y z --&gt;</span></pre>
+      <div class="box check"><span class="lbl">해볼 것</span><ul>
+        <li><code>size</code>를 2배로 → 물체가 커집니다 (size는 <strong>반</strong>지름입니다)</li>
+        <li><code>rgba</code>를 <code>0 0 1 1</code>로 → 파란색</li>
+        <li><code>pos</code>의 z를 0.5로 → 더 높은 곳에서 떨어집니다</li>
+        <li><code>&lt;geom&gt;</code> 줄을 통째로 복사해 물체를 하나 더 추가</li>
+      </ul></div>
+      <div class="box q"><span class="lbl">핵심</span>
+        <p>로봇을 <strong>'불러오는' 것이 아니라 '적는'</strong> 것 — 이것이 MuJoCo의 방식입니다. 지금 여러분은 세계를 텍스트로 쓰고 있습니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 06</span><h3>중력·마찰·질량 실시간 실험</h3></div>
+      
+      <pre><span class="p">$</span> python lab2_2_build_scene.py</pre>
+      <p><strong>별도의 조작 패널 창</strong>이 뜹니다. 안 보이면 <strong>Alt+Tab</strong>으로 찾으세요.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">마찰 0.05</span><span class="v">'큐브 밀기' → 멀리 미끄러짐<small>얼음판과 같습니다</small></span></div>
+        <div class="dlrow"><span class="k">마찰 1.5</span><span class="v">'큐브 밀기' → 거의 안 움직임<small>고무판과 같습니다</small></span></div>
+        <div class="dlrow"><span class="k">질량 ↑</span><span class="v">같은 힘으로 밀어도 덜 움직임</span></div>
+      </div>
+      <div class="box check"><span class="lbl">꼭 기억할 구분</span>
+        <p><code>model</code> = 변하지 않는 <strong>설계도</strong> (질량·마찰·중력 설정·관절 구조)<br>
+           <code>data</code> = 지금 이 순간의 <strong>상태</strong> (<code>qpos</code> 각도, <code>qvel</code> 속도, <code>ctrl</code> 명령)</p></div>
+      <div class="box q"><span class="lbl">내일 예고</span>
+        <p>내일 그리퍼로 큐브를 집습니다. 물체가 <strong>미끄러져 떨어지면</strong> 오늘 만진 <code>friction</code>을 올리면 됩니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 3</span><h2>로봇 바꿔 보기</h2><span class="pt">13:50–15:40</span></div>
+    <p class="lede">실제로 판매되는 로봇 모델을 불러옵니다. 최초 1회 다운로드에 1~2분 걸립니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 07</span><h3>Menagerie 로봇 4종</h3></div>
+      
+      <pre><span class="p">$</span> python robot_zoo.py              <span class="c"># 목록</span>
+<span class="p">$</span> python robot_zoo.py arm          <span class="c"># 로봇팔 (다운로드 불필요)</span>
+<span class="p">$</span> python robot_zoo.py dog          <span class="c"># 유니트리 Go2</span>
+<span class="p">$</span> python robot_zoo.py h1           <span class="c"># 유니트리 H1 휴머노이드</span>
+<span class="p">$</span> python robot_zoo.py hand         <span class="c"># 섀도우 로봇 핸드</span></pre>
+      <div class="box q"><span class="lbl">관찰</span><ul>
+        <li><code>hand</code>의 관절은 몇 개로 보이나요? 사람 손과 비교하면?</li>
+        <li><code>dog</code>의 다리 하나에 관절이 몇 개 있나요? (hip · thigh · calf)</li>
+      </ul></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 08</span><h3>쓰러지는 로봇 관찰하기 ★ 오늘의 핵심</h3></div>
+      
+      <p><code>dog</code>와 <code>h1</code>을 띄워 두고 <strong>10초 이상 지켜보세요.</strong> 관절 각도를 다 줬는데도 옆으로 넘어집니다.</p>
+      <div class="box q"><span class="lbl">스스로 답해 보세요</span><ol>
+        <li>로봇은 '서 있는 자세'를 정확히 취하고 있습니다. 그런데 왜 쓰러질까요?</li>
+        <li>사람은 눈을 감고도 서 있을 수 있습니다. 무엇을 하고 있는 걸까요?</li>
+        <li>넘어지지 않게 하려면 무엇이 더 필요할까요?</li>
+      </ol></div>
+      <div class="box check"><span class="lbl">답</span>
+        <p>균형은 <strong>'자세'가 아니라 '반응'</strong>입니다. 기울어지는 순간마다 다리를 다시 놓아야 하는데, 미리 정해 둔 각도로는 불가능합니다.<br>
+        실제 Go2의 보행도 사람이 수식으로 짠 것이 아니라 <strong>강화학습</strong>으로 만든 것입니다. → <strong>Day 5·6</strong></p></div>
+      <div class="box warn"><span class="lbl">과제</span><p>이 쓰러지는 장면을 캡처하세요. 오늘 과제 5번입니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 09</span><h3>URDF를 MJCF로 가져오기</h3></div>
+      
+      <pre><span class="p">$</span> python lab_mujoco_microtaur.py</pre>
+      <p>PyBullet용 <strong>URDF</strong> 로봇을 MuJoCo로 가져옵니다. 그대로는 안 열려서 스크립트가 자동 보정합니다.</p>
+      <div class="box check"><span class="lbl">무엇이 문제였나</span>
+        <p>URDF 안에 회전값(<code>rpy</code>)이 3개여야 하는데 4개로 적힌 부분이 있어 MuJoCo가 거부합니다. 스크립트가 그 부분을 고쳐서 <code>microtaur_mjc/</code>에 저장한 뒤 엽니다.</p></div>
+      <div class="box q"><span class="lbl">실무 감각</span>
+        <p>인터넷에 공개된 로봇은 대부분 URDF입니다. 남의 모델을 가져올 때 <strong>형식 변환과 보정</strong>이 가장 흔한 작업입니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 4</span><h2>로봇팔 관절 제어</h2><span class="pt">15:50–17:40</span></div>
+    <p class="lede">드디어 명령을 내립니다. 슬라이더 창은 Alt+Tab으로 찾으세요.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 10</span><h3>슬라이더로 6축 움직이기</h3></div>
+      
+      <pre><span class="p">$</span> python lab3_1_joint_control.py</pre>
+      <p>조작 패널의 슬라이더로 관절 6개를 하나씩 움직입니다. 단위는 <strong>도(°)</strong>입니다.</p>
+      <div class="box q"><span class="lbl">관절 하나씩 확인</span><ul>
+        <li>1번 관절만 움직이면 팔 전체가 회전하나요?</li>
+        <li>6번(손목) 관절만 움직이면 무엇이 달라지나요?</li>
+        <li>어느 관절이 손끝 위치를 가장 크게 바꾸나요?</li>
+      </ul></div>
+      <div class="box check"><span class="lbl">내일 복선</span>
+        <p>"손끝을 저기로 보내려면 관절 6개를 각각 몇 도로?"를 지금은 슬라이더로 <strong>감으로</strong> 맞추고 있습니다. 이것을 계산으로 푸는 것이 내일 배울 <strong>역기구학</strong>입니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 11</span><h3>ctrl과 qpos의 차이 관찰 ★</h3></div>
+      
+      <p>패널 아래 상태줄에 <strong>시킨 각도</strong>(<code>data.ctrl</code>)와 <strong>실제 각도</strong>(<code>data.qpos</code>)가 함께 나옵니다.</p>
+      <pre><span class="o">관절2  시킨 각도 -30.0°   실제 각도 -27.4°   (차이 2.6°)</span></pre>
+      <div class="box q"><span class="lbl">확인 질문</span><ul>
+        <li>어느 관절에서 차이가 가장 큰가요? 그 관절은 팔에서 어떤 위치인가요?</li>
+        <li>팔을 수평으로 뻗었을 때와 아래로 내렸을 때, 차이가 달라지나요?</li>
+      </ul></div>
+      <div class="box check"><span class="lbl">이유 세 가지</span>
+        <p><strong>중력</strong>(팔 무게가 아래로 당김) · <strong>관성</strong>(움직이던 것은 바로 안 멈춤) · <strong>모터 힘의 한계</strong>(<code>kp</code>가 유한함)</p></div>
+      <div class="box warn"><span class="lbl">과제</span><p>두 자세에 대해 시킨 각도와 실제 각도를 <strong>숫자로</strong> 적어 오세요. 오늘 과제 6번입니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 12</span><h3>나만의 자세 만들기</h3></div>
+      
+      <p>코드에서 <code>target_deg</code> 리스트를 찾아 값을 바꿉니다.</p>
+      <pre>target_deg = [<span class="o">0</span>, <span class="o">-30</span>, <span class="o">60</span>, <span class="o">0</span>, <span class="o">45</span>, <span class="o">0</span>]   <span class="c"># 관절 1~6 목표 각도(도)</span></pre>
+      <p><code>목표 자세로 이동</code> 버튼을 누르면 그 자세로 갑니다. 두 자세를 만들어 번갈아 실행해 보세요.</p>
+      <div class="box check"><span class="lbl">심화 — kp 바꿔 보기</span>
+        <p><code>assets/arm_scene.xml</code>의 <code>&lt;position ... kp="80"/&gt;</code>를 <strong>150</strong>으로 올려 보세요. 시킨 각도와 실제 각도의 차이가 줄어듭니다. <strong>300</strong>까지 올리면 어떻게 되나요?</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 A</span><h2>이런 오류가 나면</h2></div>
+    <p class="lede">오늘 가장 많이 나오는 것들입니다. 여기 없는 오류는 손을 드세요.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>증상 · 메시지</th><th>원인</th><th>대응</th></tr></thead>
+        <tbody>
+          <tr><td>조작 패널(슬라이더 창)이 안 보임</td><td>MuJoCo 3D 창 뒤에 가려짐</td><td><strong>Alt+Tab</strong>으로 찾으세요. 오늘 가장 많은 질문입니다</td></tr>
+          <tr><td><code>ModuleNotFoundError: mj_helpers</code></td><td>실습 폴더 밖에서 실행</td><td><code>cd</code>로 실습 파일 폴더로 이동한 뒤 실행</td></tr>
+          <tr><td>3D 창이 안 뜸 (원격 접속)</td><td>화면 출력이 없는 환경</td><td>로컬 PC에서 실행하세요</td></tr>
+          <tr><td>Menagerie 다운로드가 느림/실패</td><td>최초 1회 네트워크 다운로드</td><td>네트워크 확인 후 재시도. 한 번 받으면 캐시됩니다</td></tr>
+          <tr><td>로봇개·휴머노이드가 쓰러짐</td><td>걷기 제어기가 없음</td><td><strong>정상입니다.</strong> 오늘 관찰할 대상입니다 → Day 5 강화학습</td></tr>
+          <tr><td>XML 수정 후 <code>Error: XML parse</code></td><td>태그가 안 닫혔거나 따옴표 누락</td><td>수정한 줄의 <code>&lt;</code> <code>/&gt;</code> <code>"</code>를 확인</td></tr>
+          <tr><td>관절이 움직이지 않음</td><td>actuator가 없는 joint</td><td>MJCF에 <code>&lt;position joint="..."/&gt;</code>가 있는지 확인</td></tr>
+          <tr><td>팔이 부르르 떨림</td><td>kp가 너무 큼</td><td><code>kp</code>를 낮추거나 <code>damping</code>을 추가</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 B</span><h2>오늘의 퀴즈</h2></div>
+    <p class="lede">미션을 마쳤으면 오늘 배운 것을 퀴즈로 점검합니다. 채점은 바로 나오고, 틀린 문제는 왜 틀렸는지 설명이 붙습니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">QUIZ</span><h3>Day 3 · 18문항</h3></div>
+      <div class="sbody">
+        <p>객관식과 직접 입력이 섞여 있습니다. 가이드를 다시 보지 말고 먼저 풀어 보고, 틀린 부분만 해당 미션으로 돌아가 확인하세요.</p>
+        <p style="margin-top:12px;font-size:16px"><a href="quiz.html">▶ 퀴즈 풀러 가기</a></p>
+        <div class="box check">
+          <span class="lbl">통과 기준</span>
+          <p>18문항 중 <strong>15문항 이상</strong>을 맞히면 오늘 분량을 소화한 것입니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 C</span><h2>오늘 마치기 전 자가 점검</h2></div>
+    <p class="lede">전부 체크되면 오늘 목표를 달성한 것입니다. 안 되는 항목이 있으면 퇴실 전에 손을 드세요.</p>
+    <div class="selfcheck">
+      <h3>Day 3 체크리스트</h3>
+      <ul>
+        <li>시뮬레이터를 쓰는 이유를 <strong>안전 · 반복 · 병렬</strong>로 말할 수 있다</li>
+        <li><code>model</code>과 <code>data</code>의 차이를 예를 들어 설명할 수 있다</li>
+        <li><code>MjModel</code> → <code>MjData</code> → <code>mj_step</code> 세 줄의 역할을 안다</li>
+        <li>MJCF에서 <code>body</code> · <code>joint</code> · <code>geom</code> · <code>actuator</code>를 찾았다</li>
+        <li><code>hello_scene.xml</code>을 고쳐 나만의 씬을 만들었다</li>
+        <li>중력을 0으로 만들어 무중력을 관찰했다</li>
+        <li>마찰 0.05와 1.5에서 큐브 밀기 결과를 비교했다</li>
+        <li>Menagerie 로봇을 3종 이상 띄워 봤다</li>
+        <li><strong>로봇개가 쓰러지는 이유</strong>를 자기 말로 설명할 수 있다</li>
+        <li>URDF를 MuJoCo로 가져올 때 변환이 필요한 이유를 안다</li>
+        <li>슬라이더로 6축 관절을 제어했다</li>
+        <li><code>ctrl</code>과 <code>qpos</code>가 다른 이유 3가지를 말할 수 있다</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">과제 03</span><h2>나만의 씬과 물리 실험 보고서</h2><span class="pt">제출: 익일 09:00</span></div>
+    <p class="lede">MJCF를 직접 고쳐 나만의 장면을 만들고, 물리 파라미터가 무엇을 바꾸는지 증명합니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">제출 항목</span><h3>변경 전/후 화면과 수정한 XML 부분을 함께 붙일 것</h3></div>
+      <div class="sbody">
+        <ol><li>hello_scene.xml을 수정한 나만의 씬 캡처</li><li>무중력(gravity 0) 실행 화면</li><li>마찰 0.05 / 1.5 밀기 결과 비교</li><li>Menagerie 로봇 3종 이상 실행 캡처</li><li>로봇개가 쓰러지는 장면 + 이유 설명</li><li>6축 관절 목표자세 2개 + ctrl/qpos 차이 기록</li></ol>
+        <span class="prelbl">제출 양식 예시</span><pre><span class="o">학번 / 이름 : 20261234 / 홍길동
+
+6. 관절 제어 기록
+   목표자세 A : [0, -30, 60, 0, 45, 0] (도)
+   관절2 → 시킨 각도 -30.0°  /  실제 각도 -27.4°  (차이 2.6°)
+   해석 : 관절2가 팔 전체 무게를 드는 위치라 중력 편차가 가장 큼.
+          kp를 80 → 150으로 올리니 차이가 0.9°로 줄어듦</span></pre>
+        <div class="box check"><span class="lbl">채점 기준</span><p>5번이 오늘의 핵심입니다. "왜 관절 각도를 다 줬는데도 서 있지 못하는가"를 자기 말로 쓰세요. 6번은 시킨 각도와 실제 각도의 숫자를 실제로 적어 오셔야 합니다.</p></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>Day 3 / 6 · 실습 가이드 · 영상 AI × 피지컬 AI 48시간 과정</p>
+  </div>
+</footer>
+<script src="../nav.js"></script>

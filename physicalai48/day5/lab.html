@@ -1,0 +1,460 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 5 실습 가이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --bg:#F6F8F5;--surface:#FFFFFF;--surface-2:#EDF1EC;--ink:#141A16;--ink-2:#3A453E;--muted:#5F6D65;
+    --line:#DBE2DC;--line-strong:#C3CFC6;--accent:#10684A;--accent-soft:#E2EFE8;--clay:#A94D30;--clay-soft:#F6E7E0;
+    --ask:#1F5E86;--ask-soft:#E1EDF5;
+    --term-bg:#10171A;--term-fg:#DCE6E3;--term-dim:#7C9A93;--term-p:#7FD1A8;--term-out:#B8C7C2;
+    --maxw:940px;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+      --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+      --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+    --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+    --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:22px}
+  h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:600;letter-spacing:-.01em}
+  p{margin:0}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+  header.top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .masthead{display:flex;flex-direction:column;gap:16px;padding-block:46px 28px}
+  .rule-tag{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .rule-tag .dash{flex:1;height:1px;background:var(--line-strong);min-width:24px}
+  h1{font-size:clamp(26px,4.4vw,40px);line-height:1.2;font-weight:700;letter-spacing:-.03em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .standfirst{max-width:60ch;color:var(--ink-2);font-size:15.5px;font-weight:300;line-height:1.75}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-top:24px}
+  .rule{background:var(--surface);padding:15px 17px}
+  .rule .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--accent)}
+  .rule h3{font-size:14.5px;font-weight:600;margin-top:4px}
+  .rule p{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.55}
+
+  section{padding-block:44px}
+  .part{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-top:2px solid var(--accent);padding-top:14px;margin-bottom:8px}
+  .part .pn{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;color:var(--accent)}
+  .part h2{font-size:clamp(20px,3vw,26px);font-weight:700;letter-spacing:-.02em;flex:1 1 200px}
+  .part .pt{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .lede{color:var(--muted);font-size:14px;max-width:62ch;margin-bottom:22px}
+
+  .stepc{border:1px solid var(--line);border-radius:4px;background:var(--surface);margin-bottom:16px;overflow:hidden}
+  .shead{display:flex;align-items:baseline;gap:12px;padding:13px 18px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+  .shead .sn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .shead h3{font-size:15px;font-weight:600}
+  .sbody{padding:16px 18px}
+  .sbody > p{font-size:14px;color:var(--ink-2);line-height:1.7}
+  .sbody > p + p{margin-top:9px}
+  .sbody ol,.sbody ul{margin:9px 0 0;padding-left:19px}
+  .sbody li{font-size:14px;color:var(--ink-2);margin-top:5px;line-height:1.65}
+
+  pre{margin:11px 0 0;background:var(--term-bg);color:var(--term-fg);border-radius:3px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+  pre .c{color:var(--term-dim)}
+  pre .p{color:var(--term-p)}
+  pre .o{color:var(--term-out)}
+  .prelbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-top:13px;display:block}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:1px 4px;border-radius:2px}
+  kbd{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:3px;padding:1px 5px;background:var(--surface);color:var(--ink)}
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+
+  .box{margin-top:13px;border-radius:0 3px 3px 0;padding:11px 14px;display:flex;flex-direction:column;gap:5px}
+  .box.check{border-left:2px solid var(--accent);background:var(--accent-soft)}
+  .box.q{border-left:2px solid var(--ask);background:var(--ask-soft)}
+  .box.warn{border-left:2px solid var(--clay);background:var(--clay-soft)}
+  .box .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase}
+  .box.check .lbl{color:var(--accent)}
+  .box.q .lbl{color:var(--ask)}
+  .box.warn .lbl{color:var(--clay)}
+  .box p,.box li{font-size:13.5px;color:var(--ink-2);line-height:1.62}
+  .box ul{margin:0;padding-left:16px}
+  .box li{margin-top:3px}
+  .box code{background:rgba(0,0,0,.06)}
+
+  .mission{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;background:var(--surface);padding:16px 18px;margin-bottom:14px}
+  .mhead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .mhead .mn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .mhead h3{font-size:15px;font-weight:600;flex:1 1 180px}
+  .mission > p{font-size:14px;color:var(--ink-2);margin-top:7px;line-height:1.7}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;min-width:540px;font-size:13.5px}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--surface-2)}
+  tbody tr:last-child td{border-bottom:0}
+  td code{font-size:12px}
+
+  .selfcheck{border:1px solid var(--line-strong);border-radius:4px;background:var(--surface);overflow:hidden}
+  .selfcheck h3{padding:14px 18px;font-size:15px;background:var(--surface-2);border-bottom:1px solid var(--line-strong)}
+  .selfcheck ul{list-style:none;margin:0;padding:6px 18px 16px}
+  .selfcheck li{font-size:14px;color:var(--ink-2);padding:8px 0 8px 28px;border-bottom:1px solid var(--line);position:relative;line-height:1.6}
+  .selfcheck li:last-child{border-bottom:0}
+  .selfcheck li::before{content:"";position:absolute;left:0;top:13px;width:14px;height:14px;border:1.5px solid var(--line-strong);border-radius:2px}
+
+  footer{border-top:1px solid var(--line);background:var(--surface);padding-block:26px;margin-top:20px}
+  footer p{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+  @media (max-width:700px){
+    .sbody,.shead,.mission{padding-inline:14px}
+    .shead{gap:8px;flex-wrap:wrap}
+  }
+
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+</style>
+
+<header class="top">
+  <div class="wrap masthead">
+    <div class="rule-tag">
+      <span class="eyebrow">한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과</span>
+      <span class="dash"></span>
+      <span class="eyebrow">학생용 실습 가이드</span>
+    </div>
+    <h1>Day 5 · <em>인식 · 판단 · 행동을 하나로</em></h1>
+    <p class="standfirst">오늘 오전은 조립입니다. 나흘 동안 만든 부품을 하나로 잇습니다. 오후에는 전혀 다른 이야기가 시작됩니다 — 우리가 알려주지 않아도 스스로 배우는 로봇입니다. <strong>마지막 미션의 장기 학습은 반드시 걸어 두고 퇴실하세요.</strong></p>
+    <div class="rules">
+      <div class="rule"><div class="n">RULE 1</div><h3>오차를 두려워하지 않는다</h3><p>인식은 항상 틀립니다. 중요한 것은 "얼마나 틀려도 되는가"입니다. 오늘 그 한계를 숫자로 찾습니다.</p></div>
+      <div class="rule"><div class="n">RULE 2</div><h3>LLM에게 선택지를 준다</h3><p>자유롭게 답하게 두면 없는 물건을 집으라고 합니다. 있는 것만 알려주고 그 안에서 고르게 하세요.</p></div>
+      <div class="rule"><div class="n">RULE 3</div><h3>가벼운 것으로 먼저 성공한다</h3><p>RL은 기다림의 연속입니다. InvertedPendulum으로 성공을 맛본 뒤 무거운 과제로 갑니다.</p></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <div class="part"><span class="pn">PART 1</span><h2>본 위치로 가서 집기</h2><span class="pt">09:00–10:50</span></div>
+    <p class="lede">웹캠 + 인쇄 마커, 또는 웹캠 없이 시뮬 카메라 — 둘 중 하나로 진행합니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 01</span><h3>ArUco 마커로 위치 찾기</h3></div>
+      
+      <pre><span class="p">$</span> python lab5_1_aruco_robot.py           <span class="c"># ① 웹캠 + 인쇄 마커</span>
+<span class="p">$</span> python lab5_1_aruco_robot.py --sim     <span class="c"># ② 웹캠 없이 시뮬 카메라</span></pre>
+      <p>웹캠 모드는 마커(4x4_50, ID 0)를 비추면 3D 위치가 계산됩니다. 영상 창에서 <code>p</code> = 그 위치로 집기, <code>q</code> = 종료.</p>
+      <div class="box check"><span class="lbl">왜 마커 한 장으로 거리를 알 수 있나</span>
+        <p>마커의 <strong>실제 한 변 길이를 우리가 알고 있기 때문</strong>입니다. 화면에 작게 찍혔으면 멀리, 크게 찍혔으면 가까이 있는 것입니다. 어제 배운 "깊이 없이는 3D를 못 구한다"의 예외처럼 보이지만, 사실은 <strong>크기를 미리 알고 있는 것</strong>이 깊이 정보를 대신합니다.</p></div>
+      <div class="box q"><span class="lbl">확인 질문</span>
+        <p>마커를 기울이면 어떻게 되나요? <code>solvePnP</code>는 위치뿐 아니라 <strong>자세(회전)</strong>도 돌려줍니다. 화면에 그려지는 축(x·y·z)이 마커를 따라 도는지 보세요.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 02</span><h3>오차의 한계 찾기 ★ 오늘의 핵심</h3></div>
+      
+      <p><code>--sim</code> 모드는 큐브를 <strong>진짜 위치에 그대로 두고</strong>, 로봇만 '카메라가 본 좌표'로 보냅니다. 그래서 오차의 효과를 눈으로 볼 수 있습니다.</p>
+      <p>코드에서 목표 좌표에 <strong>일부러 오차를 더해</strong> 언제부터 실패하는지 찾으세요.</p>
+      <pre>target = detected_pos + np.array([<span class="o">0.005</span>, 0, 0])   <span class="c"># +5mm</span>
+target = detected_pos + np.array([<span class="o">0.010</span>, 0, 0])   <span class="c"># +1cm</span>
+target = detected_pos + np.array([<span class="o">0.020</span>, 0, 0])   <span class="c"># +2cm</span>
+target = detected_pos + np.array([<span class="o">0.030</span>, 0, 0])   <span class="c"># +3cm</span></pre>
+      <div class="box q"><span class="lbl">기록할 것</span><ul>
+        <li>집히는 최대 오차는 몇 cm인가?</li>
+        <li>그리퍼 열림 폭과 큐브 한 변의 차이는 얼마인가? (MJCF에서 확인)</li>
+        <li>둘 사이에 어떤 관계가 있는가?</li>
+      </ul></div>
+      <div class="box check"><span class="lbl">실무 감각</span>
+        <p>"인식 정확도를 얼마나 올려야 하나?"가 아니라 <strong>"여유가 얼마나 되나?"</strong>를 먼저 묻습니다. 허용 오차에서 요구 정확도를 역산하는 것이 실무의 순서입니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 2</span><h2>말로 시키는 로봇</h2><span class="pt">11:00–12:50</span></div>
+    <p class="lede">LLM이 없어도 규칙기반으로 항상 동작합니다. 없다고 막히지 마세요.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 03</span><h3>자연어 명령 실행</h3></div>
+      
+      <pre><span class="p">$</span> python lab5_2_voice_command.py
+<span class="p">$</span> python lab5_2_voice_command.py "파란 블록을 상자에 넣어줘"
+<span class="p">$</span> python lab5_2_voice_command.py "로봇팔을 좌우로 흔들어줘"</pre>
+      <p>실행하면 어떤 경로를 탔는지 표시됩니다: <code>[LLM: OpenAI]</code> / <code>[LLM: Ollama]</code> / <code>[규칙기반]</code></p>
+      <div class="box check"><span class="lbl">LLM의 역할</span>
+        <p>LLM은 로봇을 움직이지 않습니다. <strong>사람의 말을 프로그램이 읽을 수 있는 형태로 바꿔줄 뿐</strong>입니다.</p>
+        <pre style="margin-top:8px">"파란 블록을 상자에 넣어줘"
+  ↓ LLM
+{ "action": "pick_and_place", "target_color": "blue", "destination": "box" }
+  ↓ 이미 만들어 둔 파이프라인
+색 탐색 → 3D 좌표 → IK → 집기</pre></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 04</span><h3>(선택) 실제 LLM 연결하기</h3></div>
+      
+      <p>셋 중 하나만 되면 됩니다. 시도 순서는 <strong>OpenAI → Ollama → 규칙기반</strong>입니다.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">OpenAI</span><span class="v"><code>pip install openai</code> 후 키를 환경변수로<small>유료·클라우드. 가장 똑똑합니다</small></span></div>
+        <div class="dlrow"><span class="k">Ollama</span><span class="v">ollama.com에서 설치 → <code>ollama pull llama3</code><small>무료·로컬. 인터넷·과금 없음</small></span></div>
+        <div class="dlrow"><span class="k">규칙기반</span><span class="v">아무것도 안 해도 동작<small>"파란"이라는 단어를 찾습니다</small></span></div>
+      </div>
+      <pre><span class="c"># CMD — 영구 등록</span>
+<span class="p">$</span> setx OPENAI_API_KEY "sk-여기에키"
+<span class="c"># PowerShell — 현재 창만</span>
+<span class="p">$</span> $env:OPENAI_API_KEY="sk-여기에키"</pre>
+      <div class="box warn"><span class="lbl">절대 하지 마세요</span>
+        <p>API 키를 <strong>코드에 직접 쓰지 마세요.</strong> 그대로 GitHub에 올라가는 사고가 실무에서 가장 흔합니다. 반드시 환경변수로.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 05</span><h3>여러 개 중에 골라 집기 ★</h3></div>
+      
+      <pre><span class="p">$</span> python lab5_3_choose_and_pick.py
+<span class="p">$</span> python lab5_3_choose_and_pick.py "빨간 블록을 상자에 넣어줘"</pre>
+      <p>빨강·파랑·초록 3개가 놓여 있습니다. 로봇이 <strong>세 단계를 연달아</strong> 풀어야 합니다.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">1단계</span><span class="v">무엇을? — 말에서 색을 뽑아낸다<small>LLM 또는 규칙기반</small></span></div>
+        <div class="dlrow"><span class="k">2단계</span><span class="v">어디에? — 카메라로 그 색을 찾아 3D 좌표 복원<small>어제 배운 역투영 그대로</small></span></div>
+        <div class="dlrow"><span class="k">3단계</span><span class="v">간다 — IK로 손끝을 보내고 집어 상자에<small>어제 만든 것</small></span></div>
+      </div>
+      <div class="box check"><span class="lbl">중요</span>
+        <p>로봇은 큐브의 <strong>진짜 좌표를 훔쳐보지 않습니다.</strong> 시뮬 카메라로 찍은 사진에서 색을 찾아 깊이로 3D를 복원해 씁니다. 그래서 오차가 있고, 그래서 미션 2가 중요했습니다.</p></div>
+      <p>세 색을 차례로 명령해 보세요. 색마다 놓는 자리가 달라 서로 쌓이지 않습니다.</p>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 06</span><h3>환각 만들어 보기 ★</h3></div>
+      
+      <p>테이블에 <strong>없는 색</strong>을 시켜 보세요.</p>
+      <pre><span class="p">$</span> python lab5_3_choose_and_pick.py "노란 블록을 상자에 넣어줘"
+<span class="p">$</span> python lab5_3_choose_and_pick.py "고양이를 집어줘"</pre>
+      <div class="box q"><span class="lbl">관찰</span><ul>
+        <li>로봇이 어떻게 반응하나요? 거부하나요, 헤매나요?</li>
+        <li>코드에서 LLM에게 보내는 <strong>프롬프트</strong>를 찾아보세요. 무엇이 들어 있나요?</li>
+      </ul></div>
+      <div class="box check"><span class="lbl">환각을 막는 설계</span>
+        <p><strong>나쁜 방법</strong>: "사용자가 원하는 색을 알려줘" → 없는 색도 자신 있게 답합니다<br>
+        <strong>좋은 방법</strong>: "지금 테이블에 red, blue, green이 있다. <strong>이 중에서만</strong> 고르고, 없으면 error를 반환하라"</p>
+        <p style="margin-top:8px">선택지를 좁히는 것이 환각을 막는 가장 확실한 방법입니다. 이것이 LLM을 실제 시스템에 붙일 때의 기본기입니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 07</span><h3>(선택) 음성으로 명령하기</h3></div>
+      
+      <pre><span class="p">$</span> pip install sounddevice faster-whisper
+<span class="p">$</span> python lab5_2_voice_command.py --voice</pre>
+      <p><code>[마이크] 말하세요… (4초 녹음)</code>가 뜨면 명령을 말합니다. 흐름은 <strong>마이크 → STT → LLM → 로봇</strong>입니다.</p>
+      <div class="box warn"><span class="lbl">첫 실행</span><p>음성인식 모델(small)을 자동 다운로드하므로 시간이 걸립니다. 무거우면 <code>base</code>로 낮추세요.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 3</span><h2>학습의 원리 이해하기</h2><span class="pt">13:50–15:40</span></div>
+    <p class="lede">여기서 주제가 바뀝니다. rl 환경으로 전환하세요.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 08</span><h3>환경 전환과 설치 확인</h3></div>
+      
+      <pre><span class="p">$</span> conda activate rl
+<span class="p">$</span> python -c "import gymnasium, mujoco, stable_baselines3; print('OK')"
+<span class="o">OK</span>
+<span class="p">$</span> cd RL실습폴더경로</pre>
+      <div class="box check"><span class="lbl">개념 정리 — 이것만 붙잡으세요</span>
+        <p><strong>신경망 학습 4단계</strong>: 예측 → 손실(얼마나 틀렸나) → 역전파(각 가중치의 책임) → 갱신(덜 틀리는 쪽으로 조금)<br>
+        안개 속에서 발밑 경사만 보고 산을 내려가는 것 = <strong>경사하강법</strong></p>
+        <p style="margin-top:8px"><strong>어제 만든 IK도 같은 구조였습니다</strong> — 오차 보고 → 조금 다가가고 → 다시 보기.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 09</span><h3>학습 전 환경 체험 ★</h3></div>
+      
+      <p>아직 학습하지 않고 <strong>무작위 행동</strong>만 넣어 봅니다.</p>
+      <pre><span class="p">$</span> python rl_understand_env.py --env InvertedPendulum-v5 --render
+<span class="o">관측 공간: Box(4,)     ← 카트 위치·속도, 막대 각도·각속도
+행동 공간: Box(1,)     ← 카트에 주는 힘
+평균 보상: 18.3        ← 막대가 금방 쓰러진다</span></pre>
+      <div class="box q"><span class="lbl">용어를 화면과 맞춰 보세요</span><ul>
+        <li><strong>환경</strong> = MuJoCo 물리 세계 (카트와 막대)</li>
+        <li><strong>관측</strong> = 4개 숫자 — 에이전트가 보는 전부</li>
+        <li><strong>행동</strong> = 1개 숫자 — 카트를 좌우로 미는 힘</li>
+        <li><strong>보상</strong> = 막대가 서 있으면 매 스텝 +1</li>
+        <li><strong>정책</strong> = 관측 → 행동을 정하는 신경망 (지금은 무작위)</li>
+      </ul></div>
+      <div class="box check"><span class="lbl">Day 3을 떠올리세요</span>
+        <p>로봇개가 계속 쓰러졌던 그 상황과 같습니다. 관절을 움직일 줄은 아는데 <strong>어떻게</strong> 움직여야 하는지를 모릅니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 10</span><h3>다른 환경도 둘러보기</h3></div>
+      
+      <pre><span class="p">$</span> python rl_understand_env.py --env HalfCheetah-v5
+<span class="o">관측 공간: Box(17,)   행동 공간: Box(6,)</span>
+<span class="p">$</span> python rl_understand_env.py --env Ant-v5
+<span class="o">관측 공간: Box(105,)  행동 공간: Box(8,)</span></pre>
+      <div class="box q"><span class="lbl">확인 질문</span><ul>
+        <li>Ant의 관측이 105개나 되는 이유는? (힌트: 다리 4개 × 관절 2개, 그리고 접촉력)</li>
+        <li>관측과 행동의 개수가 많아지면 학습은 쉬워질까요, 어려워질까요?</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 4</span><h2>강화학습 첫 실습</h2><span class="pt">15:50–17:40</span></div>
+    <p class="lede">가벼운 것으로 성공하고, 무거운 것은 걸어 둡니다. 시간 관리가 핵심입니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 11</span><h3>막대 세우기 학습 — 첫 성공</h3></div>
+      
+      <pre><span class="p">$</span> python rl_train.py --env InvertedPendulum-v5 --algo ppo --steps 50000</pre>
+      <p>수 분이면 끝납니다. 로그에서 <code>ep_rew_mean</code>이 올라가는 것을 지켜보세요.</p>
+      <pre><span class="o">| ep_rew_mean    | 23.1   |   ← 처음
+| ep_rew_mean    | 187.4  |   ← 중간
+| ep_rew_mean    | 1000.0 |   ← 완료</span></pre>
+      <pre><span class="p">$</span> python rl_enjoy.py --env InvertedPendulum-v5 --algo ppo</pre>
+      <div class="box check"><span class="lbl">무슨 일이 일어났나</span>
+        <p>보상은 단 하나였습니다 — <strong>"막대가 서 있으면 +1"</strong>. 어떻게 세우라고는 아무도 알려주지 않았습니다. 그런데 정책이 스스로 방법을 찾았습니다.</p>
+        <p style="margin-top:8px">1000점 = 1000스텝 동안 한 번도 안 쓰러졌다는 뜻입니다.</p></div>
+      <div class="box q"><span class="lbl">과제 5번</span><p>학습 <strong>전</strong> 평균 보상(미션 9)과 <strong>후</strong> 평균 보상을 나란히 적으세요.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 12</span><h3>치타 학습 걸어 두기 ★ 퇴실 전 필수</h3></div>
+      
+      <p><strong>지금 시작해서 내일 아침에 회수합니다.</strong> 수십 분이 걸립니다.</p>
+      <pre><span class="p">$</span> python rl_train.py --env HalfCheetah-v5 --algo sac --steps 300000</pre>
+      <div class="box warn"><span class="lbl">반드시 확인</span><ul>
+        <li>터미널 창을 <strong>닫지 마세요</strong> (닫으면 학습이 중단됩니다)</li>
+        <li>PC 절전 모드를 꺼 두세요</li>
+        <li>시작 로그를 캡처하세요 — 과제 6번입니다</li>
+      </ul></div>
+      <div class="box check"><span class="lbl">왜 SAC인가</span>
+        <p>PPO는 안정적이지만 표본 효율이 낮습니다. SAC는 같은 경험에서 더 많이 배워서 보행·이동 같은 <strong>연속 제어</strong>에 강합니다.<br>
+        <strong>막대 세우기 = PPO · 치타 달리기 = SAC</strong> — 오늘은 이 조합만 기억하세요.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 13</span><h3>학습이 도는 동안 — 완성된 결과 감상</h3></div>
+      
+      <p>강사가 배포한 <strong>사전학습 정책</strong>으로 결과를 먼저 봅니다. (<code>RL/models/</code>)</p>
+      <pre><span class="p">$</span> python rl_enjoy.py --env HalfCheetah-v5 --algo sac
+<span class="p">$</span> python rl_enjoy.py --env Ant-v5 --algo sac
+<span class="p">$</span> python rl_enjoy.py --env Hopper-v5 --algo ppo</pre>
+      <div class="box check"><span class="lbl">Day 3과 연결하세요 ★</span>
+        <p>셋째 날 <code>robot_zoo.py dog</code>에서 로봇개가 계속 쓰러졌습니다. <strong>Ant</strong>는 같은 4족 구조인데 강화학습으로 걷습니다.</p>
+        <p style="margin-top:8px">실제 Unitree Go2의 보행도 사람이 수식으로 짠 것이 아니라 <strong>정확히 이 원리</strong>로 학습된 것입니다. 내일 그 이야기를 마저 합니다.</p></div>
+      <div class="box q"><span class="lbl">관찰</span>
+        <p>HalfCheetah가 달리는 자세를 보세요. <strong>사람이 보기엔 이상한 자세</strong>일 수 있습니다. 왜 그럴까요? (힌트: 보상이 "전진 속도"뿐이라면, 보기 좋을 필요가 없습니다)</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 A</span><h2>이런 오류가 나면</h2></div>
+    <p class="lede">오늘 가장 많이 나오는 것들입니다. 여기 없는 오류는 손을 드세요.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>증상 · 메시지</th><th>원인</th><th>대응</th></tr></thead>
+        <tbody>
+          <tr><td>ArUco 마커가 인식 안 됨</td><td>딕셔너리 불일치 또는 인쇄 품질</td><td>4x4_50 · ID 0 확인. 구겨지지 않게 평평히. 조명 확보</td></tr>
+          <tr><td>웹캠이 없거나 안 열림</td><td>카메라 미연결</td><td><code>--sim</code> 모드로 진행하면 웹캠 없이 전 과정 가능</td></tr>
+          <tr><td>로봇이 엉뚱한 곳으로 감</td><td>카메라→로봇 좌표 변환값 오류</td><td>보정값은 예시값입니다. <code>--sim</code>에서 먼저 검증하세요</td></tr>
+          <tr><td><code>[규칙기반]</code>만 뜸</td><td>OpenAI 키·Ollama 둘 다 없음</td><td><strong>정상입니다.</strong> 수업 진행에 지장 없습니다</td></tr>
+          <tr><td><code>OPENAI_API_KEY</code>를 넣었는데 인식 안 됨</td><td>setx는 <strong>다음 창부터</strong> 적용</td><td>터미널을 새로 열거나 <code>set</code>으로 현재 창에 등록</td></tr>
+          <tr><td><code>No module named gymnasium</code></td><td>rl 환경이 아님</td><td><code>conda activate rl</code></td></tr>
+          <tr><td>RL 렌더 창이 안 뜸 / OpenGL 오류</td><td>그래픽 드라이버 또는 원격 환경</td><td><code>--record</code>로 mp4 저장 후 확인</td></tr>
+          <tr><td>학습이 너무 느림</td><td>정상입니다</td><td>InvertedPendulum으로 성공 경험 후 HalfCheetah는 백그라운드로</td></tr>
+          <tr><td>보상이 안 오름</td><td>steps 부족 또는 알고리즘 부적합</td><td>steps를 늘리거나 SAC로 바꾸세요</td></tr>
+          <tr><td><code>--record</code> 오류</td><td>moviepy 미설치</td><td><code>pip install moviepy</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 B</span><h2>오늘의 퀴즈</h2></div>
+    <p class="lede">미션을 마쳤으면 오늘 배운 것을 퀴즈로 점검합니다. 채점은 바로 나오고, 틀린 문제는 왜 틀렸는지 설명이 붙습니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">QUIZ</span><h3>Day 5 · 18문항</h3></div>
+      <div class="sbody">
+        <p>객관식과 직접 입력이 섞여 있습니다. 가이드를 다시 보지 말고 먼저 풀어 보고, 틀린 부분만 해당 미션으로 돌아가 확인하세요.</p>
+        <p style="margin-top:12px;font-size:16px"><a href="quiz.html">▶ 퀴즈 풀러 가기</a></p>
+        <div class="box check">
+          <span class="lbl">통과 기준</span>
+          <p>18문항 중 <strong>15문항 이상</strong>을 맞히면 오늘 분량을 소화한 것입니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 C</span><h2>오늘 마치기 전 자가 점검</h2></div>
+    <p class="lede">전부 체크되면 오늘 목표를 달성한 것입니다. 안 되는 항목이 있으면 퇴실 전에 손을 드세요.</p>
+    <div class="selfcheck">
+      <h3>Day 5 체크리스트</h3>
+      <ul>
+        <li>ArUco 또는 시뮬 카메라로 찾은 위치로 로봇이 물체를 집었다</li>
+        <li>마커 한 장으로 거리를 알 수 있는 이유를 설명할 수 있다</li>
+        <li><strong>오차를 키워 가며</strong> 집히는 한계값을 찾았다</li>
+        <li>그 한계값이 그리퍼 여유와 어떤 관계인지 설명할 수 있다</li>
+        <li>자연어 명령으로 지정한 색 블록을 집어 상자에 넣었다</li>
+        <li>LLM이 "로봇을 움직이는 것"이 아니라 "말을 번역하는 것"임을 안다</li>
+        <li>없는 색을 시켜 보고, 환각을 막는 설계를 설명할 수 있다</li>
+        <li>API 키를 환경변수로 관리해야 하는 이유를 안다</li>
+        <li>손실 · 경사하강 · 역전파를 각각 한 문장으로 말할 수 있다</li>
+        <li>환경 · 관측 · 행동 · 보상 · 정책의 의미를 설명할 수 있다</li>
+        <li>학습 전 무작위 행동의 낮은 보상을 직접 확인했다</li>
+        <li>InvertedPendulum을 학습시켜 평균 보상 1000에 도달했다</li>
+        <li><strong>HalfCheetah 장기 학습을 걸어 두고 퇴실했다</strong></li>
+        <li>Day 3에서 쓰러지던 로봇개와 RL로 걷는 Ant의 차이를 안다</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">과제 05</span><h2>통합 파이프라인 시연과 학습 로그</h2><span class="pt">제출: 익일 09:00</span></div>
+    <p class="lede">본 것을 집는 전체 흐름을 완성하고, 첫 강화학습 결과를 기록합니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">제출 항목</span><h3>학습 로그는 보상이 올라가는 구간이 보이도록 캡처할 것</h3></div>
+      <div class="sbody">
+        <ol><li>ArUco 또는 --sim 모드로 집기 성공 영상</li><li>인식 오차를 키웠을 때 집히는 한계값</li><li>자연어 명령 3개 실행 결과 (색 3종)</li><li>없는 색을 시켰을 때의 동작 + 방지 설계 설명</li><li>InvertedPendulum 학습 전/후 평균 보상</li><li>HalfCheetah 학습 시작 로그 (내일 회수)</li></ol>
+        <span class="prelbl">제출 양식 예시</span><pre><span class="o">학번 / 이름 : 20261234 / 홍길동
+
+2. 인식 오차 한계 실험
+   오차 +0.5cm → 집힘      오차 +1.0cm → 집힘
+   오차 +1.5cm → 집힘(아슬)  오차 +2.0cm → 실패(밀림)
+   그리퍼 열림 폭 4.0cm, 큐브 한 변 2.5cm → 여유 편측 0.75cm
+   해석 : 실험값 1.5cm가 이론 여유 0.75cm보다 큰 이유는
+          손가락이 닫히며 큐브를 중앙으로 밀어 넣는 효과 때문</span></pre>
+        <div class="box check"><span class="lbl">채점 기준</span><p>2번이 오늘의 핵심입니다. 좌표에 일부러 오차를 더해 가며(1cm, 2cm, 3cm…) 언제부터 집히지 않는지 찾고, 그 값이 그리퍼 폭과 어떤 관계인지 쓰세요.</p></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>Day 5 / 6 · 실습 가이드 · 영상 AI × 피지컬 AI 48시간 과정</p>
+  </div>
+</footer>
+<script src="../nav.js"></script>

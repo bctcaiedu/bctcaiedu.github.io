@@ -1,0 +1,451 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 2 실습 가이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --bg:#F6F8F5;--surface:#FFFFFF;--surface-2:#EDF1EC;--ink:#141A16;--ink-2:#3A453E;--muted:#5F6D65;
+    --line:#DBE2DC;--line-strong:#C3CFC6;--accent:#10684A;--accent-soft:#E2EFE8;--clay:#A94D30;--clay-soft:#F6E7E0;
+    --ask:#1F5E86;--ask-soft:#E1EDF5;
+    --term-bg:#10171A;--term-fg:#DCE6E3;--term-dim:#7C9A93;--term-p:#7FD1A8;--term-out:#B8C7C2;
+    --maxw:940px;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+      --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+      --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+    --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+    --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:22px}
+  h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:600;letter-spacing:-.01em}
+  p{margin:0}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+  header.top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .masthead{display:flex;flex-direction:column;gap:16px;padding-block:46px 28px}
+  .rule-tag{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .rule-tag .dash{flex:1;height:1px;background:var(--line-strong);min-width:24px}
+  h1{font-size:clamp(26px,4.4vw,40px);line-height:1.2;font-weight:700;letter-spacing:-.03em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .standfirst{max-width:60ch;color:var(--ink-2);font-size:15.5px;font-weight:300;line-height:1.75}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-top:24px}
+  .rule{background:var(--surface);padding:15px 17px}
+  .rule .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--accent)}
+  .rule h3{font-size:14.5px;font-weight:600;margin-top:4px}
+  .rule p{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.55}
+
+  section{padding-block:44px}
+  .part{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-top:2px solid var(--accent);padding-top:14px;margin-bottom:8px}
+  .part .pn{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;color:var(--accent)}
+  .part h2{font-size:clamp(20px,3vw,26px);font-weight:700;letter-spacing:-.02em;flex:1 1 200px}
+  .part .pt{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .lede{color:var(--muted);font-size:14px;max-width:62ch;margin-bottom:22px}
+
+  .stepc{border:1px solid var(--line);border-radius:4px;background:var(--surface);margin-bottom:16px;overflow:hidden}
+  .shead{display:flex;align-items:baseline;gap:12px;padding:13px 18px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+  .shead .sn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .shead h3{font-size:15px;font-weight:600}
+  .sbody{padding:16px 18px}
+  .sbody > p{font-size:14px;color:var(--ink-2);line-height:1.7}
+  .sbody > p + p{margin-top:9px}
+  .sbody ol,.sbody ul{margin:9px 0 0;padding-left:19px}
+  .sbody li{font-size:14px;color:var(--ink-2);margin-top:5px;line-height:1.65}
+
+  pre{margin:11px 0 0;background:var(--term-bg);color:var(--term-fg);border-radius:3px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+  pre .c{color:var(--term-dim)}
+  pre .p{color:var(--term-p)}
+  pre .o{color:var(--term-out)}
+  .prelbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-top:13px;display:block}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:1px 4px;border-radius:2px}
+  kbd{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:3px;padding:1px 5px;background:var(--surface);color:var(--ink)}
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+
+  .box{margin-top:13px;border-radius:0 3px 3px 0;padding:11px 14px;display:flex;flex-direction:column;gap:5px}
+  .box.check{border-left:2px solid var(--accent);background:var(--accent-soft)}
+  .box.q{border-left:2px solid var(--ask);background:var(--ask-soft)}
+  .box.warn{border-left:2px solid var(--clay);background:var(--clay-soft)}
+  .box .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase}
+  .box.check .lbl{color:var(--accent)}
+  .box.q .lbl{color:var(--ask)}
+  .box.warn .lbl{color:var(--clay)}
+  .box p,.box li{font-size:13.5px;color:var(--ink-2);line-height:1.62}
+  .box ul{margin:0;padding-left:16px}
+  .box li{margin-top:3px}
+  .box code{background:rgba(0,0,0,.06)}
+
+  .mission{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;background:var(--surface);padding:16px 18px;margin-bottom:14px}
+  .mhead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .mhead .mn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .mhead h3{font-size:15px;font-weight:600;flex:1 1 180px}
+  .mission > p{font-size:14px;color:var(--ink-2);margin-top:7px;line-height:1.7}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;min-width:540px;font-size:13.5px}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--surface-2)}
+  tbody tr:last-child td{border-bottom:0}
+  td code{font-size:12px}
+
+  .selfcheck{border:1px solid var(--line-strong);border-radius:4px;background:var(--surface);overflow:hidden}
+  .selfcheck h3{padding:14px 18px;font-size:15px;background:var(--surface-2);border-bottom:1px solid var(--line-strong)}
+  .selfcheck ul{list-style:none;margin:0;padding:6px 18px 16px}
+  .selfcheck li{font-size:14px;color:var(--ink-2);padding:8px 0 8px 28px;border-bottom:1px solid var(--line);position:relative;line-height:1.6}
+  .selfcheck li:last-child{border-bottom:0}
+  .selfcheck li::before{content:"";position:absolute;left:0;top:13px;width:14px;height:14px;border:1.5px solid var(--line-strong);border-radius:2px}
+
+  footer{border-top:1px solid var(--line);background:var(--surface);padding-block:26px;margin-top:20px}
+  footer p{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+  @media (max-width:700px){
+    .sbody,.shead,.mission{padding-inline:14px}
+    .shead{gap:8px;flex-wrap:wrap}
+  }
+
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+</style>
+
+<header class="top">
+  <div class="wrap masthead">
+    <div class="rule-tag">
+      <span class="eyebrow">한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과</span>
+      <span class="dash"></span>
+      <span class="eyebrow">학생용 실습 가이드</span>
+    </div>
+    <h1>Day 2 · <em>딥러닝 검출과 랜드마크</em></h1>
+    <p class="standfirst">오전에는 남이 학습시킨 모델을 가져다 쓰고, 오후에는 직접 학습시킵니다. 오늘 라벨링이 지루하다고 느끼셨다면 그 감각을 기억해 두세요 — 내일모레 시뮬레이터가 그 일을 공짜로 해 주는 것을 보게 됩니다.</p>
+    <div class="rules">
+      <div class="rule"><div class="n">RULE 1</div><h3>어제 것과 비교한다</h3><p>어제 Haar가 실패한 사진을 오늘 YOLO에 그대로 넣어 보세요. 비교하지 않으면 아무것도 배우지 못합니다.</p></div>
+      <div class="rule"><div class="n">RULE 2</div><h3>숫자를 꺼내 쓴다</h3><p>화면에 상자만 그리고 끝내지 마세요. 클래스·좌표·신뢰도를 직접 print 해 보는 것이 목적입니다.</p></div>
+      <div class="rule"><div class="n">RULE 3</div><h3>먼저 돌리고 다듬는다</h3><p>미니프로젝트는 완성도보다 동작이 먼저입니다. 30분 안에 일단 돌아가게 만들고 남는 시간에 다듬으세요.</p></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <div class="part"><span class="pn">PART 1</span><h2>YOLO 물체 검출</h2><span class="pt">09:00–10:50</span></div>
+    <p class="lede">첫 실행 시 yolov8n.pt 가 자동 다운로드됩니다(1회성). 느려도 기다리세요.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 01</span><h3>세 가지 입력으로 돌려 보기</h3></div>
+      
+      <pre><span class="p">$</span> conda activate physicalai
+<span class="p">$</span> cd 영상AI실습폴더경로
+<span class="p">$</span> python vlab3_yolo_detect.py photo.jpg    <span class="c"># ① 이미지</span>
+<span class="p">$</span> python vlab3_yolo_detect.py road.mp4     <span class="c"># ② 동영상</span>
+<span class="p">$</span> python vlab3_yolo_detect.py              <span class="c"># ③ 웹캠 실시간</span></pre>
+      <p>터미널에 <strong>클래스 이름 / 상자 좌표 / 신뢰도</strong> 세 가지가 출력되는지 확인하세요.</p>
+      <div class="box q"><span class="lbl">확인 질문</span><ul>
+        <li>웹캠으로 돌릴 때 FPS가 어제 Canny보다 얼마나 떨어지나요?</li>
+        <li>화면에 없는 물체를 잘못 검출한 경우가 있나요? 그때 신뢰도는 얼마였나요?</li>
+      </ul></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 02</span><h3>어제의 실패 사진을 넣어 보기 ★</h3></div>
+      
+      <p>어제 <strong>Haar가 못 찾았던 캡처 3장</strong>을 그대로 YOLO에 넣습니다.</p>
+      <pre><span class="p">$</span> python vlab3_yolo_detect.py 어제_옆얼굴.jpg
+<span class="p">$</span> python vlab3_yolo_detect.py 어제_어두운얼굴.jpg
+<span class="p">$</span> python vlab3_yolo_detect.py 어제_컵.jpg</pre>
+      <div class="box check"><span class="lbl">무엇을 확인하는가</span>
+        <p>YOLO는 얼굴 검출기가 아니라 <code>person</code> 검출기입니다. 옆을 봐도, 어두워도 사람으로 잡아냅니다. 그리고 어제는 아예 불가능했던 <code>cup</code>이 이름과 함께 나옵니다.</p></div>
+      <div class="box q"><span class="lbl">과제용 기록</span>
+        <p>세 장의 전후 결과를 나란히 캡처하고, <strong>무엇이 달라졌는지 한 문단</strong>으로 적으세요. 오늘 과제 2번입니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 03</span><h3>결과를 코드에서 꺼내 쓰기</h3></div>
+      
+      <p>화면에 그리는 것만으로는 부족합니다. <strong>숫자를 직접 꺼내야</strong> 나중에 로봇을 움직일 수 있습니다.</p>
+      <pre><span class="p">$</span> python</pre>
+      <pre><span class="c">>>></span> from ultralytics import YOLO
+<span class="c">>>></span> m = YOLO("yolov8n.pt")
+<span class="c">>>></span> r = m("photo.jpg")
+<span class="c">>>></span> for b in r[0].boxes:
+...     print(m.names[int(b.cls[0])], b.xyxy[0].tolist(), round(float(b.conf[0]),2))
+<span class="o">person [102.3, 45.1, 288.7, 470.2] 0.91
+cup    [330.5, 210.8, 402.1, 300.4] 0.67</span></pre>
+      <div class="box check"><span class="lbl">Day 5 예고</span>
+        <p>여기서 나온 <strong>상자 좌표</strong>가 5일차에 로봇팔이 갈 목표 좌표가 됩니다. 지금은 픽셀 좌표지만, 깊이 정보를 더하면 3D 좌표가 됩니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 04</span><h3>필터링과 임계값 조절</h3></div>
+      
+      <p>실무에서는 전부 다 검출하지 않습니다. <strong>필요한 것만</strong> 받습니다.</p>
+      <pre>results = model(frame, conf=<span class="o">0.5</span>)                 <span class="c"># 신뢰도 0.5 이상만</span>
+results = model(frame, classes=[<span class="o">0</span>])              <span class="c"># person 만 (0번)</span>
+results = model(frame, conf=0.3, classes=[<span class="o">39</span>, <span class="o">41</span>])  <span class="c"># bottle, cup 만</span></pre>
+      <p>클래스 번호는 <code>model.names</code>로 전체를 출력해 확인하세요.</p>
+      <div class="box q"><span class="lbl">확인 질문</span>
+        <p><code>conf</code>를 0.25 → 0.7로 올리면 검출 개수가 어떻게 변하나요? <strong>어제 minNeighbors 3↔8</strong>과 같은 성질인가요, 다른가요?</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 2</span><h2>MediaPipe 랜드마크</h2><span class="pt">11:00–12:50</span></div>
+    <p class="lede">세 가지 모드를 모두 돌려 보고, 마지막에 좌표로 값을 계산해 봅니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 05</span><h3>세 가지 모드 실행</h3></div>
+      
+      <pre><span class="p">$</span> python vlab4_mediapipe.py hands   <span class="c"># 손 21점 + 편 손가락 개수</span>
+<span class="p">$</span> python vlab4_mediapipe.py pose    <span class="c"># 전신 33점</span>
+<span class="p">$</span> python vlab4_mediapipe.py face    <span class="c"># 얼굴 468점 메시</span></pre>
+      <div class="dl">
+        <div class="dlrow"><span class="k">hands</span><span class="v">손가락을 하나씩 펴며 숫자가 맞게 올라가는지<small>주먹 0 → 다섯 손가락 5</small></span></div>
+        <div class="dlrow"><span class="k">pose</span><span class="v">앉았다 일어서며 관절 점이 따라오는지<small>가려진 관절은 어떻게 표시되나요?</small></span></div>
+        <div class="dlrow"><span class="k">face</span><span class="v">눈을 감았다 뜨고, 입을 벌려 보기<small>468점이 얼굴을 따라 늘어납니다</small></span></div>
+      </div>
+      <div class="box q"><span class="lbl">확인 질문</span>
+        <p>세 모드 중 FPS가 가장 낮은 것은? 점의 개수와 관계가 있나요?</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 06</span><h3>YOLO와 나란히 비교</h3></div>
+      
+      <p>같은 장면을 두 방식으로 봅니다. <strong>창 두 개를 동시에 띄워</strong> 놓고 비교하세요.</p>
+      <pre><span class="c"># 터미널 1</span>
+<span class="p">$</span> python vlab3_yolo_detect.py
+<span class="c"># 터미널 2 (새 Anaconda Prompt)</span>
+<span class="p">$</span> conda activate physicalai
+<span class="p">$</span> python vlab4_mediapipe.py pose</pre>
+      <div class="box check"><span class="lbl">핵심 차이</span>
+        <p>손을 들어 보세요. YOLO는 <strong>상자 크기만 조금 바뀝니다</strong>. MediaPipe는 <strong>팔이 올라간 것이 보입니다</strong>. "무엇이 어디에" vs "어떤 모양으로"의 차이입니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 07</span><h3>좌표를 의미로 바꾸기 ★</h3></div>
+      
+      <p>랜드마크 좌표로 <strong>각도</strong>를 계산합니다. 세 점 A–B–C의 B에서의 각도입니다.</p>
+      <pre><span class="c">import</span> numpy as np
+
+<span class="c">def</span> angle(a, b, c):
+    ba = np.array(a) - np.array(b)
+    bc = np.array(c) - np.array(b)
+    cos = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
+    <span class="c">return</span> np.degrees(np.arccos(np.clip(cos, -1, 1)))
+
+<span class="c"># pose 기준: 엉덩이(23) - 무릎(25) - 발목(27)</span>
+knee = angle(lm[23], lm[25], lm[27])
+<span class="c">if</span> knee &lt; 100: print("스쿼트 내려감")</pre>
+      <div class="box check"><span class="lbl">오늘 가장 쓸모 있는 10줄</span>
+        <p>이 함수 하나로 무릎·팔꿈치·어깨 각도를 전부 잴 수 있습니다. 미니프로젝트 ②를 고르면 그대로 씁니다.</p></div>
+      <div class="box q"><span class="lbl">해볼 것</span>
+        <p>팔꿈치 각도(어깨 11 – 팔꿈치 13 – 손목 15)를 재서 화면에 숫자로 띄워 보세요.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 3</span><h2>내 데이터로 YOLO 학습시키기</h2><span class="pt">13:50–15:40</span></div>
+    <p class="lede">오늘 가장 어려운 파트입니다. 수집 30분 · 라벨링 40분 · 학습 20분으로 시간을 배분하세요.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 08</span><h3>데이터 수집</h3></div>
+      
+      <p>COCO 80종에 <strong>없는</strong> 물체를 하나 고르세요. 실습실 물건이면 무엇이든 좋습니다(공구, 명찰, 특정 색 블록 등).</p>
+      <pre><span class="c"># 웹캠으로 연속 캡처 — s 키를 누를 때마다 저장</span>
+<span class="p">$</span> python vlab1_webcam_preview.py</pre>
+      <div class="box check"><span class="lbl">좋은 데이터의 조건</span><ul>
+        <li><strong>각도를 바꾸며</strong> 찍기 — 정면만 찍으면 정면만 찾습니다</li>
+        <li><strong>조명을 바꾸며</strong> 찍기 — 밝은 곳, 그늘, 역광</li>
+        <li><strong>배경을 바꾸며</strong> 찍기 — 책상 위, 바닥, 손에 든 상태</li>
+        <li>최소 100장. 학습 80장 / 검증 20장으로 나눕니다</li>
+      </ul></div>
+      <div class="box warn"><span class="lbl">시간 관리</span>
+        <p>30분 안에 끝내세요. 완벽한 데이터를 모으려다 라벨링 시간을 잃는 것이 가장 흔한 실패입니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 09</span><h3>라벨링</h3></div>
+      
+      <p>도구는 <strong>LabelImg</strong>(로컬) 또는 <strong>Roboflow</strong>(웹) 중 편한 것을 쓰세요.</p>
+      <pre><span class="p">$</span> pip install labelImg
+<span class="p">$</span> labelImg</pre>
+      <p>저장 형식은 반드시 <strong>YOLO</strong>로 설정합니다. 이미지 한 장당 같은 이름의 <code>.txt</code>가 생깁니다.</p>
+      <pre><span class="c"># mydata/labels/train/img001.txt 의 내용</span>
+<span class="o">0 0.512 0.433 0.180 0.221</span>
+<span class="c"># 클래스번호  중심x  중심y  너비  높이   (전부 0~1로 정규화)</span></pre>
+      <div class="box check"><span class="lbl">폴더 구조</span>
+        <pre style="margin-top:8px">mydata/
+├── images/train/  ← 사진 80장
+├── images/val/    ← 사진 20장
+├── labels/train/  ← txt 80개
+└── labels/val/    ← txt 20개</pre></div>
+      <div class="box warn"><span class="lbl">지금 이 지루함을 기억하세요</span>
+        <p>100장에 40분이 걸립니다. 실무에서는 수천 장입니다. <strong>Day 4에서 시뮬레이터가 이 라벨을 자동으로 만들어 주는 것</strong>을 보게 됩니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 10</span><h3>학습과 평가</h3></div>
+      
+      <pre><span class="c"># data.yaml 작성</span>
+path: ./mydata
+train: images/train
+val: images/val
+names:
+  0: 내물체이름</pre>
+      <pre><span class="p">$</span> yolo detect train data=data.yaml model=yolov8n.pt epochs=50 imgsz=640
+<span class="c"># ... 학습 진행 (CPU면 15~25분, GPU면 3~5분)</span>
+<span class="o">all   100   0.83   0.71   0.79   0.52
+                  ↑P    ↑R   ↑mAP50 ↑mAP50-95</span></pre>
+      <p>학습이 끝나면 결과가 <code>runs/detect/train/</code>에 저장됩니다. <code>results.png</code>를 꼭 열어 보세요.</p>
+      <pre><span class="c"># 학습된 모델로 검출해 보기</span>
+<span class="p">$</span> yolo detect predict model=runs/detect/train/weights/best.pt source=0</pre>
+      <div class="box q"><span class="lbl">결과 해석</span><ul>
+        <li>train loss는 내려가는데 val mAP가 안 오르면 → <strong>과적합</strong>. 데이터를 다양하게</li>
+        <li>둘 다 나쁘면 → <strong>학습 부족</strong> 또는 <strong>라벨 오류</strong>. 라벨부터 다시 확인</li>
+        <li>특정 각도에서만 못 찾으면 → 그 각도 사진이 부족한 것</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">PART 4</span><h2>미니프로젝트 #1</h2><span class="pt">15:50–17:40</span></div>
+    <p class="lede">90분 제작 + 20분 시연. 완성도보다 동작이 먼저입니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 11</span><h3>주제 선택과 최소 버전 만들기</h3></div>
+      
+      <div class="dl">
+        <div class="dlrow"><span class="k">① 제스처</span><span class="v">가위바위보 판정 / 손동작으로 조작<small>hands 21점 · 펴진 손가락 조합으로 판정 · Day 6으로 이어짐</small></span></div>
+        <div class="dlrow"><span class="k">② 운동 코칭</span><span class="v">스쿼트 카운트 + 자세 경고<small>pose 33점 · 미션 7의 각도 함수를 그대로 사용</small></span></div>
+        <div class="dlrow"><span class="k">③ 졸음 감지</span><span class="v">눈 감김이 2초 이상 유지되면 경고<small>face 468점 · 눈꺼풀 세로÷가로 비율(EAR)</small></span></div>
+        <div class="dlrow"><span class="k">④ 물체 카운터</span><span class="v">특정 클래스 개수 표시 / 통과 카운트<small>YOLO · classes 필터 + 중심점이 선을 넘는지 판정</small></span></div>
+      </div>
+      <div class="box check"><span class="lbl">30분 규칙</span>
+        <p>먼저 <strong>30분 안에 최소 버전</strong>을 돌아가게 만드세요. 화면에 숫자 하나만 떠도 됩니다. 나머지 60분에 다듬습니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 12</span><h3>한계 찾고 시연 준비</h3></div>
+      
+      <p>이틀 내내 해 온 일을 여기서도 합니다. <strong>내 앱이 어디서 무너지는지</strong> 찾으세요.</p>
+      <div class="box q"><span class="lbl">시연에서 말할 세 가지</span><ol>
+        <li>무엇을 만들었나 — 한 문장</li>
+        <li>실제로 돌린다 — 슬라이드 금지, 라이브 시연 90초</li>
+        <li>어디가 잘 안 되나 — 실패 조건 1개 (배점 있음)</li>
+      </ol></div>
+      <div class="box check"><span class="lbl">예시</span>
+        <p>"손가락 개수로 볼륨을 조절하는 앱입니다. 다만 <strong>손등을 보이면</strong> 편 손가락 판정이 뒤집힙니다. 손바닥 방향을 먼저 판별해야 해결됩니다."</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 A</span><h2>이런 오류가 나면</h2></div>
+    <p class="lede">오늘 가장 많이 나오는 것들입니다. 여기 없는 오류는 손을 드세요.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>증상 · 메시지</th><th>원인</th><th>대응</th></tr></thead>
+        <tbody>
+          <tr><td>YOLO 첫 실행이 매우 느림</td><td>모델 자동 다운로드 중</td><td>1회성입니다. 완료 후에는 즉시 실행됩니다</td></tr>
+          <tr><td><code>AttributeError: multi_hand_landmarks</code></td><td>BGR→RGB 변환 누락</td><td><code>cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)</code> 후 process에 넘기세요</td></tr>
+          <tr><td>MediaPipe 랜드마크가 안 잡힘</td><td>조명 부족 또는 손이 화면 밖</td><td>밝은 곳에서, 손 전체가 프레임 안에 들어오게</td></tr>
+          <tr><td><code>yolo: command not found</code></td><td>가상환경 미활성 또는 ultralytics 미설치</td><td><code>conda activate physicalai</code> → <code>pip install ultralytics</code></td></tr>
+          <tr><td>학습 시 <code>No labels found</code></td><td>폴더 구조 또는 이름 불일치</td><td>images와 labels의 <strong>파일명이 동일</strong>해야 합니다(확장자만 다름)</td></tr>
+          <tr><td>학습이 너무 느림 (CPU)</td><td>GPU 미사용</td><td><code>epochs</code>를 20으로 줄이거나 <code>imgsz=416</code>으로. 정상입니다</td></tr>
+          <tr><td>mAP가 0에 가까움</td><td>라벨 클래스 번호 오류</td><td><code>data.yaml</code>의 names 순서와 txt의 클래스 번호가 맞는지 확인</td></tr>
+          <tr><td><code>CUDA out of memory</code></td><td>배치 크기 과다</td><td><code>batch=8</code> 또는 <code>batch=4</code>로 낮추세요</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 B</span><h2>오늘의 퀴즈</h2></div>
+    <p class="lede">미션을 마쳤으면 오늘 배운 것을 퀴즈로 점검합니다. 채점은 바로 나오고, 틀린 문제는 왜 틀렸는지 설명이 붙습니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">QUIZ</span><h3>Day 2 · 18문항</h3></div>
+      <div class="sbody">
+        <p>객관식과 직접 입력이 섞여 있습니다. 가이드를 다시 보지 말고 먼저 풀어 보고, 틀린 부분만 해당 미션으로 돌아가 확인하세요.</p>
+        <p style="margin-top:12px;font-size:16px"><a href="quiz.html">▶ 퀴즈 풀러 가기</a></p>
+        <div class="box check">
+          <span class="lbl">통과 기준</span>
+          <p>18문항 중 <strong>15문항 이상</strong>을 맞히면 오늘 분량을 소화한 것입니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 C</span><h2>오늘 마치기 전 자가 점검</h2></div>
+    <p class="lede">전부 체크되면 오늘 목표를 달성한 것입니다. 안 되는 항목이 있으면 퇴실 전에 손을 드세요.</p>
+    <div class="selfcheck">
+      <h3>Day 2 체크리스트</h3>
+      <ul>
+        <li>YOLO를 이미지 · 동영상 · 웹캠 세 가지 입력으로 돌렸다</li>
+        <li>클래스 이름 · 상자 좌표 · 신뢰도를 코드에서 <code>print</code> 했다</li>
+        <li><strong>어제 Haar가 실패한 사진</strong>을 YOLO에 넣어 결과를 비교했다</li>
+        <li><code>conf</code>와 <code>classes</code>로 검출 결과를 필터링했다</li>
+        <li>MediaPipe hands · pose · face 세 모드를 모두 실행했다</li>
+        <li>BGR→RGB 변환이 왜 필요한지 설명할 수 있다</li>
+        <li>랜드마크 좌표로 <strong>관절 각도</strong>를 계산해 화면에 띄웠다</li>
+        <li>내 물체 사진 100장 이상을 수집하고 라벨링했다</li>
+        <li>YOLO 커스텀 학습을 완료하고 mAP50 수치를 확인했다</li>
+        <li>학습된 <code>best.pt</code>로 웹캠 검출을 실행했다</li>
+        <li>미니프로젝트가 돌아가고, <strong>실패 조건 1개</strong>를 말할 수 있다</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">과제 02</span><h2>커스텀 검출기와 미니프로젝트 제출</h2><span class="pt">제출: 익일 09:00</span></div>
+    <p class="lede">오늘 학습시킨 모델의 성능을 숫자로 증명하고, 만든 앱을 영상으로 남깁니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">제출 항목</span><h3>학습 결과 그래프와 실행 영상은 반드시 포함할 것</h3></div>
+      <div class="sbody">
+        <ol><li>YOLO 검출 결과 3정보 출력 캡처</li><li>어제 실패 사진을 YOLO에 넣은 결과 비교</li><li>MediaPipe 3종(hands·pose·face) 실행 캡처</li><li>커스텀 학습 data.yaml + mAP50 수치</li><li>runs/detect/train/results.png 그래프</li><li>미니프로젝트 코드 + 30초 시연 영상</li></ol>
+        <span class="prelbl">제출 양식 예시</span><pre><span class="o">학번 / 이름 : 20261234 / 홍길동
+
+4. 커스텀 학습 결과
+   클래스 : cube_red, cube_blue  (학습 120장 / 검증 30장)
+   mAP50 : 0.71   mAP50-95 : 0.44
+   해석 : 파란 큐브가 그늘에서 검게 보여 자주 놓침.
+          → 조명이 어두운 사진을 20장 더 모아 재학습 예정</span></pre>
+        <div class="box check"><span class="lbl">채점 기준</span><p>2번이 오늘의 핵심입니다. 어제 Haar가 못 찾은 옆얼굴·어두운 사진을 그대로 YOLO에 넣고, 무엇이 달라졌는지 한 문단으로 쓰세요. 4번 mAP가 낮아도 감점 없습니다 — 낮은 이유를 설명하면 만점입니다.</p></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>Day 2 / 6 · 실습 가이드 · 영상 AI × 피지컬 AI 48시간 과정</p>
+  </div>
+</footer>
+<script src="../nav.js"></script>
