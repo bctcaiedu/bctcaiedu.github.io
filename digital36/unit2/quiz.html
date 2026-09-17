@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2단원 퀴즈 · 디지털리터러시</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --bg:#F6F8F5;--surface:#FFFFFF;--surface-2:#EDF1EC;--ink:#141A16;--ink-2:#3A453E;--muted:#5F6D65;
+    --line:#DBE2DC;--line-strong:#C3CFC6;--accent:#10684A;--accent-soft:#E2EFE8;
+    --clay:#A94D30;--clay-soft:#F6E7E0;--term:#10171A;
+    --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+      --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;
+      --clay:#E08F6E;--clay-soft:#2A1E18;--term:#0A0F11;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+    --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;
+    --clay:#E08F6E;--clay-soft:#2A1E18;--term:#0A0F11;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.68;margin:0;
+       -webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding-inline:20px}
+  h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0}
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+
+  header{border-bottom:1px solid var(--line);background:var(--surface)}
+  .mast{padding-block:32px 22px;display:flex;flex-direction:column;gap:10px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  h1{font-size:clamp(24px,4vw,32px);font-weight:700;letter-spacing:-.025em}
+  .mast p{color:var(--ink-2);font-size:14.5px;font-weight:300;max-width:60ch}
+
+  .prog{height:3px;background:var(--surface-2)}
+  .prog i{display:block;height:100%;background:var(--accent);width:0;transition:width .35s}
+
+  main{padding-block:30px 60px}
+  .meta{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+  .meta .qn{font-family:var(--mono);font-size:11.5px;letter-spacing:.11em;color:var(--accent)}
+  .meta .sc{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+  .qcard{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:26px 24px}
+  .qtext{font-size:18px;font-weight:600;line-height:1.55;text-wrap:balance}
+  pre{background:var(--term);color:#DCE6E3;border-radius:4px;padding:14px 16px;margin:16px 0 0;
+      font-family:var(--mono);font-size:13px;line-height:1.7;overflow-x:auto}
+  pre .p{color:#7FD1A8}
+  pre .c{color:#7C9A93}
+  code{font-family:var(--mono);font-size:.9em;background:var(--surface-2);padding:1px 5px;border-radius:3px}
+
+  .opts{display:flex;flex-direction:column;gap:9px;margin-top:20px}
+  .opt{text-align:left;font-family:var(--sans);font-size:15px;line-height:1.5;color:var(--ink);
+       background:var(--surface);border:1px solid var(--line-strong);border-radius:5px;
+       padding:13px 16px;cursor:pointer;display:flex;gap:11px;align-items:flex-start;width:100%}
+  .opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
+  .opt:disabled{cursor:default}
+  .opt .mk{font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:2px;flex:0 0 auto}
+  .opt.right{border-color:var(--accent);background:var(--accent-soft)}
+  .opt.right .mk{color:var(--accent)}
+  .opt.wrong{border-color:var(--clay);background:var(--clay-soft)}
+  .opt.wrong .mk{color:var(--clay)}
+  .opt code{background:rgba(0,0,0,.06)}
+
+  .typed{display:flex;gap:9px;margin-top:20px;flex-wrap:wrap}
+  input[type=text]{flex:1 1 240px;font-family:var(--mono);font-size:15px;color:var(--ink);
+      background:var(--surface);border:1px solid var(--line-strong);border-radius:5px;padding:12px 14px}
+  input[type=text]:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  input[type=text]:disabled{opacity:.75}
+
+  button.go{font-family:var(--sans);font-size:15px;font-weight:600;color:#fff;background:var(--accent);
+      border:1px solid var(--accent);border-radius:5px;padding:12px 22px;cursor:pointer}
+  button.go:hover{filter:brightness(1.08)}
+  button.ghost{font-family:var(--sans);font-size:14px;font-weight:500;color:var(--ink-2);
+      background:var(--surface);border:1px solid var(--line-strong);border-radius:5px;padding:11px 18px;cursor:pointer}
+  button.ghost:hover{border-color:var(--accent);color:var(--accent)}
+  .actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+
+  .fb{margin-top:18px;border-left:3px solid var(--accent);background:var(--accent-soft);
+      border-radius:0 4px 4px 0;padding:14px 16px}
+  .fb.no{border-left-color:var(--clay);background:var(--clay-soft)}
+  .fb .v{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+         color:var(--accent);display:block;margin-bottom:5px}
+  .fb.no .v{color:var(--clay)}
+  .fb p{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .fb code{background:rgba(0,0,0,.06)}
+
+  /* result */
+  .res{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:32px 24px;text-align:center}
+  .res .big{font-family:var(--mono);font-size:56px;font-weight:600;line-height:1;color:var(--accent);
+            font-variant-numeric:tabular-nums}
+  .res .big.mid{color:#B08322}
+  .res .big.low{color:var(--clay)}
+  .res h2{font-size:20px;margin-top:14px}
+  .res p{color:var(--muted);font-size:14.5px;margin-top:8px;max-width:48ch;margin-inline:auto}
+  .res .actions{justify-content:center}
+  .missed{margin-top:26px;text-align:left;border-top:1px solid var(--line);padding-top:20px}
+  .missed h3{font-size:14px;color:var(--muted);font-family:var(--mono);letter-spacing:.11em;
+             text-transform:uppercase;font-weight:500;margin-bottom:12px}
+  .missed li{font-size:14px;color:var(--ink-2);line-height:1.6;margin-top:9px}
+  .missed li b{color:var(--ink)}
+
+  footer{border-top:1px solid var(--line);background:var(--surface);padding-block:22px}
+  footer p{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  @media (max-width:560px){ .qcard{padding:20px 16px} .qtext{font-size:16.5px} }
+
+</style>
+
+<header>
+  <div class="wrap mast">
+    <span class="eyebrow">2단원 · 「디지털리터러시」 36시간 과정</span>
+    <h1>ChatGPT 첫걸음 확인 퀴즈</h1>
+    <p>15문항 · 객관식과 직접 입력이 섞여 있습니다. 실습지를 다시 보지 말고 먼저 풀어 보세요. 12문항 이상이면 통과입니다.</p>
+  </div>
+</header>
+<div class="prog"><i id="prog"></i></div>
+
+<main class="wrap">
+  <div class="meta"><span class="qn" id="qn">Q 01 / 15</span><span class="sc" id="sc">정답 0</span></div>
+  <div id="area"></div>
+</main>
+
+<footer><div class="wrap"><p>2단원 · <a href="lab.html">실습지로 돌아가기</a></p></div></footer>
+
+<script>
+window.QUIZ = [
+  {
+    "q": "ChatGPT 화면에서 사진이나 파일을 올릴 때 주로 누르는 버튼은?",
+    "o": [
+      "입력창 옆의 + 버튼",
+      "왼쪽 메뉴의 대화 목록",
+      "화면 위쪽의 계정 이름",
+      "브라우저의 새로고침 버튼"
+    ],
+    "a": 0,
+    "e": "입력창 옆의 + 버튼으로 사진 찍기, 앨범에서 고르기, 파일 올리기를 할 수 있습니다. 모양과 이름은 업데이트로 조금 달라질 수 있습니다."
+  },
+  {
+    "q": "ChatGPT <strong>무료 버전</strong>에 대한 설명으로 옳은 것은?",
+    "o": [
+      "사용량 제한이 있고, 넘으면 기다리거나 더 가벼운 모델로 바뀔 수 있다",
+      "모든 기능을 제한 없이 쓸 수 있다",
+      "글자 질문만 되고 사진은 올릴 수 없다",
+      "로그인하면 자동으로 요금이 결제된다"
+    ],
+    "a": 0,
+    "e": "무료로도 대화·사진·음성 등을 체험할 수 있지만 사용량 제한이 있습니다. 기능과 제한은 자주 바뀌므로 필요할 때 요금제 안내에서 확인합니다."
+  },
+  {
+    "q": "스마트폰에 ChatGPT 앱을 설치할 때 가장 먼저 확인할 것은?",
+    "o": [
+      "개발자 이름이 OpenAI인지",
+      "별점이 5점인지",
+      "앱 아이콘이 초록색인지",
+      "다운로드 수가 가장 적은지"
+    ],
+    "a": 0,
+    "e": "이름과 아이콘을 흉내 낸 다른 회사 앱이 있습니다. 개발자 이름을 확인하는 것이 가장 확실합니다."
+  },
+  {
+    "q": "좋은 질문의 4요소가 <strong>아닌</strong> 것은?",
+    "o": [
+      "비밀번호",
+      "역할",
+      "상황",
+      "형식"
+    ],
+    "a": 0,
+    "e": "4요소는 역할·상황·요청·형식입니다. 비밀번호 같은 개인정보는 질문에 절대 넣지 않습니다."
+  },
+  {
+    "q": "\"너는 여행 전문가야. 70대 부모님과 2박 3일 여행을 가. 여행지 3곳을 표로 추천해 줘.\" 여기서 <strong>\"70대 부모님과 2박 3일\"</strong>은 4요소 중 무엇인가요? (직접 입력)",
+    "t": true,
+    "acc": [
+      "상황",
+      "상황정보",
+      "상황 정보"
+    ],
+    "ans": "상황",
+    "e": "내 사정을 알려 주는 부분이 \"상황\"입니다. 상황과 요청이 4요소 중 가장 중요합니다."
+  },
+  {
+    "q": "\"운동 추천해 줘\"라는 질문을 가장 잘 고친 것은?",
+    "o": [
+      "65세이고 무릎이 약해. 집에서 매일 15분 할 운동 3가지를 방법·주의점 표로 알려 줘",
+      "운동 추천 좀 해 줘. 꼭!",
+      "운동 추천해 줘. 최대한 많이",
+      "제일 좋은 운동 한 개만 말해"
+    ],
+    "a": 0,
+    "e": "나이·몸 상태(상황), 운동 3가지(요청), 표(형식)가 들어가 내게 맞는 답을 받을 수 있습니다."
+  },
+  {
+    "q": "AI가 써 준 문자가 너무 길고 딱딱합니다. 가장 좋은 다음 행동은?",
+    "o": [
+      "같은 대화에서 \"4줄 이내로, 편한 말투로 바꿔 줘\"라고 요청한다",
+      "창을 닫고 AI는 쓸모없다고 결론 낸다",
+      "새 채팅을 열어 처음부터 같은 질문을 반복한다",
+      "답을 그대로 복사해서 보낸다"
+    ],
+    "a": 0,
+    "e": "첫 답은 초안입니다. 같은 대화 안에서 수정 요청을 하면 AI가 앞 내용을 이어받아 고쳐 줍니다."
+  },
+  {
+    "q": "말로 설명하기 어려운 \"말투와 분위기\"를 AI에게 전달하는 가장 효과적인 방법은?",
+    "o": [
+      "원하는 느낌의 예시 문장을 함께 보여 준다",
+      "\"느낌 있게\"라고 여러 번 강조한다",
+      "질문을 영어로 바꾼다",
+      "질문을 최대한 짧게 줄인다"
+    ],
+    "a": 0,
+    "e": "예시 한 줄이 길이·말투·분위기를 한꺼번에 알려 줍니다. 3차시에서 배운 \"예시 보여주기\"입니다."
+  },
+  {
+    "q": "AI가 사실이 아닌 내용을 그럴듯하게 지어내는 현상을 무엇이라고 하나요? (직접 입력)",
+    "t": true,
+    "acc": [
+      "환각",
+      "할루시네이션",
+      "hallucination",
+      "Hallucination"
+    ],
+    "ans": "환각",
+    "e": "환각(할루시네이션)은 AI가 \"다음에 올 그럴듯한 말\"을 이어 붙이는 방식으로 답하기 때문에 생깁니다. 말투가 자신 있어도 틀릴 수 있습니다."
+  },
+  {
+    "q": "다음 중 AI가 <strong>틀리기 쉬운</strong> 질문 유형으로 보기 어려운 것은?",
+    "o": [
+      "\"안녕하세요\"를 영어로 인사하는 법",
+      "우리 동네 작은 가게의 영업시간",
+      "이번 달에 바뀐 버스 요금",
+      "실제로 없는 책의 줄거리"
+    ],
+    "a": 0,
+    "e": "널리 알려진 기본 표현은 비교적 정확합니다. 자료가 적은 지역 정보, 최근 정보, 없는 대상, 정확한 숫자 세기는 틀리기 쉽습니다. 다만 항상 틀리는 것은 아닙니다."
+  },
+  {
+    "q": "ChatGPT와 Gemini에 같은 질문을 했더니 두 AI의 답이 같았습니다. 올바른 판단은?",
+    "o": [
+      "둘 다 틀릴 수 있으므로 공식 자료로 한 번 더 확인한다",
+      "두 AI가 같으니 확실한 사실이다",
+      "더 길게 답한 쪽을 믿는다",
+      "세 번째 AI에 물어 다수결로 정한다"
+    ],
+    "a": 0,
+    "e": "다른 AI와 비교는 교차 확인의 한 단계일 뿐입니다. 최종 판정은 공식 누리집·원문 같은 원래 자료로 합니다."
+  },
+  {
+    "q": "구청 프로그램 안내 PDF를 AI로 요약했습니다. 신청 마감일을 확인하는 가장 확실한 방법은?",
+    "o": [
+      "AI가 알려 준 쪽을 PDF 원문에서 직접 열어 대조한다",
+      "AI에게 \"확실해?\"라고 한 번 더 묻고 믿는다",
+      "요약이 자연스러우면 맞는 것으로 본다",
+      "다른 사람의 요약을 참고한다"
+    ],
+    "a": 0,
+    "e": "AI는 요약을 잘하지만 조건을 빠뜨리거나 덧붙일 수 있습니다. 날짜·금액은 원문과 직접 대조합니다."
+  },
+  {
+    "q": "고장 난 보일러의 문제를 AI에게 물으려 합니다. 올리면 <strong>안 되는</strong> 사진은?",
+    "o": [
+      "내 이름·주소·계좌가 보이는 관리비 고지서 전체",
+      "보일러 화면의 오류 코드",
+      "보일러 모델명이 적힌 스티커",
+      "설명서의 문제 해결 쪽"
+    ],
+    "a": 0,
+    "e": "개인정보가 보이는 서류는 올리지 않습니다. 꼭 필요하면 개인정보 부분을 가리거나 잘라 내고 올립니다."
+  },
+  {
+    "q": "빈칸 [ ]만 바꿔서 여러 번 다시 쓸 수 있게 만든 질문 틀을 무엇이라고 하나요?",
+    "o": [
+      "템플릿",
+      "환각",
+      "업로드",
+      "임시 채팅"
+    ],
+    "a": 0,
+    "e": "템플릿은 4요소의 틀은 그대로 두고 빈칸만 바꿔 쓰는 질문입니다. 프롬프트 노트에 모아 두면 매번 새로 고민할 필요가 없습니다."
+  },
+  {
+    "q": "AI에게 혈압약을 줄여도 되는지 물었더니 \"줄여도 괜찮다\"는 답이 나왔습니다. 올바른 행동은?",
+    "o": [
+      "AI 답은 참고만 하고, 약 조절은 반드시 의사와 상의한다",
+      "AI가 괜찮다고 했으니 오늘부터 줄인다",
+      "다른 AI도 같은 답이면 줄인다",
+      "인터넷 카페 후기를 보고 결정한다"
+    ],
+    "a": 0,
+    "e": "건강·금융·법률 정보에서 AI 답은 참고용입니다. 약을 줄이거나 끊는 최종 판단은 의사·약사 같은 전문가가 합니다."
+  }
+];
+window.PASS = 12;
+</script>
+<script>
+(function(){
+  const Q = window.QUIZ || [];
+
+  const $ = id => document.getElementById(id);
+  let i = 0, score = 0, missed = [], answered = false;
+
+  const norm = s => s.trim().toLowerCase().replace(/\s+/g,' ');
+
+  function render(){
+    answered = false;
+    const q = Q[i];
+    $('qn').textContent = 'Q ' + String(i+1).padStart(2,'0') + ' / ' + Q.length;
+    $('sc').textContent = '정답 ' + score;
+    $('prog').style.width = (i / Q.length * 100) + '%';
+
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.innerHTML = '<div class="qtext">' + q.q + '</div>' + (q.pre ? '<pre>' + q.pre + '</pre>' : '');
+
+    if (q.t){
+      const wrap = document.createElement('div');
+      wrap.className = 'typed';
+      wrap.innerHTML = '<input type="text" id="inp" autocomplete="off" autocapitalize="off" ' +
+                       'spellcheck="false" placeholder="명령을 그대로 입력하세요">' +
+                       '<button class="go" id="chk">확인</button>';
+      card.appendChild(wrap);
+      card.appendChild(mkFoot());
+      $('area').replaceChildren(card);
+      $('inp').focus();
+      $('chk').onclick = () => judgeTyped(q);
+      $('inp').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); answered ? nextQ() : judgeTyped(q); } });
+    } else {
+      const order = q.o.map((t,n) => n);
+      for (let k = order.length - 1; k > 0; k--){ const j = Math.floor(Math.random()*(k+1)); [order[k],order[j]] = [order[j],order[k]]; }
+      const box = document.createElement('div');
+      box.className = 'opts';
+      order.forEach((oi, pos) => {
+        const b = document.createElement('button');
+        b.className = 'opt'; b.type = 'button'; b.dataset.i = oi;
+        b.innerHTML = '<span class="mk">' + 'ABCD'[pos] + '</span><span>' + q.o[oi] + '</span>';
+        b.onclick = () => judgeChoice(q, b, box);
+        box.appendChild(b);
+      });
+      card.appendChild(box);
+      card.appendChild(mkFoot());
+      $('area').replaceChildren(card);
+    }
+  }
+
+  function mkFoot(){
+    const d = document.createElement('div');
+    d.id = 'foot';
+    return d;
+  }
+
+  function feedback(ok, q, extra){
+    answered = true;
+    score += ok ? 1 : 0;
+    if (!ok) missed.push(i);
+    $('sc').textContent = '정답 ' + score;
+    const f = document.createElement('div');
+    f.className = 'fb' + (ok ? '' : ' no');
+    f.innerHTML = '<span class="v">' + (ok ? '정답' : '오답') + '</span><p>' + (extra || '') + q.e + '</p>';
+    const act = document.createElement('div');
+    act.className = 'actions';
+    const b = document.createElement('button');
+    b.className = 'go';
+    b.textContent = (i === Q.length - 1) ? '결과 보기' : '다음 문제';
+    b.onclick = nextQ;
+    act.appendChild(b);
+    const foot = $('foot');
+    foot.replaceChildren(f, act);
+    b.focus();
+  }
+
+  function judgeChoice(q, btn, box){
+    if (answered) return;
+    const pick = +btn.dataset.i, ok = pick === q.a;
+    Array.from(box.children).forEach(el => {
+      el.disabled = true;
+      const n = +el.dataset.i;
+      if (n === q.a) el.classList.add('right');
+      else if (n === pick) el.classList.add('wrong');
+    });
+    feedback(ok, q, ok ? '' : '정답은 <code>' + q.o[q.a] + '</code> 입니다. ');
+  }
+
+  function judgeTyped(q){
+    if (answered) return;
+    const inp = $('inp');
+    const v = norm(inp.value);
+    if (!v){ inp.focus(); return; }
+    const ok = q.acc.some(a => norm(a) === v);
+    inp.disabled = true;
+    $('chk').disabled = true;
+    feedback(ok, q, ok ? '' : '정답은 <code>' + q.ans + '</code> 입니다. ');
+  }
+
+  function nextQ(){
+    i++;
+    if (i >= Q.length) result(); else render();
+  }
+
+  function result(){
+    $('prog').style.width = '100%';
+    $('qn').textContent = '완료';
+    $('sc').textContent = '정답 ' + score;
+    const pass = window.PASS || Math.ceil(Q.length*0.8);
+    const cls = score >= pass ? "" : (score >= pass - 3 ? " mid" : " low");
+    const msg = score >= pass
+      ? '통과입니다. 오늘 분량을 충분히 소화했습니다.'
+      : (score >= pass - 3
+        ? '조금 아쉽습니다. 틀린 항목의 미션으로 돌아가 한 번만 더 확인하고 다시 풀어 보세요.'
+        : '아직 손에 붙지 않았습니다. 실습 가이드의 미션 1번부터 다시 따라 해 보는 편이 빠릅니다.');
+
+    const d = document.createElement('div');
+    d.className = 'res';
+    d.innerHTML =
+      '<div class="big' + cls + '">' + score + ' / ' + Q.length + '</div>' +
+      '<h2>' + (score >= pass ? "통과" : "한 번 더") + '</h2>' +
+      '<p>' + msg + '</p>';
+
+    if (missed.length){
+      const m = document.createElement('div');
+      m.className = 'missed';
+      m.innerHTML = '<h3>다시 볼 문항</h3><ul>' +
+        missed.map(n => '<li><b>Q' + String(n+1).padStart(2,'0') + '</b> — ' +
+          Q[n].q.replace(/<[^>]+>/g,'') + '</li>').join('') + '</ul>';
+      d.appendChild(m);
+    }
+
+    const act = document.createElement('div');
+    act.className = 'actions';
+    const again = document.createElement('button');
+    again.className = 'go'; again.textContent = '처음부터 다시 풀기';
+    again.onclick = () => { i = 0; score = 0; missed = []; render(); window.scrollTo(0,0); };
+    act.appendChild(again);
+    const back = document.createElement('a');
+    back.href = 'lab.html'; back.className = 'ghost';
+    back.style.cssText = 'text-decoration:none;display:inline-flex;align-items:center;padding:12px 20px;border:1px solid var(--line-strong);border-radius:5px;color:var(--ink-2);font-weight:600;font-size:15px';
+    back.textContent = '실습 가이드로';
+    act.appendChild(back);
+    d.appendChild(act);
+
+    $('area').replaceChildren(d);
+  }
+
+  render();
+})();
+
+</script>
+<script src="../nav.js"></script>
+</html>

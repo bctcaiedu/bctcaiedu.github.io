@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>디지털리터러시 36시간 과정</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+  :root{--ink:#0E1A15;--ink2:#18271F;--pine:#10684A;--pine-l:#3E9C74;--mint:#7FD1A8;
+        --light:#F4F7F4;--card:#fff;--title:#0E1A15;--body:#3A453E;--muted:#6C7A72;--line:#DBE2DC;--chip:#EDF1EC;--clay:#B85434;
+        --mono:"IBM Plex Mono",ui-monospace,monospace;--sans:"IBM Plex Sans KR","Malgun Gothic",system-ui,sans-serif}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--light:#0F1311;--card:#161C19;--title:#E7ECE8;--body:#C2CCC6;
+        --muted:#94A29A;--line:#27302B;--chip:#1C2320;--pine:#57C294}}
+  :root[data-theme="dark"]{--light:#0F1311;--card:#161C19;--title:#E7ECE8;--body:#C2CCC6;--muted:#94A29A;--line:#27302B;--chip:#1C2320;--pine:#57C294}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--light);color:var(--body);font-family:var(--sans);line-height:1.6}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+  header{background:var(--ink);color:#fff;padding:64px 0 56px;margin-bottom:48px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--pine-l)}
+  header h1{font-size:clamp(30px,5vw,50px);line-height:1.15;letter-spacing:-.03em;margin:14px 0 10px;font-weight:700}
+  header p{color:#9FB3AA;font-size:16px;max-width:62ch;margin:0}
+  header .meta{margin-top:26px;display:flex;flex-wrap:wrap;gap:10px}
+  header .meta span,header .meta a{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:#CFE4DA;
+        border:1px solid #2A3A32;border-radius:4px;padding:6px 11px;text-decoration:none}
+  header .meta a{background:#10684A;border-color:#10684A;color:#fff}
+  h2.sec{font-size:13px;font-family:var(--mono);letter-spacing:.14em;text-transform:uppercase;
+        color:var(--muted);border-top:1px solid var(--line);padding-top:14px;margin:0 0 20px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .daycard{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:22px 22px 18px;transition:.15s}
+  .daycard:hover{border-color:var(--pine);box-shadow:0 4px 18px rgba(16,104,74,.09)}
+  .dn{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--pine)}
+  .daycard h3{font-size:20px;margin:8px 0 6px;letter-spacing:-.02em;line-height:1.3}
+  .daycard h3 a{color:var(--title);text-decoration:none}
+  .daycard p{font-size:14px;color:var(--muted);margin:0 0 14px;line-height:1.55}
+  .links{display:flex;flex-wrap:wrap;gap:8px}
+  .links a{font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:5px 9px;border-radius:4px;
+        text-decoration:none;background:var(--chip);color:var(--body);border:1px solid var(--line)}
+  .links a.b{background:#10684A;color:#fff;border-color:#10684A}
+  .links a:hover{background:#10684A;color:#fff;border-color:#10684A}
+  .flow{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:48px}
+  .fl{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--pine);border-radius:6px;padding:16px 18px}
+  .fl b{display:block;font-size:15px;margin-bottom:4px}
+  .fl span{font-size:13.5px;color:var(--muted)}
+  footer{margin-top:56px;border-top:1px solid var(--line);padding:26px 0 50px;font-size:13px;color:var(--muted)}
+  .pyintro{font-size:14.5px;margin:0 0 14px;max-width:75ch}
+  .pytable{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-left:3px solid #1F5E86;border-radius:6px;margin-bottom:48px}
+  .pytable table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+  .pytable th,.pytable td{padding:10px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  .pytable th{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--muted);font-weight:500}
+  .pytable tr:last-child td{border-bottom:0}
+  .pytable td:first-child{white-space:nowrap;font-weight:600}
+  .pytable .mut{color:var(--muted);font-size:12.5px}
+  .pytable .act{white-space:nowrap}
+  .pytable .act a{display:inline-block;font-family:var(--mono);font-size:11px;padding:4px 9px;margin:0 4px 4px 0;border-radius:4px;text-decoration:none;border:1px solid #1F5E86;color:#1F5E86}
+  .pytable .act a:first-child{background:#1F5E86;color:#fff}
+  @media (max-width:760px){ .grid,.flow{grid-template-columns:1fr} header{padding:44px 0 38px} .wrap{padding:0 16px} }
+</style>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">한국폴리텍대학 분당융합기술교육원 · 정보통신IT · AX교과(실습)</div>
+    <h1>디지털리터러시<br>생성형 AI로 생활 문제 해결하기</h1>
+    <p>생성형 인공지능을 활용하여 교육생이 디지털 사회에서 실생활 문제를 스스로 해결할 수 있는 역량을 기른다.</p>
+    <div class="meta"><span>36시간 · 5단원</span><span>1차시 50분 + 휴식 10분</span><span>설명 30% : 실습 70%</span><span>무료 서비스 · PC + 스마트폰</span><span>교수 김남호</span><a href="plan.html">교과 운영계획서 →</a></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <h2 class="sec">전체 흐름</h2>
+  <div class="flow">
+    <div class="fl"><b>1–2단원 · 기초를 다진다</b><span>디지털 기본기 · AI 원리 · 보안과 윤리 → 좋은 질문 만들기 · 답 검증</span></div>
+    <div class="fl"><b>3–4단원 · 생활에 쓴다</b><span>글쓰기 · 번역 · 생활정보 · 공공서비스 → 허위정보 판별 · 요약 · 리포트</span></div>
+    <div class="fl"><b>5단원 · 습관으로 만든다</b><span>일정 · 기록 · 맞춤 AI 비서 → 나만의 디지털 루틴북 발표</span></div>
+  </div>
+
+  <h2 class="sec">파이썬 확장 실습 · 선택</h2>
+  <p class="pyintro">앞 교과에서 배운 파이썬 기초(자료형 · 조건문 · 반복문 · 자료구조 · 함수 · 파일 입출력)로 <b>AI에게 코드를 받고 → 실행하고 → 검증</b>합니다. 각 단원 실습지에 <b>PYTHON 미션</b>으로 들어 있으며, Google Colab에서 설치 없이 실행합니다.</p>
+  <div class="pytable"><table>
+    <thead><tr><th>단원</th><th>미션</th><th>노트북</th></tr></thead>
+    <tbody>
+      <tr><td>1단원</td><td><b>P1</b> 파이썬으로 "다음 단어 맞히기" 모델 만들기 <span class="mut">(5차시)</span><br><b>P2</b> 안전한 비밀번호 생성기 · 강도 검사기 만들기 <span class="mut">(7차시)</span></td>
+        <td class="act"><a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit1_python.ipynb" target="_blank" rel="noopener">Colab</a><a href="python/unit1_python.ipynb" download>.ipynb</a></td></tr>
+      <tr><td>2단원</td><td><b>P3</b> AI가 짠 코드에서 오류 찾기 — "실행된다 ≠ 맞다" <span class="mut">(4차시)</span><br><b>P4</b> 프롬프트 노트에 "코드 요청 템플릿" 추가하기 <span class="mut">(6차시)</span></td>
+        <td class="act"><a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit2_python.ipynb" target="_blank" rel="noopener">Colab</a><a href="python/unit2_python.ipynb" download>.ipynb</a></td></tr>
+      <tr><td>3단원</td><td><b>P5</b> 지출 메모를 파이썬으로 분류·합계 내고 AI 답과 대조하기 <span class="mut">(4차시)</span></td>
+        <td class="act"><a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit3_python.ipynb" target="_blank" rel="noopener">Colab</a><a href="python/unit3_python.ipynb" download>.ipynb</a></td></tr>
+      <tr><td>4단원</td><td><b>P6</b> 같은 데이터를 파이썬으로 다시 분석해 세 결과 교차 확인하기 <span class="mut">(6차시)</span></td>
+        <td class="act"><a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit4_python.ipynb" target="_blank" rel="noopener">Colab</a><a href="python/unit4_python.ipynb" download>.ipynb</a></td></tr>
+      <tr><td>5단원</td><td><b>P7</b> 루틴 목록을 캘린더 파일(.ics)로 만들어 한 번에 등록하기 <span class="mut">(2차시)</span><br><b>P8</b> 습관 기록 분석 — 달성률 · 연속 달성일 · 주간 비교를 루틴북에 <span class="mut">(6차시)</span></td>
+        <td class="act"><a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit5_python.ipynb" target="_blank" rel="noopener">Colab</a><a href="python/unit5_python.ipynb" download>.ipynb</a></td></tr></tbody>
+  </table></div>
+
+  <h2 class="sec">단원별 자료</h2>
+  <div class="grid">
+
+    <div class="daycard">
+      <span class="dn">UNIT 01 · 8시간</span>
+      <h3><a class="h" href="unit1/index.html">인공지능 시대의 디지털 리터러시</a></h3>
+      <p>AI를 잘 쓰기 전에, 디지털 세상을 안전하게 걷는 법부터</p>
+      <span class="links">
+        <a class="b" href="unit1/index.html">강의 슬라이드</a>
+        <a href="unit1/lesson.html">차시별 교안</a>
+        <a href="unit1/lab.html">실습지</a>
+        <a href="unit1/quiz.html">퀴즈 15문항</a>
+      </span>
+    </div>
+
+    <div class="daycard">
+      <span class="dn">UNIT 02 · 7시간</span>
+      <h3><a class="h" href="unit2/index.html">ChatGPT 첫걸음: 질문하고 답받기</a></h3>
+      <p>잘 묻는 사람이 좋은 답을 받습니다 — 질문하고, 다듬고, 확인하는 법</p>
+      <span class="links">
+        <a class="b" href="unit2/index.html">강의 슬라이드</a>
+        <a href="unit2/lesson.html">차시별 교안</a>
+        <a href="unit2/lab.html">실습지</a>
+        <a href="unit2/quiz.html">퀴즈 15문항</a>
+      </span>
+    </div>
+
+    <div class="daycard">
+      <span class="dn">UNIT 03 · 7시간</span>
+      <h3><a class="h" href="unit3/index.html">실생활에 유용한 AI 활용</a></h3>
+      <p>글쓰기부터 장보기, 여행, 공공서비스까지 — 오늘 당장 쓰는 AI</p>
+      <span class="links">
+        <a class="b" href="unit3/index.html">강의 슬라이드</a>
+        <a href="unit3/lesson.html">차시별 교안</a>
+        <a href="unit3/lab.html">실습지</a>
+        <a href="unit3/quiz.html">퀴즈 15문항</a>
+      </span>
+    </div>
+
+    <div class="daycard">
+      <span class="dn">UNIT 04 · 7시간</span>
+      <h3><a class="h" href="unit4/index.html">생성형 AI와 정보활용 능력</a></h3>
+      <p>믿기 전에 확인하고, 모은 정보를 내 것으로 정리한다</p>
+      <span class="links">
+        <a class="b" href="unit4/index.html">강의 슬라이드</a>
+        <a href="unit4/lesson.html">차시별 교안</a>
+        <a href="unit4/lab.html">실습지</a>
+        <a href="unit4/quiz.html">퀴즈 15문항</a>
+      </span>
+    </div>
+
+    <div class="daycard">
+      <span class="dn">UNIT 05 · 7시간</span>
+      <h3><a class="h" href="unit5/index.html">나만의 디지털 루틴 만들기</a></h3>
+      <p>배운 도구를 매일 쓰는 습관으로 — 내 생활에 맞춘 디지털 루틴북 완성</p>
+      <span class="links">
+        <a class="b" href="unit5/index.html">강의 슬라이드</a>
+        <a href="unit5/lesson.html">차시별 교안</a>
+        <a href="unit5/lab.html">실습지</a>
+        <a href="unit5/quiz.html">퀴즈 15문항</a>
+      </span>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>「디지털리터러시」 36시간 과정 · 각 단원은 <b>강의 슬라이드(나레이션)</b> · <b>차시별 교안</b> · <b>실습지</b> · <b>퀴즈</b>로 구성됩니다.</p>
+  </div>
+</footer>
+<script src="nav.js"></script>
+</html>

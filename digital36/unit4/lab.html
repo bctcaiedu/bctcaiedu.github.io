@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4단원 실습지 · 디지털리터러시</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --bg:#F6F8F5;--surface:#FFFFFF;--surface-2:#EDF1EC;--ink:#141A16;--ink-2:#3A453E;--muted:#5F6D65;
+    --line:#DBE2DC;--line-strong:#C3CFC6;--accent:#10684A;--accent-soft:#E2EFE8;--clay:#A94D30;--clay-soft:#F6E7E0;
+    --ask:#1F5E86;--ask-soft:#E1EDF5;
+    --term-bg:#10171A;--term-fg:#DCE6E3;--term-dim:#7C9A93;--term-p:#7FD1A8;--term-out:#B8C7C2;
+    --maxw:940px;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+      --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+      --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+    --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+    --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:22px}
+  h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:600;letter-spacing:-.01em}
+  p{margin:0}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+  header.top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .masthead{display:flex;flex-direction:column;gap:16px;padding-block:46px 28px}
+  .rule-tag{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .rule-tag .dash{flex:1;height:1px;background:var(--line-strong);min-width:24px}
+  h1{font-size:clamp(26px,4.4vw,40px);line-height:1.2;font-weight:700;letter-spacing:-.03em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .standfirst{max-width:60ch;color:var(--ink-2);font-size:15.5px;font-weight:300;line-height:1.75}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-top:24px}
+  .rule{background:var(--surface);padding:15px 17px}
+  .rule .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--accent)}
+  .rule h3{font-size:14.5px;font-weight:600;margin-top:4px}
+  .rule p{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.55}
+
+  section{padding-block:44px}
+  .part{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-top:2px solid var(--accent);padding-top:14px;margin-bottom:8px}
+  .part .pn{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;color:var(--accent)}
+  .part h2{font-size:clamp(20px,3vw,26px);font-weight:700;letter-spacing:-.02em;flex:1 1 200px}
+  .part .pt{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .lede{color:var(--muted);font-size:14px;max-width:62ch;margin-bottom:22px}
+
+  .stepc{border:1px solid var(--line);border-radius:4px;background:var(--surface);margin-bottom:16px;overflow:hidden}
+  .shead{display:flex;align-items:baseline;gap:12px;padding:13px 18px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+  .shead .sn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .shead h3{font-size:15px;font-weight:600}
+  .sbody{padding:16px 18px}
+  .sbody > p{font-size:14px;color:var(--ink-2);line-height:1.7}
+  .sbody > p + p{margin-top:9px}
+  .sbody ol,.sbody ul{margin:9px 0 0;padding-left:19px}
+  .sbody li{font-size:14px;color:var(--ink-2);margin-top:5px;line-height:1.65}
+
+  pre{margin:11px 0 0;background:var(--term-bg);color:var(--term-fg);border-radius:3px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+  pre .c{color:var(--term-dim)}
+  pre .p{color:var(--term-p)}
+  pre .o{color:var(--term-out)}
+  .prelbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-top:13px;display:block}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:1px 4px;border-radius:2px}
+  kbd{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:3px;padding:1px 5px;background:var(--surface);color:var(--ink)}
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+
+  .box{margin-top:13px;border-radius:0 3px 3px 0;padding:11px 14px;display:flex;flex-direction:column;gap:5px}
+  .box.check{border-left:2px solid var(--accent);background:var(--accent-soft)}
+  .box.q{border-left:2px solid var(--ask);background:var(--ask-soft)}
+  .box.warn{border-left:2px solid var(--clay);background:var(--clay-soft)}
+  .box .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase}
+  .box.check .lbl{color:var(--accent)}
+  .box.q .lbl{color:var(--ask)}
+  .box.warn .lbl{color:var(--clay)}
+  .box p,.box li{font-size:13.5px;color:var(--ink-2);line-height:1.62}
+  .box ul{margin:0;padding-left:16px}
+  .box li{margin-top:3px}
+  .box code{background:rgba(0,0,0,.06)}
+
+  .mission{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;background:var(--surface);padding:16px 18px;margin-bottom:14px}
+  .mhead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .mhead .mn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .mhead h3{font-size:15px;font-weight:600;flex:1 1 180px}
+  .mission > p{font-size:14px;color:var(--ink-2);margin-top:7px;line-height:1.7}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;min-width:540px;font-size:13.5px}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--surface-2)}
+  tbody tr:last-child td{border-bottom:0}
+  td code{font-size:12px}
+
+  .selfcheck{border:1px solid var(--line-strong);border-radius:4px;background:var(--surface);overflow:hidden}
+  .selfcheck h3{padding:14px 18px;font-size:15px;background:var(--surface-2);border-bottom:1px solid var(--line-strong)}
+  .selfcheck ul{list-style:none;margin:0;padding:6px 18px 16px}
+  .selfcheck li{font-size:14px;color:var(--ink-2);padding:8px 0 8px 28px;border-bottom:1px solid var(--line);position:relative;line-height:1.6}
+  .selfcheck li:last-child{border-bottom:0}
+  .selfcheck li::before{content:"";position:absolute;left:0;top:13px;width:14px;height:14px;border:1.5px solid var(--line-strong);border-radius:2px}
+
+  footer{border-top:1px solid var(--line);background:var(--surface);padding-block:26px;margin-top:20px}
+  footer p{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+  @media (max-width:700px){
+    .sbody,.shead,.mission{padding-inline:14px}
+    .shead{gap:8px;flex-wrap:wrap}
+  }
+
+  pre{white-space:pre-wrap;word-break:keep-all;font-family:var(--sans);font-size:13.5px}
+  .mission.py{border-left-color:var(--ask)}
+  .mission.py .mn{color:var(--ask)}
+  .nb{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0 4px;padding:10px 12px;background:var(--ask-soft);border-radius:4px}
+  .nb b{font-size:13px;color:var(--ink-2);margin-right:4px}
+  .nb a{font-family:var(--mono);font-size:11.5px;border:1px solid var(--ask);color:var(--ask);border-radius:4px;padding:5px 10px;background:var(--surface)}
+  .nb a:hover{background:var(--ask);color:#fff}
+  .nb small{flex-basis:100%;font-size:12px;color:var(--muted)}
+  @media print{ .l70nav{display:none} pre{background:#F2F2F2;color:#000} pre .p,pre .o,pre .c{color:#000} }
+</style>
+
+<header class="top">
+  <div class="wrap masthead">
+    <div class="rule-tag">
+      <span class="eyebrow">한국폴리텍대학 분당융합기술교육원</span>
+      <span class="dash"></span>
+      <span class="eyebrow">학생용 실습지</span>
+    </div>
+    <h1>4단원 · <em>생성형 AI와 정보활용 능력</em></h1>
+    <p class="standfirst">이번 단원의 실습은 "믿기 전에 확인하는 손"을 만드는 연습입니다. 가짜뉴스를 가려내고, AI가 달아 준 출처를 직접 열고, 사진의 원본을 찾고, 여러 자료를 요약하고, 숫자를 검산합니다. 마지막에는 그 모든 과정을 한 장의 리포트로 남깁니다. 정답을 맞히는 것보다 "어떻게 확인했는지" 적는 것이 더 중요합니다.</p>
+    <div class="rules">
+      <div class="rule"><div class="n">RULE 1</div><h3>공유는 확인한 다음에</h3><p>실습 중에 본 자극적인 글·사진은 확인이 끝나기 전까지 누구에게도 보내지 않습니다.</p></div>
+      <div class="rule"><div class="n">RULE 2</div><h3>개인정보는 넣지 않는다</h3><p>AI나 NotebookLM에 이름·전화번호·주민번호·계좌·타인의 사진을 넣지 않습니다. 받은 메시지는 지우고 붙여 넣습니다.</p></div>
+      <div class="rule"><div class="n">RULE 3</div><h3>"아직 모름"도 답이다</h3><p>확인이 안 되면 억지로 진짜·가짜를 정하지 말고 "아직 모름"이라고 적습니다. 정직한 기록이 가장 좋은 결과입니다.</p></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <div class="part"><span class="pn">1차시</span><h2>가짜뉴스 구별하기</h2><span class="pt">50분</span></div>
+    <p class="lede">아래 헤드라인은 모두 수업용으로 지어낸 예시입니다. 한빛시는 가상의 도시입니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 01</span><h3>진짜/가짜 구별 퀴즈 ★</h3></div>
+      
+      <p>각 헤드라인을 읽고 <strong>가짜뉴스 신호</strong>(자극적 제목 · 출처 없음 · 날짜 오래됨 · 짜깁기 사진 · 권위 사칭)가 있는지 찾으세요. 판정은 <strong>믿을 만함 / 의심 / 아직 모름</strong> 중 하나로 적습니다.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">①</span><span class="v">[속보!!] 오늘 밤 12시부터 전국 휴대폰 문자 전면 유료화, 지금 바로 공유하세요<small>판정: ______ / 신호: ______</small></span></div>
+        <div class="dlrow"><span class="k">②</span><span class="v">"세계적 명의가 밝힌 비밀" 매일 식초 한 컵이면 고혈압약 끊어도 된다<small>판정: ______ / 신호: ______</small></span></div>
+        <div class="dlrow"><span class="k">③</span><span class="v">한빛시 폭설로 시내버스 전면 운행 중단 — 링크를 누르니 작성일이 3년 전<small>판정: ______ / 신호: ______</small></span></div>
+        <div class="dlrow"><span class="k">④</span><span class="v">(사진) 어제 한빛시 시장에 나타난 곰 — 사진 속 간판이 외국어<small>판정: ______ / 신호: ______</small></span></div>
+        <div class="dlrow"><span class="k">⑤</span><span class="v">"정부 내부 문서 유출" 다음 달 모든 경로당 폐쇄 — 문서 사진만 있고 기관명·날짜 없음<small>판정: ______ / 신호: ______</small></span></div>
+        <div class="dlrow"><span class="k">⑥</span><span class="v">한빛시청 누리집 공지: 10월 1일 시민 건강걷기 대회 참가 신청 안내 (작성일·담당 부서·전화번호 있음)<small>판정: ______ / 신호: ______</small></span></div>
+        <div class="dlrow"><span class="k">⑦</span><span class="v">"아는 약사가 알려줌" 이 영양제 먹으면 치매 100% 예방!!!<small>판정: ______ / 신호: ______</small></span></div>
+        <div class="dlrow"><span class="k">⑧</span><span class="v">○○신문 기사: 한빛시 도서관 상반기 전자책 대출 증가 (기자 이름·작성일·시청 통계 인용)<small>판정: ______ / 신호: ______</small></span></div>
+      </div>
+      <div class="box check"><span class="lbl">정답 방향</span>
+        <p>①⑤⑦ 자극적 제목·출처 없음·권위 사칭 → 의심. ② 권위 사칭 + 건강 정보 → 의심 (약은 반드시 의사와 상의). ③ 날짜 오래됨 → 지금 일이 아님. ④ 짜깁기 사진 의심 → 이미지 검색 필요. ⑥⑧ 출처·날짜·작성자가 있어 확인 가능 → 믿을 만함(단, 원문 확인 후).</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 02</span><h3>AI에게 판정 이유 물어보기</h3></div>
+      
+      <p>헷갈렸던 헤드라인 2개를 골라 ChatGPT나 Gemini에 물어보고, 내 판정과 비교합니다.</p>
+      <pre><span class="p">나 ▶</span> 아래 글이 가짜뉴스일 가능성을 판단하려고 해.
+     자극적 제목, 출처 없음, 날짜, 사진, 권위 사칭 기준으로
+     의심되는 점과 확인 방법을 알려 줘. 진짜/가짜를 단정하지는 마.
+     "[속보!!] 오늘 밤 12시부터 전국 휴대폰 문자 전면 유료화..."
+<span class="o">AI ▶ 자극적 표현·출처 없음을 지적하고, 통신사·정부 공식 발표 확인을 권함</span>
+<span class="c"># AI의 설명도 참고일 뿐, 최종 판단은 내가 원문을 보고 합니다</span></pre>
+      <div class="dl">
+        <div class="dlrow"><span class="k">고른 글</span><span class="v">번호: ______<small>①~⑧ 중 헷갈렸던 것</small></span></div>
+        <div class="dlrow"><span class="k">내 판정</span><span class="v">______<small>믿을 만함 / 의심 / 아직 모름</small></span></div>
+        <div class="dlrow"><span class="k">AI 의견</span><span class="v">______<small>AI가 지적한 신호 한 줄 요약</small></span></div>
+        <div class="dlrow"><span class="k">차이점</span><span class="v">______<small>내가 놓친 신호, 또는 AI가 놓친 점</small></span></div>
+      </div>
+      <div class="box warn"><span class="lbl">주의</span>
+        <p>실제로 받은 메시지를 넣을 때는 <strong>보낸 사람 이름·전화번호·단톡방 이름</strong>을 지우고 내용만 붙여 넣으세요.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">2차시</span><h2>AI 검색 도구와 출처 링크</h2><span class="pt">50분</span></div>
+    <p class="lede">퍼플렉시티, 제미나이, 챗GPT 중 2개 이상을 엽니다. 메뉴 이름은 업데이트로 달라질 수 있습니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 03</span><h3>같은 질문, 세 도구의 답 비교</h3></div>
+      
+      <ol>
+        <li>인터넷 주소창에 <code>perplexity.ai</code>, <code>gemini.google.com</code>, <code>chatgpt.com</code>을 각각 새 탭으로 엽니다. (로그인이 필요하면 구글 계정으로)</li>
+        <li>아래 질문을 세 곳에 똑같이 입력합니다.</li>
+        <li>답에 <strong>출처 링크·번호</strong>가 붙었는지, 몇 개인지 확인합니다.</li>
+      </ol>
+      <pre><span class="p">나 ▶</span> 우리 지역 보건소에서 받을 수 있는 무료 예방접종 종류를 알려 줘.
+     공공기관 누리집 자료를 근거로, 출처 링크와 작성 날짜를 붙여 줘.
+<span class="o">AI ▶ 접종 종류 목록 + 질병관리청·보건소 누리집 링크</span>
+<span class="c"># "우리 지역" 대신 사는 시·군·구 이름을 넣어도 됩니다</span></pre>
+      <div class="dl">
+        <div class="dlrow"><span class="k">도구 1</span><span class="v">이름: ______ / 출처 개수: ___<small>핵심 답 한 줄</small></span></div>
+        <div class="dlrow"><span class="k">도구 2</span><span class="v">이름: ______ / 출처 개수: ___<small>핵심 답 한 줄</small></span></div>
+        <div class="dlrow"><span class="k">다른 점</span><span class="v">______<small>숫자·날짜·목록이 서로 다른 곳</small></span></div>
+      </div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 04</span><h3>출처 링크 직접 열어 확인하기 ★</h3></div>
+      
+      <p>미션 3의 답에서 <strong>출처 링크 3개</strong>를 골라 하나씩 엽니다. PC에서는 <kbd>Ctrl</kbd>+<kbd>F</kbd>로 AI가 말한 단어(예: "대상포진")를 페이지에서 찾아보세요.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">링크 1</span><span class="v">열림 O/X · 작성 주체: ______ · 작성일: ______<small>AI 답 내용이 페이지에 있나요? 있음 / 일부 / 없음</small></span></div>
+        <div class="dlrow"><span class="k">링크 2</span><span class="v">열림 O/X · 작성 주체: ______ · 작성일: ______<small>AI 답 내용이 페이지에 있나요? 있음 / 일부 / 없음</small></span></div>
+        <div class="dlrow"><span class="k">링크 3</span><span class="v">열림 O/X · 작성 주체: ______ · 작성일: ______<small>AI 답 내용이 페이지에 있나요? 있음 / 일부 / 없음</small></span></div>
+      </div>
+      <div class="box q"><span class="lbl">생각해 보기</span>
+        <p>"없음"이나 "일부"가 나왔다면, AI 답의 그 부분은 어디서 왔을까요? 그 내용을 믿으려면 무엇을 더 확인해야 할까요?</p></div>
+      <div class="box warn"><span class="lbl">건강·금융·법률 정보</span>
+        <p>AI 답은 참고용입니다. 접종·약·연금·계약 같은 내용은 <strong>보건소·해당 기관 누리집이나 전화</strong>로 최종 확인하세요.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">3차시</span><h2>사실 확인 3단계 워크시트</h2><span class="pt">50분</span></div>
+    <p class="lede">이번 주 뉴스·단톡방·유튜브에서 화제가 된 정보 1건을 골라 끝까지 확인합니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 05</span><h3>화제 이슈 1건, 3단계로 확인하기 ★</h3></div>
+      
+      <ol>
+        <li>확인할 정보를 한 문장으로 적습니다. (예: "다음 달부터 ○○ 신청 방법이 바뀐다")</li>
+        <li><strong>출처</strong>: 누가 처음 말했는지 찾습니다. 기사라면 기사 안에 인용된 기관을, 기관이라면 그 기관 누리집의 원문을 찾습니다.</li>
+        <li><strong>날짜</strong>: 원문의 작성일·시행일을 확인합니다.</li>
+        <li><strong>교차 확인</strong>: 서로 다른 곳 2곳 이상에서 같은 내용이 나오는지 검색합니다.</li>
+      </ol>
+      <div class="dl">
+        <div class="dlrow"><span class="k">확인할 정보</span><span class="v">______<small>한 문장으로</small></span></div>
+        <div class="dlrow"><span class="k">어디서 봤나</span><span class="v">______<small>단톡방 / 뉴스 / 유튜브 / 기타</small></span></div>
+        <div class="dlrow"><span class="k">① 출처</span><span class="v">______<small>처음 말한 기관·언론사·작성자 이름과 원문 주소</small></span></div>
+        <div class="dlrow"><span class="k">② 날짜</span><span class="v">______<small>작성일 / 시행일 — 지금도 유효한가요?</small></span></div>
+        <div class="dlrow"><span class="k">③ 교차 확인</span><span class="v">______<small>다른 곳 2곳 이름 — 복사한 글이 아닌지 확인</small></span></div>
+        <div class="dlrow"><span class="k">판정</span><span class="v">사실 / 사실 아님 / 아직 모름<small>판정 이유 한 줄</small></span></div>
+      </div>
+      <div class="box check"><span class="lbl">확인</span>
+        <p>세 칸 중 하나라도 비어 있으면 판정은 <strong>아직 모름</strong>입니다. 그래도 괜찮습니다. 모르는 정보를 공유하지 않는 것이 이 미션의 목표입니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 06</span><h3>AI에게 확인 계획 받기</h3></div>
+      
+      <p>워크시트에서 막힌 칸이 있으면 AI를 "확인 조수"로 씁니다.</p>
+      <pre><span class="p">나 ▶</span> "(확인할 정보 한 문장)"이라는 내용이 사실인지 직접 확인하고 싶어.
+     1) 확인할 수 있는 공식 기관 누리집
+     2) 검색어 3개
+     3) 확인할 때 주의할 점
+     을 알려 줘. 사실인지 아닌지는 단정하지 마.
+<span class="o">AI ▶ 기관 이름 2~3곳, 검색어 3개, "시행일 확인" 같은 주의점</span>
+<span class="c"># AI가 알려 준 기관 누리집도 주소가 진짜인지 직접 검색해 들어가세요</span></pre>
+      <div class="dl">
+        <div class="dlrow"><span class="k">추천 기관</span><span class="v">______<small>직접 들어가 봤나요? O / X</small></span></div>
+        <div class="dlrow"><span class="k">써 본 검색어</span><span class="v">______<small>가장 도움이 된 검색어</small></span></div>
+        <div class="dlrow"><span class="k">바뀐 판정</span><span class="v">______<small>AI 도움 후 워크시트에서 새로 채운 칸</small></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">4차시</span><h2>딥페이크 알아보기와 Google 렌즈</h2><span class="pt">50분</span></div>
+    <p class="lede">다른 사람의 얼굴 사진은 쓰지 않습니다. 강사가 준비한 이미지나 풍경·사물 사진으로 실습합니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 07</span><h3>AI 이미지에서 단서 찾기</h3></div>
+      
+      <ol>
+        <li>강사가 공유한 이미지 폴더를 엽니다. (또는 Gemini에서 <code>시장 골목 풍경을 사진처럼 그려 줘</code>라고 요청해 이미지를 만듭니다)</li>
+        <li>이미지를 크게 확대해서 아래 부분을 살펴봅니다.</li>
+      </ol>
+      <div class="dl">
+        <div class="dlrow"><span class="k">글자</span><span class="v">______<small>간판·표지판 글자가 읽히나요, 뭉개졌나요?</small></span></div>
+        <div class="dlrow"><span class="k">손·사물</span><span class="v">______<small>손가락 개수, 물건 모양이 자연스러운가요?</small></span></div>
+        <div class="dlrow"><span class="k">배경·빛</span><span class="v">______<small>그림자 방향, 배경이 녹아내린 듯한 곳이 있나요?</small></span></div>
+        <div class="dlrow"><span class="k">내 판단</span><span class="v">AI 의심 / 잘 모르겠음<small>단서 없음 ≠ 진짜 사진</small></span></div>
+      </div>
+      <div class="box warn"><span class="lbl">단서의 한계</span>
+        <p>최근 AI 이미지는 이런 단서가 <strong>전혀 없을 수도</strong> 있습니다. "AI 판별" 사이트나 앱의 결과도 틀릴 수 있으니, 결과 하나로 단정하지 마세요.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 08</span><h3>Google 렌즈로 사진의 원래 모습 찾기 ★</h3></div>
+      
+      <p><strong>PC(크롬)</strong></p>
+      <ol>
+        <li>강사가 준비한 "화제 사진" 페이지를 엽니다.</li>
+        <li>사진 위에서 마우스 <strong>오른쪽 버튼</strong> → "Google 렌즈로 검색"과 비슷한 이름의 메뉴를 누릅니다.</li>
+        <li>화면 오른쪽 결과에서 같은 사진(정확히 일치하는 이미지)을 찾아 누릅니다.</li>
+      </ol>
+      <p><strong>스마트폰</strong></p>
+      <ol>
+        <li>사진을 갤러리에 저장합니다.</li>
+        <li><strong>Google 앱</strong>을 열고 검색창 오른쪽의 <strong>카메라 모양 아이콘</strong>을 누릅니다.</li>
+        <li>갤러리에서 사진을 고르고 결과를 아래로 내려 봅니다.</li>
+      </ol>
+      <div class="dl">
+        <div class="dlrow"><span class="k">가장 오래된 게시</span><span class="v">______<small>사이트 이름과 날짜</small></span></div>
+        <div class="dlrow"><span class="k">원래 설명</span><span class="v">______<small>원래 어디의, 무슨 사진이라고 되어 있나요?</small></span></div>
+        <div class="dlrow"><span class="k">화제 글과 비교</span><span class="v">같음 / 다름<small>장소·날짜·설명이 다르면 짜깁기 의심</small></span></div>
+      </div>
+      <div class="box check"><span class="lbl">확인</span>
+        <p>원본을 못 찾았다고 해서 <strong>진짜라는 뜻은 아닙니다</strong>. 이 경우 판정은 "아직 모름"이고, 공유하지 않습니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 09</span><h3>우리 가족 딥페이크 대응 카드</h3></div>
+      
+      <p>가족·지인의 목소리나 영상으로 돈·개인정보를 요구받는 상황을 대비해 카드를 만들고 스마트폰 메모에 저장합니다.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">수칙 1</span><span class="v">급하게 돈을 요구하면 일단 끊는다<small>"지금 당장", "아무한테도 말하지 마"는 위험 신호</small></span></div>
+        <div class="dlrow"><span class="k">수칙 2</span><span class="v">원래 알던 번호로 직접 다시 건다<small>받은 전화·문자의 번호로 걸지 않습니다</small></span></div>
+        <div class="dlrow"><span class="k">가족 암호</span><span class="v">______<small>우리 가족만 아는 확인 질문 (카드에는 질문만, 답은 적지 않기)</small></span></div>
+        <div class="dlrow"><span class="k">신고처</span><span class="v">금전 사기 112 · 스팸·해킹 상담 118<small>화면 캡처·통화 기록을 지우지 말고 보관</small></span></div>
+      </div>
+      <div class="box warn"><span class="lbl">주의</span>
+        <p>가족 암호의 <strong>답</strong>은 메모·단톡방·AI에 적지 마세요. 가족끼리 직접 말로만 정합니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">5차시</span><h2>NotebookLM으로 자료 요약·정리</h2><span class="pt">50분</span></div>
+    <p class="lede">구글 계정으로 notebooklm.google.com에 접속합니다. 무료로 사용할 수 있습니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 10</span><h3>한 주제로 믿을 만한 자료 3개 고르기</h3></div>
+      
+      <p>관심 주제를 하나 정하고, 3차시에 배운 기준(출처·날짜)으로 자료 3개를 고릅니다. 가능하면 종류를 섞으세요.</p>
+      <ul>
+        <li>공공기관 누리집 안내 페이지 주소 1개</li>
+        <li>언론사 기사 주소 1개</li>
+        <li>공공기관·언론사 유튜브 영상 주소 1개 (자막이 있는 영상이 잘 됩니다)</li>
+      </ul>
+      <div class="dl">
+        <div class="dlrow"><span class="k">주제</span><span class="v">______<small>예: 겨울철 건강관리, 노인 일자리 지원, 전기요금 절약</small></span></div>
+        <div class="dlrow"><span class="k">자료 1</span><span class="v">______<small>기관/언론사 · 작성일</small></span></div>
+        <div class="dlrow"><span class="k">자료 2</span><span class="v">______<small>기관/언론사 · 작성일</small></span></div>
+        <div class="dlrow"><span class="k">자료 3</span><span class="v">______<small>기관/언론사 · 작성일</small></span></div>
+      </div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 11</span><h3>노트북 만들고 근거 달린 질문하기 ★</h3></div>
+      
+      <ol>
+        <li><code>notebooklm.google.com</code>에 접속해 구글 계정으로 로그인합니다.</li>
+        <li><strong>새 노트북 만들기</strong>를 누릅니다.</li>
+        <li>소스 추가 화면에서 <strong>웹사이트</strong> 또는 <strong>YouTube</strong>를 골라 미션 10의 주소를 붙여 넣습니다. 3개 모두 넣습니다.</li>
+        <li>화면의 채팅 입력창에 아래처럼 질문합니다.</li>
+        <li>답 문장 끝의 <strong>작은 번호</strong>를 눌러 원문의 어느 부분인지 확인합니다.</li>
+      </ol>
+      <pre><span class="p">나 ▶</span> 세 자료의 핵심 내용을 5줄로 요약해 줘.
+<span class="p">나 ▶</span> 세 자료에서 서로 다르게 설명하는 부분이 있어?
+<span class="p">나 ▶</span> 내가 당장 실천할 수 있는 것 3가지를 자료 근거와 함께 알려 줘.
+<span class="o">AI ▶ 요약 문장마다 [1] [2] 같은 근거 번호가 붙음</span>
+<span class="c"># 번호를 눌러 원문과 뜻이 같은지 꼭 확인하세요</span></pre>
+      <div class="dl">
+        <div class="dlrow"><span class="k">확인한 번호</span><span class="v">______<small>근거 번호 2개 이상 눌러 보기</small></span></div>
+        <div class="dlrow"><span class="k">일치 여부</span><span class="v">일치 / 조금 다름 / 다름<small>다르다면 어떻게 달랐나요?</small></span></div>
+      </div>
+      <div class="box warn"><span class="lbl">개인정보 주의</span>
+        <p>진료기록·통장 사본·계약서·가족 연락처가 든 파일은 올리지 않습니다. 메뉴 이름과 위치는 업데이트로 달라질 수 있습니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 12</span><h3>요약본과 마인드맵 만들기</h3></div>
+      
+      <ol>
+        <li>화면 오른쪽(또는 기능 모음 영역)에서 <strong>마인드맵</strong> 기능을 찾아 누릅니다.</li>
+        <li>마인드맵이 만들어지면 가지를 눌러 펼쳐 보고, 가지를 누르면 관련 질문이 채팅으로 이어지는지 확인합니다.</li>
+        <li>마인드맵 화면을 캡처합니다. (PC: <kbd>Win</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd>)</li>
+        <li>미션 11의 5줄 요약 답을 <strong>메모로 저장</strong>하거나 구글 문서에 복사해 둡니다. (7차시 리포트에 씁니다)</li>
+      </ol>
+      <div class="box q"><span class="lbl">생각해 보기</span>
+        <p>마인드맵의 큰 가지 이름이 내가 생각한 주제 분류와 같나요? 빠진 내용이 있다면 자료가 부족했던 것일까요, AI가 놓친 것일까요?</p></div>
+      <div class="box check"><span class="lbl">더 해 보기 (선택)</span>
+        <p>음성으로 요약해 주는 기능이 보이면 만들어 들어 보세요. 만드는 데 몇 분 걸릴 수 있습니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">6차시</span><h2>구글 시트로 표·그래프 만들고 AI 해석 검증</h2><span class="pt">50분</span></div>
+    <p class="lede">아래 데이터는 가상 도시 한빛시의 수업용 예시입니다. 실제 통계가 아닙니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 13</span><h3>예시 데이터 입력하고 합계·평균 구하기</h3></div>
+      
+      <ol>
+        <li><code>sheets.google.com</code> 접속 → <strong>빈 스프레드시트</strong>를 엽니다. 제목을 <code>한빛시 도서관 예시</code>로 바꿉니다.</li>
+        <li>A1부터 아래 표를 입력합니다. (숫자는 쉼표 없이 <code>12400</code>처럼 넣어도 됩니다)</li>
+      </ol>
+      <pre>     A        B            C             D
+1    월       방문자 수    전자책 대출   비고
+2    1월      12400        2100
+3    2월      11800        2300
+4    3월      13900        2250
+5    4월      14200        2600
+6    5월      15100        2800
+7    6월      9800         3400          6월 8~14일 시설 공사로 휴관</pre>
+      <ol start="3">
+        <li>A8에 <code>합계</code>, B8에 <code>=SUM(B2:B7)</code>을 입력하고 <kbd>Enter</kbd>. C8에는 <code>=SUM(C2:C7)</code>.</li>
+        <li>A9에 <code>평균</code>, B9에 <code>=AVERAGE(B2:B7)</code>, C9에 <code>=AVERAGE(C2:C7)</code>.</li>
+      </ol>
+      <div class="dl">
+        <div class="dlrow"><span class="k">방문자 합계</span><span class="v">______<small>정답: 77,200</small></span></div>
+        <div class="dlrow"><span class="k">방문자 평균</span><span class="v">______<small>정답: 약 12,867 (12,866.67)</small></span></div>
+        <div class="dlrow"><span class="k">전자책 합계</span><span class="v">______<small>정답: 15,450</small></span></div>
+      </div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 14</span><h3>선 그래프 만들기</h3></div>
+      
+      <ol>
+        <li>마우스로 <strong>A1부터 C7까지</strong> 끌어서 선택합니다. (합계·평균 줄은 빼고)</li>
+        <li>위쪽 메뉴 <strong>삽입 → 차트</strong>를 누릅니다.</li>
+        <li>오른쪽 차트 편집기에서 차트 유형을 <strong>선 차트</strong>로 고릅니다.</li>
+        <li>차트 제목을 <code>한빛시 도서관 월별 이용 (예시)</code>로 바꿉니다.</li>
+      </ol>
+      <div class="box q"><span class="lbl">생각해 보기</span>
+        <p>방문자(만 단위)와 전자책(천 단위)을 한 그래프에 넣으면 전자책 선이 바닥에 붙어 변화가 잘 안 보입니다. 전자책만 따로 A열+C열로 그래프를 하나 더 만들어 보세요. <strong>그래프 모양은 보여 주는 방법에 따라 달라 보일 수 있습니다.</strong></p></div>
+      <div class="dl">
+        <div class="dlrow"><span class="k">가장 눈에 띄는 변화</span><span class="v">______<small>그래프만 보고 한 줄</small></span></div>
+        <div class="dlrow"><span class="k">비고와 연결</span><span class="v">______<small>그 변화의 이유가 표 안에 적혀 있나요?</small></span></div>
+      </div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 15</span><h3>AI 해석 받고 검증하기 ★</h3></div>
+      
+      <ol>
+        <li>시트에서 A1~D7을 선택해 복사(<kbd>Ctrl</kbd>+<kbd>C</kbd>)합니다.</li>
+        <li>Gemini나 ChatGPT에 아래 질문과 함께 붙여 넣습니다.</li>
+        <li>AI 답의 숫자와 주장을 표·시트 계산과 하나씩 비교합니다.</li>
+      </ol>
+      <pre><span class="p">나 ▶</span> 아래는 가상 도시 도서관의 월별 이용 예시 데이터야.
+     1) 방문자 수와 전자책 대출의 변화를 설명하고
+     2) 1월 대비 6월 전자책 대출 증가율을 계산하고
+     3) 눈에 띄는 특이점과 그 이유를 표 안의 정보로만 설명해 줘.
+     (표 붙여 넣기)
+<span class="o">AI ▶ 전자책 꾸준히 증가, 6월 방문자 급감 언급, 증가율 계산</span></pre>
+      <div class="dl">
+        <div class="dlrow"><span class="k">증가율 검산</span><span class="v">AI: ______ / 직접 계산: ______<small>(3400−2100)÷2100×100 = 약 61.9%</small></span></div>
+        <div class="dlrow"><span class="k">6월 감소 이유</span><span class="v">______<small>AI가 비고(휴관)를 언급했나요, 다른 이유를 지어냈나요?</small></span></div>
+        <div class="dlrow"><span class="k">과장된 해석</span><span class="v">______<small>예: "전자책 때문에 방문자가 줄었다" — 이 표만으로는 알 수 없음</small></span></div>
+        <div class="dlrow"><span class="k">최종 한 줄</span><span class="v">______<small>내가 확인한 해석을 내 말로</small></span></div>
+      </div>
+      <div class="box check"><span class="lbl">확인</span>
+        <p>함께 변했다고 해서 한쪽이 다른 쪽의 <strong>원인</strong>은 아닙니다. AI가 원인을 단정하면 "표에 근거가 있는가?"를 물어보세요.</p></div>
+    </div>
+
+    <div class="mission py">
+      <div class="mhead"><span class="mn">PYTHON P6 · 선택</span><h3>같은 데이터를 파이썬으로 다시 분석해 세 결과 교차 확인하기</h3></div>
+      
+      <p>구글 시트로 다룬 <strong>한빛시 도서관 예시 데이터</strong>를 파이썬으로 다시 계산합니다. <strong>구글 시트 · AI 해석 · 파이썬 코드</strong> 세 결과가 같은지 대조하고, 숫자만 보고 내린 해석이 왜 위험한지 코드로 확인합니다.</p>
+      <p><strong>쓰는 파이썬:</strong> <code>csv</code> 읽기 · 합계·평균 · 반복문으로 전월 대비 계산 · 조건문으로 방향 비교</p>
+      <div class="nb"><b>📓 Colab 노트북</b>
+        <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit4_python.ipynb" target="_blank" rel="noopener">Colab에서 열기</a>
+        <a href="../python/unit4_python.ipynb" download>노트북 내려받기 (.ipynb)</a>
+        <small>Colab에서 열기가 안 되면: 내려받기 → colab.research.google.com → 파일 → 노트북 업로드. 구글 계정으로 로그인합니다.</small></div>
+      <ol>
+        <li>노트북 1~2: 데이터를 CSV로 저장하고 읽습니다.</li>
+        <li>3 <strong>✏️</strong>: 방문자·전자책 합계와 평균, 1월→6월 전자책 증가율을 구합니다. (정답: 77,200 · 약 12,866.7 · 15,450 · 61.9%)</li>
+        <li>4 <strong>✏️</strong>: 전월 대비 변화를 계산해 <strong>가장 크게 줄어든 달</strong>을 찾고, 그 달의 비고를 함께 출력합니다.</li>
+        <li>5: "전자책이 늘면 방문자가 줄었나?"를 달마다 방향으로 세어 봅니다.</li>
+        <li>6 (선택): 휴관일을 빼고 <strong>하루 평균</strong>으로 다시 비교합니다.</li>
+        <li>미션 15에서 받은 AI 해석과 코드 결과를 실습지에 나란히 적습니다.</li>
+      </ol>
+      <div class="dl">
+        <div class="dlrow"><span class="k">방문자 합계</span><span class="v">시트 ______ / AI ______ / 코드 ______<small>세 값이 다르면 어느 쪽이 틀렸는지 찾아 적기</small></span></div>
+        <div class="dlrow"><span class="k">같은 방향 달 수</span><span class="v">______개월 / 반대 방향 ______개월<small>이 결과로 "전자책 때문에 방문자가 줄었다"고 말할 수 있나요?</small></span></div>
+        <div class="dlrow"><span class="k">6월 하루 평균</span><span class="v">______명 (5월 ______명)<small>휴관을 반영하면 감소 폭이 어떻게 달라지나요?</small></span></div>
+      </div>
+      <div class="box check"><span class="lbl">오늘의 교훈</span>
+        <p>계산은 코드로 <strong>정확하게</strong> 할 수 있지만, <strong>원인</strong>은 숫자 밖(비고·맥락)에 있습니다. AI 해석도, 코드 결과도 <strong>맥락과 함께</strong> 읽습니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">7차시</span><h2>1페이지 정보 리포트 작성</h2><span class="pt">50분</span></div>
+    <p class="lede">3차시 워크시트, 5차시 요약, 6차시 그래프를 모두 꺼내 놓고 시작합니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 16</span><h3>주제 정하고 재료 모으기</h3></div>
+      
+      <ol>
+        <li>3차시(사실 확인) 또는 5차시(NotebookLM) 주제 중 하나를 리포트 주제로 정합니다.</li>
+        <li>구글 드라이브에서 <strong>새로 만들기 → Google 문서</strong>를 엽니다. 제목은 <code>4단원 리포트_이름</code>.</li>
+        <li>필요한 재료를 문서 아래쪽에 임시로 붙여 둡니다.</li>
+      </ol>
+      <div class="dl">
+        <div class="dlrow"><span class="k">질문</span><span class="v">______<small>리포트가 답할 질문 한 문장</small></span></div>
+        <div class="dlrow"><span class="k">출처</span><span class="v">______<small>직접 열어 본 자료 2개 이상</small></span></div>
+        <div class="dlrow"><span class="k">표/그래프</span><span class="v">______<small>6차시 차트 또는 주제에 맞는 새 표</small></span></div>
+        <div class="dlrow"><span class="k">AI를 쓴 곳</span><span class="v">______<small>요약? 해석? 문장 다듬기? 사용 안 함?</small></span></div>
+      </div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 17</span><h3>1페이지 리포트 완성하기 ★</h3></div>
+      
+      <p>아래 양식을 문서에 옮겨 채웁니다. <strong>한 쪽을 넘기지 않게</strong> 짧게 씁니다.</p>
+      <pre>제목 : ____________   작성자 : ______   날짜 : ______
+
+1. 궁금했던 질문
+2. 확인한 사실 (문장 끝에 [출처 번호])
+   - ______ [1]
+   - ______ [2]
+   - ______ [1][2]
+3. 표 또는 그래프 1개 + 한 줄 설명
+4. 확인 과정과 나의 생각
+   출처 → 날짜 → 교차 확인 결과 / 아직 모르는 점 / 내가 할 일
+
+출처
+[1] 기관(작성자), 「제목」, 작성일, 주소, 확인한 날
+[2] ...
+
+AI 사용 : ______</pre>
+      <ol>
+        <li>그래프 넣기: 구글 시트 차트를 누르고 오른쪽 위 점 세 개 메뉴에서 복사 → 문서에 붙여 넣기. (또는 캡처 이미지 붙여 넣기)</li>
+        <li>AI 사용 표기는 아래 예시처럼 <strong>무엇에 · 어떤 AI를 · 어떻게 확인했는지</strong> 씁니다.</li>
+      </ol>
+      <pre><span class="c"># AI 사용 표기 예시</span>
+AI 사용 : 자료 요약에 NotebookLM 사용, 요약 내용은 원문과 대조함.
+AI 사용 : 표 해석 초안에 Gemini 사용, 증가율은 구글 시트로 직접 계산함.
+AI 사용 : 문장 다듬기에 ChatGPT 사용, 사실 내용은 직접 작성함.
+AI 사용 : 없음.</pre>
+      <div class="box warn"><span class="lbl">주의</span>
+        <p>AI가 만든 문장을 그대로 붙여 넣고 내가 쓴 것처럼 내지 않습니다. <strong>출처를 확인하지 못한 문장은 뺍니다.</strong></p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 18</span><h3>짝과 바꿔 읽고 점검하기</h3></div>
+      
+      <p>문서 오른쪽 위 <strong>공유</strong> → "링크가 있는 모든 사용자"로 바꾸고 권한을 <strong>댓글 작성자</strong>로 해서 짝에게 링크를 보냅니다. 짝의 리포트를 읽고 댓글로 점검 결과를 남깁니다.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">질문</span><span class="v">O / X<small>무엇을 알아보려는지 한 문장으로 보이나요?</small></span></div>
+        <div class="dlrow"><span class="k">출처 번호</span><span class="v">O / X<small>사실 문장마다 번호가 있고, 출처 목록과 연결되나요?</small></span></div>
+        <div class="dlrow"><span class="k">날짜</span><span class="v">O / X<small>출처에 작성일과 확인한 날이 있나요?</small></span></div>
+        <div class="dlrow"><span class="k">그래프 설명</span><span class="v">O / X<small>설명의 숫자가 그래프와 맞나요?</small></span></div>
+        <div class="dlrow"><span class="k">AI 사용 표기</span><span class="v">O / X<small>어디에 썼고 어떻게 확인했는지 적혀 있나요?</small></span></div>
+        <div class="dlrow"><span class="k">한 마디</span><span class="v">______<small>좋았던 점 1개 + 고치면 좋을 점 1개</small></span></div>
+      </div>
+      <div class="box check"><span class="lbl">제출 전 확인</span>
+        <p>리포트에 내 전화번호·주소 같은 개인정보가 들어가 있지 않은지 확인하고, 공유 권한을 <strong>뷰어</strong>로 바꿔 과제로 제출합니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 A</span><h2>이럴 땐 이렇게</h2></div>
+    <p class="lede">수업 중에 자주 막히는 상황입니다. 여기 없는 문제는 손을 들어 주세요.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>이런 일이 생기면</th><th>원인</th><th>해결 방법</th></tr></thead>
+        <tbody>
+          <tr><td>퍼플렉시티·챗GPT 답에 출처 링크가 안 보임</td><td>검색 없이 AI가 기억만으로 답함, 또는 링크가 접힌 버튼 안에 있음</td><td>답 아래 "출처"·번호·링크 아이콘을 눌러 보고, 질문에 "출처 링크를 붙여 줘"를 추가해 다시 묻기</td></tr>
+          <tr><td>출처 링크를 눌렀더니 "페이지를 찾을 수 없음"</td><td>주소가 바뀌었거나 AI가 주소를 잘못 만듦</td><td>그 내용은 믿지 않기. 기관 이름으로 직접 검색해 누리집에서 원문 찾기</td></tr>
+          <tr><td>크롬 오른쪽 클릭 메뉴에 Google 렌즈가 없음</td><td>크롬이 아닌 브라우저이거나 메뉴 이름이 바뀜</td><td>크롬 사용, 또는 <code>images.google.com</code>의 카메라 아이콘에 사진 올리기. 스마트폰은 Google 앱 카메라 아이콘</td></tr>
+          <tr><td>Google 렌즈에서 같은 사진이 안 나옴</td><td>새로 만든 이미지이거나 일부를 잘라낸 사진</td><td>사진의 특징적인 부분만 선택해 다시 검색. 그래도 없으면 판정은 "아직 모름"</td></tr>
+          <tr><td>NotebookLM에 웹 주소를 넣었는데 오류</td><td>로그인이 필요한 페이지·유료 기사·접근을 막은 사이트</td><td>다른 공개 자료로 바꾸거나, 페이지 글을 복사해 "복사한 텍스트"로 넣기</td></tr>
+          <tr><td>NotebookLM에 유튜브 주소가 안 들어감</td><td>자막이 없거나 비공개·연령 제한 영상</td><td>자막이 있는 공개 영상으로 바꾸기</td></tr>
+          <tr><td>구글 시트 합계가 0이나 오류로 나옴</td><td>숫자를 글자로 입력함(예: "12,400명") 또는 범위를 잘못 입력</td><td>숫자 칸에는 숫자만 입력, <code>=SUM(B2:B7)</code>처럼 콜론(:) 확인</td></tr>
+          <tr><td>AI가 표를 엉뚱하게 해석함</td><td>표가 줄 바꿈 없이 한 줄로 붙여 넣어짐, 또는 비고를 무시함</td><td>표를 다시 복사해 붙이고 "비고 열도 반드시 참고해 줘"라고 요청. 숫자는 시트로 직접 검산</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 B</span><h2>단원 퀴즈</h2></div>
+    <p class="lede">미션을 마쳤으면 퀴즈로 점검합니다. 채점은 바로 나오고, 틀린 문제에는 해설이 붙습니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">QUIZ</span><h3>4단원 · 15문항</h3></div>
+      <div class="sbody">
+        <p>객관식과 직접 입력이 섞여 있습니다. 실습지를 다시 보지 말고 먼저 풀어 본 뒤, 틀린 부분만 해당 미션으로 돌아가 확인하세요.</p>
+        <p style="margin-top:12px;font-size:16px"><a href="quiz.html">▶ 퀴즈 풀러 가기</a></p>
+        <div class="box check">
+          <span class="lbl">통과 기준</span>
+          <p>15문항 중 <strong>12문항 이상</strong>을 맞히면 이 단원을 소화한 것입니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 C</span><h2>단원 마치기 전 자가 점검</h2></div>
+    <p class="lede">모두 체크되면 이 단원의 목표를 달성한 것입니다. 안 되는 항목은 수업이 끝나기 전에 질문하세요.</p>
+    <div class="selfcheck">
+      <h3>4단원 체크리스트</h3>
+      <ul>
+        <li>가짜뉴스 5가지 신호(자극적 제목·출처 없음·날짜 오래됨·짜깁기 사진·권위 사칭)를 말할 수 있다</li>
+        <li>가상 헤드라인 8개를 판정하고 각각의 신호를 적었다</li>
+        <li>AI 검색 답의 출처 링크 3개를 <strong>직접 열어</strong> 내용 일치 여부를 확인했다</li>
+        <li>화제 이슈 1건을 <strong>출처 → 날짜 → 교차 확인</strong> 워크시트로 점검했다</li>
+        <li>딥페이크 단서를 찾되, 단서만으로 진짜·가짜를 확신할 수 없음을 설명할 수 있다</li>
+        <li>Google 렌즈로 사진이 처음 올라온 곳과 날짜를 찾아봤다</li>
+        <li>가족 목소리 사기 전화에 "끊고 원래 번호로 직접 확인"으로 대응할 수 있다</li>
+        <li>NotebookLM에 자료 3개를 올리고 근거 번호를 눌러 원문과 대조했다</li>
+        <li>구글 시트로 합계·평균을 구하고 선 그래프를 만들어 AI 해석을 검산했다</li>
+        <li>출처와 <strong>AI 사용 표기</strong>가 들어간 1페이지 리포트를 완성했다</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">과제 04</span><h2>생활 속 화제 정보 1건 — 1페이지 정보 리포트</h2><span class="pt">제출: 다음 수업 시작 전</span></div>
+    <p class="lede">이번 단원에서 배운 사실 확인 3단계, 표·그래프, 출처와 AI 사용 표기를 한 장에 담아 제출합니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">제출 항목</span><h3>구글 문서로 작성하고 "링크가 있는 모든 사용자 — 뷰어"로 공유한 링크를 제출하세요</h3></div>
+      <div class="sbody">
+        <ol><li>궁금했던 질문 1문장 (최근 단톡방·뉴스·유튜브에서 본 정보 중 하나)</li><li>사실 확인 3단계 기록 (출처 · 날짜 · 교차 확인 결과와 판정: 사실 / 사실 아님 / 아직 모름)</li><li>확인한 사실 3가지 — 문장마다 출처 번호</li><li>구글 시트로 만든 표 또는 그래프 1개와 한 줄 설명</li><li>출처 목록 2개 이상 (직접 열어 본 자료만, 확인한 날짜 포함)</li><li>AI 사용 표기 1줄 (사용하지 않았다면 "AI 사용: 없음")</li></ol>
+        <span class="prelbl">제출 양식 예시</span><pre><span class="o">제목 : 전자책 대출, 정말 늘고 있을까?   작성자 : 홍길동   날짜 : 2026.9.17.
+
+1. 질문 : 도서관 전자책 이용이 늘었다는 말이 사실일까?
+2. 사실 확인
+   출처 — 한빛시청 누리집 통계 공지 (원문 확인함)
+   날짜 — 2026.7.3. 작성, 올해 상반기 자료 → 최근 정보
+   교차 — ○○신문 기사도 같은 수치 인용 → 판정 : 사실
+3. 그래프 : 1~6월 전자책 대출 선 그래프 — 2,100건 → 3,400건
+4. 나의 생각 : 6월 방문자 감소는 휴관 때문. 전자책과의 관계는 이 자료로 알 수 없음
+
+[1] 한빛시청, 「시립도서관 이용 현황」, 2026.7.3., 2026.9.17. 확인
+AI 사용 : 표 해석 초안에 Gemini 사용, 합계·평균은 구글 시트로 직접 계산해 확인함</span></pre>
+        <div class="box check"><span class="lbl">채점 기준</span><p>채점 기준 — ① 출처를 직접 열어 확인했는가(30%) ② 날짜와 교차 확인이 기록되었는가(25%) ③ 표·그래프 설명이 수치와 맞는가(20%) ④ AI 사용 표기가 구체적인가(15%) ⑤ 한 장 분량과 읽기 쉬운 구성(10%). 판정이 "아직 모름"이어도 확인 과정이 정직하면 좋은 점수를 받습니다.</p></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>UNIT 04 / 05 · 실습지 · 「디지털리터러시」 36시간 과정</p>
+  </div>
+</footer>
+<script src="../nav.js"></script>
+</html>

@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1단원 실습지 · 디지털리터러시</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --bg:#F6F8F5;--surface:#FFFFFF;--surface-2:#EDF1EC;--ink:#141A16;--ink-2:#3A453E;--muted:#5F6D65;
+    --line:#DBE2DC;--line-strong:#C3CFC6;--accent:#10684A;--accent-soft:#E2EFE8;--clay:#A94D30;--clay-soft:#F6E7E0;
+    --ask:#1F5E86;--ask-soft:#E1EDF5;
+    --term-bg:#10171A;--term-fg:#DCE6E3;--term-dim:#7C9A93;--term-p:#7FD1A8;--term-out:#B8C7C2;
+    --maxw:940px;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+      --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+      --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+    --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+    --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:22px}
+  h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:600;letter-spacing:-.01em}
+  p{margin:0}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+  header.top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .masthead{display:flex;flex-direction:column;gap:16px;padding-block:46px 28px}
+  .rule-tag{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .rule-tag .dash{flex:1;height:1px;background:var(--line-strong);min-width:24px}
+  h1{font-size:clamp(26px,4.4vw,40px);line-height:1.2;font-weight:700;letter-spacing:-.03em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .standfirst{max-width:60ch;color:var(--ink-2);font-size:15.5px;font-weight:300;line-height:1.75}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-top:24px}
+  .rule{background:var(--surface);padding:15px 17px}
+  .rule .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--accent)}
+  .rule h3{font-size:14.5px;font-weight:600;margin-top:4px}
+  .rule p{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.55}
+
+  section{padding-block:44px}
+  .part{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-top:2px solid var(--accent);padding-top:14px;margin-bottom:8px}
+  .part .pn{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;color:var(--accent)}
+  .part h2{font-size:clamp(20px,3vw,26px);font-weight:700;letter-spacing:-.02em;flex:1 1 200px}
+  .part .pt{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .lede{color:var(--muted);font-size:14px;max-width:62ch;margin-bottom:22px}
+
+  .stepc{border:1px solid var(--line);border-radius:4px;background:var(--surface);margin-bottom:16px;overflow:hidden}
+  .shead{display:flex;align-items:baseline;gap:12px;padding:13px 18px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+  .shead .sn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .shead h3{font-size:15px;font-weight:600}
+  .sbody{padding:16px 18px}
+  .sbody > p{font-size:14px;color:var(--ink-2);line-height:1.7}
+  .sbody > p + p{margin-top:9px}
+  .sbody ol,.sbody ul{margin:9px 0 0;padding-left:19px}
+  .sbody li{font-size:14px;color:var(--ink-2);margin-top:5px;line-height:1.65}
+
+  pre{margin:11px 0 0;background:var(--term-bg);color:var(--term-fg);border-radius:3px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+  pre .c{color:var(--term-dim)}
+  pre .p{color:var(--term-p)}
+  pre .o{color:var(--term-out)}
+  .prelbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-top:13px;display:block}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:1px 4px;border-radius:2px}
+  kbd{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:3px;padding:1px 5px;background:var(--surface);color:var(--ink)}
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+
+  .box{margin-top:13px;border-radius:0 3px 3px 0;padding:11px 14px;display:flex;flex-direction:column;gap:5px}
+  .box.check{border-left:2px solid var(--accent);background:var(--accent-soft)}
+  .box.q{border-left:2px solid var(--ask);background:var(--ask-soft)}
+  .box.warn{border-left:2px solid var(--clay);background:var(--clay-soft)}
+  .box .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase}
+  .box.check .lbl{color:var(--accent)}
+  .box.q .lbl{color:var(--ask)}
+  .box.warn .lbl{color:var(--clay)}
+  .box p,.box li{font-size:13.5px;color:var(--ink-2);line-height:1.62}
+  .box ul{margin:0;padding-left:16px}
+  .box li{margin-top:3px}
+  .box code{background:rgba(0,0,0,.06)}
+
+  .mission{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;background:var(--surface);padding:16px 18px;margin-bottom:14px}
+  .mhead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .mhead .mn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .mhead h3{font-size:15px;font-weight:600;flex:1 1 180px}
+  .mission > p{font-size:14px;color:var(--ink-2);margin-top:7px;line-height:1.7}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;min-width:540px;font-size:13.5px}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--surface-2)}
+  tbody tr:last-child td{border-bottom:0}
+  td code{font-size:12px}
+
+  .selfcheck{border:1px solid var(--line-strong);border-radius:4px;background:var(--surface);overflow:hidden}
+  .selfcheck h3{padding:14px 18px;font-size:15px;background:var(--surface-2);border-bottom:1px solid var(--line-strong)}
+  .selfcheck ul{list-style:none;margin:0;padding:6px 18px 16px}
+  .selfcheck li{font-size:14px;color:var(--ink-2);padding:8px 0 8px 28px;border-bottom:1px solid var(--line);position:relative;line-height:1.6}
+  .selfcheck li:last-child{border-bottom:0}
+  .selfcheck li::before{content:"";position:absolute;left:0;top:13px;width:14px;height:14px;border:1.5px solid var(--line-strong);border-radius:2px}
+
+  footer{border-top:1px solid var(--line);background:var(--surface);padding-block:26px;margin-top:20px}
+  footer p{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+  @media (max-width:700px){
+    .sbody,.shead,.mission{padding-inline:14px}
+    .shead{gap:8px;flex-wrap:wrap}
+  }
+
+  pre{white-space:pre-wrap;word-break:keep-all;font-family:var(--sans);font-size:13.5px}
+  .mission.py{border-left-color:var(--ask)}
+  .mission.py .mn{color:var(--ask)}
+  .nb{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0 4px;padding:10px 12px;background:var(--ask-soft);border-radius:4px}
+  .nb b{font-size:13px;color:var(--ink-2);margin-right:4px}
+  .nb a{font-family:var(--mono);font-size:11.5px;border:1px solid var(--ask);color:var(--ask);border-radius:4px;padding:5px 10px;background:var(--surface)}
+  .nb a:hover{background:var(--ask);color:#fff}
+  .nb small{flex-basis:100%;font-size:12px;color:var(--muted)}
+  @media print{ .l70nav{display:none} pre{background:#F2F2F2;color:#000} pre .p,pre .o,pre .c{color:#000} }
+</style>
+
+<header class="top">
+  <div class="wrap masthead">
+    <div class="rule-tag">
+      <span class="eyebrow">한국폴리텍대학 분당융합기술교육원</span>
+      <span class="dash"></span>
+      <span class="eyebrow">학생용 실습지</span>
+    </div>
+    <h1>1단원 · <em>인공지능 시대의 디지털 리터러시</em></h1>
+    <p class="standfirst">이번 단원은 AI를 제대로 쓰기 위한 기본기 단원입니다. 나의 출발점을 진단하고, 파일·검색·보안을 손에 익히고, AI가 어떻게 답을 만드는지 체험합니다. 모든 미션은 무료 서비스와 구글 계정만으로 할 수 있습니다. 순서대로 하되, 막히면 바로 손을 드세요.</p>
+    <div class="rules">
+      <div class="rule"><div class="n">RULE 1</div><h3>개인정보는 넣지 않는다</h3><p>주민등록번호·계좌번호·비밀번호·다른 사람 사진은 AI에도, 공유 폴더에도, 실습지에도 적지 않습니다.</p></div>
+      <div class="rule"><div class="n">RULE 2</div><h3>눌러 보고, 적어 둔다</h3><p>틀려도 고장 나지 않습니다. 직접 눌러 보고, 어디를 눌렀는지 실습지에 짧게 기록하세요.</p></div>
+      <div class="rule"><div class="n">RULE 3</div><h3>옆 사람과 확인한다</h3><p>공유 링크가 열리는지, 답이 맞는지 짝과 서로 확인하세요. 설명해 보는 사람이 가장 많이 배웁니다.</p></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <div class="part"><span class="pn">1차시</span><h2>오리엔테이션과 사전 자가진단</h2><span class="pt">50분</span></div>
+    <p class="lede">오늘은 정답이 없습니다. 솔직하게 적는 것이 가장 좋은 답입니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 01</span><h3>수업 준비 — 계정과 기기 확인</h3></div>
+      
+      <ol>
+        <li>PC 인터넷 창(크롬 또는 엣지)을 열고 주소창에 <code>google.com</code>을 입력합니다.</li>
+        <li>화면 오른쪽 위에 <strong>동그란 프로필 사진(또는 이름 첫 글자)</strong>이 보이면 로그인된 상태입니다. <strong>로그인</strong> 버튼이 보이면 본인 구글 계정으로 로그인합니다.</li>
+        <li>스마트폰에서 <strong>Play 스토어</strong>(갤럭시) 또는 <strong>App Store</strong>(아이폰)를 열어 로그인되어 있는지 확인합니다.</li>
+        <li>구글 계정이 없거나 비밀번호가 기억나지 않으면 손을 들어 강사에게 알려 주세요.</li>
+      </ol>
+      <div class="box warn"><span class="lbl">주의</span>
+        <p>공용 PC에서는 수업이 끝나면 반드시 <strong>로그아웃</strong>합니다. 브라우저가 "비밀번호를 저장할까요?"라고 물으면 <strong>저장 안 함</strong>을 누르세요.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 02</span><h3>사전 디지털 역량 자가진단 (10문항) ★</h3></div>
+      
+      <p>각 문항을 읽고 <strong>1~5점</strong> 중 지금 내 모습에 가장 가까운 점수를 적으세요. 이 10문항은 <strong>5단원 마지막 시간에 사후 진단</strong>으로 똑같이 다시 합니다.</p>
+      <p><strong>점수 기준</strong> — 1 전혀 못 한다 · 2 도움이 있으면 한다 · 3 혼자 할 수 있다 · 4 익숙하게 한다 · 5 남에게 가르칠 수 있다</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">1. 기기 조작</span><span class="v">___ 점<small>스마트폰 앱을 찾아 설치·삭제·업데이트할 수 있다</small></span></div>
+        <div class="dlrow"><span class="k">2. 파일 관리</span><span class="v">___ 점<small>사진·문서를 폴더에 정리하고, 받은 파일을 찾아 열 수 있다</small></span></div>
+        <div class="dlrow"><span class="k">3. 클라우드</span><span class="v">___ 점<small>구글 드라이브 등에 파일을 올리고 링크로 공유할 수 있다</small></span></div>
+        <div class="dlrow"><span class="k">4. 정보 검색</span><span class="v">___ 점<small>검색어를 바꿔 가며 필요한 정보를 찾아낼 수 있다</small></span></div>
+        <div class="dlrow"><span class="k">5. 정보 판단</span><span class="v">___ 점<small>인터넷 정보가 믿을 만한지 출처와 날짜로 확인할 수 있다</small></span></div>
+        <div class="dlrow"><span class="k">6. 생성형 AI 활용</span><span class="v">___ 점<small>ChatGPT 같은 AI에게 질문하고, 받은 답을 생활에 활용할 수 있다</small></span></div>
+        <div class="dlrow"><span class="k">7. 온라인 소통</span><span class="v">___ 점<small>이메일·메신저로 파일이나 사진을 첨부해 보낼 수 있다</small></span></div>
+        <div class="dlrow"><span class="k">8. 공공·금융 서비스</span><span class="v">___ 점<small>정부24·모바일 뱅킹 같은 서비스를 혼자 이용할 수 있다</small></span></div>
+        <div class="dlrow"><span class="k">9. 보안</span><span class="v">___ 점<small>2단계 인증을 설정하고, 스미싱 문자를 구별할 수 있다</small></span></div>
+        <div class="dlrow"><span class="k">10. 디지털 윤리</span><span class="v">___ 점<small>저작권·초상권을 지키며 글과 사진을 공유할 수 있다</small></span></div>
+        <div class="dlrow"><span class="k">총점</span><span class="v">___ / 50 점<small>진단 날짜: ____년 __월 __일</small></span></div>
+      </div>
+      <div class="box q"><span class="lbl">생각해 보기</span>
+        <p>점수가 가장 낮은 문항 2개는 무엇인가요? 이 과정에서 꼭 배우고 싶은 것을 한 줄로 적어 보세요.</p></div>
+      <div class="box check"><span class="lbl">확인</span>
+        <p>실습지를 스마트폰으로 사진 찍어 두세요. 3차시에 구글 드라이브에 올리고, 5단원에서 사후 진단과 비교합니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">2차시</span><h2>내 하루 속 AI 찾기</h2><span class="pt">50분</span></div>
+    <p class="lede">생각보다 많습니다. "이것도 AI일까?" 싶으면 일단 적으세요.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 03</span><h3>내 하루 속 AI·디지털 서비스 찾기 ★</h3></div>
+      
+      <p>어제 또는 오늘 하루를 떠올리며, AI나 디지털 서비스를 쓴 순간을 <strong>시간 순서로 5개 이상</strong> 적습니다.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">아침</span><span class="v">예) 07:00 날씨 앱 알림<small>알람, 뉴스 앱, 음성 비서 등</small></span></div>
+        <div class="dlrow"><span class="k">이동</span><span class="v"><small>지도 앱 도착 예정 시간, 버스 도착 알림 등</small></span></div>
+        <div class="dlrow"><span class="k">낮</span><span class="v"><small>키오스크 주문, 모바일 뱅킹, 번역 앱 등</small></span></div>
+        <div class="dlrow"><span class="k">저녁</span><span class="v"><small>쇼핑 앱 추천, 유튜브 추천, 스팸 문자 자동 분류 등</small></span></div>
+        <div class="dlrow"><span class="k">편리한 점</span><span class="v"><small>위 사례 중 1개를 골라 적기</small></span></div>
+        <div class="dlrow"><span class="k">걱정되는 점</span><span class="v"><small>같은 사례의 불편하거나 걱정되는 점</small></span></div>
+      </div>
+      <div class="box q"><span class="lbl">생각해 보기</span>
+        <p>키오스크나 모바일 뱅킹을 못 쓰는 사람은 어떤 불편을 겪을까요? 주변에 도움을 줄 수 있는 사람이 있나요?</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 04</span><h3>추천 알고리즘 관찰하기</h3></div>
+      
+      <ol>
+        <li>스마트폰에서 <strong>유튜브</strong> 앱을 열고 첫 화면에 보이는 영상 주제 3개를 적습니다.</li>
+        <li>짝의 첫 화면과 비교합니다. 무엇이 같고 무엇이 다른가요?</li>
+        <li>관심 없는 영상 오른쪽의 <strong>점 세 개(⋮)</strong>를 눌러 <strong>관심 없음</strong> 메뉴가 있는지 찾아봅니다.</li>
+        <li>화면 아래 <strong>프로필(나)</strong> 쪽에서 <strong>기록</strong> 또는 시청 기록 관리 메뉴를 찾아봅니다. (지우지 않고 위치만 확인)</li>
+      </ol>
+      <div class="dl">
+        <div class="dlrow"><span class="k">내 첫 화면</span><span class="v"><small>영상 주제 3개</small></span></div>
+        <div class="dlrow"><span class="k">짝의 첫 화면</span><span class="v"><small>영상 주제 3개</small></span></div>
+        <div class="dlrow"><span class="k">왜 다를까?</span><span class="v"><small>한 줄로</small></span></div>
+      </div>
+      <div class="box check"><span class="lbl">확인</span>
+        <p>메뉴 이름과 위치는 앱 업데이트로 달라질 수 있습니다. 못 찾으면 짝과 함께 찾아보세요.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">3차시</span><h2>파일 정리와 구글 드라이브 공유</h2><span class="pt">50분</span></div>
+    <p class="lede">오늘 만든 드라이브 폴더가 1단원 과제 제출함이 됩니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 05</span><h3>PC에서 폴더 만들고 파일 저장하기</h3></div>
+      
+      <ol>
+        <li>바탕화면 빈 곳에서 <strong>마우스 오른쪽 클릭 → 새로 만들기 → 폴더</strong>를 누르고 이름을 <code>디지털리터러시</code>로 입력합니다.</li>
+        <li>작업 표시줄의 <strong>파일 탐색기</strong>(노란 폴더 아이콘)를 열고 왼쪽의 <strong>다운로드</strong> 폴더를 눌러 어떤 파일이 있는지 봅니다.</li>
+        <li>메모장을 열어 "1단원 배우고 싶은 것"을 한 줄 쓰고, <kbd>Ctrl</kbd>+<kbd>S</kbd>로 저장합니다.</li>
+        <li>저장 위치를 <strong>바탕화면 → 디지털리터러시</strong> 폴더로 고르고, 파일 이름을 <code>20260917_배우고싶은것</code>처럼 <strong>날짜_내용</strong>으로 적습니다. (날짜는 오늘 날짜로)</li>
+      </ol>
+      <div class="box check"><span class="lbl">확인</span>
+        <p>폴더를 열었을 때 방금 저장한 파일이 보이면 성공입니다. 파일 이름 끝의 <code>.txt</code>가 확장자입니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 06</span><h3>구글 드라이브에 올리고 공유 링크 만들기 ★</h3></div>
+      
+      <ol>
+        <li>인터넷 창 주소창에 <code>drive.google.com</code>을 입력해 구글 드라이브를 엽니다.</li>
+        <li>왼쪽 위 <strong>+ 새로 만들기 → 새 폴더</strong>를 누르고 이름을 <code>1단원_내이름</code>으로 만듭니다.</li>
+        <li>만든 폴더를 더블클릭해 들어간 뒤, <strong>+ 새로 만들기 → 파일 업로드</strong>로 미션 5의 파일을 올립니다. (파일을 창으로 끌어다 놓아도 됩니다)</li>
+        <li>폴더 목록으로 돌아와 <code>1단원_내이름</code> 폴더에서 <strong>마우스 오른쪽 클릭 → 공유</strong>를 누릅니다.</li>
+        <li>아래쪽 <strong>일반 액세스</strong>에서 <strong>제한됨</strong>을 눌러 <strong>링크가 있는 모든 사용자</strong>로 바꾸고, 오른쪽 역할이 <strong>뷰어</strong>인지 확인합니다.</li>
+        <li><strong>링크 복사</strong>를 누르고 <strong>완료</strong>를 누릅니다. 복사한 링크를 카카오톡 "나와의 채팅"이나 메일로 짝에게 보내 열어 보게 합니다.</li>
+      </ol>
+      <div class="dl">
+        <div class="dlrow"><span class="k">제한됨</span><span class="v">내가 이메일로 추가한 사람만 열 수 있음<small>가장 안전. 개인 서류는 이 상태로</small></span></div>
+        <div class="dlrow"><span class="k">링크가 있는 모든 사용자</span><span class="v">링크를 받은 누구나 열 수 있음<small>링크가 다른 곳으로 퍼지면 모르는 사람도 열 수 있음</small></span></div>
+        <div class="dlrow"><span class="k">뷰어 / 편집자</span><span class="v">보기만 가능 / 수정·삭제까지 가능<small>과제 제출은 뷰어로</small></span></div>
+      </div>
+      <div class="box warn"><span class="lbl">주의</span>
+        <p>신분증·통장 사본·가족사진처럼 민감한 파일은 <strong>링크가 있는 모든 사용자</strong>로 공유하지 마세요. 메뉴 이름은 업데이트로 조금 달라질 수 있습니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 07</span><h3>스마트폰 사진을 드라이브로 옮기기</h3></div>
+      
+      <ol>
+        <li>스마트폰에 <strong>Google 드라이브</strong> 앱이 없으면 앱 장터에서 설치합니다. (개발사: Google LLC)</li>
+        <li>앱을 열고 <code>1단원_내이름</code> 폴더로 들어간 뒤, 화면의 <strong>+</strong> 버튼 → <strong>업로드</strong>를 누릅니다.</li>
+        <li>1차시에 찍어 둔 <strong>자가진단 실습지 사진</strong>을 골라 올립니다.</li>
+        <li>PC의 드라이브 화면을 새로고침(<kbd>F5</kbd>)해서 같은 사진이 보이는지 확인합니다.</li>
+      </ol>
+      <div class="box check"><span class="lbl">확인</span>
+        <p>스마트폰에서 올린 사진이 PC에서도 보이면 클라우드를 이해한 것입니다. "인터넷 위의 서랍"이라 어느 기기에서나 열립니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">4차시</span><h2>검색으로 문제 해결하기</h2><span class="pt">50분</span></div>
+    <p class="lede">같은 질문도 검색어에 따라 결과가 크게 달라집니다. 직접 비교해 보세요.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 08</span><h3>긴 문장 vs 핵심 단어 검색 비교</h3></div>
+      
+      <ol>
+        <li><code>google.com</code>에서 아래 두 검색어를 각각 검색합니다.</li>
+      </ol>
+      <pre><span class="p">검색 ▶</span> 우리 동네에서 주말에 문 여는 약국을 어떻게 찾을 수 있는지 알고 싶어요
+<span class="p">검색 ▶</span> 주말 약국 찾기
+<span class="c"># 결과 첫 화면에 무엇이 나오는지 비교합니다</span></pre>
+      <div class="dl">
+        <div class="dlrow"><span class="k">긴 문장</span><span class="v"><small>첫 화면에 나온 결과 1~2개</small></span></div>
+        <div class="dlrow"><span class="k">핵심 단어</span><span class="v"><small>첫 화면에 나온 결과 1~2개</small></span></div>
+        <div class="dlrow"><span class="k">더 나은 쪽</span><span class="v"><small>이유 한 줄</small></span></div>
+      </div>
+      <div class="box q"><span class="lbl">생각해 보기</span>
+        <p>결과에 "스폰서" 또는 "광고" 표시가 붙은 것이 있나요? 광고는 가장 정확한 결과라는 뜻이 아닙니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 09</span><h3>검색 연산자 4종 써 보기</h3></div>
+      
+      <p>아래 검색어를 그대로 입력하고, 결과가 어떻게 달라지는지 한 줄씩 적습니다. 기호와 단어는 <strong>붙여 씁니다</strong>.</p>
+      <pre><span class="p">검색 ▶</span> "기초연금 신청 방법"
+<span class="c"># 큰따옴표: 이 문구가 그대로 들어간 페이지</span>
+<span class="p">검색 ▶</span> 제주도 맛집 -광고
+<span class="c"># 빼기: "광고"라는 단어가 들어간 결과 제외</span>
+<span class="p">검색 ▶</span> 청년 월세 지원 site:go.kr
+<span class="c"># site: 정부기관(go.kr) 사이트에서만</span>
+<span class="p">검색 ▶</span> 치매 예방 수칙 filetype:pdf
+<span class="c"># filetype: PDF 문서만</span></pre>
+      <ol>
+        <li>마지막으로 아무 검색 결과 화면에서 검색창 아래 <strong>도구</strong>를 누르고 <strong>기간</strong>을 <strong>지난 1년</strong>으로 바꿔 봅니다.</li>
+      </ol>
+      <div class="box check"><span class="lbl">확인</span>
+        <p><code>site:go.kr</code> 결과의 주소가 모두 <code>go.kr</code>로 끝나는지 확인하세요. 네이버도 검색 옵션에서 기간·정확히 일치 검색 등을 지원하지만, 오늘은 구글 기준으로 연습합니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 10</span><h3>검색으로 생활 문제 하나 해결하기 ★</h3></div>
+      
+      <p>아래 중 하나를 고르거나, 요즘 궁금했던 생활 문제를 하나 정해 검색으로 답을 찾습니다.</p>
+      <ul>
+        <li>우리 구청(시청)의 대형 폐기물 배출 신청 방법</li>
+        <li>가까운 보건소의 독감 예방접종 대상과 기간</li>
+        <li>주민등록등본을 온라인으로 발급받는 방법</li>
+      </ul>
+      <div class="dl">
+        <div class="dlrow"><span class="k">내 문제</span><span class="v"><small>한 줄로</small></span></div>
+        <div class="dlrow"><span class="k">사용한 검색어</span><span class="v"><small>바꿔 본 검색어까지 모두</small></span></div>
+        <div class="dlrow"><span class="k">찾은 답</span><span class="v"><small>핵심만 2~3줄</small></span></div>
+        <div class="dlrow"><span class="k">출처 (누가)</span><span class="v"><small>사이트 이름과 주소 — 공식기관인가?</small></span></div>
+        <div class="dlrow"><span class="k">날짜 (언제)</span><span class="v"><small>글 작성일 또는 수정일</small></span></div>
+        <div class="dlrow"><span class="k">교차 확인</span><span class="v"><small>다른 출처 1곳에서도 같은 내용인가?</small></span></div>
+      </div>
+      <div class="box warn"><span class="lbl">주의</span>
+        <p>건강·지원금·법률 정보는 해마다 바뀝니다. 최종 확인은 <strong>공식기관 누리집이나 전화</strong>로 하세요. 검색 기록에 주민등록번호 같은 개인정보를 입력하지 않습니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">5차시</span><h2>다음 단어 맞히기로 AI 원리 체험</h2><span class="pt">50분</span></div>
+    <p class="lede">여러분이 게임하는 방식이 바로 LLM이 답을 만드는 방식입니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 11</span><h3>"다음 단어 맞히기" 게임 ★</h3></div>
+      
+      <p><strong>모둠 활동 (4~5명)</strong> — 한 사람이 문장의 앞부분을 말하면, 나머지는 다음에 올 단어를 포스트잇에 각자 적습니다.</p>
+      <ol>
+        <li>시작 문장: <strong>"점심으로 따뜻한 국물이 먹고 싶어서 ___"</strong></li>
+        <li>모두 공개하고, 가장 많이 나온 단어를 골라 문장 뒤에 붙입니다.</li>
+        <li>늘어난 문장으로 다시 다음 단어를 적습니다. 이렇게 <strong>5번</strong> 반복해 문장을 완성합니다.</li>
+        <li>이번에는 <strong>가장 적게 나온 단어</strong>만 골라 붙여 봅니다. 문장이 어떻게 되나요?</li>
+      </ol>
+      <div class="dl">
+        <div class="dlrow"><span class="k">많이 나온 단어로</span><span class="v"><small>완성된 문장</small></span></div>
+        <div class="dlrow"><span class="k">적게 나온 단어로</span><span class="v"><small>완성된 문장</small></span></div>
+      </div>
+      <p>이제 ChatGPT나 Gemini에게 같은 문장을 물어봅니다. (로그인이 아직이면 강사 시연을 봅니다)</p>
+      <pre><span class="p">나 ▶</span> "점심으로 따뜻한 국물이 먹고 싶어서" 다음에 올 만한 말을 5개 골라서, 자연스러운 순서대로 보여 줘.
+<span class="o">AI ▶ 칼국수를, 근처 식당에, 순댓국을 ... 같은 후보를 나열</span>
+<span class="c"># 우리 모둠 후보와 얼마나 비슷한가요?</span></pre>
+      <div class="box check"><span class="lbl">알아 둘 것</span>
+        <p>AI가 보여 주는 후보는 원리를 체험하기 위한 <strong>비유</strong>입니다. AI가 자기 속 계산을 정확히 보여 주는 것은 아닙니다. 핵심은 "그럴듯한 다음 말을 이어 붙인다"는 점입니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 12</span><h3>내 말로 AI 설명하기</h3></div>
+      
+      <p>오늘 배운 것을 <strong>가족에게 설명한다고 생각하고</strong> 적어 보세요.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">머신러닝은</span><span class="v"><small>"컴퓨터가 ____에서 스스로 ____을 배우는 것"</small></span></div>
+        <div class="dlrow"><span class="k">생성형 AI는</span><span class="v"><small>"____을 새로 만들어 내는 AI"</small></span></div>
+        <div class="dlrow"><span class="k">LLM은</span><span class="v"><small>"____ 다음에 올 ____을 맞히며 글을 만드는 AI"</small></span></div>
+        <div class="dlrow"><span class="k">AI가 틀리는 이유</span><span class="v"><small>한 문장으로</small></span></div>
+      </div>
+      <div class="box q"><span class="lbl">생각해 보기</span>
+        <p>"AI가 알려 준 약 복용법대로 먹어도 될까?"라고 가족이 묻는다면 뭐라고 답하시겠어요?</p></div>
+    </div>
+
+    <div class="mission py">
+      <div class="mhead"><span class="mn">PYTHON P1 · 선택</span><h3>파이썬으로 "다음 단어 맞히기" 모델 만들기</h3></div>
+      
+      <p>게임으로 해 본 "다음 단어 맞히기"를 <strong>진짜 프로그램</strong>으로 만듭니다. 문장 몇 개를 읽고 "이 단어 다음에는 무엇이 몇 번 나왔나"를 세면, 아주 작은 언어 모델이 됩니다.</p>
+      <p><strong>쓰는 파이썬:</strong> 문자열 <code>split()</code> · 딕셔너리 · 이중 반복문 · <code>random</code> 모듈</p>
+      <div class="nb"><b>📓 Colab 노트북</b>
+        <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit1_python.ipynb" target="_blank" rel="noopener">Colab에서 열기</a>
+        <a href="../python/unit1_python.ipynb" download>노트북 내려받기 (.ipynb)</a>
+        <small>Colab에서 열기가 안 되면: 내려받기 → colab.research.google.com → 파일 → 노트북 업로드. 구글 계정으로 로그인합니다.</small></div>
+      <ol>
+        <li>노트북 A-1~A-2: 문장을 단어로 쪼개고, <strong>✏️ 셀</strong>의 빈칸을 채워 "다음 단어 표"를 만듭니다. 확인 셀에 ✅가 나오면 성공입니다.</li>
+        <li>A-3: <code>다음단어_확률(표, "오늘")</code>로 확률 막대를 봅니다.</li>
+        <li>A-4: <code>문장_만들기()</code>를 <strong>5번</strong> 실행합니다. 매번 문장이 달라지나요?</li>
+        <li>A-5: 문장을 5개 더 넣고 다시 실행해 확률이 어떻게 바뀌는지 봅니다. 배운 적 없는 단어도 넣어 봅니다.</li>
+      </ol>
+      <pre><span class="p">나 ▶</span> 아래 파이썬 코드를 한 줄씩, 파이썬 기초만 배운 사람이 이해하게 설명해 줘.
+     (다음단어_표_만들기 함수 코드 붙여 넣기)</pre>
+      <div class="box q"><span class="lbl">생각해 보기</span>
+        <p>① 같은 시작 단어인데 문장이 매번 다른 이유는? ② 데이터에 "나는 오늘"이 많으면 결과가 어떻게 치우치나요? ③ 배운 적 없는 단어를 받으면 우리 모델은 멈추는데, ChatGPT는 어떻게 할까요?</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">6차시</span><h2>생성형 AI 앱 설치와 같은 질문 비교</h2><span class="pt">50분</span></div>
+    <p class="lede">가장 좋은 AI를 고르는 시간이 아니라, 차이를 보는 눈을 기르는 시간입니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 13</span><h3>AI 앱 설치하고 로그인하기</h3></div>
+      
+      <ol>
+        <li>스마트폰 앱 장터(Play 스토어 / App Store)에서 <code>ChatGPT</code>를 검색합니다.</li>
+        <li>설치 전에 앱 이름 아래 <strong>개발사</strong>가 <strong>OpenAI</strong>인지 확인하고 설치합니다.</li>
+        <li>앱을 열고 <strong>Google로 계속하기</strong>(구글로 로그인)를 눌러 본인 구글 계정을 고릅니다.</li>
+        <li>같은 방법으로 <code>Gemini</code> 앱(개발사 Google)을 설치합니다. 아이폰은 Google 앱 안에서 Gemini를 쓸 수도 있습니다.</li>
+        <li>PC 인터넷 창에서 <code>copilot.microsoft.com</code>, <code>claude.ai</code>, <code>perplexity.ai</code>를 각각 열어 봅니다. 로그인이 필요하면 구글 계정으로 로그인할 수 있는지 화면을 확인하세요.</li>
+      </ol>
+      <div class="box warn"><span class="lbl">주의</span>
+        <p>설치하자마자 <strong>결제</strong>나 <strong>구독</strong>을 요구하면 가짜 앱이거나 유료 안내 화면입니다. 결제하지 말고 닫은 뒤 강사에게 알려 주세요. 로그인 화면과 메뉴 이름은 업데이트로 달라질 수 있습니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 14</span><h3>같은 질문, 여러 AI 답 비교하기 ★</h3></div>
+      
+      <p>아래 두 질문을 <strong>3개 이상</strong>의 AI에 똑같이 복사해 붙여 넣습니다.</p>
+      <pre><span class="p">나 ▶</span> 60대 초보자가 스마트폰으로 처음 해 보면 좋은 일 3가지를 쉬운 말로 알려 줘.
+<span class="o">AI ▶ 영상통화, 사진 정리, 지도 앱 길찾기 등 3가지 제안</span>
+<span class="c"># 답의 길이와 말투를 비교합니다</span>
+
+<span class="p">나 ▶</span> 오늘 서울 날씨 어때? 어디서 확인한 정보인지도 알려 줘.
+<span class="o">AI ▶ 실시간 검색 결과와 출처 링크를 주거나, 알 수 없다고 답함</span>
+<span class="c"># 최신 정보와 출처 표시에서 차이가 납니다</span></pre>
+      <div class="dl">
+        <div class="dlrow"><span class="k">AI ①</span><span class="v">이름: ________<small>쉬움 ○△× / 구체적 ○△× / 출처 ○△× / 최신 ○△×</small></span></div>
+        <div class="dlrow"><span class="k">AI ②</span><span class="v">이름: ________<small>쉬움 ○△× / 구체적 ○△× / 출처 ○△× / 최신 ○△×</small></span></div>
+        <div class="dlrow"><span class="k">AI ③</span><span class="v">이름: ________<small>쉬움 ○△× / 구체적 ○△× / 출처 ○△× / 최신 ○△×</small></span></div>
+        <div class="dlrow"><span class="k">이럴 땐 이 AI</span><span class="v"><small>예) 출처가 필요할 땐 ____</small></span></div>
+      </div>
+      <div class="box warn"><span class="lbl">개인정보 주의</span>
+        <p>질문에 내 이름·주소·전화번호·주민등록번호·병명 같은 개인정보를 넣지 마세요. 날씨 답은 기상청 날씨누리나 날씨 앱과 비교해 맞는지 확인합니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">7차시</span><h2>내 계정 보안 점검</h2><span class="pt">50분</span></div>
+    <p class="lede">비밀번호는 절대 소리 내어 말하거나 실습지에 적지 않습니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 15</span><h3>구글 계정 보안 점검하기 ★</h3></div>
+      
+      <ol>
+        <li>PC에서 <code>google.com</code> 오른쪽 위 <strong>프로필 사진</strong>을 누르고 <strong>Google 계정 관리</strong>를 누릅니다.</li>
+        <li>왼쪽(스마트폰은 위쪽) 메뉴에서 <strong>보안</strong>을 누릅니다.</li>
+        <li>화면에 <strong>보안 권장사항</strong> 또는 <strong>보안 진단</strong>이 보이면 눌러서 안내대로 점검합니다. (최근 보안 활동에 모르는 기기가 있는지 확인)</li>
+        <li>보안 화면에서 <strong>2단계 인증</strong> 항목을 찾아 <strong>사용</strong> 중인지 확인합니다. 꺼져 있으면 안내에 따라 켭니다.</li>
+        <li>복구 전화번호와 복구 이메일이 <strong>지금 쓰는 번호·메일</strong>인지 확인합니다.</li>
+      </ol>
+      <div class="dl">
+        <div class="dlrow"><span class="k">보안 진단 결과</span><span class="v"><small>문제 없음 / 권장 조치 __개</small></span></div>
+        <div class="dlrow"><span class="k">모르는 기기</span><span class="v"><small>없음 / 있음 → 로그아웃 처리</small></span></div>
+        <div class="dlrow"><span class="k">2단계 인증</span><span class="v"><small>원래 켜져 있음 / 오늘 켰음 / 다음에 켜기(이유)</small></span></div>
+        <div class="dlrow"><span class="k">복구 정보</span><span class="v"><small>최신임 / 수정함</small></span></div>
+      </div>
+      <div class="box warn"><span class="lbl">주의</span>
+        <p>비밀번호·인증번호는 <strong>본인만</strong> 입력합니다. 강사나 옆 사람에게도 보여 주지 마세요. 메뉴 이름은 업데이트로 달라질 수 있으니, 못 찾으면 계정 관리 화면 위쪽 <strong>검색창</strong>에 "2단계 인증"을 입력하세요.</p></div>
+      <div class="box check"><span class="lbl">집에서 이어서</span>
+        <p>네이버·카카오 계정과 은행 앱에도 2단계 인증(또는 로그인 알림) 설정이 있는지 확인해 보세요.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 16</span><h3>스미싱 구별하고 가족 암호 정하기</h3></div>
+      
+      <p>아래 문자 중 <strong>의심해야 할 문자</strong>에 표시하고 이유를 적으세요.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">문자 ①</span><span class="v">[국제발신] 고객님 택배가 주소 불일치로 보류되었습니다. 주소 수정 bit.ly/xxxx<small>의심 ○ / × · 이유:</small></span></div>
+        <div class="dlrow"><span class="k">문자 ②</span><span class="v">엄마 나 폰 액정 깨져서 임시폰이야. 이 번호로 문자만 줘. 급하게 인증할 게 있어<small>의심 ○ / × · 이유:</small></span></div>
+        <div class="dlrow"><span class="k">문자 ③</span><span class="v">[OO은행] 고객님 계좌에서 해외 결제가 시도되었습니다. 본인이 아니면 아래 앱 설치 후 확인<small>의심 ○ / × · 이유:</small></span></div>
+        <div class="dlrow"><span class="k">문자 ④</span><span class="v">(내가 직접 예약한 병원) 내일 오전 10시 진료 예약 안내드립니다. 변경은 병원 대표번호로 연락 주세요<small>의심 ○ / × · 이유:</small></span></div>
+      </div>
+      <div class="box check"><span class="lbl">정답 확인 포인트</span>
+        <p>①②③은 모두 <strong>링크 누르기·앱 설치·급한 인증</strong>을 요구합니다. ④는 링크 없이 내가 아는 기관의 대표번호로 연락하게 합니다. 헷갈리면 <strong>118</strong>(한국인터넷진흥원 상담), 돈이 나갔으면 즉시 <strong>112</strong>와 은행에 연락합니다.</p></div>
+      <div class="dl">
+        <div class="dlrow"><span class="k">우리 가족 확인 질문</span><span class="v">실습지에는 적지 말고 머릿속으로만 정하기<small>예) "우리 첫 강아지 이름은?" — 오늘 집에 가서 가족과 정합니다</small></span></div>
+      </div>
+    </div>
+
+    <div class="mission py">
+      <div class="mhead"><span class="mn">PYTHON P2 · 선택</span><h3>안전한 비밀번호 생성기 · 강도 검사기 만들기</h3></div>
+      
+      <p>보안 점검에서 배운 "좋은 비밀번호 규칙"을 코드로 바꿉니다. 규칙을 코드로 옮기다 보면 <strong>규칙이 왜 필요한지</strong>가 분명해집니다.</p>
+      <p><strong>쓰는 파이썬:</strong> <code>secrets</code>·<code>string</code> 모듈 · 조건문 · <code>any()</code> · 함수의 여러 값 반환</p>
+      <div class="nb"><b>📓 Colab 노트북</b>
+        <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit1_python.ipynb" target="_blank" rel="noopener">Colab에서 열기</a>
+        <a href="../python/unit1_python.ipynb" download>노트북 내려받기 (.ipynb)</a>
+        <small>Colab에서 열기가 안 되면: 내려받기 → colab.research.google.com → 파일 → 노트북 업로드. 구글 계정으로 로그인합니다.</small></div>
+      <ol>
+        <li>노트북 B-1: <code>비밀번호_만들기()</code>를 몇 번 실행해 봅니다. <code>random</code> 대신 <code>secrets</code>를 쓰는 이유를 읽습니다.</li>
+        <li>B-2 <strong>✏️</strong>: 강도 검사 함수의 빈칸 4곳(대·소문자, 숫자, 특수문자, 같은 문자 3번 연속)을 채우고 테스트 5개를 통과시킵니다.</li>
+        <li>B-3: 단어를 이어 붙인 <strong>비밀번호 문구</strong>를 만들어 강도를 비교합니다.</li>
+        <li>B-4 🤖: AI에게 내 검사기가 놓치는 약점을 묻고, 그 약점을 실제 예시로 확인합니다.</li>
+      </ol>
+      <div class="box warn"><span class="lbl">주의</span>
+        <p>노트북에는 <strong>지금 실제로 쓰는 비밀번호를 절대 입력하지 않습니다.</strong> 예시 문자열로만 시험하세요.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">8차시</span><h2>AI 윤리 사례 토론</h2><span class="pt">50분</span></div>
+    <p class="lede">정답을 맞히는 시간이 아닙니다. 이유를 말하고 듣는 시간입니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 17</span><h3>모둠 사례 토론 ★</h3></div>
+      
+      <p>모둠별로 사례 하나를 고릅니다. (사례 A~D는 슬라이드 참고)</p>
+      <ol>
+        <li>각자 1분 동안 <strong>괜찮다 / 문제다 / 조건에 따라 다르다</strong> 중 하나를 고르고 이유를 적습니다.</li>
+        <li>돌아가며 1분씩 이유를 말합니다. 다른 사람이 말할 때는 끼어들지 않습니다.</li>
+        <li>모둠 의견을 정리합니다. 의견이 갈리면 갈린 그대로 정리해도 됩니다.</li>
+        <li>궁금한 사실은 AI에게 물어보되, 답을 공식 출처로 한 번 더 확인합니다.</li>
+      </ol>
+      <pre><span class="p">나 ▶</span> 인터넷에서 찾은 유명 캐릭터 그림을 동창회 포스터에 넣어 단체방에 공유하면 저작권 문제가 될 수 있어? 초보자도 이해하게 쉽게 설명하고, 확인할 수 있는 공식 기관도 알려 줘.
+<span class="o">AI ▶ 저작권자 허락이 필요할 수 있음, 한국저작권위원회 등 안내</span>
+<span class="c"># AI 답은 참고용 — 법률 판단은 공식기관·전문가에게 확인</span></pre>
+      <div class="dl">
+        <div class="dlrow"><span class="k">고른 사례</span><span class="v"><small>A / B / C / D</small></span></div>
+        <div class="dlrow"><span class="k">모둠 판단</span><span class="v"><small>괜찮다 / 문제다 / 조건부</small></span></div>
+        <div class="dlrow"><span class="k">이유 1</span><span class="v"><small>저작권·초상권·거짓 정보·편향 중 무엇과 관련?</small></span></div>
+        <div class="dlrow"><span class="k">이유 2</span><span class="v"><small></small></span></div>
+        <div class="dlrow"><span class="k">다르게 하려면</span><span class="v"><small>어떻게 바꾸면 괜찮아질까?</small></span></div>
+      </div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 18</span><h3>나의 AI 사용 약속 3가지</h3></div>
+      
+      <p>1단원에서 배운 것을 바탕으로, 앞으로 AI와 디지털 서비스를 쓸 때 지킬 약속을 적습니다.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">약속 1 (확인)</span><span class="v"><small>예) 건강·돈 문제는 AI 답을 공식기관에서 한 번 더 확인한다</small></span></div>
+        <div class="dlrow"><span class="k">약속 2 (보호)</span><span class="v"><small>예) AI에 주민등록번호·계좌번호·가족 사진을 넣지 않는다</small></span></div>
+        <div class="dlrow"><span class="k">약속 3 (존중)</span><span class="v"><small>예) AI로 만든 글·그림을 공유할 때 "AI 활용"이라고 밝힌다</small></span></div>
+      </div>
+      <div class="box check"><span class="lbl">과제 연결</span>
+        <p>토론지와 약속을 사진 찍어 <code>1단원_내이름</code> 드라이브 폴더에 올리세요. 1단원 과제 6번 항목입니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 A</span><h2>이럴 땐 이렇게</h2></div>
+    <p class="lede">수업 중에 자주 막히는 상황입니다. 여기 없는 문제는 손을 들어 주세요.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>이런 일이 생기면</th><th>원인</th><th>해결 방법</th></tr></thead>
+        <tbody>
+          <tr><td>구글 로그인이 안 됨 / 비밀번호가 기억 안 남</td><td>오래 안 쓴 계정이거나 다른 계정 주소를 입력함</td><td>로그인 화면의 <strong>비밀번호를 잊으셨나요?</strong>로 본인 휴대폰 인증 후 재설정. 비밀번호는 본인만 입력</td></tr>
+          <tr><td>2단계 인증 문자가 안 옴</td><td>복구 전화번호가 예전 번호이거나 스팸 차단함</td><td>잠시 기다린 뒤 <strong>다른 방법 시도</strong> 선택. 휴대폰 스팸함 확인. 안 되면 집에서 다시 설정</td></tr>
+          <tr><td>앱 장터에서 AI 앱이 여러 개 나옴</td><td>이름이 비슷한 유사 앱이 많음</td><td><strong>개발사 이름</strong> 확인 (OpenAI, Google 등). 설치 직후 결제를 요구하면 닫기</td></tr>
+          <tr><td>공유 링크를 열면 "액세스 권한 필요"가 뜸</td><td>일반 액세스가 아직 <strong>제한됨</strong> 상태</td><td>파일 오른쪽 클릭 → 공유 → <strong>링크가 있는 모든 사용자</strong>로 변경 후 링크 다시 복사</td></tr>
+          <tr><td>다운로드한 파일이 어디 있는지 모름</td><td>브라우저가 자동으로 다운로드 폴더에 저장함</td><td>파일 탐색기 → <strong>다운로드</strong> 폴더. 스마트폰은 내 파일/파일 앱 → 다운로드</td></tr>
+          <tr><td>AI가 "사용량 한도에 도달했습니다"라고 함</td><td>무료 버전의 사용량 제한</td><td>잠시 후 다시 시도하거나 다른 AI 서비스로 같은 질문을 이어서 실습</td></tr>
+          <tr><td>AI가 엉뚱하거나 영어로 답함</td><td>질문이 짧거나 모호함</td><td>"한국어로, 초보자가 이해하게 쉽게"를 질문 끝에 붙여 다시 질문</td></tr>
+          <tr><td>검색 연산자를 썼는데 결과가 이상함</td><td>기호와 단어 사이를 띄어 씀 (site: go.kr)</td><td><code>site:go.kr</code>, <code>-광고</code>처럼 <strong>붙여서</strong> 입력</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 B</span><h2>단원 퀴즈</h2></div>
+    <p class="lede">미션을 마쳤으면 퀴즈로 점검합니다. 채점은 바로 나오고, 틀린 문제에는 해설이 붙습니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">QUIZ</span><h3>1단원 · 15문항</h3></div>
+      <div class="sbody">
+        <p>객관식과 직접 입력이 섞여 있습니다. 실습지를 다시 보지 말고 먼저 풀어 본 뒤, 틀린 부분만 해당 미션으로 돌아가 확인하세요.</p>
+        <p style="margin-top:12px;font-size:16px"><a href="quiz.html">▶ 퀴즈 풀러 가기</a></p>
+        <div class="box check">
+          <span class="lbl">통과 기준</span>
+          <p>15문항 중 <strong>12문항 이상</strong>을 맞히면 이 단원을 소화한 것입니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 C</span><h2>단원 마치기 전 자가 점검</h2></div>
+    <p class="lede">모두 체크되면 이 단원의 목표를 달성한 것입니다. 안 되는 항목은 수업이 끝나기 전에 질문하세요.</p>
+    <div class="selfcheck">
+      <h3>1단원 체크리스트</h3>
+      <ul>
+        <li>사전 디지털 역량 자가진단 10문항을 작성하고 총점을 계산했다</li>
+        <li>디지털 리터러시를 <strong>다루기·찾고 판단하기·소통하고 만들기·지키기</strong>로 설명할 수 있다</li>
+        <li>내 하루 속 AI·디지털 서비스를 5개 이상 찾았다</li>
+        <li>구글 드라이브에 폴더를 만들고, <strong>뷰어 권한 공유 링크</strong>를 만들어 짝이 열어 보았다</li>
+        <li>검색 연산자 <code>" "</code> · <code>-</code> · <code>site:</code> · <code>filetype:</code>를 각각 써 봤다</li>
+        <li>검색한 정보의 출처와 날짜를 확인하고 기록했다</li>
+        <li>생성형 AI가 "다음 단어 맞히기"로 답을 만들어 틀릴 수 있다는 것을 설명할 수 있다</li>
+        <li>같은 질문을 3개 이상 AI에 넣고 비교표를 만들었다</li>
+        <li>구글 계정 보안 점검을 하고 <strong>2단계 인증</strong> 설정 여부를 확인했다</li>
+        <li>스미싱·AI 목소리 사기의 대응 방법을 말할 수 있고, 나의 AI 사용 약속 3가지를 적었다</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">과제 01</span><h2>나의 디지털 출발점 기록장</h2><span class="pt">제출: 다음 수업 시작 전</span></div>
+    <p class="lede">1단원에서 만든 결과물을 구글 드라이브 폴더 하나에 모아, 공유 링크로 제출합니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">제출 항목</span><h3>구글 드라이브에 "1단원_이름" 폴더를 만들고 아래 파일을 넣은 뒤, 폴더 공유 링크(뷰어 권한)를 강사에게 제출</h3></div>
+      <div class="sbody">
+        <ol><li>사전 디지털 역량 자가진단 10문항 점수표 (사진 또는 캡처)</li><li>내 하루 속 AI 찾기 — 5개 이상 + 편리한 점·걱정되는 점 1개</li><li>검색으로 생활 문제 해결 기록 — 검색어, 찾은 답, 출처, 날짜</li><li>같은 질문 AI 비교표 — 3개 이상 서비스, 4가지 기준</li><li>계정 보안 점검 결과 — 2단계 인증 설정 여부와 새로 바꾼 습관 (비밀번호·인증번호는 절대 적지 말 것)</li><li>AI 윤리 사례 토론 — 고른 사례, 나의 판단과 이유 3줄</li></ol>
+        <span class="prelbl">제출 양식 예시</span><pre><span class="o">이름 : 홍길동
+폴더 링크 : https://drive.google.com/drive/folders/...(뷰어 권한)
+
+2. 내 하루 속 AI
+   07:00 날씨 앱 알림 / 08:10 지도 앱 도착 예정 시간 / 12:30 키오스크 주문
+   19:00 쇼핑 앱 추천 상품 / 21:00 유튜브 추천 영상
+   - 편리한 점 : 버스 도착 시간을 보고 덜 기다린다
+   - 걱정되는 점 : 유튜브에서 비슷한 건강 영상만 계속 뜬다
+
+4. AI 비교표 (질문: 초보자가 스마트폰으로 해 보면 좋은 일 3가지)
+   ChatGPT  : 쉬움 ○ / 구체적 ○ / 출처 × / 최신 -
+   Perplexity : 쉬움 △ / 구체적 ○ / 출처 ○ / 최신 ○</span></pre>
+        <div class="box check"><span class="lbl">채점 기준</span><p>완성도보다 "직접 해 봤는가"를 봅니다. 공유 링크가 열리는지(권한 설정) 제출 전에 옆 사람과 서로 확인하세요. 캡처에 전화번호·주소·계좌번호 등이 보이면 가리고 올립니다.</p></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>UNIT 01 / 05 · 실습지 · 「디지털리터러시」 36시간 과정</p>
+  </div>
+</footer>
+<script src="../nav.js"></script>
+</html>

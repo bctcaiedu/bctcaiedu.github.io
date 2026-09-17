@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5단원 실습지 · 디지털리터러시</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --bg:#F6F8F5;--surface:#FFFFFF;--surface-2:#EDF1EC;--ink:#141A16;--ink-2:#3A453E;--muted:#5F6D65;
+    --line:#DBE2DC;--line-strong:#C3CFC6;--accent:#10684A;--accent-soft:#E2EFE8;--clay:#A94D30;--clay-soft:#F6E7E0;
+    --ask:#1F5E86;--ask-soft:#E1EDF5;
+    --term-bg:#10171A;--term-fg:#DCE6E3;--term-dim:#7C9A93;--term-p:#7FD1A8;--term-out:#B8C7C2;
+    --maxw:940px;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+      --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+      --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+    --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+    --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:22px}
+  h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:600;letter-spacing:-.01em}
+  p{margin:0}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+  header.top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .masthead{display:flex;flex-direction:column;gap:16px;padding-block:46px 28px}
+  .rule-tag{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .rule-tag .dash{flex:1;height:1px;background:var(--line-strong);min-width:24px}
+  h1{font-size:clamp(26px,4.4vw,40px);line-height:1.2;font-weight:700;letter-spacing:-.03em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .standfirst{max-width:60ch;color:var(--ink-2);font-size:15.5px;font-weight:300;line-height:1.75}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-top:24px}
+  .rule{background:var(--surface);padding:15px 17px}
+  .rule .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--accent)}
+  .rule h3{font-size:14.5px;font-weight:600;margin-top:4px}
+  .rule p{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.55}
+
+  section{padding-block:44px}
+  .part{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-top:2px solid var(--accent);padding-top:14px;margin-bottom:8px}
+  .part .pn{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;color:var(--accent)}
+  .part h2{font-size:clamp(20px,3vw,26px);font-weight:700;letter-spacing:-.02em;flex:1 1 200px}
+  .part .pt{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .lede{color:var(--muted);font-size:14px;max-width:62ch;margin-bottom:22px}
+
+  .stepc{border:1px solid var(--line);border-radius:4px;background:var(--surface);margin-bottom:16px;overflow:hidden}
+  .shead{display:flex;align-items:baseline;gap:12px;padding:13px 18px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+  .shead .sn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .shead h3{font-size:15px;font-weight:600}
+  .sbody{padding:16px 18px}
+  .sbody > p{font-size:14px;color:var(--ink-2);line-height:1.7}
+  .sbody > p + p{margin-top:9px}
+  .sbody ol,.sbody ul{margin:9px 0 0;padding-left:19px}
+  .sbody li{font-size:14px;color:var(--ink-2);margin-top:5px;line-height:1.65}
+
+  pre{margin:11px 0 0;background:var(--term-bg);color:var(--term-fg);border-radius:3px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+  pre .c{color:var(--term-dim)}
+  pre .p{color:var(--term-p)}
+  pre .o{color:var(--term-out)}
+  .prelbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-top:13px;display:block}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:1px 4px;border-radius:2px}
+  kbd{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:3px;padding:1px 5px;background:var(--surface);color:var(--ink)}
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+
+  .box{margin-top:13px;border-radius:0 3px 3px 0;padding:11px 14px;display:flex;flex-direction:column;gap:5px}
+  .box.check{border-left:2px solid var(--accent);background:var(--accent-soft)}
+  .box.q{border-left:2px solid var(--ask);background:var(--ask-soft)}
+  .box.warn{border-left:2px solid var(--clay);background:var(--clay-soft)}
+  .box .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase}
+  .box.check .lbl{color:var(--accent)}
+  .box.q .lbl{color:var(--ask)}
+  .box.warn .lbl{color:var(--clay)}
+  .box p,.box li{font-size:13.5px;color:var(--ink-2);line-height:1.62}
+  .box ul{margin:0;padding-left:16px}
+  .box li{margin-top:3px}
+  .box code{background:rgba(0,0,0,.06)}
+
+  .mission{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;background:var(--surface);padding:16px 18px;margin-bottom:14px}
+  .mhead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .mhead .mn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .mhead h3{font-size:15px;font-weight:600;flex:1 1 180px}
+  .mission > p{font-size:14px;color:var(--ink-2);margin-top:7px;line-height:1.7}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;min-width:540px;font-size:13.5px}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--surface-2)}
+  tbody tr:last-child td{border-bottom:0}
+  td code{font-size:12px}
+
+  .selfcheck{border:1px solid var(--line-strong);border-radius:4px;background:var(--surface);overflow:hidden}
+  .selfcheck h3{padding:14px 18px;font-size:15px;background:var(--surface-2);border-bottom:1px solid var(--line-strong)}
+  .selfcheck ul{list-style:none;margin:0;padding:6px 18px 16px}
+  .selfcheck li{font-size:14px;color:var(--ink-2);padding:8px 0 8px 28px;border-bottom:1px solid var(--line);position:relative;line-height:1.6}
+  .selfcheck li:last-child{border-bottom:0}
+  .selfcheck li::before{content:"";position:absolute;left:0;top:13px;width:14px;height:14px;border:1.5px solid var(--line-strong);border-radius:2px}
+
+  footer{border-top:1px solid var(--line);background:var(--surface);padding-block:26px;margin-top:20px}
+  footer p{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+  @media (max-width:700px){
+    .sbody,.shead,.mission{padding-inline:14px}
+    .shead{gap:8px;flex-wrap:wrap}
+  }
+
+  pre{white-space:pre-wrap;word-break:keep-all;font-family:var(--sans);font-size:13.5px}
+  .mission.py{border-left-color:var(--ask)}
+  .mission.py .mn{color:var(--ask)}
+  .nb{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0 4px;padding:10px 12px;background:var(--ask-soft);border-radius:4px}
+  .nb b{font-size:13px;color:var(--ink-2);margin-right:4px}
+  .nb a{font-family:var(--mono);font-size:11.5px;border:1px solid var(--ask);color:var(--ask);border-radius:4px;padding:5px 10px;background:var(--surface)}
+  .nb a:hover{background:var(--ask);color:#fff}
+  .nb small{flex-basis:100%;font-size:12px;color:var(--muted)}
+  @media print{ .l70nav{display:none} pre{background:#F2F2F2;color:#000} pre .p,pre .o,pre .c{color:#000} }
+</style>
+
+<header class="top">
+  <div class="wrap masthead">
+    <div class="rule-tag">
+      <span class="eyebrow">한국폴리텍대학 분당융합기술교육원</span>
+      <span class="dash"></span>
+      <span class="eyebrow">학생용 실습지</span>
+    </div>
+    <h1>5단원 · <em>나만의 디지털 루틴 만들기</em></h1>
+    <p class="standfirst">이번 단원은 지금까지 배운 것을 "매일 쓰는 습관"으로 바꾸는 시간입니다. 내 휴대폰 사용을 진단하고, 캘린더·메모·녹음 요약·나만의 AI 비서를 설정한 뒤, 이 도구들을 하나의 루틴으로 이어 붙입니다. 마지막에는 1~5단원 결과물을 모은 디지털 루틴북을 완성해 발표합니다. 모든 실습은 무료 버전으로 할 수 있습니다.</p>
+    <div class="rules">
+      <div class="rule"><div class="n">RULE 1</div><h3>내 생활에 맞게</h3><p>예시를 그대로 따라 하지 말고, 내 실제 일정·습관에 맞게 바꾸세요. 내 것이어야 과정이 끝난 뒤에도 씁니다.</p></div>
+      <div class="rule"><div class="n">RULE 2</div><h3>개인정보는 빼고</h3><p>주민등록번호·계좌·비밀번호·주소·전화번호는 AI 질문, 메모, 캡처 어디에도 넣지 마세요. 캡처는 가리고 저장합니다.</p></div>
+      <div class="rule"><div class="n">RULE 3</div><h3>작게, 확인하며</h3><p>AI가 만든 계획·요약은 초안입니다. 이름·숫자·날짜를 직접 확인하고, 루틴은 5분짜리 하나부터 시작합니다.</p></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <div class="part"><span class="pn">1차시</span><h2>디지털 웰빙: 사용 시간 진단과 알림 정리</h2><span class="pt">50분</span></div>
+    <p class="lede">개인 스마트폰을 준비하세요. 휴대폰마다 메뉴 이름이 조금 다르면 설정 맨 위 검색창을 활용합니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 01</span><h3>내 사용 시간 들여다보기 ★</h3></div>
+      
+      <p>먼저 어제 휴대폰을 몇 시간 썼을지 <strong>예상 시간</strong>을 적은 뒤, 실제 숫자를 확인합니다.</p>
+      <p><strong>Android (삼성 갤럭시 등)</strong></p>
+      <ol>
+        <li><strong>설정</strong> 앱을 엽니다.</li>
+        <li><strong>디지털 웰빙 및 자녀 보호 기능</strong>을 누릅니다. (안 보이면 설정 위쪽 돋보기에 <code>디지털 웰빙</code> 입력)</li>
+        <li>화면 가운데의 사용 시간 그래프를 눌러 <strong>앱별 사용 시간</strong>, <strong>알림 수</strong>, <strong>잠금 해제 횟수</strong>를 확인합니다.</li>
+      </ol>
+      <p><strong>iPhone</strong></p>
+      <ol>
+        <li><strong>설정</strong> → <strong>스크린 타임</strong>을 누릅니다.</li>
+        <li><strong>모든 활동 보기</strong>를 누르고 위쪽에서 <strong>일</strong>(하루) 보기를 선택합니다.</li>
+        <li>아래로 내리며 <strong>가장 많이 사용한 앱</strong>, <strong>픽업</strong>(화면 켠 횟수), <strong>알림</strong>을 확인합니다.</li>
+      </ol>
+      <div class="dl">
+        <div class="dlrow"><span class="k">예상 시간</span><span class="v"><small>확인 전에 먼저 적기</small></span></div>
+        <div class="dlrow"><span class="k">실제 사용 시간</span><span class="v"><small>어제 또는 오늘 하루</small></span></div>
+        <div class="dlrow"><span class="k">많이 쓴 앱 TOP 3</span><span class="v"><small>앱 이름과 시간</small></span></div>
+        <div class="dlrow"><span class="k">화면 켠 횟수</span><span class="v"><small>잠금 해제 · 픽업</small></span></div>
+        <div class="dlrow"><span class="k">알림 개수</span><span class="v"><small>가장 알림이 많은 앱도 함께</small></span></div>
+      </div>
+      <div class="box warn"><span class="lbl">숫자가 안 나오면</span>
+        <p>아이폰은 스크린 타임을 <strong>켠 뒤부터</strong> 기록됩니다. 꺼져 있었다면 지금 켜고, 오늘은 짝의 화면으로 함께 보며 내일 다시 확인하세요.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 02</span><h3>알림 다이어트 — 3개 이상 끄기</h3></div>
+      
+      <p>미션 1에서 알림이 많았던 앱을 <strong>꼭 필요 · 가끔 필요 · 필요 없음</strong>으로 나눈 뒤 정리합니다.</p>
+      <ol>
+        <li>Android: <strong>설정 → 알림 → 앱 알림</strong>에서 앱 옆 스위치를 끕니다. iPhone: <strong>설정 → 알림</strong> → 앱 이름 → <strong>알림 허용</strong>을 끕니다.</li>
+        <li>"가끔 필요" 앱은 완전히 끄지 말고 <strong>소리만 끄기</strong> 또는 앱 안의 설정에서 <strong>광고·이벤트 알림</strong>만 끕니다.</li>
+        <li>잠자는 시간에 방해 금지를 예약합니다. Android는 <strong>디지털 웰빙의 취침 모드</strong> 또는 <strong>방해 금지</strong>, iPhone은 <strong>설정 → 집중 모드 → 수면</strong>에서 시간을 정합니다.</li>
+      </ol>
+      <div class="dl">
+        <div class="dlrow"><span class="k">끈 알림</span><span class="v"><small>앱 이름 3개 이상</small></span></div>
+        <div class="dlrow"><span class="k">소리만 끈 알림</span><span class="v"><small>앱 이름</small></span></div>
+        <div class="dlrow"><span class="k">방해 금지 시간</span><span class="v"><small>예) 23:00 ~ 06:30</small></span></div>
+      </div>
+      <div class="box warn"><span class="lbl">끄면 안 되는 알림</span>
+        <p>은행·카드 결제 알림, 가족 메신저, <strong>재난문자(긴급 재난 알림)</strong>는 켜 두세요. 결제 알림은 내 카드가 도용됐을 때 가장 먼저 알려 주는 신호입니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 03</span><h3>AI에게 사용 습관 개선 아이디어 묻기</h3></div>
+      
+      <p>Gemini나 ChatGPT에 내 숫자를 넣고 실천 아이디어를 받습니다. <strong>이름·전화번호 같은 개인정보는 넣지 않습니다.</strong></p>
+      <pre><span class="p">나 ▶</span> 나는 하루에 스마트폰을 5시간 쓰고, 그중 동영상 앱이 2시간이야. 화면은 하루 90번 켜.
+     잠들기 전 1시간 사용을 줄이고 싶어. 오늘부터 할 수 있는 쉬운 방법 3가지를 표로 알려 줘.
+<span class="o">AI ▶ 방법 · 휴대폰 설정 · 기대 효과를 담은 3줄 표 (예: 취침 모드 예약, 충전기를 침대 밖에 두기 …)</span>
+<span class="c"># 받은 방법 중 내가 실제로 할 수 있는 1개만 골라 적습니다</span></pre>
+      <div class="dl">
+        <div class="dlrow"><span class="k">내가 고른 방법</span><span class="v"><small>1개만, 구체적으로</small></span></div>
+      </div>
+      <div class="box q"><span class="lbl">생각해 보기</span>
+        <p>수면·눈 건강에 관한 AI의 설명은 참고용입니다. 불면이나 시력 문제가 계속되면 AI가 아니라 <strong>의사와 상담</strong>하세요.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">2차시</span><h2>일정·할 일 관리</h2><span class="pt">50분</span></div>
+    <p class="lede">PC와 스마트폰에서 같은 구글 계정으로 로그인했는지 먼저 확인하세요.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 04</span><h3>구글 캘린더에 반복·알림 일정 등록 ★</h3></div>
+      
+      <p>실제 내 일정 2개를 등록합니다. 하나는 <strong>매주 반복</strong>, 하나는 <strong>한 번만 있는 약속</strong>으로 합니다.</p>
+      <ol>
+        <li>PC에서 <code>calendar.google.com</code>에 접속합니다.</li>
+        <li>왼쪽 위 <strong>+ 만들기</strong> → <strong>일정</strong>을 누르고, 필요하면 <strong>옵션 더보기</strong>를 눌러 자세한 화면을 엽니다.</li>
+        <li><strong>제목</strong>에 <code>디지털 교육 (노트북 지참)</code>처럼 준비물까지 적습니다.</li>
+        <li>날짜와 시작·종료 시간을 정합니다.</li>
+        <li><strong>반복 안함</strong>을 눌러 <strong>매주 ○요일</strong>을 고릅니다.</li>
+        <li><strong>알림</strong>에서 <code>30분 전</code>으로 정하고, 필요하면 <strong>알림 추가</strong>로 <code>1일 전</code>도 넣습니다.</li>
+        <li><strong>저장</strong>을 누릅니다.</li>
+        <li>스마트폰의 <strong>구글 캘린더 앱</strong>을 열어 같은 일정이 보이는지 확인합니다. (앱에서는 오른쪽 아래 <kbd>+</kbd> → 일정)</li>
+      </ol>
+      <div class="dl">
+        <div class="dlrow"><span class="k">반복 일정</span><span class="v"><small>제목 · 요일 · 시간 · 알림</small></span></div>
+        <div class="dlrow"><span class="k">한 번 일정</span><span class="v"><small>제목 · 날짜 · 시간 · 알림</small></span></div>
+      </div>
+      <div class="box check"><span class="lbl">확인</span>
+        <p>스마트폰 캘린더에 두 일정이 모두 보이면 성공입니다. 메뉴 이름·위치는 업데이트로 조금 달라질 수 있습니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 05</span><h3>AI 주간 계획 초안 → 고치기 → 직접 등록</h3></div>
+      
+      <p>Gemini 또는 ChatGPT에 다음 주 계획을 부탁합니다. 괄호 안은 내 상황으로 바꿔 쓰세요.</p>
+      <pre><span class="p">나 ▶</span> 너는 일정 관리 도우미야. 나는 (평일 오전 9시~오후 1시에 일하고),
+     (화·목 오후 2시에 교육)을 들어. (매일 30분 걷기, 주 2회 장보기)를 하고 싶어.
+     다음 주 월~일 계획을 요일별 표로 짜 줘. 쉬는 시간도 넣어 줘.
+<span class="o">AI ▶ 월~일 × 오전·오후·저녁 칸으로 된 주간 계획표</span>
+<span class="c"># 병원 이름·주소·동행인 이름은 넣지 않습니다. "오후 병원 진료"면 충분합니다</span></pre>
+      <ol>
+        <li>AI 표에서 <strong>내 실제 상황과 맞지 않는 칸</strong>에 표시합니다. (이미 있는 약속, 너무 빡빡한 날 등)</li>
+        <li>필요하면 "수요일은 오후에 약속이 있어. 걷기를 아침으로 옮겨 줘"처럼 <strong>고쳐 달라고 한 번 더</strong> 요청합니다.</li>
+        <li>확정한 일정 중 <strong>2개 이상</strong>을 미션 4와 같은 방법으로 캘린더에 <strong>직접</strong> 등록합니다.</li>
+      </ol>
+      <div class="dl">
+        <div class="dlrow"><span class="k">고친 부분</span><span class="v"><small>AI 초안 → 내가 바꾼 내용과 이유</small></span></div>
+        <div class="dlrow"><span class="k">등록한 일정</span><span class="v"><small>2개 이상</small></span></div>
+      </div>
+      <div class="box warn"><span class="lbl">AI에게 맡기지 않는 이유</span>
+        <p>AI는 내 실제 약속과 몸 상태를 모릅니다. 날짜·요일이 틀린 표를 만들기도 합니다. 캘린더에 넣기 전에 <strong>날짜와 요일을 달력과 대조</strong>하세요.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 06</span><h3>할 일 목록 만들기</h3></div>
+      
+      <p>시간이 정해지지 않은, <strong>마감만 있는 일</strong>을 할 일 목록에 넣습니다.</p>
+      <ol>
+        <li>구글 캘린더 화면 오른쪽 옆 패널에서 <strong>Tasks(할 일)</strong> 아이콘을 누르거나, 스마트폰에 <strong>Google Tasks</strong> 앱을 설치합니다.</li>
+        <li><strong>할 일 추가</strong>를 눌러 3개를 적습니다. 예) <code>택배 반품하기</code>, <code>보험 서류 찾기</code></li>
+        <li>하나에는 <strong>날짜(마감일)</strong>를 넣어 봅니다.</li>
+        <li>끝낸 일이 있다면 동그라미를 눌러 <strong>완료</strong> 표시를 해 봅니다.</li>
+      </ol>
+      <div class="box q"><span class="lbl">생각해 보기</span>
+        <p>"매주 목요일 10시 수업"과 "이번 주 안에 반품"은 각각 캘린더와 할 일 목록 중 어디에 넣는 것이 좋을까요?</p></div>
+    </div>
+
+    <div class="mission py">
+      <div class="mhead"><span class="mn">PYTHON P7 · 선택</span><h3>루틴 목록을 캘린더 파일(.ics)로 만들어 한 번에 등록하기</h3></div>
+      
+      <p>반복 일정을 하나씩 클릭해 넣는 대신, 파이썬으로 <strong>.ics 캘린더 파일</strong>을 만들어 구글 캘린더에 <strong>한 번에 가져오기</strong> 합니다. .ics는 구글·애플·아웃룩 캘린더가 모두 읽는 표준 파일입니다.</p>
+      <p><strong>쓰는 파이썬:</strong> 리스트 안의 딕셔너리 · 함수 · 문자열 만들기 · 파일 쓰기 · 조건문</p>
+      <div class="nb"><b>📓 Colab 노트북</b>
+        <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit5_python.ipynb" target="_blank" rel="noopener">Colab에서 열기</a>
+        <a href="../python/unit5_python.ipynb" download>노트북 내려받기 (.ipynb)</a>
+        <small>Colab에서 열기가 안 되면: 내려받기 → colab.research.google.com → 파일 → 노트북 업로드. 구글 계정으로 로그인합니다.</small></div>
+      <ol>
+        <li>노트북 A-1: <code>일정들</code> 리스트의 날짜·시간·반복 요일을 <strong>나의 루틴</strong>으로 고칩니다.</li>
+        <li>A-2 <strong>✏️</strong>: 일정 하나를 캘린더 형식 줄들로 바꾸는 함수의 빈칸(끝 시각, 제목, 반복 규칙)을 채웁니다.</li>
+        <li>A-3: 검사 셀이 모두 ✅이면 <code>내_루틴.ics</code>를 내려받습니다.</li>
+        <li>구글 캘린더(PC)에서 <strong>새 캘린더 "루틴 연습"</strong>을 먼저 만듭니다. (설정 → 캘린더 추가 → 새 캘린더)</li>
+        <li>설정 → <strong>가져오기/내보내기</strong> → 파일 선택 → 추가할 캘린더를 <strong>"루틴 연습"</strong>으로 고르고 가져오기.</li>
+        <li>휴대폰 캘린더 앱에서 일정이 반복으로 보이는지 확인합니다.</li>
+      </ol>
+      <div class="box warn"><span class="lbl">꼭 새 캘린더로</span>
+        <p>가져온 일정은 한꺼번에 취소하기 어렵습니다. <strong>연습용 캘린더에 넣어 두면</strong> 잘못됐을 때 그 캘린더만 삭제하면 됩니다. 메뉴 이름은 업데이트로 달라질 수 있습니다. 알림은 캘린더의 기본 알림 설정이 적용됩니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">3차시</span><h2>기록 습관 만들기</h2><span class="pt">50분</span></div>
+    <p class="lede">녹음 실습은 반드시 상대방의 동의를 받고 시작합니다. 네이버 계정이 없으면 대안 방법을 안내받으세요.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 07</span><h3>구글 Keep으로 생활 메모 만들기</h3></div>
+      
+      <ol>
+        <li>PC에서 <code>keep.google.com</code>에 접속하거나, 스마트폰에 <strong>Google Keep</strong> 앱을 설치하고 구글 계정으로 로그인합니다.</li>
+        <li><strong>메모 작성</strong>을 누르고 제목 <code>장보기</code>를 입력합니다.</li>
+        <li>체크박스 모양 아이콘(<strong>체크박스 표시</strong> 또는 <strong>새 목록</strong>)을 눌러 목록으로 바꾸고 물건 5개를 적습니다.</li>
+        <li>하나를 체크해서 아래로 내려가는 것을 확인합니다.</li>
+        <li>새 메모를 하나 더 만들고 메뉴(점 세 개)에서 <strong>라벨 추가</strong> → <code>배움</code> 라벨을 붙입니다.</li>
+        <li>PC에서 만들었다면 스마트폰에서, 스마트폰에서 만들었다면 PC에서 같은 메모가 보이는지 확인합니다.</li>
+      </ol>
+      <div class="box warn"><span class="lbl">메모에 적지 말 것</span>
+        <p>비밀번호, 주민등록번호, 카드·계좌번호, 보안카드 사진은 저장하지 않습니다. 편리한 만큼 계정이 뚫리면 한꺼번에 새어 나갑니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 08</span><h3>음성 녹음 → AI 요약본 만들기 ★</h3></div>
+      
+      <div class="box warn"><span class="lbl">시작 전 — 녹음 동의</span>
+        <p>짝에게 <strong>"실습용으로 2분만 녹음해도 될까요?"</strong>라고 먼저 묻고, 동의를 받은 뒤 시작합니다. 내가 참여하지 않은 다른 사람들끼리의 대화를 몰래 녹음하면 <strong>통신비밀보호법 위반</strong>이 될 수 있습니다. 동의를 원하지 않는 분은 혼자 안내문을 소리 내어 읽어 녹음합니다.</p></div>
+      <p><strong>방법 A — 클로바노트 (네이버 계정 필요)</strong></p>
+      <ol>
+        <li>스마트폰에 <strong>클로바노트</strong> 앱을 설치하고 네이버 계정으로 로그인합니다.</li>
+        <li>녹음 버튼을 눌러 짝과 2분 동안 대화합니다. 주제 예) <code>이번 주말 계획과 필요한 준비물</code></li>
+        <li>녹음을 멈추고 저장하면 <strong>글로 변환</strong>될 때까지 잠시 기다립니다.</li>
+        <li>노트 화면에서 <strong>AI 요약</strong>(또는 요약 메뉴)을 확인합니다.</li>
+        <li>변환된 글과 요약에서 <strong>사람 이름·숫자·날짜·장소</strong>가 맞는지 녹음을 다시 들으며 고칩니다.</li>
+        <li>완성한 요약을 복사해 구글 Keep의 <code>배움</code> 라벨 메모에 붙여 넣습니다.</li>
+      </ol>
+      <p><strong>방법 B — 네이버 계정이 없거나 무료 한도를 다 쓴 경우</strong></p>
+      <ol>
+        <li>휴대폰 기본 녹음 앱에 <strong>텍스트 변환</strong> 기능이 있으면 그것을 씁니다. (기종에 따라 없을 수 있음)</li>
+        <li>또는 대화 내용을 메모로 간단히 받아 적은 뒤, Gemini에 붙여 넣고 아래처럼 요청합니다.</li>
+      </ol>
+      <pre><span class="p">나 ▶</span> 아래 대화 기록을 "핵심 내용 3줄 + 할 일 목록" 형식으로 요약해 줘. 기록에 없는 내용은 추가하지 마.
+<span class="o">AI ▶ 핵심 내용 3줄 / 할 일: ① ... ② ...</span>
+<span class="c"># "기록에 없는 내용은 추가하지 마" — AI가 지어내는 것을 줄여 줍니다</span></pre>
+      <div class="dl">
+        <div class="dlrow"><span class="k">사용한 방법</span><span class="v"><small>A 클로바노트 / B 대안</small></span></div>
+        <div class="dlrow"><span class="k">AI가 틀린 곳</span><span class="v"><small>예) "3시" → "세 시"를 "셋이"로 적음</small></span></div>
+        <div class="dlrow"><span class="k">최종 요약본</span><span class="v"><small>3줄 + 할 일</small></span></div>
+      </div>
+      <div class="box check"><span class="lbl">확인</span>
+        <p>클로바노트는 매달 무료로 쓸 수 있는 시간에 한도가 있고, 기능·한도는 바뀔 수 있습니다. 실습 녹음은 끝난 뒤 짝과 함께 확인하고 필요 없으면 삭제하세요.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 09</span><h3>나의 기록 규칙 3가지 정하기</h3></div>
+      
+      <p>오늘 써 본 도구 중에서 앞으로 계속 쓸 기록 방법을 정합니다.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">언제 기록할까</span><span class="v"><small>예) 병원 진료 직후, 교육이 끝난 저녁</small></span></div>
+        <div class="dlrow"><span class="k">어디에 기록할까</span><span class="v"><small>예) Keep "건강" 라벨, 클로바노트</small></span></div>
+        <div class="dlrow"><span class="k">지킬 약속</span><span class="v"><small>예) 녹음 전 반드시 동의 구하기, 개인정보는 적지 않기</small></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">4차시</span><h2>나만의 AI 비서 만들기</h2><span class="pt">50분</span></div>
+    <p class="lede">젬 만들기는 PC 웹(gemini.google.com)에서 진행합니다. 아래 지침 예시 3개 중 하나를 골라 내 상황에 맞게 고쳐 쓰세요.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 10</span><h3>Gemini 젬(Gems)으로 나의 비서 만들기 ★</h3></div>
+      
+      <ol>
+        <li>PC에서 <code>gemini.google.com</code>에 접속해 구글 계정으로 로그인합니다.</li>
+        <li>왼쪽 메뉴를 펼치고 <strong>젬</strong>(또는 <strong>Gem 관리자</strong>, <strong>젬 둘러보기</strong>)을 찾습니다.</li>
+        <li><strong>새 젬 만들기</strong>(또는 <kbd>+</kbd> 젬 만들기)를 누릅니다.</li>
+        <li><strong>이름</strong>에 비서 이름을 적습니다. 예) <code>우리집 요리 도우미</code></li>
+        <li><strong>요청 사항(지침)</strong> 칸에 아래 예시 중 하나를 붙여 넣고, 괄호 부분을 내 상황으로 고칩니다.</li>
+        <li>오른쪽 <strong>미리보기</strong> 창에서 질문을 한 번 해 봅니다.</li>
+        <li><strong>저장</strong>을 누르고, 젬 목록에 나타나는지 확인합니다.</li>
+      </ol>
+      <p><strong>지침 예시 ① 요리 도우미</strong></p>
+      <pre>너는 요리 초보를 돕는 친절한 요리 도우미야.
+나는 (두 식구) 식사를 준비하는 (요리 초보)야.
+내가 집에 있는 재료를 말하면 30분 안에 만들 수 있는 요리 2가지를 추천해 줘.
+답은 "요리 이름 → 재료 목록 → 번호 붙인 만드는 순서"로 쓰고, 계량은 숟가락·컵 단위로 알려 줘.
+어려운 요리 용어는 쉬운 말로 풀어 줘.
+식품 알레르기가 있는지 처음에 한 번 물어봐 줘.
+건강·영양에 관한 설명은 참고용이라고 밝히고, 모르는 것은 모른다고 말해 줘.</pre>
+      <p><strong>지침 예시 ② 문서 교정 비서</strong></p>
+      <pre>너는 꼼꼼한 문서 교정 비서야.
+내가 이메일·안내문·문자 초안을 붙여 넣으면 맞춤법·띄어쓰기·어색한 문장을 고쳐 줘.
+원래 뜻은 바꾸지 말고, 말투는 (공손한 존댓말)로 맞춰 줘.
+답은 "① 고친 전체 글 ② 바꾼 부분과 이유 표" 순서로 보여 줘.
+글에 전화번호·주민등록번호·계좌번호 같은 개인정보가 보이면 지우라고 먼저 알려 줘.
+사실 여부(날짜·금액 등)는 네가 판단하지 말고 "직접 확인 필요"라고 표시해 줘.</pre>
+      <p><strong>지침 예시 ③ 공부 코치</strong></p>
+      <pre>너는 성인 학습자를 응원하는 공부 코치야.
+나는 (디지털·AI 활용)을 공부하는 초보자야.
+내가 주제를 말하면 중학생도 이해할 수 있게 쉬운 말과 생활 예시로 설명해 줘.
+설명이 끝나면 확인 퀴즈 3문제를 내고, 내가 답하기 전에는 정답을 알려 주지 마.
+틀리면 바로 정답을 말하지 말고 힌트를 한 번 준 뒤 설명해 줘.
+한 번에 너무 길게 쓰지 말고, 확실하지 않은 정보는 공식 자료에서 확인하라고 알려 줘.</pre>
+      <div class="box warn"><span class="lbl">주의</span>
+        <p>지침에 <strong>이름·주소·전화번호·건강 기록·계좌</strong> 같은 개인정보를 넣지 마세요. 회사나 학교 구글 계정은 관리자 설정으로 Gemini가 막혀 있을 수 있으니 개인 구글 계정을 사용합니다. 메뉴 이름과 무료 제공 범위는 업데이트로 달라질 수 있습니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 11</span><h3>질문 3개로 시험하고 지침 고치기</h3></div>
+      
+      <ol>
+        <li>저장한 젬을 목록에서 눌러 대화를 시작합니다.</li>
+        <li>평소 내가 할 법한 질문을 <strong>3개</strong> 해 봅니다. 예) <code>달걀, 두부, 양파가 있어</code></li>
+        <li>마음에 안 드는 점을 찾습니다. (너무 길다, 형식이 다르다, 어려운 말이 나온다 등)</li>
+        <li>젬 목록에서 내 젬의 <strong>수정</strong>(연필 모양 또는 점 세 개 메뉴)을 눌러 지침에 <strong>한 줄을 추가</strong>합니다. 예) <code>답은 10줄 이내로 써 줘.</code></li>
+        <li>같은 질문을 다시 해서 달라졌는지 비교합니다.</li>
+      </ol>
+      <div class="dl">
+        <div class="dlrow"><span class="k">나의 젬 이름</span><span class="v"><small>목적이 드러나게</small></span></div>
+        <div class="dlrow"><span class="k">시험 질문 3개</span><span class="v"><small>① ② ③</small></span></div>
+        <div class="dlrow"><span class="k">추가한 지침</span><span class="v"><small>무엇이 불편해서 무엇을 추가했나</small></span></div>
+      </div>
+      <div class="box check"><span class="lbl">확인</span>
+        <p>스마트폰 제미나이 앱에서도 내 젬을 골라 대화할 수 있는지 확인해 보세요. (앱 버전에 따라 위치가 다를 수 있습니다)</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 12</span><h3>(선택) ChatGPT 맞춤 설정 해 보기</h3></div>
+      
+      <p>ChatGPT를 주로 쓰는 분은 <strong>맞춤 설정(사용자 지정 지침)</strong>으로 모든 대화의 기본 말투를 정할 수 있습니다.</p>
+      <ol>
+        <li>ChatGPT에 로그인한 뒤, 화면 구석의 <strong>내 프로필(이름·사진)</strong>을 누릅니다.</li>
+        <li><strong>설정</strong>에서 <strong>개인 맞춤 설정</strong> 또는 <strong>ChatGPT 맞춤 설정</strong>을 찾습니다. (메뉴 이름은 업데이트로 달라질 수 있습니다)</li>
+        <li>"ChatGPT가 어떻게 응답했으면 하나요?" 같은 칸에 아래처럼 적고 저장합니다.</li>
+      </ol>
+      <pre>나는 AI를 배우는 초보자야. 어려운 용어는 쉬운 말로 풀어 주고,
+답은 번호를 붙여 짧게 정리해 줘. 확실하지 않은 내용은 확실하지 않다고 말해 줘.
+<span class="c"># 새 대화를 열어 질문하면 이 지침이 적용됩니다</span></pre>
+      <div class="box q"><span class="lbl">생각해 보기</span>
+        <p>젬은 목적별로 여러 개, 맞춤 설정은 모든 대화에 하나. 나에게는 어느 쪽이 더 편할까요?</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">5차시</span><h2>루틴 설계</h2><span class="pt">50분</span></div>
+    <p class="lede">지금까지 설정한 도구 목록을 옆에 두고 시작하세요. 루틴은 "5분짜리 1개"부터입니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 13</span><h3>나의 루틴 후보 고르고 네 칸 채우기</h3></div>
+      
+      <ol>
+        <li>아침·업무·학습·저녁 중 <strong>가장 바꾸고 싶은 시간대 1개</strong>를 고릅니다.</li>
+        <li>아래 네 칸을 채웁니다. 행동은 <strong>5~15분 안에 끝나는 것</strong>으로 정합니다.</li>
+      </ol>
+      <div class="dl">
+        <div class="dlrow"><span class="k">1 · 신호 (언제)</span><span class="v"><small>예) 매일 07:00 캘린더 알림이 울리면</small></span></div>
+        <div class="dlrow"><span class="k">2 · 행동 (무엇을)</span><span class="v"><small>예) 오늘 일정 확인 → 할 일 3개 적기</small></span></div>
+        <div class="dlrow"><span class="k">3 · 도구 (무엇으로)</span><span class="v"><small>캘린더 · Keep · 클로바노트 · 나의 젬 · 디지털 웰빙 중</small></span></div>
+        <div class="dlrow"><span class="k">4 · 기록 (확인)</span><span class="v"><small>예) Keep 체크리스트에 체크, 일요일에 돌아보기</small></span></div>
+      </div>
+      <div class="box q"><span class="lbl">생각해 보기</span>
+        <p>이 루틴을 <strong>2주 동안 매일</strong> 할 수 있을까요? 자신이 없다면 행동을 더 작게 줄이세요.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 14</span><h3>루틴 흐름도 그리기 ★</h3></div>
+      
+      <p>네모와 화살표로 그립니다. 도구는 편한 것을 고르세요: <strong>종이(사진 찍어 저장)</strong> · <strong>구글 슬라이드</strong> · <strong>캔바</strong>.</p>
+      <ol>
+        <li>맨 위에 <strong>[신호]</strong> 네모를 그립니다.</li>
+        <li>아래로 화살표를 그리고 <strong>[행동]</strong>을 순서대로 적습니다.</li>
+        <li>각 행동 옆에 <strong>(도구)</strong>를 적습니다.</li>
+        <li>맨 아래에 <strong>[기록]</strong> 네모를 넣습니다.</li>
+        <li>완성한 흐름도를 구글 드라이브에 저장합니다. (루틴북 5장에 들어갑니다)</li>
+      </ol>
+      <p>그리기가 막막하면 AI에게 글자 흐름도 초안을 부탁하고 직접 고칩니다.</p>
+      <pre><span class="p">나 ▶</span> 내 루틴을 네모 괄호와 화살표로 된 간단한 글자 흐름도로 그려 줘. 각 단계 옆에 쓰는 도구를 괄호로 적어 줘.
+     신호: 화·목 20시 캘린더 알림 / 행동: 공부 코치 젬과 퀴즈 5문제, 틀린 것 메모 / 기록: Keep 체크
+<span class="o">AI ▶ [신호] 화·목 20:00 알림 → [행동] 퀴즈 5문제 (공부 코치 젬) → [행동] 오답 메모 (Keep) → [기록] 체크 ✔</span>
+<span class="c"># AI 초안을 그대로 쓰지 말고, 내 실제 순서에 맞게 고칩니다. 루틴북에는 "AI 사용"을 표기합니다</span></pre>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 15</span><h3>루틴에 도구 실제로 연결하기</h3></div>
+      
+      <p>흐름도는 그림으로 끝나면 안 됩니다. <strong>신호</strong>가 실제로 울리게 만듭니다.</p>
+      <ol>
+        <li>구글 캘린더에 루틴 신호를 <strong>반복 일정</strong>으로 등록합니다. 제목 예) <code>[루틴] 아침 5분 점검</code></li>
+        <li>알림을 <strong>시작 시간 0분 전(정시)</strong> 또는 <strong>5분 전</strong>으로 설정합니다.</li>
+        <li>구글 Keep에 <code>루틴 체크</code> 체크리스트를 만들고 요일(월~일)을 적어 둡니다.</li>
+        <li>루틴에 젬을 쓴다면, 스마트폰 제미나이 앱에서 해당 젬을 바로 찾을 수 있는지 확인합니다.</li>
+      </ol>
+      <div class="box check"><span class="lbl">심화 · 선택</span>
+        <p>갤럭시의 <strong>모드 및 루틴</strong>, 아이폰의 <strong>단축어 → 자동화</strong>를 쓰면 "특정 시간이 되면 방해 금지 켜기"처럼 휴대폰 설정도 자동으로 바꿀 수 있습니다. 기기마다 메뉴가 달라 오늘은 소개만 합니다.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">6차시</span><h2>최종 프로젝트: 나만의 디지털 루틴북</h2><span class="pt">50분</span></div>
+    <p class="lede">1~5단원 결과물을 한 폴더에 모으는 것부터 시작합니다. 꾸미기보다 빠진 장이 없는지가 먼저입니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 16</span><h3>구글 드라이브에 결과물 모으기</h3></div>
+      
+      <ol>
+        <li><code>drive.google.com</code>에 접속해 <strong>+ 새로 만들기 → 새 폴더</strong>를 누르고 이름을 <code>디지털 루틴북_이름</code>으로 짓습니다.</li>
+        <li>아래 표를 보며 단원별 결과물을 폴더에 올리거나(파일 업로드) 캡처해서 넣습니다.</li>
+        <li>찾지 못한 결과물은 표에 <strong>"없음"</strong>이라고 적고, 짧게라도 다시 만듭니다.</li>
+      </ol>
+      <div class="dl">
+        <div class="dlrow"><span class="k">1단원</span><span class="v">사전 역량 자가진단 결과 · 계정 보안 점검표<small>있음 / 없음</small></span></div>
+        <div class="dlrow"><span class="k">2단원</span><span class="v">나만의 프롬프트 노트 (질문 템플릿 10개)<small>있음 / 없음</small></span></div>
+        <div class="dlrow"><span class="k">3단원</span><span class="v">생활 문제 해결 기록 (문제→질문→결과→확인)<small>있음 / 없음</small></span></div>
+        <div class="dlrow"><span class="k">4단원</span><span class="v">1페이지 정보 리포트 (출처·AI 사용 표기)<small>있음 / 없음</small></span></div>
+        <div class="dlrow"><span class="k">5단원</span><span class="v">웰빙 진단표 · 젬 지침 · 루틴 흐름도 · 실천 체크<small>있음 / 없음</small></span></div>
+      </div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 17</span><h3>루틴북 제작 — 목차 템플릿 따라 붙이기 ★</h3></div>
+      
+      <p><strong>구글 문서</strong>, <strong>구글 슬라이드</strong>, <strong>캔바</strong> 중 하나를 고릅니다. 슬라이드라면 한 장에 한 챕터씩 만들면 발표 자료로 바로 쓸 수 있습니다.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">0장 표지</span><span class="v">제목 · 이름 · 나의 목표 한 줄<small>예) "AI를 무서워하지 않고 매일 쓰는 사람 되기"</small></span></div>
+        <div class="dlrow"><span class="k">1장 출발점</span><span class="v">사전 자가진단 점수 · 보안 점검 결과<small>비밀번호 자체는 절대 넣지 않기</small></span></div>
+        <div class="dlrow"><span class="k">2장 프롬프트</span><span class="v">베스트 질문 템플릿 3개 + 어디에 썼는지<small>2단원 프롬프트 노트에서 고르기</small></span></div>
+        <div class="dlrow"><span class="k">3장 생활 문제</span><span class="v">문제 → 질문 → 결과 → 확인 1건<small>무엇을 어떻게 확인했는지가 핵심</small></span></div>
+        <div class="dlrow"><span class="k">4장 정보 리포트</span><span class="v">1페이지 리포트 이미지 또는 링크<small>출처·AI 사용 표기 확인</small></span></div>
+        <div class="dlrow"><span class="k">5장 나의 루틴</span><span class="v">웰빙 진단 전·후 · 젬 지침 · 루틴 흐름도 · 실천 체크표<small>이번 단원 결과물</small></span></div>
+        <div class="dlrow"><span class="k">마지막 쪽</span><span class="v">사전·사후 자가진단 비교 · 세 문장 소감<small>7차시에 완성</small></span></div>
+      </div>
+      <div class="box warn"><span class="lbl">개인정보 가리기</span>
+        <p>캡처 화면 속 <strong>전화번호, 이메일 주소, 집 주소, 다른 사람의 이름·얼굴</strong>은 도형으로 덮거나 잘라 냅니다. AI가 만든 문장·그림에는 <code>AI 사용: Gemini로 초안 작성 후 수정</code>처럼 표기합니다.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 18</span><h3>루브릭으로 자기 점검하고 공유 링크 만들기</h3></div>
+      
+      <p>각 항목에 <strong>우수 / 보통 / 노력</strong> 중 하나를 표시하고, "노력"이 있으면 지금 보완합니다.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">① 완성도 30%</span><span class="v">목차 6장(0~5장)이 모두 있다<small>우수 6장+설명 / 보통 4~5장 / 노력 3장 이하</small></span></div>
+        <div class="dlrow"><span class="k">② 실생활 적용 30%</span><span class="v">캘린더 등록 화면, 루틴 실천 체크 등 실제로 쓴 증거가 있다<small>우수 증거 있음 / 보통 계획만 / 노력 막연함</small></span></div>
+        <div class="dlrow"><span class="k">③ 안전·윤리 20%</span><span class="v">개인정보를 가렸고, 출처·AI 사용을 표기했다<small>우수 둘 다 / 보통 하나 / 노력 없음</small></span></div>
+        <div class="dlrow"><span class="k">④ 성찰·전달 20%</span><span class="v">전·후 변화와 앞으로의 계획이 있고, 3분 안에 설명할 수 있다<small>우수 모두 / 보통 하나 부족 / 노력 둘 이상 부족</small></span></div>
+      </div>
+      <ol>
+        <li>루틴북 파일 오른쪽 위 <strong>공유</strong>를 누릅니다.</li>
+        <li><strong>일반 액세스</strong>를 <strong>링크가 있는 모든 사용자</strong>로 바꾸고, 권한은 <strong>뷰어</strong>로 둡니다.</li>
+        <li><strong>링크 복사</strong>를 눌러 강사가 안내한 곳에 제출합니다.</li>
+      </ol>
+      <div class="box warn"><span class="lbl">편집자 권한 주의</span>
+        <p>권한을 <strong>편집자</strong>로 두면 링크를 받은 누구나 내 루틴북을 고치거나 지울 수 있습니다.</p></div>
+    </div>
+
+    <div class="mission py">
+      <div class="mhead"><span class="mn">PYTHON P8 · 선택</span><h3>습관 기록 분석 — 달성률 · 연속 달성일 · 주간 비교를 루틴북에</h3></div>
+      
+      <p>2주 동안의 습관 체크 기록(O/X)을 파이썬으로 분석해서, <strong>루틴북에 붙일 요약 보고서</strong>를 만듭니다. 내 기록이 있다면 구글 시트에서 CSV로 내려받아 그대로 넣을 수 있습니다.</p>
+      <p><strong>쓰는 파이썬:</strong> CSV 읽기 · 반복문과 카운트 · 연속 구간 찾기 · 문자열로 보고서 만들기 · 파일 저장</p>
+      <div class="nb"><b>📓 Colab 노트북</b>
+        <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit5_python.ipynb" target="_blank" rel="noopener">Colab에서 열기</a>
+        <a href="../python/unit5_python.ipynb" download>노트북 내려받기 (.ipynb)</a>
+        <small>Colab에서 열기가 안 되면: 내려받기 → colab.research.google.com → 파일 → 노트북 업로드. 구글 계정으로 로그인합니다.</small></div>
+      <ol>
+        <li>노트북 B-1: 예시 기록(14일 × 습관 4개)을 저장하고 읽습니다.</li>
+        <li>B-2 <strong>✏️</strong>: 습관별 <strong>달성률(%)</strong>을 계산합니다.</li>
+        <li>B-3 <strong>✏️</strong>: <strong>가장 길게 연속으로 달성한 날 수</strong>를 구하는 함수를 완성합니다.</li>
+        <li>B-4: 1주차와 2주차를 비교해 오른 습관·내려간 습관을 찾습니다.</li>
+        <li>B-5: 요약 보고서를 <code>루틴_보고서.txt</code>로 저장·내려받아 <strong>루틴북 5장</strong>에 붙입니다.</li>
+        <li>(선택) 내 기록: 구글 시트 → 파일 → 다운로드 → <strong>CSV</strong> → Colab 왼쪽 📁에 올리고 파일 이름만 바꿔 다시 실행.</li>
+      </ol>
+      <pre><span class="p">나 ▶</span> 아래는 내 2주 습관 기록 분석 결과야. 잘한 점 1가지와, 다음 2주 동안
+     달성률이 가장 낮은 습관을 지키기 쉽게 만드는 작은 방법 3가지를 알려 줘.
+     (루틴_보고서 내용 붙여 넣기)</pre>
+      <div class="box check"><span class="lbl">루틴북 연결</span>
+        <p>보고서 + AI 조언 + <strong>내가 실제로 고른 방법 1가지</strong>를 함께 적으면 루브릭 "② 실생활 적용"의 증거가 됩니다. 건강 관련 목표는 무리하지 말고 필요하면 전문가와 상의하세요.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">7차시</span><h2>발표와 마무리</h2><span class="pt">50분</span></div>
+    <p class="lede">1단원 사전 자가진단 결과를 미리 열어 두세요. 발표는 1인 3분입니다.</p>
+    
+    
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 19</span><h3>루틴북 3분 발표 ★</h3></div>
+      
+      <p>발표 전에 아래 표를 채워 두면 3분이 훨씬 편합니다. 루틴북 화면을 띄워 놓고 말합니다.</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">30초 · 시작</span><span class="v"><small>"저는 ○○ 때문에 이 과정을 시작했습니다"</small></span></div>
+        <div class="dlrow"><span class="k">60초 · 가장 쓸모 있던 것</span><span class="v"><small>루틴북에서 한 장 골라 보여 주기</small></span></div>
+        <div class="dlrow"><span class="k">60초 · 나의 루틴</span><span class="v"><small>흐름도 설명 + 젬이나 캘린더 짧게 시연</small></span></div>
+        <div class="dlrow"><span class="k">30초 · 앞으로</span><span class="v"><small>"수료 후 한 달 동안 ○○를 계속하겠습니다"</small></span></div>
+      </div>
+      <p><strong>듣는 사람</strong>은 발표마다 아래 두 가지를 메모해 발표자에게 전합니다.</p>
+      <ul>
+        <li>좋았던 점 1개</li>
+        <li>나도 따라 해 보고 싶은 점 1개</li>
+      </ul>
+      <div class="box warn"><span class="lbl">시연 전 확인</span>
+        <p>화면을 보여 주기 전에 알림 팝업, 메신저, 개인 메일이 뜨지 않도록 <strong>방해 금지</strong>를 켜 두세요.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 20</span><h3>사후 디지털 역량 자가진단</h3></div>
+      
+      <p>과정 첫날(1단원)과 <strong>같은 10문항</strong>입니다. 지금의 나를 기준으로 솔직하게 1~5점을 적고, 사전 점수를 옆에 옮겨 적습니다.</p>
+      <p>점수: 1 전혀 못 한다 · 2 도움이 있으면 한다 · 3 혼자 할 수 있다 · 4 익숙하게 한다 · 5 남에게 가르칠 수 있다</p>
+      <div class="dl">
+        <div class="dlrow"><span class="k">1. 기기 조작</span><span class="v">스마트폰 앱을 찾아 설치·삭제·업데이트할 수 있다<small>사전 ( ) → 사후 ( )</small></span></div>
+        <div class="dlrow"><span class="k">2. 파일 관리</span><span class="v">사진·문서를 폴더에 정리하고, 받은 파일을 찾아 열 수 있다<small>사전 ( ) → 사후 ( )</small></span></div>
+        <div class="dlrow"><span class="k">3. 클라우드</span><span class="v">구글 드라이브 등에 파일을 올리고 링크로 공유할 수 있다<small>사전 ( ) → 사후 ( )</small></span></div>
+        <div class="dlrow"><span class="k">4. 정보 검색</span><span class="v">검색어를 바꿔 가며 필요한 정보를 찾아낼 수 있다<small>사전 ( ) → 사후 ( )</small></span></div>
+        <div class="dlrow"><span class="k">5. 정보 판단</span><span class="v">인터넷 정보가 믿을 만한지 출처와 날짜로 확인할 수 있다<small>사전 ( ) → 사후 ( )</small></span></div>
+        <div class="dlrow"><span class="k">6. 생성형 AI 활용</span><span class="v">ChatGPT 같은 AI에게 질문하고, 받은 답을 생활에 활용할 수 있다<small>사전 ( ) → 사후 ( )</small></span></div>
+        <div class="dlrow"><span class="k">7. 온라인 소통</span><span class="v">이메일·메신저로 파일이나 사진을 첨부해 보낼 수 있다<small>사전 ( ) → 사후 ( )</small></span></div>
+        <div class="dlrow"><span class="k">8. 공공·금융 서비스</span><span class="v">정부24·모바일 뱅킹 같은 서비스를 혼자 이용할 수 있다<small>사전 ( ) → 사후 ( )</small></span></div>
+        <div class="dlrow"><span class="k">9. 보안</span><span class="v">2단계 인증을 설정하고, 스미싱 문자를 구별할 수 있다<small>사전 ( ) → 사후 ( )</small></span></div>
+        <div class="dlrow"><span class="k">10. 디지털 윤리</span><span class="v">저작권·초상권을 지키며 글과 사진을 공유할 수 있다<small>사전 ( ) → 사후 ( )</small></span></div>
+      </div>
+      <div class="dl">
+        <div class="dlrow"><span class="k">합계</span><span class="v"><small>사전 ( /50) → 사후 ( /50)</small></span></div>
+        <div class="dlrow"><span class="k">가장 많이 오른 문항</span><span class="v"><small>나의 성장 포인트</small></span></div>
+        <div class="dlrow"><span class="k">아직 낮은 문항</span><span class="v"><small>수료 후 연습할 목표와 방법</small></span></div>
+      </div>
+      <div class="box check"><span class="lbl">확인</span>
+        <p>자가진단 점수는 성적에 들어가지 않습니다. 결과를 루틴북 마지막 쪽에 붙이세요.</p></div>
+    </div>
+
+    <div class="mission">
+      <div class="mhead"><span class="mn">MISSION 21</span><h3>과정 만족도와 소감 남기기</h3></div>
+      
+      <ol>
+        <li>강사가 안내한 <strong>과정 만족도 설문</strong>에 응답합니다. (내용·실습 난이도·진행 속도·자료)</li>
+        <li>아래 세 문장 소감을 적어 루틴북 마지막 쪽에 붙입니다.</li>
+      </ol>
+      <div class="dl">
+        <div class="dlrow"><span class="k">기억에 남는 것</span><span class="v"><small>36시간 중 가장 기억에 남는 활동 하나</small></span></div>
+        <div class="dlrow"><span class="k">달라진 것</span><span class="v"><small>과정 전과 비교해 생활에서 달라진 점</small></span></div>
+        <div class="dlrow"><span class="k">계속할 것</span><span class="v"><small>수료 후 1주 · 1개월 동안 지킬 루틴</small></span></div>
+      </div>
+      <div class="box q"><span class="lbl">수료 후에도</span>
+        <p>AI 서비스의 메뉴와 요금제는 계속 바뀝니다. 화면이 달라져도 <strong>질문하고 → 확인하고 → 기록하는</strong> 원칙은 그대로입니다. 한 달 뒤 루틴북을 다시 펼쳐 보세요.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 A</span><h2>이럴 땐 이렇게</h2></div>
+    <p class="lede">수업 중에 자주 막히는 상황입니다. 여기 없는 문제는 손을 들어 주세요.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>이런 일이 생기면</th><th>원인</th><th>해결 방법</th></tr></thead>
+        <tbody>
+          <tr><td>"디지털 웰빙" 메뉴가 안 보임</td><td>제조사·운영체제 버전에 따라 이름이나 위치가 다름</td><td>설정 맨 위 검색창(돋보기)에 <code>디지털 웰빙</code> 또는 <code>사용 시간</code> 입력</td></tr>
+          <tr><td>아이폰 스크린 타임에 기록이 없음</td><td>스크린 타임이 꺼져 있었음 (켠 뒤부터 기록)</td><td>설정 → 스크린 타임 → 켜기. 오늘은 짝의 화면으로 실습하고 다음 날 다시 확인</td></tr>
+          <tr><td>PC에서 넣은 일정이 폰 캘린더에 안 보임</td><td>PC와 폰의 구글 계정이 다르거나 동기화 지연</td><td>폰 캘린더 앱 메뉴에서 같은 계정이 체크되어 있는지 확인, 새로고침 또는 잠시 후 확인</td></tr>
+          <tr><td>캘린더 알림이 안 울림</td><td>휴대폰에서 캘린더 앱 알림이 꺼져 있거나 방해 금지 중</td><td>설정 → 알림에서 구글 캘린더 알림 허용. 방해 금지 시간대인지 확인</td></tr>
+          <tr><td>클로바노트 로그인·사용이 안 됨</td><td>네이버 계정이 없거나 무료 사용 시간 한도 초과</td><td>방법 B 사용: 휴대폰 녹음 앱 텍스트 변환, 또는 받아 적은 내용을 Gemini로 요약</td></tr>
+          <tr><td>녹음 요약에 이름·숫자가 엉뚱하게 나옴</td><td>주변 소음, 빠른 말, 고유명사는 AI가 잘못 알아듣기 쉬움</td><td>녹음을 다시 들으며 직접 수정. 다음 녹음은 조용한 곳에서 또박또박</td></tr>
+          <tr><td>Gemini에 "젬" 메뉴가 안 보이거나 막힘</td><td>회사·학교 계정의 관리자 제한, 또는 스마트폰 앱에서 찾고 있음</td><td>PC 웹(gemini.google.com)에서 <strong>개인 구글 계정</strong>으로 로그인. 왼쪽 메뉴를 펼쳐서 확인</td></tr>
+          <tr><td>젬이 지침대로 답하지 않음</td><td>지침이 모호하거나 서로 부딪히는 문장이 있음</td><td>원하는 형식을 구체적으로 한 줄 추가(예: "10줄 이내"), 저장 후 <strong>새 대화</strong>에서 다시 시험</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 B</span><h2>단원 퀴즈</h2></div>
+    <p class="lede">미션을 마쳤으면 퀴즈로 점검합니다. 채점은 바로 나오고, 틀린 문제에는 해설이 붙습니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">QUIZ</span><h3>5단원 · 15문항</h3></div>
+      <div class="sbody">
+        <p>객관식과 직접 입력이 섞여 있습니다. 실습지를 다시 보지 말고 먼저 풀어 본 뒤, 틀린 부분만 해당 미션으로 돌아가 확인하세요.</p>
+        <p style="margin-top:12px;font-size:16px"><a href="quiz.html">▶ 퀴즈 풀러 가기</a></p>
+        <div class="box check">
+          <span class="lbl">통과 기준</span>
+          <p>15문항 중 <strong>12문항 이상</strong>을 맞히면 이 단원을 소화한 것입니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">부록 C</span><h2>단원 마치기 전 자가 점검</h2></div>
+    <p class="lede">모두 체크되면 이 단원의 목표를 달성한 것입니다. 안 되는 항목은 수업이 끝나기 전에 질문하세요.</p>
+    <div class="selfcheck">
+      <h3>5단원 체크리스트</h3>
+      <ul>
+        <li>내 휴대폰에서 <strong>사용 시간·화면 켠 횟수·알림 수</strong>를 찾아 기록했다</li>
+        <li>필요 없는 앱 알림을 3개 이상 끄고, 방해 금지(취침·집중) 시간을 정했다</li>
+        <li>구글 캘린더에 <strong>반복과 알림</strong>이 있는 일정을 등록하고 스마트폰에서 확인했다</li>
+        <li>AI가 만든 주간 계획 초안을 내 상황에 맞게 고친 뒤 직접 등록했다</li>
+        <li>구글 Keep에 체크리스트와 라벨 붙인 메모를 만들었다</li>
+        <li><strong>녹음 전에 동의를 구하고</strong>, 요약본의 이름·숫자·날짜를 원문과 대조했다</li>
+        <li>5가지 재료가 담긴 지침으로 <strong>나만의 젬</strong>을 만들고 시험 후 고쳤다</li>
+        <li>신호·행동·도구·기록 네 칸으로 <strong>루틴 흐름도</strong>를 그리고 캘린더 알림과 연결했다</li>
+        <li>1~5단원 결과물을 목차에 맞춰 <strong>디지털 루틴북</strong>으로 묶고 개인정보를 가렸다</li>
+        <li>3분 발표를 하고, 사전·사후 자가진단을 비교해 나의 성장과 다음 목표를 말할 수 있다</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">과제 05</span><h2>나만의 디지털 루틴북 완성·제출</h2><span class="pt">제출: 7차시 발표 시작 전 (실천 체크표는 수료 후에도 계속 채워 나가기)</span></div>
+    <p class="lede">1~5단원 결과물을 목차대로 묶고, 실제로 루틴을 실천한 기록과 사후 진단·소감까지 담아 제출합니다.</p>
+    <div class="stepc">
+      <div class="shead"><span class="sn">제출 항목</span><h3>구글 드라이브 공유 링크(뷰어 권한)를 과정 게시판 또는 강사가 안내한 곳에 제출</h3></div>
+      <div class="sbody">
+        <ol><li>루틴북 파일 1개 (구글 문서·슬라이드·캔바 중 선택) — 목차 0~5장 모두 포함</li><li>5장: 디지털 웰빙 진단 전·후 숫자 + 알림 정리 내용</li><li>5장: 나의 젬(또는 ChatGPT 맞춤 설정) 지침 전문과 시험 대화 캡처 1장</li><li>5장: 루틴 흐름도 1개 + 3일 이상 실천 체크표</li><li>마지막 쪽: 사전·사후 역량 자가진단 10문항 점수 비교표</li><li>마지막 쪽: 세 문장 소감 (기억에 남는 것 · 달라진 것 · 계속할 것)</li></ol>
+        <span class="prelbl">제출 양식 예시</span><pre><span class="o">이름 : 홍길동 / 제출일 : ○월 ○일
+링크 : (구글 드라이브 공유 링크 · 뷰어 권한)
+
+5장. 나의 디지털 루틴
+  웰빙 진단 : 하루 사용 5시간 10분 → 4시간 20분 / 알림 하루 180개 → 70개
+  나의 젬   : "공부 코치" — 지침 전문 첨부, 시험 대화 캡처 1장
+  루틴      : 화·목 20:00 반복 알림 → 공부 코치 젬 퀴즈 5문제 → Keep "배움" 라벨 저장
+  실천 체크 : 화 ✔ / 목 ✔ / 토(보충) ✔
+
+마지막 쪽. 자가진단 비교 (사전 → 사후)
+  5번 좋은 질문 다듬기 : 1 → 4  ← 가장 많이 오름
+  8번 가짜뉴스 확인   : 2 → 3  ← 계속 연습할 목표
+소감 : 에이아이가 어렵기만 했는데 이제 매일 씁니다. 캘린더 알림 덕분에 약속을 잊지 않습니다. 수료 후에도 공부 코치 젬과 주 2회 복습을 계속하겠습니다.
+(AI 사용 : 루틴 흐름도 초안을 Gemini로 만들고 직접 수정함)</span></pre>
+        <div class="box check"><span class="lbl">채점 기준</span><p>평가 루브릭 — 완성도 30% · 실생활 적용 30% · 안전·윤리 20% · 성찰·전달 20%. 캡처 속 전화번호·이메일·주소는 반드시 가리고, AI로 만든 부분은 "AI 사용"이라고 표기하세요. 꾸미기는 점수에 들어가지 않습니다.</p></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>UNIT 05 / 05 · 실습지 · 「디지털리터러시」 36시간 과정</p>
+  </div>
+</footer>
+<script src="../nav.js"></script>
+</html>

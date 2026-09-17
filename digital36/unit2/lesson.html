@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2단원 차시별 교안 · 디지털리터러시</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --bg:#F6F8F5;--surface:#FFFFFF;--surface-2:#EDF1EC;--ink:#141A16;--ink-2:#3A453E;--muted:#5F6D65;
+    --line:#DBE2DC;--line-strong:#C3CFC6;--accent:#10684A;--accent-soft:#E2EFE8;--clay:#A94D30;--clay-soft:#F6E7E0;
+    --ask:#1F5E86;--ask-soft:#E1EDF5;
+    --term-bg:#10171A;--term-fg:#DCE6E3;--term-dim:#7C9A93;--term-p:#7FD1A8;--term-out:#B8C7C2;
+    --maxw:940px;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+      --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+      --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+    --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+    --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:22px}
+  h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:600;letter-spacing:-.01em}
+  p{margin:0}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+  header.top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .masthead{display:flex;flex-direction:column;gap:16px;padding-block:46px 28px}
+  .rule-tag{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .rule-tag .dash{flex:1;height:1px;background:var(--line-strong);min-width:24px}
+  h1{font-size:clamp(26px,4.4vw,40px);line-height:1.2;font-weight:700;letter-spacing:-.03em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .standfirst{max-width:60ch;color:var(--ink-2);font-size:15.5px;font-weight:300;line-height:1.75}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-top:24px}
+  .rule{background:var(--surface);padding:15px 17px}
+  .rule .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--accent)}
+  .rule h3{font-size:14.5px;font-weight:600;margin-top:4px}
+  .rule p{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.55}
+
+  section{padding-block:44px}
+  .part{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-top:2px solid var(--accent);padding-top:14px;margin-bottom:8px}
+  .part .pn{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;color:var(--accent)}
+  .part h2{font-size:clamp(20px,3vw,26px);font-weight:700;letter-spacing:-.02em;flex:1 1 200px}
+  .part .pt{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .lede{color:var(--muted);font-size:14px;max-width:62ch;margin-bottom:22px}
+
+  .stepc{border:1px solid var(--line);border-radius:4px;background:var(--surface);margin-bottom:16px;overflow:hidden}
+  .shead{display:flex;align-items:baseline;gap:12px;padding:13px 18px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+  .shead .sn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .shead h3{font-size:15px;font-weight:600}
+  .sbody{padding:16px 18px}
+  .sbody > p{font-size:14px;color:var(--ink-2);line-height:1.7}
+  .sbody > p + p{margin-top:9px}
+  .sbody ol,.sbody ul{margin:9px 0 0;padding-left:19px}
+  .sbody li{font-size:14px;color:var(--ink-2);margin-top:5px;line-height:1.65}
+
+  pre{margin:11px 0 0;background:var(--term-bg);color:var(--term-fg);border-radius:3px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+  pre .c{color:var(--term-dim)}
+  pre .p{color:var(--term-p)}
+  pre .o{color:var(--term-out)}
+  .prelbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-top:13px;display:block}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:1px 4px;border-radius:2px}
+  kbd{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:3px;padding:1px 5px;background:var(--surface);color:var(--ink)}
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+
+  .box{margin-top:13px;border-radius:0 3px 3px 0;padding:11px 14px;display:flex;flex-direction:column;gap:5px}
+  .box.check{border-left:2px solid var(--accent);background:var(--accent-soft)}
+  .box.q{border-left:2px solid var(--ask);background:var(--ask-soft)}
+  .box.warn{border-left:2px solid var(--clay);background:var(--clay-soft)}
+  .box .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase}
+  .box.check .lbl{color:var(--accent)}
+  .box.q .lbl{color:var(--ask)}
+  .box.warn .lbl{color:var(--clay)}
+  .box p,.box li{font-size:13.5px;color:var(--ink-2);line-height:1.62}
+  .box ul{margin:0;padding-left:16px}
+  .box li{margin-top:3px}
+  .box code{background:rgba(0,0,0,.06)}
+
+  .mission{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;background:var(--surface);padding:16px 18px;margin-bottom:14px}
+  .mhead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .mhead .mn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .mhead h3{font-size:15px;font-weight:600;flex:1 1 180px}
+  .mission > p{font-size:14px;color:var(--ink-2);margin-top:7px;line-height:1.7}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;min-width:540px;font-size:13.5px}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--surface-2)}
+  tbody tr:last-child td{border-bottom:0}
+  td code{font-size:12px}
+
+  .selfcheck{border:1px solid var(--line-strong);border-radius:4px;background:var(--surface);overflow:hidden}
+  .selfcheck h3{padding:14px 18px;font-size:15px;background:var(--surface-2);border-bottom:1px solid var(--line-strong)}
+  .selfcheck ul{list-style:none;margin:0;padding:6px 18px 16px}
+  .selfcheck li{font-size:14px;color:var(--ink-2);padding:8px 0 8px 28px;border-bottom:1px solid var(--line);position:relative;line-height:1.6}
+  .selfcheck li:last-child{border-bottom:0}
+  .selfcheck li::before{content:"";position:absolute;left:0;top:13px;width:14px;height:14px;border:1.5px solid var(--line-strong);border-radius:2px}
+
+  footer{border-top:1px solid var(--line);background:var(--surface);padding-block:26px;margin-top:20px}
+  footer p{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+  @media (max-width:700px){
+    .sbody,.shead,.mission{padding-inline:14px}
+    .shead{gap:8px;flex-wrap:wrap}
+  }
+
+
+  .form{width:100%;border-collapse:collapse;min-width:0;background:var(--surface);font-size:14px}
+  .form th,.form td{border:1px solid var(--line-strong);padding:10px 12px;vertical-align:middle;text-align:left}
+  .form th{background:var(--surface-2);font-family:var(--sans);font-size:13.5px;letter-spacing:0;text-transform:none;
+           color:var(--ink);font-weight:700;text-align:center;white-space:nowrap}
+  .form td.c{text-align:center}
+  .form td ul{margin:0;padding-left:17px}
+  .form td li{margin:2px 0;font-size:13.5px;line-height:1.6;color:var(--ink-2)}
+  .form .stage{font-weight:700;text-align:center;white-space:nowrap}
+  .form .min{font-family:var(--mono);font-size:12px;text-align:center;white-space:nowrap;color:var(--muted)}
+  .form .ttl{font-size:17px;font-weight:700;text-align:center;padding:14px}
+  .form .sec{background:var(--surface-2);font-weight:700;text-align:left;font-size:14.5px}
+  .form tr.u td{background:var(--accent-soft);font-weight:600}
+  .formwrap{overflow-x:auto;margin-top:14px}
+  .lesson{margin-bottom:30px;break-inside:avoid;page-break-inside:avoid}
+  .lesson .form{min-width:620px}
+  .lnk{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .lnk a{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;border:1px solid var(--line-strong);border-radius:4px;padding:6px 11px;background:var(--surface)}
+  .printbtn{font-family:var(--sans);font-size:13px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:4px;padding:7px 13px;cursor:pointer}
+  @media print{
+    :root{--bg:#fff;--surface:#fff;--surface-2:#EEE;--ink:#000;--ink-2:#111;--muted:#444;--line:#999;--line-strong:#777;--accent:#000;--accent-soft:#F2F2F2}
+    header.top{border:0} .masthead{padding-block:0 12px} section{padding-block:14px}
+    .printbtn,.lnk,footer{display:none!important}
+    .form th,.form td{padding:6px 8px;font-size:11.5px} .form td li{font-size:11.5px}
+  }
+</style>
+
+<header class="top">
+  <div class="wrap masthead">
+    <div class="rule-tag">
+      <span class="eyebrow">한국폴리텍대학 분당융합기술교육원</span>
+      <span class="dash"></span>
+      <span class="eyebrow">교수자용 차시별 교안</span>
+    </div>
+    <h1>2단원 · <em>ChatGPT 첫걸음: 질문하고 답받기</em></h1>
+    <p class="standfirst">잘 묻는 사람이 좋은 답을 받습니다 — 질문하고, 다듬고, 확인하는 법 — 교과목 「디지털리터러시」 · AX교과(실습) · 교수 김남호 · 훈련시설 401호</p>
+    <div class="lnk">
+      <a href="index.html">강의 슬라이드</a><a href="lab.html">실습지</a><a href="quiz.html">퀴즈</a><a href="../plan.html">운영계획서</a>
+      <button class="printbtn" onclick="window.print()">🖨 인쇄 / PDF 저장</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <div class="part"><span class="pn">개요</span><h2>2단원 차시 구성</h2><span class="pt">7시간</span></div>
+    <div class="formwrap"><table class="form">
+      <thead><tr><th>과정 차시</th><th>단원 차시</th><th>차시명</th><th>학습목표</th><th>교수방법</th></tr></thead>
+      <tbody>
+      <tr><td class="c">9</td><td class="c">1</td><td>ChatGPT 시작하기</td><td>ChatGPT의 화면 구성을 알고 PC와 스마트폰에서 글과 음성으로 첫 질문을 할 수 있다.</td><td class="c">강의 · 시연 · 실습</td></tr>
+      <tr><td class="c">10</td><td class="c">2</td><td>좋은 질문의 4요소</td><td>역할·상황·요청·형식의 4요소를 넣어 막연한 질문을 구체적인 질문으로 고칠 수 있다.</td><td class="c">강의 · 비교 시연 · 실습 · 짝 활동</td></tr>
+      <tr><td class="c">11</td><td class="c">3</td><td>대화 이어가기</td><td>추가 질문·수정 요청·예시 제시를 활용해 AI의 답을 3번 이상 다듬을 수 있다.</td><td class="c">시연 · 실습 · 발표</td></tr>
+      <tr><td class="c">12</td><td class="c">4</td><td>AI가 틀릴 때(환각)</td><td>AI 답의 오류(환각)가 생기는 원인을 설명하고 교차 확인 4단계로 사실 여부를 판정할 수 있다.</td><td class="c">강의 · 탐구 실습 · 조별 공유</td></tr>
+      <tr><td class="c">13</td><td class="c">5</td><td>사진·파일로 질문하기</td><td>안내문·설명서 사진과 PDF 파일을 올려 설명과 요약을 받고 원문과 대조해 확인할 수 있다.</td><td class="c">시연 · 실습 · 공유</td></tr>
+      <tr><td class="c">14</td><td class="c">6</td><td>나만의 프롬프트 노트</td><td>생활에서 자주 쓸 질문을 빈칸이 있는 템플릿 10개로 정리해 저장하고 다시 활용할 수 있다.</td><td class="c">강의 · 실습 · 짝 활동</td></tr>
+      <tr><td class="c">15</td><td class="c">7</td><td>미니 프로젝트: 내 생활 질문 해결</td><td>내 생활 문제 하나를 질문·다듬기·교차 확인 과정으로 해결하고 그 과정을 기록해 3분 동안 발표할 수 있다.</td><td class="c">프로젝트 실습 · 발표 · 동료 평가</td></tr>
+      </tbody>
+    </table></div>
+    <div class="formwrap"><table class="form">
+      <tbody>
+        <tr><th style="width:130px">단원 학습목표</th><td><ul><li>ChatGPT 화면과 모바일 앱을 구분해 글과 음성으로 질문할 수 있다</li><li>좋은 질문의 4요소(역할·상황·요청·형식)를 넣어 나쁜 질문을 고칠 수 있다</li><li>추가 질문·수정 요청·예시 제시로 답을 3번 이상 다듬을 수 있다</li><li>AI의 틀린 답(환각)을 교차 확인 절차로 찾아낼 수 있다</li><li>사진과 PDF 파일을 올려 내용 설명과 요약을 받을 수 있다</li><li>자주 쓸 질문 템플릿을 프롬프트 노트로 정리하고 생활 문제 해결에 활용할 수 있다</li></ul></td></tr>
+        <tr><th>단원 과제</th><td><strong>프롬프트 노트 완성과 생활 질문 해결 기록</strong> — 이번 단원의 결과물 두 가지 — 다시 쓸 질문 템플릿 10개와, 내 생활 문제 하나를 해결한 기록을 제출합니다.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="lesson">
+    <div class="part"><span class="pn">1차시 · 과정 9/36</span><h2>ChatGPT 시작하기</h2><span class="pt">50분</span></div>
+    <div class="formwrap"><table class="form">
+      <colgroup><col style="width:92px"><col><col style="width:70px"></colgroup>
+      <tbody>
+        <tr><th>학습목표</th><td colspan="2">ChatGPT의 화면 구성을 알고 PC와 스마트폰에서 글과 음성으로 첫 질문을 할 수 있다.</td></tr>
+        <tr><th>단계</th><th>교수 · 학습 활동</th><th>시간</th></tr>
+        <tr><td class="stage">도입</td><td><ul><li>1단원 복습: 생성형 AI 서비스 종류와 "다음 단어 맞히기" 원리 확인</li><li>동기유발: 강사가 음성 대화로 "오늘 점심 메뉴 추천"을 시연하며 AI와 말로 대화하는 모습 보여주기</li></ul></td><td class="min">5분</td></tr>
+        <tr><td class="stage">전개</td><td><ul><li>ChatGPT 화면 4구역(대화 목록·대화 창·입력창·마이크/음성 버튼) 설명</li><li>무료와 유료의 차이, 사용량 제한과 모델 변경 가능성 안내 (결제 창 누르지 않기)</li><li>실습 미션 1: PC 웹에서 로그인하고 첫 질문 3개, 새 대화 열기·대화 이름 확인</li><li>실습 미션 2: 스마트폰 앱 설치(개발사 확인) → 마이크 받아쓰기와 음성 대화로 질문</li><li>개인정보 주의: 질문에 이름·연락처·주민번호 넣지 않기</li></ul></td><td class="min">35분</td></tr>
+        <tr><td class="stage">정리</td><td><ul><li>글 질문과 음성 질문의 장단점 한 가지씩 발표</li><li>다음 차시 예고: 같은 AI인데 왜 사람마다 답이 다를까 — 좋은 질문의 4요소</li></ul></td><td class="min">10분</td></tr>
+        
+        <tr><th>교수방법</th><td colspan="2">강의 · 시연 · 실습</td></tr>
+        <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 구글 계정, 이어폰(선택)</td></tr>
+        <tr><th>평가</th><td colspan="2">관찰 체크리스트 — PC와 앱에서 각각 로그인해 글·음성 질문을 1회 이상 했는가</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="lesson">
+    <div class="part"><span class="pn">2차시 · 과정 10/36</span><h2>좋은 질문의 4요소</h2><span class="pt">50분</span></div>
+    <div class="formwrap"><table class="form">
+      <colgroup><col style="width:92px"><col><col style="width:70px"></colgroup>
+      <tbody>
+        <tr><th>학습목표</th><td colspan="2">역할·상황·요청·형식의 4요소를 넣어 막연한 질문을 구체적인 질문으로 고칠 수 있다.</td></tr>
+        <tr><th>단계</th><th>교수 · 학습 활동</th><th>시간</th></tr>
+        <tr><td class="stage">도입</td><td><ul><li>전시 확인: 지난 시간 첫 질문 중 답이 아쉬웠던 경험 나누기</li><li>동기유발: "운동 추천해 줘"와 4요소를 넣은 질문의 답을 나란히 띄워 비교</li></ul></td><td class="min">5분</td></tr>
+        <tr><td class="stage">전개</td><td><ul><li>4요소(역할·상황·요청·형식) 설명과 예시, 상황·요청이 가장 중요함을 강조</li><li>건강·금융·법률 질문은 참고용이며 최종 판단은 전문가·공식기관임을 안내</li><li>실습 미션 3: 나쁜 질문 4개를 4요소로 고쳐 쓰고 답 비교</li><li>실습 미션 4: 형식 바꾸기 — 같은 질문을 표·번호 목록·3줄 요약으로 받아 보기</li><li>짝 활동: 서로 고친 질문을 바꿔 보고 빠진 요소 찾아 주기</li></ul></td><td class="min">35분</td></tr>
+        <tr><td class="stage">정리</td><td><ul><li>가장 달라진 답 한 쌍을 골라 발표</li><li>다음 차시 예고: 한 번에 끝내지 않고 대화를 이어 가며 다듬기</li></ul></td><td class="min">10분</td></tr>
+        
+        <tr><th>교수방법</th><td colspan="2">강의 · 비교 시연 · 실습 · 짝 활동</td></tr>
+        <tr><th>준비물·매체</th><td colspan="2">PC, 구글 계정, 실습지</td></tr>
+        <tr><th>평가</th><td colspan="2">실습지 확인 — 고친 질문에 4요소 중 3개 이상이 들어갔는가</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="lesson">
+    <div class="part"><span class="pn">3차시 · 과정 11/36</span><h2>대화 이어가기</h2><span class="pt">50분</span></div>
+    <div class="formwrap"><table class="form">
+      <colgroup><col style="width:92px"><col><col style="width:70px"></colgroup>
+      <tbody>
+        <tr><th>학습목표</th><td colspan="2">추가 질문·수정 요청·예시 제시를 활용해 AI의 답을 3번 이상 다듬을 수 있다.</td></tr>
+        <tr><th>단계</th><th>교수 · 학습 활동</th><th>시간</th></tr>
+        <tr><td class="stage">도입</td><td><ul><li>전시 확인: 4요소를 말로 복습 (역할·상황·요청·형식)</li><li>동기유발: 첫 답이 마음에 안 들 때 창을 닫았던 경험 묻기</li></ul></td><td class="min">5분</td></tr>
+        <tr><td class="stage">전개</td><td><ul><li>답을 다듬는 3가지 방법(추가 질문·수정 요청·예시 보여주기) 설명</li><li>같은 대화 창에서 이어 쓰기 vs 주제가 바뀌면 새 대화 열기</li><li>시연: 모임 안내 문자를 3번 다듬어 완성하는 과정</li><li>실습 미션 5: 내 상황에 맞는 문자·안내문을 3번 이상 다듬기 (다듬기 기록표 작성)</li><li>실습 미션 6: 예시를 보여 주고 같은 느낌의 문구 받기, "답변 다시 생성"으로 다른 답 비교</li></ul></td><td class="min">35분</td></tr>
+        <tr><td class="stage">정리</td><td><ul><li>첫 답과 마지막 답을 비교해 가장 효과 있던 요청 말하기</li><li>다음 차시 예고: AI가 자신 있게 틀리는 순간 — 환각</li></ul></td><td class="min">10분</td></tr>
+        
+        <tr><th>교수방법</th><td colspan="2">시연 · 실습 · 발표</td></tr>
+        <tr><th>준비물·매체</th><td colspan="2">PC 또는 스마트폰, 구글 계정, 다듬기 기록표</td></tr>
+        <tr><th>평가</th><td colspan="2">기록표 확인 — 한 대화 안에서 3번 이상 다듬고 무엇을 바꿨는지 적었는가</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="lesson">
+    <div class="part"><span class="pn">4차시 · 과정 12/36</span><h2>AI가 틀릴 때(환각)</h2><span class="pt">50분</span></div>
+    <div class="formwrap"><table class="form">
+      <colgroup><col style="width:92px"><col><col style="width:70px"></colgroup>
+      <tbody>
+        <tr><th>학습목표</th><td colspan="2">AI 답의 오류(환각)가 생기는 원인을 설명하고 교차 확인 4단계로 사실 여부를 판정할 수 있다.</td></tr>
+        <tr><th>단계</th><th>교수 · 학습 활동</th><th>시간</th></tr>
+        <tr><td class="stage">도입</td><td><ul><li>동기유발: AI가 만든 그럴듯한 가짜 정보(없는 책 소개 등) 화면을 보여 주고 진짜인지 맞혀 보기</li><li>전시 확인: "다음 단어 맞히기" 원리와 환각의 관계 짚기</li></ul></td><td class="min">5분</td></tr>
+        <tr><td class="stage">전개</td><td><ul><li>환각의 원인 4가지(말이 자연스러움≠사실, 학습 시점, 자료가 적은 내용, 모른다고 잘 안 함)</li><li>틀린 답이 잘 나오는 질문 유형(없는 책, 작은 지역 정보, 최근 일, 정확한 숫자) 소개 — 항상 틀리는 것은 아님을 안내</li><li>교차 확인 4단계(되묻기 → 다른 AI → 검색·공식 자료 → 판정 기록) 설명</li><li>실습 미션 7: 유형별 질문 4개 던지고 답 기록</li><li>실습 미션 8: 교차 확인 4단계로 판정표 작성 (맞음·틀림·확인 불가)</li></ul></td><td class="min">35분</td></tr>
+        <tr><td class="stage">정리</td><td><ul><li>조별로 "가장 그럴듯했던 틀린 답" 공유</li><li>다음 차시 예고: 사진과 파일로 질문하기 — 여기서도 확인은 필수</li></ul></td><td class="min">10분</td></tr>
+        <tr><td class="stage">확장<br>(선택)</td><td><ul><li><strong>파이썬 P3</strong> AI가 짠 코드에서 오류 찾기 — "실행된다 ≠ 맞다" — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="../python/unit2_python.ipynb" download>노트북</a> · <a href="../python/answers/unit2_python_answers.ipynb" download>답안</a></li></ul></td><td class="min">선택</td></tr>
+        <tr><th>교수방법</th><td colspan="2">강의 · 탐구 실습 · 조별 공유</td></tr>
+        <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 구글 계정, 판정표</td></tr>
+        <tr><th>평가</th><td colspan="2">판정표 확인 — 질문 2개 이상에 대해 AI가 아닌 자료로 확인하고 근거를 적었는가</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="lesson">
+    <div class="part"><span class="pn">5차시 · 과정 13/36</span><h2>사진·파일로 질문하기</h2><span class="pt">50분</span></div>
+    <div class="formwrap"><table class="form">
+      <colgroup><col style="width:92px"><col><col style="width:70px"></colgroup>
+      <tbody>
+        <tr><th>학습목표</th><td colspan="2">안내문·설명서 사진과 PDF 파일을 올려 설명과 요약을 받고 원문과 대조해 확인할 수 있다.</td></tr>
+        <tr><th>단계</th><th>교수 · 학습 활동</th><th>시간</th></tr>
+        <tr><td class="stage">도입</td><td><ul><li>동기유발: 깨알 같은 관리비 안내문이나 가전 설명서를 보여 주며 "이거 한 번에 이해되세요?"</li><li>전시 확인: 교차 확인 4단계 복습</li></ul></td><td class="min">5분</td></tr>
+        <tr><td class="stage">전개</td><td><ul><li>+ 버튼으로 사진 찍기·앨범에서 고르기·파일 올리기 시연, 사진 잘 찍는 요령</li><li>올리면 안 되는 사진·파일(신분증·통장·개인정보 서류·타인 얼굴)과 가리고 올리기, 설정에서 대화 저장 여부 확인·임시 채팅 안내</li><li>실습 미션 9: 스마트폰으로 생활 안내문·설명서를 찍어 질문하기</li><li>실습 미션 10: 강사 제공 PDF를 요약 → 항목별 표 → 쪽수 묻기 → 원문 대조</li></ul></td><td class="min">35분</td></tr>
+        <tr><td class="stage">정리</td><td><ul><li>AI가 잘못 읽거나 빠뜨린 부분이 있었는지 공유</li><li>다음 차시 예고: 잘 된 질문을 모아 나만의 프롬프트 노트 만들기</li></ul></td><td class="min">10분</td></tr>
+        
+        <tr><th>교수방법</th><td colspan="2">시연 · 실습 · 공유</td></tr>
+        <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 구글 계정, 강사 제공 안내문 PDF, 생활 안내문·설명서(개인정보 없는 것)</td></tr>
+        <tr><th>평가</th><td colspan="2">관찰 체크리스트 — 사진 질문 1회, PDF 요약 후 원문 대조 1회 이상 했는가, 개인정보를 올리지 않았는가</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="lesson">
+    <div class="part"><span class="pn">6차시 · 과정 14/36</span><h2>나만의 프롬프트 노트</h2><span class="pt">50분</span></div>
+    <div class="formwrap"><table class="form">
+      <colgroup><col style="width:92px"><col><col style="width:70px"></colgroup>
+      <tbody>
+        <tr><th>학습목표</th><td colspan="2">생활에서 자주 쓸 질문을 빈칸이 있는 템플릿 10개로 정리해 저장하고 다시 활용할 수 있다.</td></tr>
+        <tr><th>단계</th><th>교수 · 학습 활동</th><th>시간</th></tr>
+        <tr><td class="stage">도입</td><td><ul><li>전시 확인: 1~5차시에서 가장 잘 된 질문 하나씩 떠올리기</li><li>동기유발: 같은 질문을 매번 새로 쓰는 번거로움 — 템플릿이면 빈칸만 바꾸면 된다는 시연</li></ul></td><td class="min">5분</td></tr>
+        <tr><td class="stage">전개</td><td><ul><li>템플릿 구조(4요소 + 대괄호 빈칸) 설명</li><li>생활 템플릿 10종(글쓰기·이해하기·계획하기·비교하기·배우기·확인하기) 소개</li><li>실습 미션 11: 구글 Keep 또는 구글 문서에 프롬프트 노트 만들기</li><li>실습 미션 12: 템플릿 10개 표 채우기 → 그중 3개를 실제로 채워 써 보고 결과 평가</li><li>짝 활동: 서로의 템플릿 하나를 바꿔 써 보고 개선점 제안</li></ul></td><td class="min">35분</td></tr>
+        <tr><td class="stage">정리</td><td><ul><li>가장 쓸모 있을 것 같은 템플릿 1개씩 소개</li><li>다음 차시 예고: 미니 프로젝트 — 해결하고 싶은 생활 문제 하나 생각해 오기</li></ul></td><td class="min">10분</td></tr>
+        <tr><td class="stage">확장<br>(선택)</td><td><ul><li><strong>파이썬 P4</strong> 프롬프트 노트에 "코드 요청 템플릿" 추가하기 — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="../python/unit2_python.ipynb" download>노트북</a> · <a href="../python/answers/unit2_python_answers.ipynb" download>답안</a></li></ul></td><td class="min">선택</td></tr>
+        <tr><th>교수방법</th><td colspan="2">강의 · 실습 · 짝 활동</td></tr>
+        <tr><th>준비물·매체</th><td colspan="2">PC 또는 스마트폰, 구글 계정(Keep·문서), 템플릿 표</td></tr>
+        <tr><th>평가</th><td colspan="2">결과물 확인 — 템플릿 10개를 저장하고 3개 이상 실제로 사용해 보았는가</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="lesson">
+    <div class="part"><span class="pn">7차시 · 과정 15/36</span><h2>미니 프로젝트: 내 생활 질문 해결</h2><span class="pt">50분</span></div>
+    <div class="formwrap"><table class="form">
+      <colgroup><col style="width:92px"><col><col style="width:70px"></colgroup>
+      <tbody>
+        <tr><th>학습목표</th><td colspan="2">내 생활 문제 하나를 질문·다듬기·교차 확인 과정으로 해결하고 그 과정을 기록해 3분 동안 발표할 수 있다.</td></tr>
+        <tr><th>단계</th><th>교수 · 학습 활동</th><th>시간</th></tr>
+        <tr><td class="stage">도입</td><td><ul><li>단원 전체 흐름 복습: 4요소 → 다듬기 → 확인 → 템플릿</li><li>프로젝트 안내: 진행 5단계, 기록 양식, 발표 4구성과 평가 기준 제시</li></ul></td><td class="min">5분</td></tr>
+        <tr><td class="stage">전개</td><td><ul><li>실습 미션 13: 문제 고르기(작고 구체적인 것) → 4요소 첫 질문</li><li>실습 미션 13 계속: 3번 이상 다듬고 중요한 사실 2가지를 교차 확인</li><li>실습 미션 14: 기록 양식 작성 (문제·질문 변화·결과·확인·배운 점)</li><li>실습 미션 15: 3분 발표 (내 문제 → 질문의 변화 → 결과와 확인 → 배운 점), 청중은 칭찬 1개·질문 1개</li></ul></td><td class="min">35분</td></tr>
+        <tr><td class="stage">정리</td><td><ul><li>동료 평가 결과와 강사 피드백, 단원 과제 안내</li><li>다음 단원 예고: 3단원 「실생활에 유용한 AI 활용」</li></ul></td><td class="min">10분</td></tr>
+        
+        <tr><th>교수방법</th><td colspan="2">프로젝트 실습 · 발표 · 동료 평가</td></tr>
+        <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 구글 계정, 기록 양식, 프롬프트 노트</td></tr>
+        <tr><th>평가</th><td colspan="2">발표·기록 평가 — 4요소 사용, 3번 이상 다듬기, 자료로 교차 확인, 개인정보 제외 여부</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+</div>
+
+<footer><div class="wrap"><p>UNIT 02 / 05 · 차시별 교안 · 「디지털리터러시」 36시간 과정</p></div></footer>
+<script src="../nav.js"></script>
+</html>

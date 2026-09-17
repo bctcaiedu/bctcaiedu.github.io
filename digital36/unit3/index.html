@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3단원 강의 슬라이드 · 디지털리터러시</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --ink:#0E1A15; --ink2:#18271F; --pine:#10684A; --pine-l:#3E9C74; --mint:#7FD1A8;
+    --light:#F4F7F4; --white:#FFF; --body:#3A453E; --muted:#6C7A72; --line:#D6DFD8;
+    --clay:#B85434; --sand:#F7E9E2; --soft:#E2EFE8; --shell:#0B100E;
+    --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Malgun Gothic",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--shell);color:var(--light);font-family:var(--sans);margin:0;
+       height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+  /* ---------- chrome ---------- */
+  .bar{display:flex;align-items:center;gap:10px;padding:8px 14px;flex-wrap:wrap;
+       background:#0F1613;border-bottom:1px solid #1E2A24;flex:0 0 auto}
+  .bar .brand{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--pine-l);margin-right:auto}
+  button,select{font-family:var(--sans);font-size:12.5px;color:#D7E2DC;background:#18241E;
+       border:1px solid #29372F;border-radius:4px;padding:6px 11px;cursor:pointer}
+  button:hover,select:hover{background:#203029;border-color:#3A4C42}
+  button:focus-visible,select:focus-visible{outline:2px solid var(--mint);outline-offset:1px}
+  button.on{background:var(--pine);border-color:var(--pine);color:#fff}
+  button.play{background:var(--pine);border-color:var(--pine);color:#fff;font-weight:600;min-width:92px}
+  button.play.playing{background:var(--clay);border-color:var(--clay)}
+  .count{font-family:var(--mono);font-size:12px;color:#7F918A;min-width:56px;text-align:center;
+         font-variant-numeric:tabular-nums}
+  .prog{height:2px;background:#1E2A24;flex:0 0 auto}
+  .prog i{display:block;height:100%;background:var(--mint);width:0;transition:width .3s}
+
+  /* ---------- stage ---------- */
+  .wrap{flex:1 1 auto;display:flex;align-items:center;justify-content:center;padding:14px;min-height:0}
+  .stage{width:100%;aspect-ratio:16/9;max-height:100%;max-width:calc(100% - 0px);
+         position:relative;border-radius:6px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+  .slide{position:absolute;inset:0;container-type:size;padding:5.5cqh 5cqw;
+         display:none;flex-direction:column;background:var(--light);color:var(--ink)}
+  .slide.show{display:flex}
+  .slide.dk{background:var(--ink);color:var(--white)}
+
+  .eb{font-family:var(--mono);font-size:1.9cqh;letter-spacing:.16em;color:var(--pine);
+      text-transform:uppercase;margin-bottom:1.4cqh}
+  .dk .eb{color:var(--pine-l)}
+  h1{font-size:8.4cqh;line-height:1.15;font-weight:700;letter-spacing:-.03em;margin:0;text-wrap:balance}
+  h2{font-size:6.2cqh;line-height:1.2;font-weight:700;letter-spacing:-.025em;margin:0;text-wrap:balance}
+  .sub{font-size:2.9cqh;color:var(--muted);margin-top:1.4cqh;line-height:1.55;max-width:62ch}
+  .dk .sub{color:#9FB3AA}
+  .lead{font-size:3.2cqh;color:var(--mint);margin-top:1.6cqh;font-weight:500}
+
+  .fill{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;min-height:0}
+  .foot{font-size:2.1cqh;color:var(--muted);font-style:italic;margin-top:auto;padding-top:1.6cqh}
+  .dk .foot{color:#7F918A}
+
+  .grid{display:grid;gap:1.6cqh 1.6cqw}
+  .g2{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:.8cqh;
+        padding:2.4cqh 2cqw;display:flex;flex-direction:column;gap:.8cqh;justify-content:center}
+  .dk .card{background:var(--ink2);border-color:#26332C}
+  .card .n{font-family:var(--mono);font-size:1.9cqh;color:var(--pine-l);letter-spacing:.08em}
+  .card .t{font-size:2.9cqh;font-weight:600;line-height:1.3}
+  .card .d{font-size:2.3cqh;color:var(--muted);line-height:1.5}
+  .dk .card .d{color:#93A69E}
+  .card.warn{background:var(--sand);border-color:#E7CDBF}
+  .card.warn .t,.card.warn .n{color:var(--clay)}
+  .card.warn .d{color:#7A4433}
+
+  .rowlist{display:flex;flex-direction:column;gap:1.2cqh}
+  .row{display:flex;align-items:center;gap:2cqw;background:var(--white);border:1px solid var(--line);
+       border-radius:.8cqh;padding:2cqh 2cqw}
+  .dk .row{background:var(--ink2);border-color:#26332C}
+  .dot{flex:0 0 auto;width:5.4cqh;height:5.4cqh;border-radius:50%;background:var(--soft);color:var(--pine);
+       display:flex;align-items:center;justify-content:center;font-family:var(--mono);
+       font-size:2.2cqh;font-weight:600}
+  .dk .dot{background:var(--pine);color:#fff}
+  .row .t{font-size:2.9cqh;font-weight:600;flex:0 0 auto}
+  .row .d{font-size:2.4cqh;color:var(--muted);line-height:1.45}
+  .dk .row .d{color:#93A69E}
+
+  .stack{display:flex;flex-direction:column;gap:.9cqh}
+  .lay{display:flex;align-items:center;gap:2cqw;border-radius:.6cqh;padding:1.8cqh 2cqw;
+       border:1px solid var(--line);background:var(--white)}
+  .lay b{font-size:2.9cqh;min-width:12cqw}
+  .lay span{font-size:2.4cqh;color:var(--muted)}
+
+  pre{background:var(--shell);color:#CFDCD6;border-radius:.7cqh;padding:2.4cqh 2cqw;margin:0;
+      font-family:var(--mono);font-size:2.35cqh;line-height:1.75;overflow:hidden;white-space:pre-wrap}
+  pre .p{color:var(--mint)}
+  pre .c{color:#7C9A93}
+  code{font-family:var(--mono);font-size:.92em;background:var(--soft);padding:.1em .35em;border-radius:.2em}
+  .dk code{background:#22312A;color:#CFE4DA}
+
+  .chips{display:flex;flex-wrap:wrap;gap:1cqh 1cqw}
+  .chip{font-family:var(--mono);font-size:2.3cqh;background:var(--white);border:1px solid var(--line);
+        border-radius:.5cqh;padding:.9cqh 1.2cqw;color:var(--pine);font-weight:500}
+  .chip.bad{background:var(--sand);border-color:#E7CDBF;color:var(--clay)}
+
+  .banner{background:var(--sand);color:var(--clay);border-radius:.7cqh;padding:2.2cqh 2cqw;
+          font-size:2.7cqh;font-weight:600;line-height:1.45}
+  .dk .banner{background:#2A1E18;color:#E0A288}
+  .bannerG{background:var(--soft);color:var(--pine);border-radius:.7cqh;padding:2.2cqh 2cqw;
+          font-size:2.7cqh;font-weight:600;line-height:1.45}
+
+  .tnote{margin-top:1.6cqh;border-left:.35cqh solid var(--clay);background:rgba(184,84,52,.07);
+         padding:1.4cqh 1.6cqw;font-size:2.1cqh;color:var(--body);line-height:1.5}
+  .dk .tnote{color:#C9B4AB;background:rgba(224,162,136,.08)}
+  .tnote b{font-family:var(--mono);font-size:1.7cqh;letter-spacing:.12em;color:var(--clay);
+           display:block;margin-bottom:.4cqh}
+  body:not(.notes) .tnote{display:none}
+
+  .nar{display:none}
+
+  /* ---------- caption ---------- */
+  .cap{flex:0 0 auto;min-height:62px;display:flex;align-items:center;justify-content:center;
+       padding:10px 18px 16px;background:var(--shell)}
+  .cap p{margin:0;max-width:1000px;text-align:center;font-size:15px;line-height:1.6;color:#B6C6BE}
+  .cap p.idle{color:#5C6D65;font-size:13px}
+  body.nocap .cap{display:none}
+
+  .toast{position:fixed;left:50%;bottom:88px;transform:translateX(-50%);background:var(--clay);
+         color:#fff;padding:9px 16px;border-radius:5px;font-size:13px;display:none;z-index:9}
+  .toast.show{display:block}
+  @media (max-width:760px){ .bar .brand{width:100%;margin-bottom:4px} .cap p{font-size:13.5px} }
+
+</style>
+
+<div class="bar">
+  <span class="brand">UNIT 03 · 실생활에 유용한 AI 활용 · 강의 슬라이드</span>
+  <button id="prev" title="이전 (←)">◀</button>
+  <span class="count" id="count">1 / 31</span>
+  <button id="next" title="다음 (→)">▶</button>
+  <button class="play" id="play" title="재생 / 정지 (Space)">▶ 재생</button>
+  <button id="auto" class="on" title="나레이션이 끝나면 자동으로 다음 장">자동 진행</button>
+  <select id="rate" title="말하기 속도">
+    <option value="0.85">0.85배</option>
+    <option value="1" selected>1.0배</option>
+    <option value="1.15">1.15배</option>
+    <option value="1.3">1.3배</option>
+    <option value="1.5">1.5배</option>
+  </select>
+  <button id="vf" class="on" title="여성 목소리">여성</button>
+  <button id="vm" title="남성 목소리">남성</button>
+  <select id="voice" title="목소리"></select>
+  <button id="cap" class="on" title="자막">자막</button>
+  <button id="full" title="전체화면 (F)">전체화면</button>
+</div>
+<div class="prog"><i id="prog"></i></div>
+
+<div class="wrap"><div class="stage" id="stage">
+<section class="slide dk show">
+    <div class="fill">
+      <div class="eb">한국폴리텍대학 분당융합기술교육원 · 「디지털리터러시」 36시간 과정</div>
+      <h1>실생활에 유용한 AI 활용</h1>
+      <div class="lead">글쓰기부터 장보기, 여행, 공공서비스까지 — 오늘 당장 쓰는 AI</div>
+      <div class="sub" style="margin-top:3cqh">UNIT 03 / 05 · 7시간 · 교수 김남호</div>
+    </div>
+  <div class="nar">3단원을 시작하겠습니다. 2단원에서 챗지피티에게 질문하고 답을 받는 방법을 익혔습니다. 이번 단원에서는 그 실력을 실제 생활에 가져갑니다. 문자와 이메일 쓰기, 외국어 번역, 냉장고 사진으로 저녁 메뉴 정하기, 여행 일정 짜기, 한 달 지출 정리하기, 정부 지원제도 찾기, 그리고 포스터 만들기까지 해 봅니다. 다만 이번 단원에서 꼭 함께 기억하실 말이 하나 있습니다. 건강과 돈과 공공서비스에 관한 에이아이의 답은 참고용이고, 마지막 확인은 공식기관과 전문가에게 한다는 것입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Learning Objectives</div>
+    <h2>이 단원이 끝나면 할 수 있는 것</h2>
+    <div class="fill"><div class="grid g2" style="margin-top:2cqh">
+      <div class="card"><span class="n">01</span><span class="t">AI 글쓰기 도우미로</span><span class="d">문자·이메일·안내문·자기소개서 초안을 만들고 다듬을 수 있다</span></div>
+      <div class="card"><span class="n">02</span><span class="t">번역 앱과 AI 음성 대화로</span><span class="d">여행·민원 상황의 외국어 소통을 연습할 수 있다</span></div>
+      <div class="card"><span class="n">03</span><span class="t">사진·조건을 넣어</span><span class="d">레시피와 1박 2일 여행 일정을 AI와 함께 계획할 수 있다</span></div>
+      <div class="card"><span class="n">04</span><span class="t">지출 내역과 요금제를</span><span class="d">AI로 표로 정리하되 건강·금융 판단은 공식기관·전문가에게 확인할 수 있다</span></div>
+      <div class="card"><span class="n">05</span><span class="t">정부24·복지로에서</span><span class="d">지원제도를 찾고 어려운 공문서를 쉬운 말로 풀어 읽을 수 있다</span></div>
+      <div class="card"><span class="n">06</span><span class="t">AI 이미지와 Canva로</span><span class="d">저작권·초상권을 지키며 포스터를 만들 수 있다</span></div>
+    </div></div>
+  <div class="nar">이번 단원의 목표는 여섯 가지입니다. 글쓰기, 번역, 생활정보, 가계 정리, 공공서비스, 이미지 만들기입니다. 하나하나가 오늘 집에 가서 바로 써먹을 수 있는 내용입니다. 그리고 네 번째 목표 뒷부분을 눈여겨봐 주세요. 에이아이로 표를 만드는 것까지는 에이아이에게 맡기지만, 건강과 돈에 관한 판단은 공식기관과 전문가에게 확인한다는 내용입니다. 이 원칙은 이번 단원 일곱 차시 내내 반복됩니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Lesson Plan · 7 Hours</div>
+    <h2>7개의 차시로 진행합니다</h2>
+    <div class="fill"><div class="grid g4" style="margin-top:2cqh">
+      <div class="card"><span class="n">1차시</span><span class="t">글쓰기 도우미</span><span class="d">문자 · 이메일 · 안내문 · 자기소개서 초안</span></div>
+      <div class="card"><span class="n">2차시</span><span class="t">번역과 외국어</span><span class="d">번역 앱 · 카메라 번역 · AI 음성 회화 · 역할극</span></div>
+      <div class="card"><span class="n">3차시</span><span class="t">생활정보 활용</span><span class="d">냉장고 사진 레시피 · 1박 2일 여행 · 건강정보 주의점</span></div>
+      <div class="card"><span class="n">4차시</span><span class="t">가계·소비 정리</span><span class="d">지출 분류표 · 요금제 비교표 · AI 조언의 한계</span></div>
+      <div class="card"><span class="n">5차시</span><span class="t">공공서비스 찾기</span><span class="d">정부24 · 복지로 · 어려운 공문서 쉽게 풀기</span></div>
+      <div class="card"><span class="n">6차시</span><span class="t">이미지 만들기</span><span class="d">AI 이미지 생성 · Canva 템플릿 · 저작권·초상권</span></div>
+      <div class="card"><span class="n">7차시</span><span class="t">나의 생활 문제 해결</span><span class="d">문제 → 질문 → 결과 → 확인 기록</span></div>
+    </div></div>
+    <div class="foot">1차시 = 50분 수업 + 10분 휴식 · 설명 15~20분, 실습 30~35분</div>
+  <div class="nar">이번 단원은 일곱 차시입니다. 첫 차시는 글쓰기, 두 번째는 번역과 외국어, 세 번째는 요리와 여행과 건강정보입니다. 네 번째는 가계부 정리와 요금제 비교, 다섯 번째는 정부이십사와 복지로 같은 공공서비스입니다. 여섯 번째에는 에이아이로 그림을 만들고 캔바로 포스터를 완성합니다. 마지막 일곱 번째 차시에는 여러분 각자의 생활 문제 하나를 골라 처음부터 끝까지 직접 해결해 보고 기록으로 남깁니다. 매 차시 설명은 짧게, 실습은 길게 하겠습니다.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">1차시 · 50분</div>
+      <h2>글쓰기 도우미</h2>
+      <div class="sub">빈 화면 앞에서 막막할 때, AI가 첫 문장을 대신 써 줍니다.</div>
+    </div>
+  <div class="nar">1차시입니다. 글쓰기 도우미로 에이아이를 써 보겠습니다. 모임 일정이 바뀌었다는 문자, 관리사무소에 보내는 이메일, 동호회 안내문처럼 막상 쓰려면 첫 문장부터 막히는 글들이 있습니다. 오늘은 에이아이에게 초안을 받고, 내 말투로 다듬는 방법을 익힙니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Writing Helper</div>
+    <h2>AI에게 글을 맡기는 네 단계</h2>
+    <div class="sub">초안은 AI가, 마지막 확인은 내가 합니다.</div>
+    
+    <div class="fill"><div class="rowlist" style="margin-top:1.2cqh">
+        <div class="row"><span class="dot">1</span><span class="t">상황 알려주기</span><span class="d">누구에게, 무엇 때문에, 어떤 말투로 보낼 글인지 적습니다</span></div>
+        <div class="row"><span class="dot">2</span><span class="t">초안 받기</span><span class="d">AI가 쓴 첫 글을 끝까지 읽어 봅니다</span></div>
+        <div class="row"><span class="dot">3</span><span class="t">고쳐 달라고 하기</span><span class="d">"더 짧게", "더 공손하게", "문자 길이로" 처럼 다듬기를 요청합니다</span></div>
+        <div class="row"><span class="dot">4</span><span class="t">내가 최종 확인</span><span class="d">날짜·시간·장소·이름이 맞는지 직접 확인하고 보냅니다</span></div>
+      </div>
+      <div class="banner" style="margin-top:2cqh">이름·전화번호·주소·주민번호는 AI에 넣지 말고 [이름], [연락처] 처럼 빈칸으로 두세요.</div></div>
+    <div class="foot">2단원에서 배운 좋은 질문의 4요소(역할·상황·요청·형식)가 그대로 쓰입니다.</div>
+  <div class="nar">에이아이에게 글을 맡길 때는 네 단계로 하시면 됩니다. 첫째, 누구에게 무엇 때문에 보내는 글인지 상황을 알려 줍니다. 둘째, 에이아이가 써 준 초안을 끝까지 읽습니다. 셋째, 마음에 안 드는 부분을 더 짧게, 더 공손하게 하는 식으로 고쳐 달라고 합니다. 넷째, 날짜와 시간과 이름이 맞는지 내가 직접 확인하고 보냅니다. 그리고 실명이나 전화번호, 주소 같은 개인정보는 넣지 마시고, 대괄호로 이름이라고 빈칸만 두었다가 보내기 전에 직접 채우세요.</div>
+</section>
+<section class="slide">
+    <div class="eb">Prompt Examples</div>
+    <h2>문서 3종, 이렇게 요청하세요</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.4cqh"><span class="c"># ① 문자 — 모임 일정 변경</span>
+<span class="p">나 ▶</span> 등산 모임 회원 12명에게 보낼 단체 문자를 써 줘. 이번 주 토요일 모임이
+     비 예보 때문에 다음 주 토요일 같은 시간으로 미뤄졌어. 정중하지만 짧게, 3줄 이내로.
+
+<span class="c"># ② 이메일 — 관리사무소에 수리 요청</span>
+<span class="p">나 ▶</span> 아파트 관리사무소에 보낼 이메일을 써 줘. 3일 전부터 욕실 천장에서 물이 새.
+     점검 방문을 요청하고, 평일 오후에 가능하다고 적어 줘. 제목도 붙여 줘.
+     내 이름과 동·호수는 [이름], [동호수]로 비워 둬.
+
+<span class="c"># ③ 안내문 — 동호회 공지</span>
+<span class="p">나 ▶</span> 복지관 서예 동아리 신입 회원 모집 안내문을 A4 한 장 분량으로 써 줘.
+     항목: 모임 요일·시간, 장소, 준비물, 문의처([연락처]). 어르신이 읽기 쉽게 큰 제목과 짧은 문장으로.</pre></div>
+    <div class="foot">세 질문 모두 "누구에게 · 무슨 일 · 길이·형식"이 들어 있습니다.</div>
+  <div class="nar">오늘 실습할 문서 세 가지의 질문 예시입니다. 첫 번째는 모임 일정이 바뀌었다는 단체 문자입니다. 세 줄 이내로 짧게 해 달라고 길이를 정해 준 것을 보세요. 두 번째는 관리사무소에 보내는 이메일입니다. 언제부터 무슨 문제가 있는지, 무엇을 원하는지, 언제 가능한지를 알려 주고, 이름과 동호수는 비워 두라고 했습니다. 세 번째는 동아리 모집 안내문입니다. 들어갈 항목을 미리 정해 주면 빠진 내용 없이 깔끔하게 나옵니다. 화면의 질문을 그대로 따라 쓰셔도 되고, 여러분 상황으로 바꾸셔도 됩니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Self-introduction</div>
+    <h2>자기소개서 초안은 "재료"를 내가 줍니다</h2>
+    <div class="sub">재료 없이 "써 줘"만 하면 AI는 없는 경험을 지어냅니다.</div>
+    
+    <div class="fill"><div class="grid g2" style="margin-top:1.6cqh">
+        <div class="card"><span class="n">좋은 방법</span><span class="t">내 경험 메모 → AI가 문장으로</span><span class="d">"20년 동안 식당 운영, 손님 응대, 재고 관리" 같은 사실 메모를 주고 정리만 부탁합니다</span></div>
+        <div class="card warn"><span class="n">나쁜 방법</span><span class="t">"자기소개서 써 줘"만 입력</span><span class="d">해 본 적 없는 경력·자격증을 그럴듯하게 지어 넣을 수 있습니다</span></div>
+      </div>
+      <div class="chips" style="margin-top:2cqh">
+        <span class="chip">내 경험 3가지</span><span class="chip">지원 분야</span><span class="chip">글자 수</span><span class="chip">말투</span>
+        <span class="chip bad">주민번호</span><span class="chip bad">가족 신상 자세히</span><span class="chip bad">전 직장 내부 자료</span>
+      </div></div>
+    <div class="foot">완성본은 소리 내어 읽어 보고, 사실과 다르거나 내 말투가 아닌 곳을 고치세요.</div>
+  <div class="nar">자기소개서는 특히 조심해서 써야 합니다. 에이아이에게 그냥 자기소개서 써 줘라고만 하면, 해 본 적도 없는 경력이나 자격증을 그럴듯하게 지어 넣는 경우가 있습니다. 그래서 재료는 반드시 내가 줍니다. 이십 년 동안 식당을 운영했다, 손님 응대와 재고 관리를 했다, 이런 사실 메모를 주고 문장으로 정리만 해 달라고 하세요. 초록색 칩은 넣으면 좋은 재료이고, 빨간색 칩은 넣지 말아야 할 정보입니다. 완성된 글은 소리 내어 읽어 보고, 내가 하지 않은 말이 들어가 있으면 꼭 지우세요.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">2차시 · 50분</div>
+      <h2>번역과 외국어</h2>
+      <div class="sub">메뉴판 사진 한 장, 마이크 버튼 하나로 외국어가 가까워집니다.</div>
+    </div>
+  <div class="nar">2차시는 번역과 외국어입니다. 해외여행에서 메뉴판을 읽거나, 우리 동네에 사는 외국인 이웃에게 길을 알려 줄 때 쓸 수 있는 도구들을 알아봅니다. 그리고 에이아이와 음성으로 대화하면서 회화 연습도 해 보겠습니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Translation Tools</div>
+    <h2>상황에 맞게 고르는 번역 도구</h2>
+    
+    
+    <div class="fill"><div class="grid g3" style="margin-top:1.6cqh">
+        <div class="card"><span class="n">글자·음성</span><span class="t">파파고 · 구글 번역</span><span class="d">문장을 입력하거나 말하면 바로 번역. 스마트폰 앱으로 설치</span></div>
+        <div class="card"><span class="n">사진</span><span class="t">카메라 번역</span><span class="d">메뉴판·안내판·설명서를 비추면 글자 위에 번역이 겹쳐 보입니다</span></div>
+        <div class="card"><span class="n">마주 보고</span><span class="t">대화 번역</span><span class="d">두 사람이 번갈아 말하면 서로의 언어로 바꿔 줍니다</span></div>
+        <div class="card"><span class="n">뉘앙스</span><span class="t">ChatGPT · Gemini</span><span class="d">"더 공손한 표현은?", "이 말이 무례하게 들리나?"까지 설명해 줍니다</span></div>
+        <div class="card"><span class="n">연습 상대</span><span class="t">AI 음성 대화</span><span class="d">마이크 버튼으로 말하면 AI가 목소리로 답합니다. 역할극 연습에 좋습니다</span></div>
+        <div class="card warn"><span class="n">주의</span><span class="t">중요한 서류는 따로</span><span class="d">병원·계약·법률 내용은 번역만 믿지 말고 통역 서비스나 전문가에게 확인</span></div>
+      </div></div>
+    <div class="foot">앱 메뉴 이름과 버튼 모양은 업데이트로 달라질 수 있습니다.</div>
+  <div class="nar">번역 도구는 상황에 따라 고르시면 됩니다. 글자를 입력하거나 말로 할 때는 파파고나 구글 번역 앱이 편합니다. 메뉴판이나 안내판처럼 글자가 적힌 것은 카메라 번역으로 비추기만 하면 됩니다. 두 사람이 마주 보고 이야기할 때는 대화 번역 기능을 씁니다. 챗지피티나 제미나이는 단순 번역을 넘어서, 이 표현이 무례하게 들리는지, 더 공손한 말은 무엇인지까지 설명해 줍니다. 다만 병원이나 계약서처럼 중요한 내용은 번역 결과만 믿지 마시고 통역 서비스나 전문가에게 꼭 확인하세요.</div>
+</section>
+<section class="slide">
+    <div class="eb">Voice Role-play</div>
+    <h2>AI와 목소리로 역할극 하기</h2>
+    <div class="sub">역할 · 상황 · 난이도 · 고쳐 주는 방법을 먼저 정해 줍니다.</div>
+    
+    <div class="fill"><pre style="margin-top:1.4cqh"><span class="c"># ① 여행 역할극 — 호텔 체크인</span>
+<span class="p">나 ▶</span> 지금부터 역할극을 하자. 너는 일본 오사카 호텔 프런트 직원이고, 나는 체크인하는
+     한국인 여행객이야. 아주 쉬운 일본어로 한 문장씩만 말해 줘.
+     내가 틀리게 말하면 한국어로 짧게 고쳐 주고 다시 이어 가 줘.
+
+<span class="c"># ② 민원 역할극 — 외국인 이웃 돕기</span>
+<span class="p">나 ▶</span> 너는 영어만 할 줄 아는 외국인 이웃이야. 분리수거 요일을 몰라서 나에게 묻는 상황이야.
+     나는 영어를 잘 못하니까 천천히, 쉬운 단어로 말해 줘.
+     대화가 끝나면 내가 쓴 표현 중 고칠 곳 3가지를 알려 줘.</pre>
+      <div class="bannerG" style="margin-top:2cqh">앱 입력창 근처의 음성(마이크·파형 모양) 버튼을 누르면 말로 대화할 수 있습니다.</div></div>
+    <div class="foot">조용한 곳에서, 이어폰 마이크를 쓰면 훨씬 잘 알아듣습니다.</div>
+  <div class="nar">에이아이를 회화 연습 상대로 쓰는 방법입니다. 핵심은 시작하기 전에 규칙을 정해 주는 것입니다. 너는 호텔 직원이고 나는 여행객이다, 쉬운 말로 한 문장씩만 해 달라, 내가 틀리면 한국어로 고쳐 달라, 이렇게요. 두 번째 예시는 외국인 이웃이 분리수거 요일을 묻는 상황입니다. 대화가 끝나면 고칠 표현 세 가지를 알려 달라고 하면 복습까지 됩니다. 챗지피티나 제미나이 앱의 입력창 근처에 있는 음성 버튼을 누르면 말로 대화할 수 있습니다. 버튼 모양은 앱마다 조금씩 다르니 마이크나 소리 물결 모양을 찾아보세요.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">3차시 · 50분</div>
+      <h2>생활정보 활용</h2>
+      <div class="sub">오늘 저녁 메뉴부터 주말 여행까지. 그리고 건강정보는 조심해서.</div>
+    </div>
+  <div class="nar">3차시는 생활정보입니다. 냉장고 사진 한 장으로 저녁 메뉴를 정하고, 일박 이일 여행 일정을 짜 봅니다. 그리고 많은 분들이 궁금해하시는 건강정보를 에이아이에게 물을 때 무엇을 조심해야 하는지도 함께 알아보겠습니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Fridge to Recipe</div>
+    <h2>냉장고 사진 한 장으로 저녁 메뉴 정하기</h2>
+    
+    
+    <div class="fill"><div class="rowlist" style="margin-top:1.2cqh">
+        <div class="row"><span class="dot">1</span><span class="t">사진 찍기</span><span class="d">냉장고 안을 밝게 찍습니다. 문에 붙은 메모·가족 사진은 안 나오게</span></div>
+        <div class="row"><span class="dot">2</span><span class="t">사진 올리기</span><span class="d">ChatGPT나 Gemini 입력창의 + 또는 사진 버튼으로 올립니다</span></div>
+        <div class="row"><span class="dot">3</span><span class="t">조건 붙이기</span><span class="d">시간·인원·입맛·못 먹는 재료를 함께 적습니다</span></div>
+        <div class="row"><span class="dot">4</span><span class="t">재료 확인</span><span class="d">AI가 잘못 알아본 재료가 있으면 바로잡아 줍니다</span></div>
+      </div>
+      <pre style="margin-top:1.6cqh"><span class="p">나 ▶</span> 사진 속 냉장고 재료로 2인분 저녁 메뉴 3가지를 추천해 줘. 20분 안에 만들 수 있고,
+     싱겁게 먹어야 해. 먼저 사진에서 알아본 재료 목록부터 보여 줘.</pre></div>
+    <div class="foot">"알아본 재료 목록부터 보여 줘" — 이 한 줄이 엉뚱한 레시피를 막아 줍니다.</div>
+  <div class="nar">냉장고 사진으로 저녁 메뉴를 정해 보겠습니다. 냉장고 안을 밝게 찍고, 챗지피티나 제미나이에 사진을 올립니다. 이때 냉장고 문에 붙은 메모나 가족 사진이 함께 찍히지 않게 조심하세요. 그리고 조건을 붙입니다. 두 사람이 먹을 거고, 이십 분 안에, 싱겁게. 여기서 요령이 하나 있습니다. 알아본 재료 목록부터 보여 달라고 하는 겁니다. 에이아이가 두부를 치즈로 잘못 보는 일도 있거든요. 목록을 보고 틀린 것을 바로잡은 뒤에 레시피를 받으면 훨씬 정확합니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Trip Planner</div>
+    <h2>1박 2일 여행 일정 짜기</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.4cqh"><span class="p">나 ▶</span> 10월 둘째 주 주말에 강릉으로 1박 2일 여행을 가려고 해.
+     조건: 서울에서 기차로 이동, 70대 어머니와 둘이 감, 많이 걷는 코스는 빼 줘,
+     숙박 빼고 1인 예산 10만 원 정도.
+     시간대별 일정표를 표로 만들고, 각 장소 사이 이동 방법과 걸리는 시간도 적어 줘.
+
+<span class="p">나 ▶</span> 둘째 날 오후에 비가 오면 갈 수 있는 실내 장소로 바꾼 일정도 만들어 줘.</pre>
+      <div class="banner" style="margin-top:2cqh">영업시간 · 휴무일 · 입장료 · 기차 시간표는 AI가 옛날 정보를 말할 수 있습니다 → 공식 홈페이지 · 지도 앱 · 예매 앱에서 다시 확인</div></div>
+    <div class="foot">"비 오면?" 같은 두 번째 질문으로 계획 B까지 받아 두세요.</div>
+  <div class="nar">이번에는 여행 일정입니다. 좋은 일정표를 받으려면 조건을 자세히 적어야 합니다. 어디로, 언제, 누구와, 무엇을 타고, 무엇을 피하고 싶은지, 예산은 얼마인지요. 그리고 표로 만들어 달라, 이동 시간도 적어 달라고 형식을 정해 줍니다. 받은 뒤에는 비가 오면 어떻게 할지 두 번째 질문으로 계획 비까지 받아 두시면 좋습니다. 그런데 주의할 점이 있습니다. 식당이 문을 닫는 날이나 입장료, 기차 시간은 에이아이가 예전 정보를 말하는 경우가 많습니다. 출발 전에 공식 홈페이지나 지도 앱, 기차 예매 앱에서 꼭 다시 확인하세요.</div>
+</section>
+<section class="slide">
+    <div class="eb">Health Info</div>
+    <h2>건강정보는 참고만, 판단은 전문가에게</h2>
+    
+    
+    <div class="fill"><div class="grid g2" style="margin-top:1.6cqh">
+        <div class="card"><span class="n">이렇게 쓰면 좋아요</span><span class="t">이해를 돕는 용도</span><span class="d">건강검진 결과지의 어려운 용어 뜻 · 진료 때 의사에게 물어볼 질문 목록 · 약 복용 시간표 정리</span></div>
+        <div class="card warn"><span class="n">이렇게 쓰면 위험해요</span><span class="t">판단을 맡기는 용도</span><span class="d">증상만으로 병명 정하기 · 약을 끊거나 양을 바꾸기 · 진료기록 원문·주민번호 올리기</span></div>
+      </div>
+      <pre style="margin-top:1.6cqh"><span class="p">나 ▶</span> 다음 주에 무릎 통증으로 정형외과에 가. 진료 시간이 짧으니 의사에게 물어볼
+     질문 5가지를 정리해 줘. 진단은 하지 말고 질문 목록만 만들어 줘.</pre>
+      <div class="bannerG" style="margin-top:1.6cqh">AI 답은 참고용 → 의사 · 약사 · 보건소에서 확인. 갑자기 심하게 아프면 AI 말고 119.</div></div>
+    
+  <div class="nar">건강정보는 특히 조심해야 합니다. 에이아이는 건강검진 결과지의 어려운 용어를 쉽게 풀어 주거나, 병원에서 물어볼 질문 목록을 만드는 데는 아주 좋습니다. 하지만 증상을 말하고 무슨 병인지 정해 달라거나, 먹던 약을 끊어도 되는지 묻는 것은 위험합니다. 에이아이는 여러분의 몸을 직접 보지 못하고, 틀린 답을 자신 있게 말할 수 있기 때문입니다. 진료기록 원문이나 주민번호도 올리지 마세요. 에이아이 답은 참고용이고 판단은 의사와 약사, 보건소에서 합니다. 갑자기 심하게 아프면 에이아이에게 묻지 말고 바로 일일구에 전화하세요.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">4차시 · 50분</div>
+      <h2>가계·소비 정리</h2>
+      <div class="sub">복잡한 지출을 표로 정리하는 일은 AI에게, 돈에 관한 결정은 나에게.</div>
+    </div>
+  <div class="nar">4차시는 가계와 소비입니다. 한 달 동안 어디에 돈을 썼는지 에이아이로 분류해 보고, 휴대폰 요금제 같은 상품을 비교표로 정리해 봅니다. 그리고 돈 문제에서 에이아이가 할 수 없는 일, 해서는 안 되는 일도 분명히 짚고 넘어가겠습니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Expense Table</div>
+    <h2>지출 메모를 분류표로 바꾸기</h2>
+    <div class="sub">아래는 수업용으로 만든 가상의 지출 메모입니다.</div>
+    
+    <div class="fill"><pre style="margin-top:1.4cqh"><span class="p">나 ▶</span> 아래는 이번 달 지출 메모야. 식비·교통·통신·의료·생활용품·기타로 분류해서
+     표로 만들고, 분류별 합계와 전체 합계도 알려 줘.
+     3/2 동네 마트 장보기 54,300원      3/12 친구와 점심 22,000원
+     3/3 교통카드 충전 30,000원         3/15 동네 병원 진료비 5,000원
+     3/5 휴대폰 요금 48,000원           3/18 인터넷 요금 22,000원
+     3/8 약국 감기약 6,500원            3/21 시장 반찬 12,000원
+     3/10 세제·휴지 17,800원            3/25 손주 생일 선물 35,000원
+<span class="o">AI ▶ 식비 88,300 · 교통 30,000 · 통신 70,000 · 의료 11,500 · 생활용품 17,800 · 기타 35,000 / 합계 252,600원</span></pre>
+      <div class="banner" style="margin-top:1.8cqh">날짜·항목·금액만 넣습니다. 카드번호·계좌번호·통장 사진 원본은 넣지 마세요. 합계는 계산기로 한 번 더!</div></div>
+    
+  <div class="nar">지출 정리부터 해 보겠습니다. 화면의 지출 메모는 수업용으로 만든 가상의 예시입니다. 이렇게 날짜와 항목과 금액을 적어 주고, 분류 기준을 정해 준 다음 표와 합계를 부탁합니다. 정답은 식비 팔만 팔천삼백 원, 전체 합계 이십오만 이천육백 원입니다. 그런데 에이아이는 말을 만드는 도구라서 덧셈을 틀리는 경우가 가끔 있습니다. 그래서 합계는 휴대폰 계산기로 꼭 한 번 더 확인하세요. 그리고 카드번호나 계좌번호, 통장 사진은 절대 넣지 마시고 항목과 금액만 넣으세요.</div>
+</section>
+<section class="slide">
+    <div class="eb">Comparison Table</div>
+    <h2>요금제·상품 비교표 만들기</h2>
+    
+    
+    <div class="fill"><div class="rowlist" style="margin-top:1.2cqh">
+        <div class="row"><span class="dot">1</span><span class="t">기준은 내가 정한다</span><span class="d">월 요금 · 데이터 양 · 약정 기간 · 할인 끝난 뒤 요금 · 위약금</span></div>
+        <div class="row"><span class="dot">2</span><span class="t">안내 내용을 붙여 넣는다</span><span class="d">통신사·판매처 안내문의 글을 복사해 AI에게 표로 정리를 부탁</span></div>
+        <div class="row"><span class="dot">3</span><span class="t">함정을 물어본다</span><span class="d">"할인이 끝나면 얼마가 돼?", "숨은 조건이 있어?"</span></div>
+        <div class="row"><span class="dot">4</span><span class="t">공식 정보로 재확인</span><span class="d">통신사 공식 홈페이지 · 공식 비교 사이트에서 최신 요금 확인</span></div>
+      </div>
+      <pre style="margin-top:1.6cqh"><span class="p">나 ▶</span> 아래 요금제 3개 안내문을 월 요금, 데이터, 약정, 할인 종료 후 요금으로 비교표를 만들어 줘.
+     나는 한 달에 데이터를 5GB 정도 써. 안내문에 없는 내용은 "안내문에 없음"이라고 적어 줘.</pre></div>
+    <div class="foot">"없는 내용은 없다고 적어 줘" — AI가 빈칸을 지어서 채우는 것을 막습니다.</div>
+  <div class="nar">다음은 요금제나 상품을 비교하는 방법입니다. 먼저 무엇을 비교할지 기준은 내가 정합니다. 월 요금, 데이터 양, 약정 기간, 그리고 특히 할인이 끝난 뒤의 요금입니다. 통신사 안내문 글을 복사해서 붙여 넣고 표로 만들어 달라고 하면 한눈에 비교가 됩니다. 이때 안내문에 없는 내용은 없다고 적어 달라고 꼭 덧붙이세요. 그렇지 않으면 에이아이가 빈칸을 그럴듯한 숫자로 채울 수 있습니다. 마지막으로 요금은 자주 바뀌니 공식 홈페이지에서 최신 정보를 다시 확인합니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Limits of AI Advice</div>
+    <h2>돈 문제에서 AI가 못 하는 것</h2>
+    
+    
+    <div class="fill"><div class="grid g2" style="margin-top:1.6cqh">
+        <div class="card"><span class="n">AI에게 맡겨도 되는 일</span><span class="t">정리 · 계산 도움 · 용어 설명</span><span class="d">지출 분류, 비교표 만들기, "중도해지 수수료가 무슨 뜻이야?" 같은 용어 풀이</span></div>
+        <div class="card warn"><span class="n">AI에게 맡기면 안 되는 일</span><span class="t">투자 · 대출 · 보험 결정</span><span class="d">"어떤 주식을 살까?", "이 대출 받아도 돼?" — AI는 내 형편도, 최신 시장도 모릅니다</span></div>
+      </div>
+      <div class="chips" style="margin-top:2cqh">
+        <span class="chip bad">계좌번호</span><span class="chip bad">카드번호</span><span class="chip bad">비밀번호·인증번호</span><span class="chip bad">신분증 사진</span>
+      </div>
+      <div class="bannerG" style="margin-top:2cqh">금융상품 가입·해지는 금융회사 창구 설명, 공식 비교 사이트, 전문 상담을 거쳐 내가 결정합니다.</div></div>
+    <div class="foot">"AI가 추천했다"며 투자를 권하는 문자·영상은 사기일 가능성이 높습니다.</div>
+  <div class="nar">돈 문제에서 에이아이의 한계를 분명히 하겠습니다. 지출을 분류하고, 비교표를 만들고, 어려운 금융 용어를 풀어 주는 일은 에이아이에게 맡겨도 좋습니다. 하지만 어떤 주식을 살지, 대출을 받아도 되는지, 보험을 해지할지 같은 결정은 맡기면 안 됩니다. 에이아이는 여러분의 형편도, 오늘의 시장 상황도 정확히 알지 못합니다. 빨간 칩에 있는 계좌번호, 카드번호, 비밀번호, 신분증 사진은 어떤 경우에도 넣지 마세요. 그리고 에이아이가 추천한 종목이라며 투자를 권하는 문자나 영상은 사기일 가능성이 아주 높다는 것도 기억하세요.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">5차시 · 50분</div>
+      <h2>공공서비스 찾기</h2>
+      <div class="sub">받을 수 있는 지원을 몰라서 못 받는 일이 없도록.</div>
+    </div>
+  <div class="nar">5차시는 공공서비스입니다. 나라와 지자체에는 생각보다 많은 지원제도가 있는데, 몰라서 신청하지 못하는 경우가 많습니다. 오늘은 정부이십사와 복지로에서 지원제도를 찾아보고, 읽기 어려운 공문서를 에이아이로 쉽게 풀어 보겠습니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Public Services</div>
+    <h2>정부24와 복지로에서 찾아보기</h2>
+    
+    
+    <div class="fill"><div class="grid g2" style="margin-top:1.6cqh">
+        <div class="card"><span class="n">gov.kr</span><span class="t">정부24</span><span class="d">주민등록등본 같은 민원서류 발급·신청, 정부·지자체 서비스와 혜택 검색</span></div>
+        <div class="card"><span class="n">bokjiro.go.kr</span><span class="t">복지로</span><span class="d">복지서비스 검색과 온라인 신청. 나이·가구 상황 등 조건으로 찾기</span></div>
+      </div>
+      <div class="stack" style="margin-top:2cqh">
+        <div class="lay"><b>① 검색창에 쉬운 낱말</b><span>"노인 일자리", "난방비 지원", "출산 지원", "장애인 활동지원" 처럼</span></div>
+        <div class="lay"><b>② 네 가지를 확인</b><span>누가 받을 수 있나(대상) · 무엇을 주나(내용) · 어떻게 신청하나 · 어디에 묻나(문의처)</span></div>
+        <div class="lay"><b>③ AI는 검색어 도우미로</b><span>"70대 혼자 사는 사람이 찾아볼 만한 지원 분야 검색어 5개 알려 줘"</span></div>
+      </div></div>
+    <div class="foot">사이트 메뉴 이름과 위치는 개편으로 달라질 수 있습니다. 검색창을 먼저 찾으세요.</div>
+  <div class="nar">공공서비스를 찾을 때 가장 먼저 가 볼 곳은 두 곳입니다. 정부이십사에서는 등본 같은 민원서류를 발급받고, 정부와 지자체의 서비스와 혜택을 검색할 수 있습니다. 복지로에서는 복지서비스를 검색하고 온라인으로 신청할 수 있습니다. 사이트 메뉴는 개편될 때마다 바뀌니까 메뉴를 외우기보다 검색창을 찾으세요. 검색창에 노인 일자리, 난방비 지원처럼 쉬운 낱말을 넣고, 누가 받을 수 있는지, 무엇을 주는지, 어떻게 신청하는지, 어디에 묻는지 네 가지를 확인합니다. 무엇을 검색해야 할지 모르겠다면 에이아이에게 검색어를 추천받으세요.</div>
+</section>
+<section class="slide">
+    <div class="eb">Plain Language</div>
+    <h2>어려운 공문서를 쉬운 말로 풀기</h2>
+    <div class="sub">아래 안내문은 수업을 위해 만든 가상의 예시입니다. 실제 사업이 아닙니다.</div>
+    
+    <div class="fill"><pre style="margin-top:1.4cqh"><span class="c"># 가상 예시 안내문</span>
+귀하는 「2026년 ○○시 겨울철 난방비 경감 지원사업」의 지원 대상 요건을 충족하는 것으로
+확인되었는바, 지원을 희망하시는 경우 공고일로부터 30일 이내에 신분증 및 구비서류를
+지참하시어 관할 행정복지센터에 방문 신청하여 주시기 바라며, 기한 내 미신청 시에는
+지원 의사가 없는 것으로 간주되어 지원 대상에서 제외됨을 알려 드립니다.
+
+<span class="p">나 ▶</span> 위 안내문을 중학생도 이해할 수 있게 쉬운 말로 3줄로 풀어 줘.
+     그리고 "내가 할 일 · 기한 · 가져갈 것 · 갈 곳 · 안 하면 생기는 일"을 표로 정리해 줘.
+     안내문에 없는 내용은 지어내지 말고 "안내문에 없음"이라고 적어 줘.
+<span class="o">AI ▶ 난방비 지원을 받을 수 있어요. 공고일부터 30일 안에 신분증과 서류를 들고
+     주민센터에 가서 신청하세요. 안 하면 지원을 못 받아요.</span></pre></div>
+    <div class="foot">"구비서류"가 정확히 무엇인지는 안내문에 없습니다 — 이런 빈칸은 기관에 직접 묻습니다.</div>
+  <div class="nar">공문서는 한 문장이 길고 한자어가 많아서 읽기 어렵습니다. 화면의 안내문은 수업을 위해 만든 가상의 예시입니다. 이 긴 문장을 에이아이에게 주고 중학생도 알 수 있게 풀어 달라고 하면, 난방비 지원을 받을 수 있으니 삼십 일 안에 신분증과 서류를 들고 주민센터에 가라는 뜻이라고 알려 줍니다. 여기에 할 일, 기한, 가져갈 것, 갈 곳, 안 하면 생기는 일을 표로 정리해 달라고 하면 더 좋습니다. 그런데 구비서류가 정확히 무엇인지는 안내문에 나와 있지 않지요. 이런 빈칸은 에이아이가 지어내지 않게 하고, 기관에 직접 물어서 채웁니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Check & Privacy</div>
+    <h2>AI로 풀어 읽은 뒤에 꼭 할 일</h2>
+    
+    
+    <div class="fill"><div class="rowlist" style="margin-top:1.2cqh">
+        <div class="row"><span class="dot">1</span><span class="t">가리고 올리기</span><span class="d">안내문 사진의 이름·주소·주민번호·계좌번호는 가리거나 잘라 내고 올립니다</span></div>
+        <div class="row"><span class="dot">2</span><span class="t">원문과 대조</span><span class="d">AI가 풀어 준 기한·금액·장소를 원문에서 한 번 더 확인합니다</span></div>
+        <div class="row"><span class="dot">3</span><span class="t">자격은 기관이 판단</span><span class="d">"나 받을 수 있어?"의 최종 답은 AI가 아니라 담당 기관이 줍니다</span></div>
+        <div class="row"><span class="dot">4</span><span class="t">전화로 묻기</span><span class="d">보건복지상담센터 129 · 정부민원안내콜센터 110 · 가까운 행정복지센터</span></div>
+      </div>
+      <div class="banner" style="margin-top:2cqh">문자로 온 "지원금 신청" 링크는 누르지 마세요. 사이트는 직접 검색해서 들어가고, 의심되면 118에 상담.</div></div>
+    
+  <div class="nar">에이아이로 공문서를 풀어 읽은 뒤에는 네 가지를 꼭 하세요. 첫째, 안내문 사진을 올릴 때는 이름, 주소, 주민번호, 계좌번호를 가리고 올립니다. 둘째, 에이아이가 알려 준 기한과 금액을 원문에서 다시 확인합니다. 셋째, 내가 지원을 받을 수 있는지는 에이아이가 아니라 담당 기관이 판단합니다. 넷째, 궁금하면 전화하세요. 복지 상담은 일이구, 정부 민원 안내는 일일공입니다. 그리고 지원금을 신청하라며 문자로 온 링크는 누르지 마세요. 사이트는 직접 검색해서 들어가고, 의심스러우면 일일팔에 상담하세요.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">6차시 · 50분</div>
+      <h2>이미지 만들기</h2>
+      <div class="sub">그림 실력이 없어도 초대장과 포스터를 만들 수 있습니다.</div>
+    </div>
+  <div class="nar">6차시는 이미지 만들기입니다. 에이아이에게 말로 그림을 주문하고, 캔바의 무료 템플릿에 글자를 넣어 포스터를 완성합니다. 그리고 남의 사진이나 얼굴을 쓸 때 지켜야 할 저작권과 초상권도 함께 배웁니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">AI Image</div>
+    <h2>말로 그림을 주문하기</h2>
+    
+    
+    <div class="fill"><div class="chips" style="margin-top:1.4cqh">
+        <span class="chip">무엇을 (주제)</span><span class="chip">분위기</span><span class="chip">그림 스타일</span><span class="chip">색감</span><span class="chip">가로·세로 비율</span><span class="chip bad">넣지 말 것</span>
+      </div>
+      <pre style="margin-top:1.6cqh"><span class="p">나 ▶</span> 복지관 가을 음악회 포스터에 쓸 배경 그림을 만들어 줘.
+     단풍이 든 공원 무대, 따뜻한 수채화 느낌, 주황과 갈색 위주.
+     사람 얼굴은 넣지 말고, 글자도 넣지 마. 세로로 긴 그림으로.
+
+<span class="p">나 ▶</span> 좋아. 무대 위에 기타와 악보를 추가하고, 하늘을 조금 더 밝게 바꿔 줘.
+<span class="c"># 한 번에 완벽하게 나오지 않습니다. 대화로 조금씩 고쳐 가세요.</span></pre>
+      <div class="banner" style="margin-top:1.8cqh">ChatGPT · Gemini 무료 버전은 이미지 생성 횟수에 제한이 있습니다. 그림 속 한글은 잘 깨지므로 글자는 Canva에서 넣습니다.</div></div>
+    
+  <div class="nar">에이아이에게 그림을 주문할 때는 여섯 가지를 말해 주면 좋습니다. 무엇을 그릴지, 어떤 분위기인지, 수채화나 사진 같은 스타일, 색감, 가로 세로 비율, 그리고 넣지 말 것입니다. 챗지피티나 제미나이에 화면의 예시처럼 요청하면 그림을 만들어 줍니다. 한 번에 마음에 들게 나오는 경우는 드무니까, 기타를 추가해 달라, 하늘을 밝게 해 달라처럼 대화로 고쳐 가세요. 두 가지를 기억하세요. 무료 버전은 하루에 만들 수 있는 횟수에 제한이 있습니다. 그리고 에이아이 그림 속 한글은 잘 깨지니까, 글자는 넣지 말라고 하고 캔바에서 따로 넣는 것이 좋습니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Canva</div>
+    <h2>Canva 무료 템플릿으로 완성하기</h2>
+    
+    
+    <div class="fill"><div class="rowlist" style="margin-top:1.2cqh">
+        <div class="row"><span class="dot">1</span><span class="t">로그인</span><span class="d">canva.com 접속 또는 앱 설치 → 구글 계정으로 로그인</span></div>
+        <div class="row"><span class="dot">2</span><span class="t">템플릿 검색</span><span class="d">검색창에 "포스터", "초대장", "카드뉴스" 입력</span></div>
+        <div class="row"><span class="dot">3</span><span class="t">무료로 고르기</span><span class="d">왕관 표시가 있는 요소는 유료(Pro)입니다. 표시 없는 것을 고르세요</span></div>
+        <div class="row"><span class="dot">4</span><span class="t">글자·그림 바꾸기</span><span class="d">글자를 눌러 고치고, AI로 만든 그림은 업로드해서 배경에 놓습니다</span></div>
+        <div class="row"><span class="dot">5</span><span class="t">저장·공유</span><span class="d">공유 버튼에서 다운로드(PNG·PDF) 또는 링크로 보내기</span></div>
+      </div></div>
+    <div class="foot">메뉴 이름과 버튼 위치는 업데이트로 달라질 수 있습니다. 모르면 검색창과 "공유" 버튼부터 찾으세요.</div>
+  <div class="nar">이제 캔바로 포스터를 완성합니다. 캔바 누리집에 들어가거나 앱을 설치하고, 구글 계정으로 로그인합니다. 검색창에 포스터나 초대장, 카드뉴스를 입력하면 이미 디자인된 템플릿이 많이 나옵니다. 여기서 주의할 것은 왕관 표시입니다. 왕관이 붙은 요소는 유료인 프로 버전용이라, 쓰면 다운로드할 때 결제 안내가 나옵니다. 표시가 없는 무료 템플릿을 고르세요. 글자를 눌러 내용을 바꾸고, 에이아이로 만든 그림을 업로드해서 배경에 놓습니다. 마지막으로 공유 버튼에서 피엔지나 피디에프로 다운로드하면 완성입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Copyright</div>
+    <h2>저작권·초상권, 이것만은 지키세요</h2>
+    
+    
+    <div class="fill"><div class="grid g2" style="margin-top:1.6cqh">
+        <div class="card warn"><span class="n">저작권</span><span class="t">남의 사진·캐릭터·로고 그대로 쓰기</span><span class="d">인터넷에서 찾은 이미지라고 마음대로 써도 되는 것이 아닙니다</span></div>
+        <div class="card warn"><span class="n">초상권 · 딥페이크</span><span class="t">실제 사람 얼굴로 만들기</span><span class="d">연예인·지인의 얼굴을 합성하거나 AI로 비슷하게 만들지 않습니다</span></div>
+        <div class="card"><span class="n">안심</span><span class="t">내가 찍은 사진 · AI로 만든 배경</span><span class="d">사람 얼굴이 없는 풍경·사물 그림은 비교적 안전합니다</span></div>
+        <div class="card"><span class="n">허락</span><span class="t">가족·회원 사진을 넣을 때</span><span class="d">사진 속 사람에게 먼저 물어보고 허락을 받습니다</span></div>
+      </div>
+      <div class="bannerG" style="margin-top:2cqh">AI로 만든 그림에는 "AI로 생성한 이미지" 라고 작게 적어 두면 보는 사람이 오해하지 않습니다.</div></div>
+    <div class="foot">판매·광고 등 돈을 버는 데 쓸 때는 각 서비스의 이용약관을 따로 확인하세요.</div>
+  <div class="nar">마지막으로 꼭 지켜야 할 것입니다. 인터넷에서 찾은 사진이나 캐릭터, 회사 로고는 저작권이 있어서 마음대로 쓰면 안 됩니다. 연예인이나 지인의 얼굴을 합성하거나 에이아이로 비슷하게 만드는 것은 초상권 침해이고, 딥페이크 문제로 이어질 수 있습니다. 반대로 내가 찍은 사진이나, 사람 얼굴이 없는 에이아이 배경 그림은 비교적 안전합니다. 가족이나 동호회 회원 사진을 넣을 때는 미리 허락을 받으세요. 그리고 에이아이로 만든 그림에는 에이아이로 생성한 이미지라고 작게 적어 두면 보는 분들이 오해하지 않습니다.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">7차시 · 50분</div>
+      <h2>나의 생활 문제 해결</h2>
+      <div class="sub">이번 단원에서 배운 것을 내 문제 하나에 전부 써 봅니다.</div>
+    </div>
+  <div class="nar">3단원의 마지막 7차시입니다. 지금까지 여섯 차시 동안 글쓰기, 번역, 생활정보, 가계, 공공서비스, 이미지를 배웠습니다. 이번 시간에는 여러분 각자의 실제 생활 문제 하나를 골라, 에이아이로 해결하는 과정을 처음부터 끝까지 기록합니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Problem Solving</div>
+    <h2>문제 → 질문 → 결과 → 확인</h2>
+    
+    
+    <div class="fill"><div class="stack" style="margin-top:1.6cqh">
+        <div class="lay"><b>① 문제</b><span>해결하고 싶은 일을 한 문장으로. "손주 돌잔치 초대 문자를 보내야 한다"</span></div>
+        <div class="lay"><b>② 질문</b><span>역할·상황·요청·형식을 넣어 묻고, 2~3번 다듬습니다. 개인정보는 빈칸으로</span></div>
+        <div class="lay"><b>③ 결과</b><span>AI가 준 답에서 쓸 부분을 고르고, 캡처해 둡니다</span></div>
+        <div class="lay"><b>④ 확인</b><span>공식 사이트·전문가·원문·계산기로 맞는지 확인합니다. 이 단계가 없으면 미완성!</span></div>
+      </div>
+      <div class="chips" style="margin-top:2cqh">
+        <span class="chip">모임 안내문</span><span class="chip">해외여행 회화</span><span class="chip">명절 장보기 예산</span><span class="chip">지원제도 찾기</span><span class="chip">행사 포스터</span>
+      </div></div>
+    
+  <div class="nar">생활 문제는 네 단계로 해결합니다. 첫째, 문제를 한 문장으로 적습니다. 둘째, 에이아이에게 질문합니다. 2단원에서 배운 역할, 상황, 요청, 형식을 넣고 두세 번 다듬으세요. 셋째, 에이아이가 준 결과 중에서 쓸 부분을 고르고 캡처해 둡니다. 넷째, 확인입니다. 공식 사이트나 전문가, 원문, 계산기로 맞는지 확인합니다. 이 네 번째 단계가 빠지면 아직 해결한 것이 아닙니다. 아래 칩에 있는 주제 중에서 골라도 되고, 여러분의 진짜 고민을 가져오셔도 좋습니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Record Example</div>
+    <h2>해결 기록표는 이렇게 씁니다</h2>
+    
+    
+    <div class="fill"><pre style="margin-top:1.4cqh"><span class="c"># 기록 예시</span>
+<span class="p">문제 ▶</span> 설날 가족 모임(8명) 장보기를 15만 원 안에서 하고 싶다.
+<span class="p">질문 ▶</span> 8명이 먹을 설날 상차림 장보기 목록을 만들어 줘. 떡국·전·나물 위주,
+       전체 예산 15만 원, 표로 품목·양·예상 가격을 적어 줘.
+<span class="p">다듬기 ▶</span> 전 종류를 2가지로 줄이고, 남는 돈으로 과일을 넣어 줘.
+<span class="p">결과 ▶</span> 품목 14개 장보기 표 (캡처 첨부)
+<span class="p">확인 ▶</span> AI 예상 가격이 실제와 달라 동네 마트 전단·온라인 장보기 앱으로 가격 확인
+       → 3개 품목 가격 수정, 합계는 계산기로 다시 계산
+<span class="p">배운 점 ▶</span> 가격 같은 최신 정보는 AI보다 실제 가게 정보가 정확하다.</pre></div>
+    <div class="foot">다 끝난 기록은 짝과 바꿔 읽고, "확인" 칸이 비어 있지 않은지 서로 점검합니다.</div>
+  <div class="nar">기록 예시를 보겠습니다. 문제는 설날 가족 모임 장보기를 십오만 원 안에서 하는 것입니다. 질문에 인원, 메뉴, 예산, 표 형식을 넣었고, 한 번 더 다듬어서 전 종류를 줄이고 과일을 넣었습니다. 결과는 캡처해 둡니다. 그리고 가장 중요한 확인 칸을 보세요. 에이아이가 말한 가격이 실제와 달라서 마트 전단과 장보기 앱으로 확인하고 세 품목을 고쳤습니다. 합계도 계산기로 다시 계산했습니다. 마지막에 배운 점을 한 줄 적으면 기록이 완성됩니다. 다 쓰신 분은 짝과 바꿔 읽고 확인 칸이 비어 있지 않은지 서로 봐 주세요.</div>
+</section>
+<section class="slide dk">
+    <div class="eb">Assignment 03 · 다음 수업 시작 전</div>
+    <h2>나의 생활 문제 해결 기록서</h2>
+    <div class="sub">이번 단원에서 배운 AI 활용법으로 실제 생활 문제 하나를 해결하고, 과정을 기록으로 남깁니다.</div>
+    <div class="fill"><div class="grid g3" style="margin-top:2cqh">
+      <div class="card"><span class="n">01</span><span class="t">해결한 생활 문제를 한 문장으로 적기</span></div>
+      <div class="card"><span class="n">02</span><span class="t">AI에게 한 첫 질문과 다듬은 질문(2번 이상) 원문 그대로 붙이기</span></div>
+      <div class="card"><span class="n">03</span><span class="t">AI 결과 화면 캡처 1장 이상</span></div>
+      <div class="card"><span class="n">04</span><span class="t">결과를 확인한 방법 적기 (공식 사이트 · 전문가 · 원문 대조 · 계산기 등)</span></div>
+      <div class="card"><span class="n">05</span><span class="t">이번 단원 결과물 1개 첨부 (문서 3종 · 여행 일정표 · 지출 분류표 · 포스터 중 택1)</span></div>
+      <div class="card"><span class="n">06</span><span class="t">개인정보를 가렸는지 스스로 점검한 결과 (예/아니오와 가린 항목)</span></div>
+    </div></div>
+    <div class="foot">채점 기준: ① 질문에 상황·요청·형식이 들어가고 다듬기를 했는가(30%) ② 결과를 실제로 확인했고 확인 방법이 구체적인가(40%) ③ 개인정보를 가렸는가(20%) ④ 결과물이 첨부되었는가(10%). 확인 칸이 비어 있으면 감점이 큽니다.</div>
+  <div class="nar">이번 단원의 과제는 나의 생활 문제 해결 기록서입니다. 실제 생활 문제 하나를 골라 에이아이로 해결하고, 그 과정을 여섯 항목으로 적어 주세요. 문제 한 문장, 첫 질문과 다듬은 질문, 결과 캡처, 확인한 방법, 이번 단원 결과물 하나, 그리고 개인정보를 가렸는지 점검한 결과입니다. 채점에서 가장 비중이 큰 것은 네 번째, 확인입니다. 에이아이 답을 그대로 믿지 않고 어떻게 확인했는지를 구체적으로 적어 주세요. 구글 문서로 쓰셔서 드라이브 공유 링크로 제출하시면 됩니다.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">Wrap-up</div>
+      <h2>이번 단원에서 한 일</h2>
+      <div class="sub" style="font-size:3.4cqh;color:#D7E2DC;margin-top:2cqh">글쓰기·번역·생활정보·가계·공공서비스·이미지까지, AI를 내 생활 문제에 직접 써 보고 결과를 확인하는 습관을 만들었습니다.</div>
+      <div class="lead" style="margin-top:4cqh">다음 · 4단원 — 생성형 AI와 정보활용 능력</div>
+      <div class="sub">넘쳐나는 정보 속에서 가짜뉴스를 가려내고, AI 검색의 출처를 직접 열어 확인하며, 딥페이크를 알아보고 여러 자료를 NotebookLM으로 정리하는 법을 배웁니다.</div>
+    </div>
+  <div class="nar">3단원을 정리하겠습니다. 에이아이로 문자와 이메일과 자기소개서 초안을 만들었고, 번역 앱과 음성 역할극으로 외국어를 연습했습니다. 냉장고 사진으로 메뉴를 정하고 여행 일정을 짰고, 지출을 표로 정리하고 요금제를 비교했습니다. 정부이십사와 복지로에서 지원제도를 찾고 어려운 공문서를 쉽게 풀었고, 캔바로 포스터도 만들었습니다. 그리고 매번 에이아이 답을 공식기관과 원문으로 확인했습니다. 다음 4단원은 생성형 에이아이와 정보활용 능력입니다. 가짜뉴스를 가려내고, 에이아이 검색의 출처를 직접 확인하고, 딥페이크를 알아보고, 노트북엘엠으로 여러 자료를 정리하는 법을 배웁니다. 수고하셨습니다.</div>
+</section>
+</div></div>
+
+<div class="cap"><p id="capText" class="idle">▶ 재생을 누르면 나레이션이 시작됩니다 · ← → 슬라이드 이동 · Space 재생/정지 · F 전체화면</p></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const synth  = window.speechSynthesis;
+  const $ = id => document.getElementById(id);
+  let idx = 0, playing = false, auto = true, chunks = [], ci = 0, voices = [], voice = null;
+
+  $('count').textContent = '1 / ' + slides.length;
+
+  function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 3800); }
+
+  function narration(i){ const n = slides[i].querySelector('.nar'); return n ? n.textContent.trim() : ''; }
+  function splitSentences(t){
+    return t.split(/(?<=[.?!])\s+/).map(s=>s.trim()).filter(Boolean);
+  }
+
+  function show(i){
+    slides[idx].classList.remove('show');
+    idx = Math.max(0, Math.min(slides.length-1, i));
+    slides[idx].classList.add('show');
+    $('count').textContent = (idx+1) + ' / ' + slides.length;
+    $('prog').style.width = ((idx+1)/slides.length*100) + '%';
+  }
+
+  function setCap(text, idle){
+    const p = $('capText');
+    p.textContent = text;
+    p.classList.toggle('idle', !!idle);
+  }
+
+  function stop(){
+    playing = false; chunks = []; ci = 0;
+    try { synth.cancel(); } catch(e){}
+    $('play').textContent = '▶ 재생';
+    $('play').classList.remove('playing');
+    setCap('▶ 재생을 누르면 나레이션이 시작됩니다 · ← → 슬라이드 이동 · Space 재생/정지 · F 전체화면', true);
+  }
+
+  function speakNext(){
+    if (!playing) return;
+    if (ci >= chunks.length){
+      if (auto && idx < slides.length-1){ show(idx+1); startSpeaking(); }
+      else { stop(); }
+      return;
+    }
+    const u = new SpeechSynthesisUtterance(chunks[ci]);
+    u.lang = 'ko-KR';
+    if (voice) u.voice = voice;
+    u.pitch = pitch;
+    u.rate = parseFloat($('rate').value);
+    u.onend = () => { ci++; speakNext(); };
+    u.onerror = () => { ci++; speakNext(); };
+    setCap(chunks[ci]);
+    synth.speak(u);
+  }
+
+  function startSpeaking(){
+    try { synth.cancel(); } catch(e){}
+    chunks = splitSentences(narration(idx)); ci = 0;
+    if (!chunks.length){ if (auto && idx < slides.length-1){ show(idx+1); setTimeout(startSpeaking,120); } else stop(); return; }
+    playing = true;
+    $('play').textContent = '❚❚ 정지';
+    $('play').classList.add('playing');
+    setTimeout(speakNext, 120);
+  }
+
+  function toggle(){ playing ? stop() : startSpeaking(); }
+  function go(d){ const was = playing; stop(); show(idx+d); if (was) setTimeout(startSpeaking, 150); }
+
+  /* voices — 기본: 여성(Google 한국의) · 남성: 실제 남성 음성, 없으면 기본 음성을 낮은 톤으로 */
+  const FEMALE = /한국의|SunHi|Heami|JiMin|SeoHyeon|SoonBok|YuJin|Yuna|female|여성/i;
+  const MALE   = /InJoon|Hyunsu|BongJin|GookMin|Minsu|male|남성/i;
+  const PREFER_F = [/Google 한국의/i, /SunHi/i, /Heami/i, /Yuna/i];
+  const PREFER_M = [/InJoon/i, /Hyunsu/i, /BongJin/i, /GookMin/i];
+  let options = [], pitch = 1, gender = 'f';
+  const store = { get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+                  set(k,v){ try { localStorage.setItem(k,v); } catch(e){} } };
+  const pick = (list, prefs) => { for (const r of prefs){ const v = list.find(x => r.test(x.name)); if (v) return v; } return null; };
+  const label = v => v.name.replace(/^(Microsoft|Google) /,'').replace(/ Online \(Natural\)/,'').replace(/\s*-\s*Korean.*$/,'').trim();
+
+  function loadVoices(){
+    voices = synth.getVoices();
+    const ko = voices.filter(v => /^ko/i.test(v.lang) || /한국의/.test(v.name));
+    const sel = $('voice');
+    sel.innerHTML = '';
+    options = [];
+    if (!voices.length){ sel.innerHTML = '<option>음성 불러오는 중…</option>'; return; }
+    const list = ko.length ? ko : voices;
+    const females = list.filter(v => FEMALE.test(v.name) && !MALE.test(v.name.replace(/female/i,'')));
+    const males   = list.filter(v => MALE.test(v.name.replace(/female/i,'')));
+    const others  = list.filter(v => !females.includes(v) && !males.includes(v));
+    const baseF   = pick(list, PREFER_F) || females[0] || list[0];
+
+    // 여성 (기본 음성을 맨 앞에)
+    [baseF, ...females.filter(v => v !== baseF)].forEach(v =>
+      options.push({ v, pitch: 1, g: 'f', text: '여성 · ' + label(v) + (v === baseF ? ' (기본)' : '') }));
+    // 남성: 실제 음성 우선, 없으면 기본 음성 낮은 톤
+    const bestM = pick(males, PREFER_M) || males[0];
+    if (bestM) [bestM, ...males.filter(v => v !== bestM)].forEach(v =>
+      options.push({ v, pitch: 1, g: 'm', text: '남성 · ' + label(v) }));
+    else options.push({ v: baseF, pitch: 0.62, g: 'm', text: '남성 · ' + label(baseF) + ' 낮은 톤' });
+    others.forEach(v => options.push({ v, pitch: 1, g: 'x', text: label(v) }));
+
+    options.forEach((o,i) => { const el = document.createElement('option'); el.value = i; el.textContent = o.text; sel.appendChild(el); });
+
+    const saved = store.get('deckVoice');
+    let i = options.findIndex(o => o.text === saved);
+    if (i < 0) i = options.findIndex(o => o.g === (store.get('deckGender') || 'f'));
+    choose(i < 0 ? 0 : i);
+    if (!ko.length) toast('한국어 음성이 없습니다 — Chrome 또는 Edge에서 열어 보세요');
+  }
+  function choose(i){
+    const o = options[i]; if (!o) return;
+    voice = o.v; pitch = o.pitch; gender = o.g;
+    $('voice').value = i;
+    $('vf').classList.toggle('on', gender === 'f');
+    $('vm').classList.toggle('on', gender === 'm');
+    store.set('deckVoice', o.text); if (gender !== 'x') store.set('deckGender', gender);
+  }
+  function restart(){ if (playing){ const w=idx; stop(); show(w); startSpeaking(); } }
+  function setGender(g){ const i = options.findIndex(o => o.g === g); if (i >= 0){ choose(i); restart(); } }
+  loadVoices();
+  if (typeof synth.onvoiceschanged !== 'undefined') synth.onvoiceschanged = loadVoices;
+
+  /* controls */
+  $('play').onclick = toggle;
+  $('prev').onclick = () => go(-1);
+  $('next').onclick = () => go(1);
+  $('voice').onchange = e => { choose(+e.target.value); restart(); };
+  $('vf').onclick = () => setGender('f');
+  $('vm').onclick = () => setGender('m');
+  $('rate').onchange  = () => { if (playing){ const w=idx; stop(); show(w); startSpeaking(); } };
+  $('auto').onclick   = e => { auto = !auto; e.target.classList.toggle('on', auto); };
+  $('cap').onclick    = e => { document.body.classList.toggle('nocap'); e.target.classList.toggle('on', !document.body.classList.contains('nocap')); };
+  $('full').onclick   = () => { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); };
+
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'SELECT') return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown'){ e.preventDefault(); go(1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); go(-1); }
+    else if (e.key === ' '){ e.preventDefault(); toggle(); }
+    else if (e.key === 'f' || e.key === 'F'){ $('full').click(); }
+    else if (e.key === 'Home'){ go(-idx); }
+    else if (e.key === 'End'){ go(slides.length-1-idx); }
+  });
+  $('stage').addEventListener('click', e => { if (e.clientX > window.innerWidth/2) go(1); else go(-1); });
+  window.addEventListener('beforeunload', () => { try{ synth.cancel(); }catch(e){} });
+  window.deckGo = n => { const was = playing; stop(); show(n); if (was) setTimeout(startSpeaking, 150); };
+})();
+
+</script>
+<script src="../nav.js"></script>
+</html>
