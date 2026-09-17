@@ -195,6 +195,24 @@
       <div class="box check"><span class="lbl">확인</span>
         <p>실습지를 스마트폰으로 사진 찍어 두세요. 3차시에 구글 드라이브에 올리고, 5단원에서 사후 진단과 비교합니다.</p></div>
     </div>
+
+    <div class="mission py">
+      <div class="mhead"><span class="mn">PYTHON P1 · 선택</span><h3>사전 자가진단 점수 분석기</h3></div>
+      
+      <p>방금 적은 <strong>사전 자가진단 10문항 점수</strong>를 파이썬에 넣어 총점과 막대그래프를 만들고, <strong>가장 낮은 문항</strong>을 찾습니다. 앞 교과에서 배운 파이썬을 가볍게 다시 떠올리는 몸풀기입니다.</p>
+      <p><strong>쓰는 파이썬:</strong> 리스트 · <code>sum()</code> · <code>for</code> 반복문 · 문자열 곱하기 <code>"■" * 3</code> · <code>min()</code></p>
+      <div class="nb"><b>📓 Colab 노트북</b>
+        <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit1_python.ipynb" target="_blank" rel="noopener">Colab에서 열기</a>
+        <a href="../python/unit1_python.ipynb" download>노트북 내려받기 (.ipynb)</a>
+        <small>Colab에서 열기가 안 되면: 내려받기 → colab.research.google.com → 파일 → 노트북 업로드. 구글 계정으로 로그인합니다.</small></div>
+      <ol>
+        <li>노트북 <strong>1-1</strong>: <code>점수</code> 리스트의 숫자 10개를 <strong>내 점수</strong>로 바꾸고 실행합니다.</li>
+        <li><strong>1-2</strong>: 문항별 막대그래프(■)를 확인합니다.</li>
+        <li><strong>1-3 ✏️</strong>: 빈칸 한 줄 — 가장 낮은 점수를 <code>min()</code>으로 구합니다. 그 점수인 문항이 자동으로 표시됩니다.</li>
+      </ol>
+      <div class="box check"><span class="lbl">확인</span>
+        <p>가장 낮은 문항이 이 과정에서 <strong>나의 목표</strong>입니다. 실습지 자가진단 아래에 적어 두세요. 5단원에서 같은 코드로 사후 점수와 비교합니다.</p></div>
+    </div>
   </section>
 
   <section>
@@ -395,24 +413,24 @@
     </div>
 
     <div class="mission py">
-      <div class="mhead"><span class="mn">PYTHON P1 · 선택</span><h3>파이썬으로 "다음 단어 맞히기" 모델 만들기</h3></div>
+      <div class="mhead"><span class="mn">PYTHON P2 · 선택</span><h3>"오늘" 다음에 오는 단어 세어 보기</h3></div>
       
-      <p>게임으로 해 본 "다음 단어 맞히기"를 <strong>진짜 프로그램</strong>으로 만듭니다. 문장 몇 개를 읽고 "이 단어 다음에는 무엇이 몇 번 나왔나"를 세면, 아주 작은 언어 모델이 됩니다.</p>
-      <p><strong>쓰는 파이썬:</strong> 문자열 <code>split()</code> · 딕셔너리 · 이중 반복문 · <code>random</code> 모듈</p>
+      <p>"다음 단어 맞히기" 게임을 코드로 확인합니다. 문장들에서 <strong>"오늘" 바로 다음에 나온 단어</strong>를 모두 모아 세어 보면, AI가 왜 <strong>자주 나온 단어를 고르는지</strong> 보입니다.</p>
+      <p><strong>쓰는 파이썬:</strong> 문자열 <code>split()</code> · 리스트 <code>append()</code> · <code>for</code> + <code>if</code> · 리스트 <code>count()</code></p>
       <div class="nb"><b>📓 Colab 노트북</b>
         <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit1_python.ipynb" target="_blank" rel="noopener">Colab에서 열기</a>
         <a href="../python/unit1_python.ipynb" download>노트북 내려받기 (.ipynb)</a>
         <small>Colab에서 열기가 안 되면: 내려받기 → colab.research.google.com → 파일 → 노트북 업로드. 구글 계정으로 로그인합니다.</small></div>
       <ol>
-        <li>노트북 A-1~A-2: 문장을 단어로 쪼개고, <strong>✏️ 셀</strong>의 빈칸을 채워 "다음 단어 표"를 만듭니다. 확인 셀에 ✅가 나오면 성공입니다.</li>
-        <li>A-3: <code>다음단어_확률(표, "오늘")</code>로 확률 막대를 봅니다.</li>
-        <li>A-4: <code>문장_만들기()</code>를 <strong>5번</strong> 실행합니다. 매번 문장이 달라지나요?</li>
-        <li>A-5: 문장을 5개 더 넣고 다시 실행해 확률이 어떻게 바뀌는지 봅니다. 배운 적 없는 단어도 넣어 봅니다.</li>
+        <li>노트북 <strong>2-1</strong>: 문장을 단어로 쪼갭니다.</li>
+        <li><strong>2-2 ✏️</strong>: 빈칸 한 줄 — "오늘" 다음 단어를 <code>다음단어</code> 리스트에 추가합니다.</li>
+        <li><strong>2-3</strong>: 단어마다 몇 번 나왔는지 세고, 가장 많이 나온 단어를 "AI의 선택"으로 출력합니다.</li>
+        <li><strong>2-4</strong>: <code>찾을단어</code>를 "나는"으로 바꾸고, 문장도 몇 개 더 넣어 결과가 바뀌는지 봅니다.</li>
       </ol>
-      <pre><span class="p">나 ▶</span> 아래 파이썬 코드를 한 줄씩, 파이썬 기초만 배운 사람이 이해하게 설명해 줘.
-     (다음단어_표_만들기 함수 코드 붙여 넣기)</pre>
       <div class="box q"><span class="lbl">생각해 보기</span>
-        <p>① 같은 시작 단어인데 문장이 매번 다른 이유는? ② 데이터에 "나는 오늘"이 많으면 결과가 어떻게 치우치나요? ③ 배운 적 없는 단어를 받으면 우리 모델은 멈추는데, ChatGPT는 어떻게 할까요?</p></div>
+        <p>문장에 "오늘 저녁에"를 5번 더 넣으면 AI의 선택은 어떻게 바뀔까요? → <strong>데이터가 답을 정한다</strong> (편향)</p></div>
+      <div class="box check"><span class="lbl">도전 문제 (선택)</span>
+        <p>노트북 끝 <strong>도전 A</strong>: 모든 단어의 "다음 단어 표"를 딕셔너리로 만들고, 확률에 따라 문장을 자동으로 만들어 봅니다.</p></div>
     </div>
   </section>
 
@@ -502,22 +520,24 @@
     </div>
 
     <div class="mission py">
-      <div class="mhead"><span class="mn">PYTHON P2 · 선택</span><h3>안전한 비밀번호 생성기 · 강도 검사기 만들기</h3></div>
+      <div class="mhead"><span class="mn">PYTHON P3 · 선택</span><h3>스미싱 문자 경고등 만들기</h3></div>
       
-      <p>보안 점검에서 배운 "좋은 비밀번호 규칙"을 코드로 바꿉니다. 규칙을 코드로 옮기다 보면 <strong>규칙이 왜 필요한지</strong>가 분명해집니다.</p>
-      <p><strong>쓰는 파이썬:</strong> <code>secrets</code>·<code>string</code> 모듈 · 조건문 · <code>any()</code> · 함수의 여러 값 반환</p>
+      <p>7차시에 배운 스미싱 문자의 특징을 <strong>의심 단어 목록</strong>으로 만들고, 문자에 의심 단어가 몇 개 들어 있는지 세어 🔴🟡🟢 경고등을 켭니다.</p>
+      <p><strong>쓰는 파이썬:</strong> 리스트 · <code>in</code> 연산자 · <code>for</code> + <code>if</code> · 개수 세기 · <code>if / elif / else</code></p>
       <div class="nb"><b>📓 Colab 노트북</b>
         <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit1_python.ipynb" target="_blank" rel="noopener">Colab에서 열기</a>
         <a href="../python/unit1_python.ipynb" download>노트북 내려받기 (.ipynb)</a>
         <small>Colab에서 열기가 안 되면: 내려받기 → colab.research.google.com → 파일 → 노트북 업로드. 구글 계정으로 로그인합니다.</small></div>
       <ol>
-        <li>노트북 B-1: <code>비밀번호_만들기()</code>를 몇 번 실행해 봅니다. <code>random</code> 대신 <code>secrets</code>를 쓰는 이유를 읽습니다.</li>
-        <li>B-2 <strong>✏️</strong>: 강도 검사 함수의 빈칸 4곳(대·소문자, 숫자, 특수문자, 같은 문자 3번 연속)을 채우고 테스트 5개를 통과시킵니다.</li>
-        <li>B-3: 단어를 이어 붙인 <strong>비밀번호 문구</strong>를 만들어 강도를 비교합니다.</li>
-        <li>B-4 🤖: AI에게 내 검사기가 놓치는 약점을 묻고, 그 약점을 실제 예시로 확인합니다.</li>
+        <li>노트북 <strong>3-1 ✏️</strong>: 빈칸 한 줄 — 의심 단어가 문자에 들어 있으면 <code>개수</code>를 1 늘립니다.</li>
+        <li><strong>3-2</strong>: 예시 문자 5개를 한꺼번에 검사합니다.</li>
+        <li><strong>3-3</strong>: 경고등을 <strong>속이는 문자</strong>를 직접 만들어 봅니다. (의심 단어를 피해서 쓴 사기 문자)</li>
+        <li><code>의심단어</code> 목록에 단어를 추가해 경고등을 더 똑똑하게 만듭니다.</li>
       </ol>
-      <div class="box warn"><span class="lbl">주의</span>
-        <p>노트북에는 <strong>지금 실제로 쓰는 비밀번호를 절대 입력하지 않습니다.</strong> 예시 문자열로만 시험하세요.</p></div>
+      <div class="box warn"><span class="lbl">규칙 검사의 한계</span>
+        <p>단어 목록만으로는 새로운 수법을 놓칩니다. 🟢가 나와도 <strong>모르는 번호의 링크는 누르지 않고</strong>, 의심되면 <strong>118</strong>(한국인터넷진흥원)에 문의합니다.</p></div>
+      <div class="box check"><span class="lbl">도전 문제 (선택)</span>
+        <p>노트북 끝 <strong>도전 B</strong>: <code>secrets</code> 모듈로 안전한 비밀번호 생성기와 강도 검사기를 만듭니다. 실제 쓰는 비밀번호는 입력하지 마세요.</p></div>
     </div>
   </section>
 

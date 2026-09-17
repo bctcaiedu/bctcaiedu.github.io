@@ -388,25 +388,27 @@
     </div>
 
     <div class="mission py">
-      <div class="mhead"><span class="mn">PYTHON P5 · 선택</span><h3>지출 메모를 파이썬으로 분류·합계 내고 AI 답과 대조하기</h3></div>
+      <div class="mhead"><span class="mn">PYTHON P6 · 선택</span><h3>지출 합계를 파이썬으로 검산하고, 요금제를 기간별로 비교하기</h3></div>
       
-      <p>미션 9의 가상 지출 메모를 <strong>CSV 파일</strong>로 저장하고, 파이썬으로 분류·합계·비율 그래프를 만듭니다. 그다음 AI가 말한 합계와 <strong>세 가지 방법(AI · 계산기 · 코드)</strong>으로 대조합니다.</p>
-      <p><strong>쓰는 파이썬:</strong> 파일 입출력 · <code>csv</code> 모듈 · 딕셔너리 누적 합계 · 반복문 · 문자열 <code>in</code></p>
+      <p>미션 9·10의 <strong>가상 지출 메모</strong>와 <strong>가상 요금제</strong>를 파이썬으로 계산해서, AI가 말한 숫자와 대조합니다. 그리고 요금제는 <strong>몇 개월을 쓰느냐에 따라 가장 싼 것이 바뀐다</strong>는 것을 확인합니다.</p>
+      <p><strong>쓰는 파이썬:</strong> 리스트 · <code>sum()</code> · <code>for</code> + <code>if</code> · 곱셈 · 글자 막대그래프</p>
       <div class="nb"><b>📓 Colab 노트북</b>
         <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit3_python.ipynb" target="_blank" rel="noopener">Colab에서 열기</a>
         <a href="../python/unit3_python.ipynb" download>노트북 내려받기 (.ipynb)</a>
         <small>Colab에서 열기가 안 되면: 내려받기 → colab.research.google.com → 파일 → 노트북 업로드. 구글 계정으로 로그인합니다.</small></div>
       <ol>
-        <li>노트북 A-1~A-2: 지출 메모를 <code>지출.csv</code>로 저장하고 다시 읽습니다.</li>
-        <li>A-3 <strong>✏️</strong>: 항목 이름에 들어 있는 낱말로 분류하는 함수를 완성합니다. (예: "약국" → 의료)</li>
-        <li>A-4 <strong>✏️</strong>: 분류별 합계를 딕셔너리에 누적합니다. 전체 합계 <strong>252,600원</strong>이 나와야 합니다.</li>
-        <li>A-5: 비율 막대그래프를 확인하고, 실습지에 적었던 <strong>AI 합계</strong>를 입력해 대조합니다.</li>
-        <li>B ✏️: 요금제 총요금 함수를 만들어 <strong>12개월과 24개월</strong>을 비교합니다.</li>
+        <li>노트북 <strong>1-1</strong>: 지출 항목·금액·분류 리스트를 실행하고 전체 합계를 확인합니다. (정답 252,600원)</li>
+        <li><strong>1-2 ✏️</strong>: 빈칸 한 줄 — 분류가 "식비"인 금액만 더합니다. (정답 88,300원)</li>
+        <li><strong>1-3</strong>: 분류별 합계와 막대그래프를 보고, 실습지에 적은 <strong>AI 합계</strong>를 넣어 대조합니다.</li>
+        <li><strong>2-1 ✏️</strong>: 빈칸 한 줄 — "나 요금제" 12개월 총요금 계산식을 완성합니다. (정답 366,000원)</li>
+        <li><strong>2-2</strong>: 1~24개월 비교표에서 <strong>가장 싼 요금제가 바뀌는 달</strong>을 찾아 실습지에 적습니다.</li>
       </ol>
       <div class="box check"><span class="lbl">발견할 것</span>
-        <p>1년이면 "나 요금제"가 가장 싸지만, <strong>18개월째부터는 "가 요금제"가 더 쌉니다.</strong> 같은 질문도 <strong>기간·조건</strong>에 따라 답이 바뀝니다. AI가 "나가 제일 싸요"라고 했다면 무엇을 빠뜨린 걸까요?</p></div>
+        <p>1년이면 "나"가 가장 싸지만, <strong>18개월째부터는 "가"가 더 쌉니다.</strong> AI가 "나가 제일 싸요"라고만 했다면 <strong>몇 개월 기준</strong>인지 빠뜨린 것입니다.</p></div>
       <div class="box warn"><span class="lbl">주의</span>
-        <p>내 지출로 해 볼 때도 <strong>날짜·항목·금액</strong>만 씁니다. 카드·계좌번호나 명세서 원본 파일은 올리지 않습니다.</p></div>
+        <p>내 지출로 해 볼 때도 <strong>항목·금액</strong>만 씁니다. 카드·계좌번호나 명세서 원본은 넣지 않습니다.</p></div>
+      <div class="box check"><span class="lbl">도전 문제 (선택)</span>
+        <p>노트북 끝 <strong>도전</strong>: 지출 메모를 CSV 파일로 저장·읽기 → 항목 이름으로 <strong>자동 분류</strong>하는 함수 → 딕셔너리로 분류별 합계 → matplotlib 그래프.</p></div>
     </div>
   </section>
 

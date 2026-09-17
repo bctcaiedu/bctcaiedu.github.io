@@ -350,29 +350,31 @@
     </div>
 
     <div class="mission py">
-      <div class="mhead"><span class="mn">PYTHON P3 · 선택</span><h3>AI가 짠 코드에서 오류 찾기 — "실행된다 ≠ 맞다"</h3></div>
+      <div class="mhead"><span class="mn">PYTHON P4 · 선택</span><h3>AI가 짠 코드에서 틀린 곳 찾기 — "실행된다 ≠ 맞다"</h3></div>
       
-      <p>글로 된 답은 틀려도 알아채기 어렵지만, 코드는 <strong>실행해 보면</strong> 틀린 곳이 드러납니다. "AI가 짜 준 코드"라고 가정한 3개(수업용으로 일부러 오류를 넣음)를 검증합니다.</p>
-      <p><strong>쓰는 파이썬:</strong> 오류 메시지 읽기 · 함수 · 반복문 · 조건문 · 테스트 값 만들기</p>
+      <p>글로 된 답은 틀려도 알아채기 어렵지만, 코드는 <strong>실행해 보면</strong> 틀린 곳이 드러납니다. "AI가 짜 준 코드"라고 가정한 3개(수업용으로 일부러 틀리게 만듦)를 실행하고, <strong>한 줄씩</strong> 고칩니다.</p>
+      <p><strong>쓰는 파이썬:</strong> 오류 메시지 읽기 · <code>sum()</code>·<code>len()</code> · 곱셈 · 비교 연산자 <code>&gt;</code> <code>&gt;=</code></p>
       <div class="nb"><b>📓 Colab 노트북</b>
         <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit2_python.ipynb" target="_blank" rel="noopener">Colab에서 열기</a>
         <a href="../python/unit2_python.ipynb" download>노트북 내려받기 (.ipynb)</a>
         <small>Colab에서 열기가 안 되면: 내려받기 → colab.research.google.com → 파일 → 노트북 업로드. 구글 계정으로 로그인합니다.</small></div>
       <div class="dl">
-        <div class="dlrow"><span class="k">코드 1</span><span class="v">평균 구하기 — <strong>실행 오류</strong><small>없는 함수를 지어냄. 오류 메시지 마지막 줄: ____________</small></span></div>
-        <div class="dlrow"><span class="k">코드 2</span><span class="v">윤년 판정 — <strong>조용히 틀림</strong><small>오류 없이 실행되지만 틀리는 연도: ______</small></span></div>
-        <div class="dlrow"><span class="k">코드 3</span><span class="v">1부터 n까지 합 — <strong>경계값 오류</strong><small>합계(10)의 결과: ____ / 정답: ____</small></span></div>
+        <div class="dlrow"><span class="k">코드 1</span><span class="v">점수 평균 — <strong>빨간 오류</strong>가 남<small>오류 메시지 마지막 줄: ____________________</small></span></div>
+        <div class="dlrow"><span class="k">코드 2</span><span class="v">10% 할인 가격 — 오류 없이 <strong>답이 틀림</strong><small>20,000원의 할인 가격: 코드 ______ / 정답 ______</small></span></div>
+        <div class="dlrow"><span class="k">코드 3</span><span class="v">60점 이상 합격 — <strong>딱 60점</strong>에서 틀림<small>60점의 결과: 코드 ______ / 정답 ______</small></span></div>
       </div>
       <ol>
-        <li>각 코드를 실행하고, 오류 메시지 또는 테스트 결과(❌)를 확인합니다.</li>
-        <li>🤖 아래 질문으로 AI에게 고쳐 달라고 한 뒤, <strong>고친 코드를 다시 테스트</strong>합니다.</li>
-        <li>✏️ 셀에 고친 코드를 넣어 테스트를 모두 ✅로 만듭니다.</li>
+        <li>각 코드의 <strong>🤖 셀</strong>을 그대로 실행하고, 오류나 ❌ 결과를 실습지에 적습니다.</li>
+        <li>바로 아래 <strong>✏️ 셀</strong>에서 표시된 한 줄만 고쳐 ✅를 만듭니다.</li>
+        <li>막히면 🤖 아래처럼 AI에게 묻고, <strong>AI가 고친 코드도 다시 실행해서</strong> 확인합니다.</li>
       </ol>
-      <pre><span class="p">나 ▶</span> 아래 파이썬 코드를 실행했더니 이런 결과가 나왔어. 원인을 설명하고 고친 코드를 줘.
+      <pre><span class="p">나 ▶</span> 아래 파이썬 코드를 실행했더니 이런 결과가 나왔어. 원인을 쉽게 설명하고 고쳐 줘.
      [코드] (붙여 넣기)
-     [결과] (오류 메시지 마지막 줄 또는 ❌ 테스트 줄 붙여 넣기)</pre>
+     [결과] (빨간 글씨 마지막 줄 또는 ❌ 줄 붙여 넣기)</pre>
       <div class="box check"><span class="lbl">오늘의 교훈</span>
-        <p>AI의 답은 <strong>실행 오류</strong>처럼 티가 나기도 하지만, <strong>조용히 틀리는</strong> 경우가 더 위험합니다. 1900년 같은 <strong>예외 값</strong>과 끝 값으로 시험하는 습관이 교차 확인입니다.</p></div>
+        <p>코드 1처럼 <strong>티가 나는 오류</strong>보다 코드 2·3처럼 <strong>조용히 틀리는 답</strong>이 더 위험합니다. 답을 아는 값, <strong>딱 경계에 있는 값(60점)</strong>으로 시험하는 것이 교차 확인입니다.</p></div>
+      <div class="box check"><span class="lbl">도전 문제 (선택)</span>
+        <p>노트북 끝 <strong>도전 A</strong>: 윤년 판정 함수(1900년 함정)와 1부터 n까지 합 함수의 오류를 찾아 고칩니다.</p></div>
     </div>
   </section>
 
@@ -481,29 +483,29 @@
     </div>
 
     <div class="mission py">
-      <div class="mhead"><span class="mn">PYTHON P4 · 선택</span><h3>프롬프트 노트에 "코드 요청 템플릿" 추가하기</h3></div>
+      <div class="mhead"><span class="mn">PYTHON P5 · 선택</span><h3>코드 요청 템플릿으로 AI에게 함수 받고 테스트하기</h3></div>
       
-      <p>좋은 질문의 4요소(역할·상황·요청·형식)는 코드를 부탁할 때도 그대로 통합니다. 템플릿으로 <strong>글자 수 세기 함수</strong>를 받아서, 미리 준비된 테스트로 검증합니다.</p>
-      <p><strong>쓰는 파이썬:</strong> 함수 · 문자열 처리 · 반환값 여러 개 · 올림 계산</p>
+      <p>좋은 질문의 4요소(역할·상황·요청·형식)는 코드를 부탁할 때도 그대로 통합니다. 템플릿으로 <strong>공백을 뺀 글자 수를 세는 함수</strong>를 받아서, 준비된 테스트로 맞는지 확인합니다. <strong>코드를 직접 짜지 않고, 받아서 검증하는 연습</strong>입니다.</p>
+      <p><strong>쓰는 파이썬:</strong> 셀에 코드 붙여 넣기 · 함수 실행 · 테스트 결과 읽기</p>
       <div class="nb"><b>📓 Colab 노트북</b>
         <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit2_python.ipynb" target="_blank" rel="noopener">Colab에서 열기</a>
         <a href="../python/unit2_python.ipynb" download>노트북 내려받기 (.ipynb)</a>
         <small>Colab에서 열기가 안 되면: 내려받기 → colab.research.google.com → 파일 → 노트북 업로드. 구글 계정으로 로그인합니다.</small></div>
       <pre><span class="p">나 ▶</span> [역할] 너는 파이썬 초보자를 가르치는 친절한 강사야.
      [상황] 나는 파이썬 기초(변수, 조건문, 반복문, 함수)까지 배웠고 Google Colab에서 실행할 거야.
-     [요청] 문장을 받아 글자 수를 세는 함수 두 개를 만들어 줘.
-       1) 글자수_세기(문장): (공백 포함 글자 수, 공백 제외 글자 수)를 돌려준다.
-          공백 포함 = 줄바꿈만 뺀 모든 글자 / 공백 제외 = 띄어쓰기·줄바꿈·탭을 모두 뺀 글자
-       2) 원고지_매수(문장): 공백 포함 글자 수를 200으로 나눠 올림한 값. 빈 문장은 0.
-     [형식] 외부 라이브러리 없이, 줄마다 한국어 주석, 사용 예시 3개 포함.</pre>
+     [요청] 문장을 받아서 띄어쓰기를 뺀 글자 수를 돌려주는 함수를 만들어 줘.
+            함수 이름은 공백빼고_세기(문장)이야.
+     [형식] 외부 라이브러리 없이, 5줄 이내로, 줄마다 한국어 주석을 달아 줘.</pre>
       <ol>
-        <li>위 질문을 AI에게 보내고, 받은 코드를 노트북 <strong>🤖 셀</strong>에 붙여 넣어 실행합니다.</li>
-        <li>테스트 셀을 실행합니다. ❌가 있으면 <strong>❌ 줄을 그대로 AI에게 보내</strong> 고쳐 달라고 합니다.</li>
-        <li>[요청]에서 "공백 제외" 정의를 빼고 다시 물어보면 결과가 어떻게 달라지는지도 확인합니다.</li>
-        <li>완성된 템플릿을 프롬프트 노트 <strong>11번 템플릿</strong>으로 추가합니다.</li>
+        <li>위 질문을 ChatGPT나 Gemini에 보내고, 받은 코드를 노트북 <strong>🤖 셀</strong>에 붙여 넣어 실행합니다.</li>
+        <li>테스트 셀을 실행합니다. ❌가 있으면 <strong>❌ 줄을 복사해 AI에게 보내고</strong> 고쳐 달라고 합니다.</li>
+        <li>[역할]·[상황]·[형식]을 빼고 "글자 수 세는 코드 줘"라고만 새 대화에서 물어보고, 받은 코드도 테스트해 봅니다.</li>
+        <li>완성된 템플릿을 프롬프트 노트 <strong>11번 템플릿(코드 요청)</strong>으로 저장합니다.</li>
       </ol>
       <div class="box q"><span class="lbl">생각해 보기</span>
-        <p>"글자 수 세 줘"만 말하면 AI는 공백을 셀까요, 뺄까요? <strong>요청이 모호하면 코드도 모호해집니다.</strong> 테스트를 먼저 정해 두면 요청이 분명해집니다.</p></div>
+        <p>"글자 수 세 줘"라고만 하면 AI는 띄어쓰기를 셀까요, 뺄까요? <strong>요청이 모호하면 코드도 모호합니다.</strong></p></div>
+      <div class="box check"><span class="lbl">도전 문제 (선택)</span>
+        <p>노트북 끝 <strong>도전 B</strong>: (공백 포함, 공백 제외) 두 값을 돌려주는 함수와 원고지 매수 계산 함수를 요청하고 테스트 10개를 통과시킵니다.</p></div>
     </div>
   </section>
 
