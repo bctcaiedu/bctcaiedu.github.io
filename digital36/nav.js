@@ -160,7 +160,8 @@
     '     letter-spacing:.12em;color:var(--sn-mut);margin-top:4px}',
     '.sn-list{padding:0 0 40px}',
     '.sn-top{padding:8px 0!important;border-bottom:1px solid var(--sn-line)}',
-    '.sn-top a{padding-left:18px!important}',
+    '.sn-top > li > a{padding-left:18px!important}',
+    '.sn-top .sn-toc a{padding-left:32px}',
     '.sn-day{border-bottom:1px solid var(--sn-line)}',
     '.sn-day:last-child{border-bottom:0}',
     '.sn-dh{display:flex;gap:9px;align-items:baseline;padding:11px 18px 7px}',
@@ -235,10 +236,21 @@
     nav.className = 'l70nav';
     nav.setAttribute('aria-label', '과정 목차');
 
+    var TOP = [
+      { f: 'index.html', label: '과정 표지' },
+      { f: 'plan.html',  label: '교과 운영계획서', tag: '36시간' },
+      { f: 'bonus.html', label: '보너스 실습 · 게임형', tag: '15+2', toc: true }
+    ];
     var html = '<div class="sn-hd"><b>' + COURSE + '</b><span>' + SUB + '</span></div>' +
-      '<ul class="sn-items sn-top"><li><a href="' + B + 'index.html"' + (samePage(B + 'index.html') ? ' class="on"' : '') + '>과정 표지</a></li>' +
-      '<li><a href="' + B + 'plan.html"' + (samePage(B + 'plan.html') ? ' class="on"' : '') + '>교과 운영계획서<s>36시간</s></a></li></ul>' +
-      '<div class="sn-list">';
+      '<ul class="sn-items sn-top">';
+    TOP.forEach(function (it) {
+      var on = samePage(B + it.f);
+      html += '<li><a href="' + B + it.f + '"' + (on ? ' class="on" aria-current="page"' : '') + '>' +
+              it.label + (it.tag ? '<s>' + it.tag + '</s>' : '') + '</a>';
+      if (on && it.toc) html += '<ul class="sn-toc" data-here="1"></ul>';
+      html += '</li>';
+    });
+    html += '</ul><div class="sn-list">';
 
     DAYS.forEach(function (d) {
       html += '<div class="sn-day' + (d.soon ? ' soon' : '') + '">';

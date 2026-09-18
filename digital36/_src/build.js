@@ -46,7 +46,8 @@ const colabUrl = file => `https://colab.research.google.com/github/${GITHUB.repo
 const CSS = {
   deck: read('css/deck.css'),
   lab:  read('css/lab.css'),
-  quiz: read('css/quiz.css')
+  quiz: read('css/quiz.css'),
+  bonus: read('css/bonus.css')
 };
 const JS = {
   deck: read('js/deck.js'),
@@ -674,6 +675,14 @@ ${FONTS}
   .pytable .act{white-space:nowrap}
   .pytable .act a{display:inline-block;font-family:var(--mono);font-size:11px;padding:4px 9px;margin:0 4px 4px 0;border-radius:4px;text-decoration:none;border:1px solid #1F5E86;color:#1F5E86}
   .pytable .act a:first-child{background:#1F5E86;color:#fff}
+  .bonus{display:block;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--clay);border-radius:6px;
+        padding:20px 22px 18px;margin-bottom:48px;text-decoration:none;color:var(--body);transition:.15s}
+  .bonus:hover{border-color:var(--clay);box-shadow:0 4px 18px rgba(184,84,52,.10)}
+  .bonus .dn{color:var(--clay)}
+  .bonus b{display:block;font-size:19px;color:var(--title);letter-spacing:-.02em;margin:8px 0 4px}
+  .bonus .bd{display:block;font-size:14px;color:var(--muted);margin-bottom:12px}
+  .bonus .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .bonus .chips i{font-style:normal;font-family:var(--mono);font-size:11px;padding:4px 9px;border-radius:4px;background:var(--chip);border:1px solid var(--line)}
   @media (max-width:760px){ .grid,.flow{grid-template-columns:1fr} header{padding:44px 0 38px} .wrap{padding:0 16px} }
 </style>
 
@@ -696,6 +705,14 @@ ${FONTS}
 
   ${pySection(all)}
 
+  <h2 class="sec">보너스 실습 · 게임형</h2>
+  <a class="bonus" href="bonus.html">
+    <span class="dn">BONUS · 미션 15개 + 파이썬 2개</span>
+    <b>놀면서 익히는 AI — 단원별 게임형 보너스 실습</b>
+    <span class="bd">각 단원 ★ 미션 뒤 남는 시간이나 복습 시간에 합니다. 강사 메모(정답·준비물·진행 팁) 포함.</span>
+    <span class="chips"><i>스미싱 방탈출</i><i>AI와 끝말잇기</i><i>프롬프트 골프</i><i>두 개의 진실, 하나의 거짓</i><i>디지털 습관 빙고</i><i>AI 골든벨</i></span>
+  </a>
+
   <h2 class="sec">단원별 자료</h2>
   <div class="grid">
 ${cards}
@@ -705,6 +722,39 @@ ${cards}
 <footer>
   <div class="wrap">
     <p>${COURSE_LONG} · 각 단원은 <b>강의 슬라이드(나레이션)</b> · <b>차시별 교안</b> · <b>실습지</b> · <b>퀴즈</b>로 구성됩니다.</p>
+  </div>
+</footer>
+<script src="nav.js"></script>
+</html>
+`;
+}
+
+/* =================================================================
+   6-1. 보너스 실습지  (bonus.html) — 본문은 _src/bonus.html
+   ================================================================= */
+function buildBonus() {
+  const body = read('bonus.html')
+    .replace(/^<!--[\s\S]*?-->\n/, '')
+    .replace(/__ORG__/g, ORG);
+  return `<!doctype html>
+<html lang="ko">
+${META}
+<title>보너스 실습지 · ${COURSE}</title>
+${FONTS}
+<style>
+${CSS.lab}
+  pre{white-space:pre-wrap;word-break:keep-all;font-family:var(--sans);font-size:13.5px}
+  .mission.py{border-left-color:var(--ask)}
+  .mission.py .mn{color:var(--ask)}
+${CSS.bonus}
+  @media print{ .l70nav{display:none} pre{background:#F2F2F2;color:#000} pre .p,pre .o,pre .c{color:#000} }
+</style>
+
+${body.trim()}
+
+<footer>
+  <div class="wrap">
+    <p>BONUS · 게임형 보너스 실습지 · ${COURSE_LONG}</p>
   </div>
 </footer>
 <script src="nav.js"></script>
@@ -842,10 +892,11 @@ targets.forEach(D => {
 fs.writeFileSync(path.join(ROOT, 'index.html'), buildIndex(all));
 fs.writeFileSync(path.join(ROOT, 'plan.html'), buildPlan(all));
 fs.writeFileSync(path.join(ROOT, 'nav.js'), buildNav(all));
+fs.writeFileSync(path.join(ROOT, 'bonus.html'), buildBonus());
 writeNotebooks(all);
 console.log(`python/  노트북 ${all.filter(D => D.py).length}개 (+ answers/ 답안)`);
 const total = all.reduce((s, u) => s + u.hours, 0);
-console.log(`index.html · plan.html · nav.js  (${all.length}개 단원 · ${total}시간)`);
+console.log(`index.html · plan.html · nav.js · bonus.html  (${all.length}개 단원 · ${total}시간)`);
 if (all.length === TOTAL_UNITS && total !== COURSE_INFO.hours) console.warn(`  ⚠ 단원 시수 합계 ${total} ≠ 과정 시수 ${COURSE_INFO.hours}`);
 
 console.log(`\n완료 — ${targets.length}개 단원`);

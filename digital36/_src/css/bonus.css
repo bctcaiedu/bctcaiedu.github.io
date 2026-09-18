@@ -1,0 +1,19 @@
+/* 보너스 실습지(bonus.html) 전용 — lab.css 위에 덧붙습니다 */
+  .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+  .meta span{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line);border-radius:3px;padding:2px 8px}
+  .meta span.fun{color:var(--clay);background:var(--clay-soft);border-color:transparent}
+  .mission.bonus{border-left-color:var(--clay)}
+  .mission.bonus .mn{color:var(--clay)}
+  .box.teach{border-left:2px solid var(--ink-2);background:var(--surface-2)}
+  .box.teach .lbl{color:var(--ink-2)}
+  .msgs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:12px}
+  .msg{border:1px solid var(--line);border-radius:10px 10px 10px 2px;background:var(--surface-2);padding:10px 13px;font-size:13.5px;color:var(--ink-2);line-height:1.6;position:relative}
+  .msg b.id{display:inline-block;font-family:var(--mono);font-size:11px;color:var(--surface);background:var(--ink-2);border-radius:3px;padding:0 6px;margin-right:6px}
+  .msg .syl{position:absolute;right:10px;top:8px;font-weight:700;font-size:15px;color:var(--clay);border:1.5px solid var(--clay);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:var(--surface)}
+  .msg p{padding-right:34px}
+  .bingo{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+  .bingo div{border:1.5px solid var(--line-strong);border-radius:4px;background:var(--surface);padding:10px 9px;font-size:12.5px;line-height:1.45;color:var(--ink-2);min-height:78px;position:relative}
+  .bingo div i{display:block;font-style:normal;font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:3px}
+  @media (max-width:600px){ .bingo{grid-template-columns:repeat(2,1fr)} }
+  .toc td:first-child{font-family:var(--mono);font-size:11.5px;color:var(--clay);white-space:nowrap}
+  .toc td a{font-weight:600}

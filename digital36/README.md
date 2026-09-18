@@ -17,6 +17,7 @@ digital36/
 ├── index.html          ← 과정 표지 (자동 생성)
 ├── plan.html           ← 교과 운영계획서 · 36차시 세부 교수계획 · 평가 계획 (자동 생성, 인쇄 가능)
 ├── nav.js              ← 공통 목차 사이드바 (자동 생성)
+├── bonus.html          ← 게임형 보너스 실습지 · 미션 15개 + 파이썬 2개 (자동 생성)
 ├── unit1 ~ unit5/
 │   ├── index.html      ← 강의 슬라이드 (TTS 나레이션 · 자막 · 자동진행)
 │   ├── lesson.html     ← 차시별 교안 (학습목표 · 도입/전개/정리 · 교수방법 · 준비물 · 평가) — 인쇄 가능
@@ -26,7 +27,8 @@ digital36/
     ├── build.js        ← 과정 정보(COURSE_INFO)·평가 배점도 여기
     ├── SPEC.md         ← 단원 파일 작성 규격
     ├── unit1.js ~ unit5.js
-    ├── css/  deck.css · lab.css · quiz.css
+    ├── bonus.html      ← 보너스 실습지 본문 (HTML 그대로 작성)
+    ├── css/  deck.css · lab.css · quiz.css · bonus.css
     └── js/   deck.js · quiz.js · nav.tpl.js
 ```
 
@@ -95,6 +97,7 @@ HTML을 직접 고치지 마세요. **`_src/unitN.js`만 고치고 다시 빌드
 | 문제 해결표 · 체크리스트 | `_src/unitN.js` → `lab.errors[]`, `lab.checklist[]` |
 | 과제 | `_src/unitN.js` → `assignment` |
 | 퀴즈 | `_src/unitN.js` → `quiz[]` |
+| 보너스 실습지(게임형) | `_src/bonus.html` (본문) · `_src/css/bonus.css` — 표지 카드는 `build.js` → `buildIndex`, 목차 항목은 `_src/js/nav.tpl.js` → `TOP` |
 
 차시 수를 바꾸면 `hours`, `blocks[]`, `lesson[]`, `lab.parts[]` 개수를 함께 맞추세요. 안 맞으면 빌드할 때 경고가 나옵니다.
 필드 형식과 슬라이드에 쓸 수 있는 클래스는 `_src/SPEC.md`에 정리되어 있습니다.

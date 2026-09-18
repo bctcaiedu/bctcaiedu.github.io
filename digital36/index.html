@@ -54,6 +54,14 @@
   .pytable .act{white-space:nowrap}
   .pytable .act a{display:inline-block;font-family:var(--mono);font-size:11px;padding:4px 9px;margin:0 4px 4px 0;border-radius:4px;text-decoration:none;border:1px solid #1F5E86;color:#1F5E86}
   .pytable .act a:first-child{background:#1F5E86;color:#fff}
+  .bonus{display:block;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--clay);border-radius:6px;
+        padding:20px 22px 18px;margin-bottom:48px;text-decoration:none;color:var(--body);transition:.15s}
+  .bonus:hover{border-color:var(--clay);box-shadow:0 4px 18px rgba(184,84,52,.10)}
+  .bonus .dn{color:var(--clay)}
+  .bonus b{display:block;font-size:19px;color:var(--title);letter-spacing:-.02em;margin:8px 0 4px}
+  .bonus .bd{display:block;font-size:14px;color:var(--muted);margin-bottom:12px}
+  .bonus .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .bonus .chips i{font-style:normal;font-family:var(--mono);font-size:11px;padding:4px 9px;border-radius:4px;background:var(--chip);border:1px solid var(--line)}
   @media (max-width:760px){ .grid,.flow{grid-template-columns:1fr} header{padding:44px 0 38px} .wrap{padding:0 16px} }
 </style>
 
@@ -90,6 +98,14 @@
       <tr><td>5단원</td><td><b>P8</b> 루틴을 캘린더 파일(.ics)로 만들어 한 번에 등록하기 <span class="mut">(2차시)</span><br><b>P9</b> 습관 기록 달성률 계산해 루틴북에 붙이기 <span class="mut">(6차시)</span></td>
         <td class="act"><a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit5_python.ipynb" target="_blank" rel="noopener">Colab</a><a href="python/unit5_python.ipynb" download>.ipynb</a></td></tr></tbody>
   </table></div>
+
+  <h2 class="sec">보너스 실습 · 게임형</h2>
+  <a class="bonus" href="bonus.html">
+    <span class="dn">BONUS · 미션 15개 + 파이썬 2개</span>
+    <b>놀면서 익히는 AI — 단원별 게임형 보너스 실습</b>
+    <span class="bd">각 단원 ★ 미션 뒤 남는 시간이나 복습 시간에 합니다. 강사 메모(정답·준비물·진행 팁) 포함.</span>
+    <span class="chips"><i>스미싱 방탈출</i><i>AI와 끝말잇기</i><i>프롬프트 골프</i><i>두 개의 진실, 하나의 거짓</i><i>디지털 습관 빙고</i><i>AI 골든벨</i></span>
+  </a>
 
   <h2 class="sec">단원별 자료</h2>
   <div class="grid">
