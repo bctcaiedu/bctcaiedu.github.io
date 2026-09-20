@@ -47,7 +47,8 @@ const CSS = {
   deck: read('css/deck.css'),
   lab:  read('css/lab.css'),
   quiz: read('css/quiz.css'),
-  bonus: read('css/bonus.css')
+  bonus: read('css/bonus.css'),
+  colab: read('css/colab.css')
 };
 const JS = {
   deck: read('js/deck.js'),
@@ -682,6 +683,13 @@ ${FONTS}
   .bonus b{display:block;font-size:19px;color:var(--title);letter-spacing:-.02em;margin:8px 0 4px}
   .bonus .bd{display:block;font-size:14px;color:var(--muted);margin-bottom:12px}
   .bonus .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .bonus.colab{border-left-color:#1F5E86;margin-bottom:10px}
+  .bonus.colab:hover{border-color:#1F5E86;box-shadow:0 4px 18px rgba(31,94,134,.10)}
+  .bonus.colab .dn{color:#1F5E86}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .bonus.colab .dn{color:#6FB3DC}}
+  :root[data-theme="dark"] .bonus.colab .dn{color:#6FB3DC}
+  .colabsub{font-size:13.5px;margin:0 0 48px;color:var(--muted)}
+  .colabsub a{color:var(--pine);font-weight:600}
   .bonus .chips i{font-style:normal;font-family:var(--mono);font-size:11px;padding:4px 9px;border-radius:4px;background:var(--chip);border:1px solid var(--line)}
   @media (max-width:760px){ .grid,.flow{grid-template-columns:1fr} header{padding:44px 0 38px} .wrap{padding:0 16px} }
 </style>
@@ -702,6 +710,15 @@ ${FONTS}
     <div class="fl"><b>3–4단원 · 생활에 쓴다</b><span>글쓰기 · 번역 · 생활정보 · 공공서비스 → 허위정보 판별 · 요약 · 리포트</span></div>
     <div class="fl"><b>5단원 · 습관으로 만든다</b><span>일정 · 기록 · 맞춤 AI 비서 → 나만의 디지털 루틴북 발표</span></div>
   </div>
+
+  <h2 class="sec">파이썬 실습 준비 · Google Colab</h2>
+  <a class="bonus colab" href="colab.html">
+    <span class="dn">GUIDE · 사용 설명서 + 실습 예제 10개 · 준비 ${CB.hours}차시(선택)</span>
+    <b>${CB.title} — ${CB.theme}</b>
+    <span class="bd">PYTHON 미션(P1~P9)을 하기 전에 봅니다. 접속 · 화면 · 셀 실행 · 런타임 · 파일/드라이브 · 입력 폼 · 오류 고치기 · AI 코드 검증 · 공유 제출.</span>
+    <span class="chips"><i>사용 설명서</i><i>colab_basics.ipynb</i><i>QR 코드 만들기</i><i>AI 코드 테스트</i></span>
+  </a>
+  <p class="colabsub"><a href="colab_lesson.html">교수자용 차시별 교안 (${CB.hours}차시)</a> · <a href="${colabUrl(CB.notebook.file)}" target="_blank" rel="noopener">실습 노트북 Colab에서 열기</a> · <a href="python/${CB.notebook.file}" download>노트북 내려받기</a></p>
 
   ${pySection(all)}
 
@@ -757,6 +774,157 @@ ${body.trim()}
     <p>BONUS · 게임형 보너스 실습지 · ${COURSE_LONG}</p>
   </div>
 </footer>
+<script src="nav.js"></script>
+</html>
+`;
+}
+
+/* =================================================================
+   6-2. Google Colab — 사용 설명서 (colab.html, 본문은 _src/colab_guide.html)
+        · 준비 차시 교안 (colab_lesson.html). 내용은 _src/colab.js
+   ================================================================= */
+function colabNbBox() {
+  const file = CB.notebook.file;
+  return `<div class="nb"><b>📓 실습 노트북</b>
+      <a href="${colabUrl(file)}" target="_blank" rel="noopener">Colab에서 열기</a>
+      <a href="python/${file}" download>노트북 내려받기 (.ipynb)</a>
+      <small>Colab에서 열기가 안 되면: 내려받기 → colab.research.google.com → 업로드 탭에 파일 끌어다 놓기. 열었으면 먼저 파일 → Drive에 사본 저장.</small></div>`;
+}
+
+function buildColabGuide() {
+  const rows = CB.errors.map(e => `          <tr><td><strong>${esc(e[0])}</strong></td><td>${esc(e[1])}</td><td>${esc(e[2])}</td></tr>`).join('\n');
+  const body = read('colab_guide.html')
+    .replace(/^<!--[\s\S]*?-->\n/, '')
+    .replace(/__ORG__/g, ORG)
+    .replace('__NB__', colabNbBox())
+    .replace('__ERRORS__', rows);
+  return `<!doctype html>
+<html lang="ko">
+${META}
+<title>Colab 사용 설명서 · ${COURSE}</title>
+${FONTS}
+<style>
+${CSS.lab}
+${DOC_EXTRA}
+${CSS.colab}
+</style>
+
+${body.trim()}
+
+<footer>
+  <div class="wrap">
+    <p>GUIDE · Google Colab 사용 설명서 · ${COURSE_LONG} · 화면·메뉴 이름·무료 사용량은 업데이트로 달라질 수 있습니다</p>
+  </div>
+</footer>
+<script src="nav.js"></script>
+</html>
+`;
+}
+
+function buildColabLesson() {
+  const li = arr => `<ul>${(arr || []).map(x => `<li>${x}</li>`).join('')}</ul>`;
+  const file = CB.notebook.file;
+  const ans = answerName(file);
+
+  const summary = `
+  <section>
+    <div class="part"><span class="pn">개요</span><h2>Colab 준비 차시 구성</h2><span class="pt">${CB.hours}시간 · 선택</span></div>
+    <p class="lede">과정 36시간과 별도로 운영하는 <strong>파이썬 확장 실습 준비 차시</strong>입니다. 1단원 첫 파이썬 미션(P1) 전에, 또는 보충 시간·사전 과제로 진행합니다. 시간이 부족하면 1차시만 수업하고 2차시는 사용 설명서 9장을 과제로 냅니다.</p>
+    <div class="formwrap"><table class="form">
+      <thead><tr><th>차시</th><th>차시명</th><th>학습목표</th><th>교수방법</th></tr></thead>
+      <tbody>
+      ${CB.lesson.map(L => `<tr><td class="c">${L.no}</td><td>${L.title}</td><td>${L.objective}</td><td class="c">${L.method}</td></tr>`).join('\n      ')}
+      </tbody>
+    </table></div>
+    <div class="formwrap"><table class="form">
+      <tbody>
+        <tr><th style="width:130px">학습목표</th><td>${li(CB.goals.map(g => g[0] + ' ' + g[1]))}</td></tr>
+        <tr><th>교재 · 자료</th><td><ul>
+          <li><a href="colab.html">Colab 사용 설명서</a> — 학생용 · 1~11장 · 실습 예제 C1~C10 · 인쇄 가능</li>
+          <li>실습 노트북 <a href="python/${file}" download>${file}</a> (<a href="${colabUrl(file)}" target="_blank" rel="noopener">Colab에서 열기</a>) · 교수자용 답안 <a href="python/answers/${ans}" download>${ans}</a></li>
+        </ul></td></tr>
+        <tr><th>연계</th><td>앞 교과 「파이썬 기초」 → <strong>이 준비 차시</strong> → 각 단원 실습지의 PYTHON 미션 P1~P9</td></tr>
+      </tbody>
+    </table></div>
+  </section>`;
+
+  const each = CB.lesson.map(L => `
+  <section class="lesson">
+    <div class="part"><span class="pn">준비 ${L.no}차시</span><h2>${L.title}</h2><span class="pt">50분</span></div>
+    <div class="formwrap"><table class="form">
+      <colgroup><col style="width:92px"><col><col style="width:70px"></colgroup>
+      <tbody>
+        <tr><th>학습목표</th><td colspan="2">${L.objective}</td></tr>
+        <tr><th>단계</th><th>교수 · 학습 활동</th><th>시간</th></tr>
+        <tr><td class="stage">도입</td><td>${li(L.intro)}</td><td class="min">5분</td></tr>
+        <tr><td class="stage">전개</td><td>${li(L.main)}</td><td class="min">35분</td></tr>
+        <tr><td class="stage">정리</td><td>${li(L.close)}</td><td class="min">10분</td></tr>
+        <tr><th>교수방법</th><td colspan="2">${L.method}</td></tr>
+        <tr><th>준비물·매체</th><td colspan="2">${L.material}</td></tr>
+        <tr><th>평가</th><td colspan="2">${L.eval}</td></tr>
+      </tbody>
+    </table></div>
+  </section>`).join('\n');
+
+  const table = (pn, h, pt, lede, head, rows) => `
+  <section>
+    <div class="part"><span class="pn">${pn}</span><h2>${h}</h2><span class="pt">${pt}</span></div>
+    ${lede ? `<p class="lede">${lede}</p>` : ''}
+    <div class="formwrap"><table class="form">
+      <thead><tr>${head}</tr></thead>
+      <tbody>
+      ${rows.join('\n      ')}
+      </tbody>
+    </table></div>
+  </section>`;
+
+  const prep = table('준비', '수업 전 강사 점검표', CB.prep.length + '항목', '',
+    '<th style="width:110px">시기</th><th>점검 내용</th><th style="width:56px">확인</th>',
+    CB.prep.map(p => `<tr><td class="nw">${p[0]}</td><td>${p[1]}</td><td class="c">☐</td></tr>`));
+  const errors = table('운영', '문제 해결표', '수업 중 자주 나오는 문제', '학생용 사용 설명서 10장과 같은 내용입니다.',
+    '<th>증상</th><th>원인</th><th>대응</th>',
+    CB.errors.map(e => `<tr><td><strong>${esc(e[0])}</strong></td><td>${esc(e[1])}</td><td>${esc(e[2])}</td></tr>`));
+  const rubric = table('평가', '평가 기준 (관찰 · 결과물)', '상 · 중 · 하',
+    '과정 평가의 「수업 참여」·「실습 결과물」에 반영합니다. 제출물은 뷰어 권한 공유 링크 1개입니다.',
+    '<th style="width:130px">평가 항목</th><th>상</th><th>중</th><th>하</th>',
+    CB.rubric.map(r => `<tr><td class="nw">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`));
+
+  return `<!doctype html>
+<html lang="ko">
+${META}
+<title>Colab 차시별 교안 · ${COURSE}</title>
+${FONTS}
+<style>
+${CSS.lab}
+${DOC_EXTRA}
+${CSS.colab}
+</style>
+
+<header class="top">
+  <div class="wrap masthead">
+    <div class="rule-tag">
+      <span class="eyebrow">${ORG}</span>
+      <span class="dash"></span>
+      <span class="eyebrow">교수자용 차시별 교안 · 준비 차시</span>
+    </div>
+    <h1>파이썬 실습 준비 · <em>${CB.title}</em></h1>
+    <p class="standfirst">${CB.theme} — 교과목 「${COURSE_INFO.name}」 · ${COURSE_INFO.kind} · 교수 ${COURSE_INFO.prof} · 훈련시설 ${COURSE_INFO.room}</p>
+    <div class="lnk">
+      <a href="colab.html">Colab 사용 설명서</a><a href="python/${file}" download>실습 노트북</a><a href="python/answers/${ans}" download>답안 노트북</a><a href="plan.html">운영계획서</a>
+      <button class="printbtn" onclick="window.print()">🖨 인쇄 / PDF 저장</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+${summary}
+${each}
+${prep}
+${errors}
+${rubric}
+</div>
+
+<footer><div class="wrap"><p>GUIDE · Colab 준비 ${CB.hours}차시 · 차시별 교안 · ${COURSE_LONG}</p></div></footer>
 <script src="nav.js"></script>
 </html>
 `;
@@ -846,6 +1014,8 @@ function writeNotebooks(all) {
     fs.writeFileSync(path.join(dir, file), buildNotebook(D.py, false));
     fs.writeFileSync(path.join(dir, 'answers', answerName(file)), buildNotebook(D.py, true));
   });
+  fs.writeFileSync(path.join(dir, CB.notebook.file), buildNotebook(CB, false));
+  fs.writeFileSync(path.join(dir, 'answers', answerName(CB.notebook.file)), buildNotebook(CB, true));
 }
 
 /* =================================================================
@@ -863,6 +1033,9 @@ function check(D) {
   });
   if (errs.length) console.warn(`  ⚠ unit${D.unit}: ` + errs.join(' · '));
 }
+
+const CB = require(path.join(SRC, 'colab.js'));
+if (CB.lesson.length !== CB.hours) console.warn(`  ⚠ colab: lesson ${CB.lesson.length} ≠ hours ${CB.hours}`);
 
 const all = [];
 for (let n = 1; n <= TOTAL_UNITS; n++) {
@@ -893,8 +1066,11 @@ fs.writeFileSync(path.join(ROOT, 'index.html'), buildIndex(all));
 fs.writeFileSync(path.join(ROOT, 'plan.html'), buildPlan(all));
 fs.writeFileSync(path.join(ROOT, 'nav.js'), buildNav(all));
 fs.writeFileSync(path.join(ROOT, 'bonus.html'), buildBonus());
+fs.writeFileSync(path.join(ROOT, 'colab.html'), buildColabGuide());
+fs.writeFileSync(path.join(ROOT, 'colab_lesson.html'), buildColabLesson());
 writeNotebooks(all);
-console.log(`python/  노트북 ${all.filter(D => D.py).length}개 (+ answers/ 답안)`);
+console.log(`python/  노트북 ${all.filter(D => D.py).length}개 + ${CB.notebook.file} (+ answers/ 답안)`);
+console.log(`colab.html · colab_lesson.html  (Colab 사용 설명서 · 준비 ${CB.hours}차시 교안)`);
 const total = all.reduce((s, u) => s + u.hours, 0);
 console.log(`index.html · plan.html · nav.js · bonus.html  (${all.length}개 단원 · ${total}시간)`);
 if (all.length === TOTAL_UNITS && total !== COURSE_INFO.hours) console.warn(`  ⚠ 단원 시수 합계 ${total} ≠ 과정 시수 ${COURSE_INFO.hours}`);

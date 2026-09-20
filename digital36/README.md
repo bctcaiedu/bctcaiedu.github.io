@@ -18,6 +18,8 @@ digital36/
 ├── plan.html           ← 교과 운영계획서 · 36차시 세부 교수계획 · 평가 계획 (자동 생성, 인쇄 가능)
 ├── nav.js              ← 공통 목차 사이드바 (자동 생성)
 ├── bonus.html          ← 게임형 보너스 실습지 · 미션 15개 + 파이썬 2개 (자동 생성)
+├── colab.html          ← Google Colab 사용 설명서 (학생용 · 11장 · 실습 예제 10개, 자동 생성)
+├── colab_lesson.html   ← Colab 준비 2차시 교안 (교수자용 · 점검표 · 문제 해결표 · 평가 기준, 자동 생성)
 ├── unit1 ~ unit5/
 │   ├── index.html      ← 강의 슬라이드 (TTS 나레이션 · 자막 · 자동진행)
 │   ├── lesson.html     ← 차시별 교안 (학습목표 · 도입/전개/정리 · 교수방법 · 준비물 · 평가) — 인쇄 가능
@@ -28,6 +30,8 @@ digital36/
     ├── SPEC.md         ← 단원 파일 작성 규격
     ├── unit1.js ~ unit5.js
     ├── bonus.html      ← 보너스 실습지 본문 (HTML 그대로 작성)
+    ├── colab.js        ← Colab 교안(lesson) · 점검표 · 문제 해결표 · 평가 기준 · 실습 노트북 셀
+    ├── colab_guide.html← Colab 사용 설명서 본문 (HTML 그대로 작성)
     ├── css/  deck.css · lab.css · quiz.css · bonus.css
     └── js/   deck.js · quiz.js · nav.tpl.js
 ```
@@ -68,6 +72,19 @@ digital36/
   **답안을 학생에게 공개하지 않으려면 `python/answers/` 폴더는 저장소에 올리지 마세요.**
 - "Colab에서 열기" 링크는 `_src/build.js`의 `GITHUB`(저장소 `bctcaiedu/bctcaiedu.github.io`, 브랜치 `main`) 기준입니다. 브랜치 이름이 다르면 고치고 다시 빌드하세요.
 - 그래프 셀은 선택입니다. Colab에서 한글 글꼴(나눔고딕)을 자동 설치합니다. 기본 결과는 글자 막대(■)라 글꼴 없이도 보입니다.
+
+## Google Colab 준비 차시 (선택 2시간)
+
+파이썬 미션을 처음 하기 전에 코랩 사용법을 익히는 **과정 외 준비 차시**입니다. 36시간 시수에는 포함되지 않습니다.
+
+| 자료 | 파일 | 내용 |
+|---|---|---|
+| 사용 설명서 (학생용) | `colab.html` | 1 코랩이란 · 2 시작하기 · 3 화면 구성(그림) · 4 셀 · 5 런타임 · 6 파일/드라이브 · 7 편리한 기능(폼·`!pip`·Gemini) · 8 저장/공유/제출 · 9 실습 예제 C1~C10 · 10 문제 해결표 · 11 단축키/안전 수칙/자가 점검 |
+| 차시별 교안 (교수자용) | `colab_lesson.html` | 준비 1차시(접속·화면·셀·저장) · 2차시(폼·파일·드라이브·QR·그래프·오류·AI 코드 검증·공유) · 수업 전 점검표 · 평가 기준(상/중/하) |
+| 실습 노트북 | `python/colab_basics.ipynb` | 예제 1~10 + 도전(평↔㎡ 변환기). 답안은 `python/answers/colab_basics_answers.ipynb` |
+
+- 교안·문제 해결표·노트북은 `_src/colab.js`, 설명서 본문은 `_src/colab_guide.html`, 전용 스타일은 `_src/css/colab.css`를 고치고 다시 빌드합니다.
+- 표지(index.html)의 "파이썬 실습 준비 · Google Colab" 카드와 목차 사이드바에서 들어갈 수 있습니다.
 
 ## 빌드
 

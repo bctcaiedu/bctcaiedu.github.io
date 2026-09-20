@@ -108,7 +108,9 @@
     var TOP = [
       { f: 'index.html', label: '과정 표지' },
       { f: 'plan.html',  label: '교과 운영계획서', tag: '36시간' },
-      { f: 'bonus.html', label: '보너스 실습 · 게임형', tag: '15+2', toc: true }
+      { f: 'bonus.html', label: '보너스 실습 · 게임형', tag: '15+2', toc: true },
+      { f: 'colab.html', label: 'Colab 사용 설명서', tag: '예제 10', toc: true },
+      { f: 'colab_lesson.html', label: 'Colab 준비 교안', tag: '2차시' }
     ];
     var html = '<div class="sn-hd"><b>' + COURSE + '</b><span>' + SUB + '</span></div>' +
       '<ul class="sn-items sn-top">';

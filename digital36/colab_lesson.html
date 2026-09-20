@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colab 차시별 교안 · 디지털리터러시</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+    --bg:#F6F8F5;--surface:#FFFFFF;--surface-2:#EDF1EC;--ink:#141A16;--ink-2:#3A453E;--muted:#5F6D65;
+    --line:#DBE2DC;--line-strong:#C3CFC6;--accent:#10684A;--accent-soft:#E2EFE8;--clay:#A94D30;--clay-soft:#F6E7E0;
+    --ask:#1F5E86;--ask-soft:#E1EDF5;
+    --term-bg:#10171A;--term-fg:#DCE6E3;--term-dim:#7C9A93;--term-p:#7FD1A8;--term-out:#B8C7C2;
+    --maxw:940px;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+      --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+      --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1311;--surface:#161C19;--surface-2:#1C2320;--ink:#E7ECE8;--ink-2:#C2CCC6;--muted:#94A29A;
+    --line:#27302B;--line-strong:#36423B;--accent:#57C294;--accent-soft:#14261E;--clay:#E08F6E;--clay-soft:#2A1E18;
+    --ask:#6FB3DC;--ask-soft:#13222C;--term-bg:#0A0F11;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:22px}
+  h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:600;letter-spacing:-.01em}
+  p{margin:0}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+  header.top{border-bottom:1px solid var(--line);background:var(--surface)}
+  .masthead{display:flex;flex-direction:column;gap:16px;padding-block:46px 28px}
+  .rule-tag{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .rule-tag .dash{flex:1;height:1px;background:var(--line-strong);min-width:24px}
+  h1{font-size:clamp(26px,4.4vw,40px);line-height:1.2;font-weight:700;letter-spacing:-.03em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .standfirst{max-width:60ch;color:var(--ink-2);font-size:15.5px;font-weight:300;line-height:1.75}
+
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-top:24px}
+  .rule{background:var(--surface);padding:15px 17px}
+  .rule .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--accent)}
+  .rule h3{font-size:14.5px;font-weight:600;margin-top:4px}
+  .rule p{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.55}
+
+  section{padding-block:44px}
+  .part{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-top:2px solid var(--accent);padding-top:14px;margin-bottom:8px}
+  .part .pn{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;color:var(--accent)}
+  .part h2{font-size:clamp(20px,3vw,26px);font-weight:700;letter-spacing:-.02em;flex:1 1 200px}
+  .part .pt{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .lede{color:var(--muted);font-size:14px;max-width:62ch;margin-bottom:22px}
+
+  .stepc{border:1px solid var(--line);border-radius:4px;background:var(--surface);margin-bottom:16px;overflow:hidden}
+  .shead{display:flex;align-items:baseline;gap:12px;padding:13px 18px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+  .shead .sn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .shead h3{font-size:15px;font-weight:600}
+  .sbody{padding:16px 18px}
+  .sbody > p{font-size:14px;color:var(--ink-2);line-height:1.7}
+  .sbody > p + p{margin-top:9px}
+  .sbody ol,.sbody ul{margin:9px 0 0;padding-left:19px}
+  .sbody li{font-size:14px;color:var(--ink-2);margin-top:5px;line-height:1.65}
+
+  pre{margin:11px 0 0;background:var(--term-bg);color:var(--term-fg);border-radius:3px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+  pre .c{color:var(--term-dim)}
+  pre .p{color:var(--term-p)}
+  pre .o{color:var(--term-out)}
+  .prelbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-top:13px;display:block}
+  code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:1px 4px;border-radius:2px}
+  kbd{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:3px;padding:1px 5px;background:var(--surface);color:var(--ink)}
+  a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid currentColor}
+  a:hover{background:var(--accent-soft)}
+  .dl{display:flex;flex-direction:column;gap:10px;margin-top:11px}
+  .dlrow{display:grid;grid-template-columns:118px 1fr;gap:6px 16px;padding:12px 0;border-top:1px solid var(--line)}
+  .dlrow:first-child{border-top:0}
+  .dlrow .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+  .dlrow .v{font-size:14px;color:var(--ink-2);line-height:1.65}
+  .dlrow .v small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  @media (max-width:700px){ .dlrow{grid-template-columns:1fr;gap:3px} .dlrow .k{padding-top:0} }
+
+  .box{margin-top:13px;border-radius:0 3px 3px 0;padding:11px 14px;display:flex;flex-direction:column;gap:5px}
+  .box.check{border-left:2px solid var(--accent);background:var(--accent-soft)}
+  .box.q{border-left:2px solid var(--ask);background:var(--ask-soft)}
+  .box.warn{border-left:2px solid var(--clay);background:var(--clay-soft)}
+  .box .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase}
+  .box.check .lbl{color:var(--accent)}
+  .box.q .lbl{color:var(--ask)}
+  .box.warn .lbl{color:var(--clay)}
+  .box p,.box li{font-size:13.5px;color:var(--ink-2);line-height:1.62}
+  .box ul{margin:0;padding-left:16px}
+  .box li{margin-top:3px}
+  .box code{background:rgba(0,0,0,.06)}
+
+  .mission{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;background:var(--surface);padding:16px 18px;margin-bottom:14px}
+  .mhead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .mhead .mn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);white-space:nowrap}
+  .mhead h3{font-size:15px;font-weight:600;flex:1 1 180px}
+  .mission > p{font-size:14px;color:var(--ink-2);margin-top:7px;line-height:1.7}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;min-width:540px;font-size:13.5px}
+  th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--surface-2)}
+  tbody tr:last-child td{border-bottom:0}
+  td code{font-size:12px}
+
+  .selfcheck{border:1px solid var(--line-strong);border-radius:4px;background:var(--surface);overflow:hidden}
+  .selfcheck h3{padding:14px 18px;font-size:15px;background:var(--surface-2);border-bottom:1px solid var(--line-strong)}
+  .selfcheck ul{list-style:none;margin:0;padding:6px 18px 16px}
+  .selfcheck li{font-size:14px;color:var(--ink-2);padding:8px 0 8px 28px;border-bottom:1px solid var(--line);position:relative;line-height:1.6}
+  .selfcheck li:last-child{border-bottom:0}
+  .selfcheck li::before{content:"";position:absolute;left:0;top:13px;width:14px;height:14px;border:1.5px solid var(--line-strong);border-radius:2px}
+
+  footer{border-top:1px solid var(--line);background:var(--surface);padding-block:26px;margin-top:20px}
+  footer p{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+  @media (max-width:700px){
+    .sbody,.shead,.mission{padding-inline:14px}
+    .shead{gap:8px;flex-wrap:wrap}
+  }
+
+
+  .form{width:100%;border-collapse:collapse;min-width:0;background:var(--surface);font-size:14px}
+  .form th,.form td{border:1px solid var(--line-strong);padding:10px 12px;vertical-align:middle;text-align:left}
+  .form th{background:var(--surface-2);font-family:var(--sans);font-size:13.5px;letter-spacing:0;text-transform:none;
+           color:var(--ink);font-weight:700;text-align:center;white-space:nowrap}
+  .form td.c{text-align:center}
+  .form td ul{margin:0;padding-left:17px}
+  .form td li{margin:2px 0;font-size:13.5px;line-height:1.6;color:var(--ink-2)}
+  .form .stage{font-weight:700;text-align:center;white-space:nowrap}
+  .form .min{font-family:var(--mono);font-size:12px;text-align:center;white-space:nowrap;color:var(--muted)}
+  .form .ttl{font-size:17px;font-weight:700;text-align:center;padding:14px}
+  .form .sec{background:var(--surface-2);font-weight:700;text-align:left;font-size:14.5px}
+  .form tr.u td{background:var(--accent-soft);font-weight:600}
+  .formwrap{overflow-x:auto;margin-top:14px}
+  .lesson{margin-bottom:30px;break-inside:avoid;page-break-inside:avoid}
+  .lesson .form{min-width:620px}
+  .lnk{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .lnk a{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;border:1px solid var(--line-strong);border-radius:4px;padding:6px 11px;background:var(--surface)}
+  .printbtn{font-family:var(--sans);font-size:13px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:4px;padding:7px 13px;cursor:pointer}
+  @media print{
+    :root{--bg:#fff;--surface:#fff;--surface-2:#EEE;--ink:#000;--ink-2:#111;--muted:#444;--line:#999;--line-strong:#777;--accent:#000;--accent-soft:#F2F2F2}
+    header.top{border:0} .masthead{padding-block:0 12px} section{padding-block:14px}
+    .printbtn,.lnk,footer{display:none!important}
+    .form th,.form td{padding:6px 8px;font-size:11.5px} .form td li{font-size:11.5px}
+  }
+  /* ---- Colab 사용 설명서 (colab.html) · 교안(colab_lesson.html) 전용 ---- */
+  pre{white-space:pre-wrap;word-break:keep-all}
+  .masthead .rules{margin-top:8px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+  .toc td:first-child{font-family:var(--mono);white-space:nowrap}
+  .tablewrap thead th{white-space:nowrap}
+
+  .nb{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 16px;padding:10px 12px;background:var(--ask-soft);border-radius:4px}
+  .nb b{font-size:13px;color:var(--ink-2);margin-right:4px}
+  .nb a{font-family:var(--mono);font-size:11.5px;border:1px solid var(--ask);color:var(--ask);border-radius:4px;padding:5px 10px;background:var(--surface)}
+  .nb a:hover{background:var(--ask);color:#fff}
+  .nb small{flex-basis:100%;font-size:12px;color:var(--muted)}
+
+  .cards4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:4px 0 4px}
+  .cards4 .cd{background:var(--surface);border:1px solid var(--line);border-top:2px solid var(--accent);border-radius:3px;padding:13px 15px}
+  .cards4 b{display:block;font-size:14.5px;color:var(--ink);margin-bottom:3px}
+  .cards4 span{font-size:13px;color:var(--muted);line-height:1.6}
+
+  /* 런타임 흐름 */
+  .flow2{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch}
+  .flow2 .fb{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:14px 16px;display:flex;flex-direction:column;gap:3px}
+  .flow2 .fb b{font-size:15px;color:var(--ink)}
+  .flow2 .fb span{font-size:13.5px;color:var(--ink-2)}
+  .flow2 .fb em{font-style:normal;font-family:var(--mono);font-size:11.5px;color:var(--accent);margin-top:4px}
+  .flow2 .fb:last-child em{color:var(--clay)}
+  .flow2 .fa{align-self:center;font-family:var(--mono);font-size:12px;color:var(--muted)}
+  @media (max-width:700px){ .flow2{grid-template-columns:1fr} .flow2 .fa{text-align:center} }
+
+  /* 화면 구성 그림 */
+  .mockwrap{overflow-x:auto;padding:4px 0}
+  .mock{min-width:560px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface);overflow:hidden;font-size:12.5px;color:var(--ink-2)}
+  .mock .bd{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;
+            background:var(--clay);color:#fff;font-style:normal;font-family:var(--mono);font-size:11px;font-weight:600;vertical-align:middle;margin-left:4px}
+  .mk-top{display:flex;align-items:center;gap:12px;padding:9px 12px;border-bottom:1px solid var(--line)}
+  .mk-logo{font-family:var(--mono);font-weight:700;font-size:13px;color:#fff;background:#E8710A;border-radius:4px;padding:3px 6px;letter-spacing:.02em}
+  .mk-file{flex:1;line-height:1.5}
+  .mk-file b{color:var(--ink);font-size:13.5px}
+  .mk-file small{color:var(--muted);font-size:12px;word-spacing:6px}
+  .mk-share{border:1px solid var(--line-strong);border-radius:14px;padding:4px 12px;font-weight:600;color:var(--ink)}
+  .mk-tool{display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+  .mk-btn{border:1px solid var(--line-strong);border-radius:3px;padding:2px 9px;background:var(--surface);font-weight:600}
+  .mk-conn{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--accent)}
+  .mk-body{display:grid;grid-template-columns:44px 1fr;min-height:190px}
+  .mk-side{display:flex;flex-direction:column;align-items:center;gap:11px;padding:12px 0;border-right:1px solid var(--line);background:var(--surface-2);font-size:13px}
+  .mk-side span{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+  .mk-cells{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+  .mk-cell{border:1px solid var(--line);border-radius:3px;padding:8px 10px;display:flex;align-items:center;gap:8px;background:var(--bg)}
+  .mk-cell.text{display:block;background:transparent;border-style:dashed;line-height:1.6}
+  .mk-run{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--ink);color:var(--surface);font-size:9px}
+  .mk-no{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .mk-cell code{background:transparent;padding:0;font-size:12px}
+  .mk-out{font-family:var(--mono);font-size:12px;padding:0 10px 0 58px;color:var(--ink-2);margin-top:-3px}
+
+  /* 교안 부가 표 */
+  .form td.nw{white-space:nowrap;font-weight:600;text-align:center}
+  .form .lv{font-family:var(--mono);font-size:12px;text-align:center}
+
+  @media print{
+    pre{background:#F2F2F2;color:#000} pre .p,pre .o,pre .c{color:#000}
+    .mission,.stepc,.lesson{break-inside:avoid}
+    .nb a{border-color:#000;color:#000}
+  }
+
+</style>
+
+<header class="top">
+  <div class="wrap masthead">
+    <div class="rule-tag">
+      <span class="eyebrow">한국폴리텍대학 분당융합기술교육원</span>
+      <span class="dash"></span>
+      <span class="eyebrow">교수자용 차시별 교안 · 준비 차시</span>
+    </div>
+    <h1>파이썬 실습 준비 · <em>Google Colab 시작하기</em></h1>
+    <p class="standfirst">설치 없이 브라우저에서 파이썬을 실행하고, 저장하고, 공유하기 — 교과목 「디지털리터러시」 · AX교과(실습) · 교수 김남호 · 훈련시설 401호</p>
+    <div class="lnk">
+      <a href="colab.html">Colab 사용 설명서</a><a href="python/colab_basics.ipynb" download>실습 노트북</a><a href="python/answers/colab_basics_answers.ipynb" download>답안 노트북</a><a href="plan.html">운영계획서</a>
+      <button class="printbtn" onclick="window.print()">🖨 인쇄 / PDF 저장</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <div class="part"><span class="pn">개요</span><h2>Colab 준비 차시 구성</h2><span class="pt">2시간 · 선택</span></div>
+    <p class="lede">과정 36시간과 별도로 운영하는 <strong>파이썬 확장 실습 준비 차시</strong>입니다. 1단원 첫 파이썬 미션(P1) 전에, 또는 보충 시간·사전 과제로 진행합니다. 시간이 부족하면 1차시만 수업하고 2차시는 사용 설명서 9장을 과제로 냅니다.</p>
+    <div class="formwrap"><table class="form">
+      <thead><tr><th>차시</th><th>차시명</th><th>학습목표</th><th>교수방법</th></tr></thead>
+      <tbody>
+      <tr><td class="c">1</td><td>Colab 첫걸음: 접속 · 화면 · 셀 실행 · 저장</td><td>구글 코랩에 접속하여 새 노트북을 만들고, 코드 셀과 텍스트 셀을 실행·작성한 뒤 구글 드라이브에 저장할 수 있다.</td><td class="c">강의 · 시연 · 실습</td></tr>
+      <tr><td class="c">2</td><td>Colab 활용: 폼 · 파일 · 드라이브 · 그래프 · 오류 · AI 코드 검증 · 공유</td><td>코랩의 입력 폼, 파일 업로드·드라이브 연결, 패키지 설치 기능을 사용하고, 오류를 읽어 고치며, AI에게 받은 코드를 테스트로 검증한 뒤 노트북을 공유할 수 있다.</td><td class="c">시연 · 실습 · 짝 활동(오류 고치기)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="formwrap"><table class="form">
+      <tbody>
+        <tr><th style="width:130px">학습목표</th><td><ul><li>구글 코랩이 무엇이고 왜 쓰는지 설명할 수 있다</li><li>새 노트북을 만들고 코드 셀·텍스트 셀을 실행하고 저장할 수 있다</li><li>런타임(가상 컴퓨터)과 실행 순서의 관계를 이해하고 오류를 스스로 복구할 수 있다</li><li>파일 업로드·구글 드라이브 연결·패키지 설치를 따라 할 수 있다</li><li>AI에게 받은 코드를 코랩에서 실행하고 테스트로 검증할 수 있다</li><li>노트북을 링크로 공유해 과제로 제출할 수 있다</li></ul></td></tr>
+        <tr><th>교재 · 자료</th><td><ul>
+          <li><a href="colab.html">Colab 사용 설명서</a> — 학생용 · 1~11장 · 실습 예제 C1~C10 · 인쇄 가능</li>
+          <li>실습 노트북 <a href="python/colab_basics.ipynb" download>colab_basics.ipynb</a> (<a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/colab_basics.ipynb" target="_blank" rel="noopener">Colab에서 열기</a>) · 교수자용 답안 <a href="python/answers/colab_basics_answers.ipynb" download>colab_basics_answers.ipynb</a></li>
+        </ul></td></tr>
+        <tr><th>연계</th><td>앞 교과 「파이썬 기초」 → <strong>이 준비 차시</strong> → 각 단원 실습지의 PYTHON 미션 P1~P9</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="lesson">
+    <div class="part"><span class="pn">준비 1차시</span><h2>Colab 첫걸음: 접속 · 화면 · 셀 실행 · 저장</h2><span class="pt">50분</span></div>
+    <div class="formwrap"><table class="form">
+      <colgroup><col style="width:92px"><col><col style="width:70px"></colgroup>
+      <tbody>
+        <tr><th>학습목표</th><td colspan="2">구글 코랩에 접속하여 새 노트북을 만들고, 코드 셀과 텍스트 셀을 실행·작성한 뒤 구글 드라이브에 저장할 수 있다.</td></tr>
+        <tr><th>단계</th><th>교수 · 학습 활동</th><th>시간</th></tr>
+        <tr><td class="stage">도입</td><td><ul><li>동기유발: 앞 교과 「파이썬 기초」에서 파이썬 설치·경로 설정으로 고생했던 경험을 떠올리게 한다 → "오늘은 설치 없이 인터넷 창 하나로 파이썬을 실행합니다"</li><li>비유로 개념 잡기: 코랩 = "코딩용 구글 문서". 내 PC가 아니라 구글의 컴퓨터를 잠시 빌려 쓰고, 파일은 구글 드라이브에 저장된다</li><li>오늘 목표 2가지 안내: ① 노트북 하나를 만들어 실행·저장 ② 실습 노트북(colab_basics) 1~3번 완료</li></ul></td><td class="min">5분</td></tr>
+        <tr><td class="stage">전개</td><td><ul><li>[설명 5분] 코랩의 장점 4가지(설치 없음 · 무료 · 드라이브 저장/공유 · AI 도우미)와 무료 사용의 한계(오래 쉬면 연결 끊김 · 세션이 끝나면 변수·업로드 파일 사라짐)를 사용 설명서 1장으로 설명</li><li>[시연 5분] colab.research.google.com 접속 → 구글 로그인 → "새 노트북" → 제목을 "홍길동_코랩연습"으로 바꾸기 → 드라이브의 "Colab Notebooks" 폴더에 저장된 것 확인</li><li>[시연 5분] 화면 구성 짚기(사용 설명서 3장 그림): 메뉴 · +코드/+텍스트 · 셀과 ▶ 실행 버튼 · 왼쪽 사이드바(목차·변수·파일) · 오른쪽 위 연결 상태(RAM/디스크)</li><li>[실습 15분] 실습 C1 — 첫 코드 실행: print 한 줄 → Shift+Enter → 결과 확인. 셀 왼쪽 [1] [2] 실행 번호가 늘어나는 것 관찰. 첫 실행 때 "연결 중" 대기가 있음을 미리 알린다</li><li>[실습 5분] 실습 노트북 열기: 사용 설명서의 "Colab에서 열기" → 경고창에서 "무시하고 계속하기"(과정 공식 노트북이므로) → 파일 → "Drive에 사본 저장". 노트북 1~2번(첫 실행, 실행 순서와 변수) 진행</li><li>[체험 · 실습 C2] 런타임 → "세션 다시 시작" 후 2-2 셀만 실행 → NameError 확인 → "이전 셀 실행"/"모두 실행"으로 복구. 핵심 메시지: "코랩은 위에서부터 순서대로, 실행한 것만 기억한다"</li><li>[실습 C3] 텍스트 셀 만들기: +텍스트 → # 제목, **굵게**, - 목록으로 나의 자기소개 3줄 작성 → Shift+Enter로 미리보기</li></ul></td><td class="min">35분</td></tr>
+        <tr><td class="stage">정리</td><td><ul><li>확인 질문 3개: "셀을 실행하는 단축키는?(Shift+Enter)" · "변수가 사라졌다면?(위에서부터 다시 실행)" · "내 노트북은 어디 저장되나?(드라이브 Colab Notebooks)"</li><li>자주 나는 문제 3가지 짚기: 로그인 계정 헷갈림 · 사본 저장 안 하고 닫음 · 실행 순서 꼬임 (사용 설명서 문제 해결표)</li><li>예고: 2차시 — 입력 폼 계산기 · 파일 · 드라이브 · QR 코드 · 그래프 · 오류 고치기 · AI 코드 검증</li></ul></td><td class="min">10분</td></tr>
+        <tr><th>교수방법</th><td colspan="2">강의 · 시연 · 실습</td></tr>
+        <tr><th>준비물·매체</th><td colspan="2">PC(Chrome 권장), 구글 계정, 사용 설명서(colab.html), 실습 노트북(colab_basics.ipynb), 빔프로젝터</td></tr>
+        <tr><th>평가</th><td colspan="2">관찰 체크리스트 — 새 노트북을 만들어 제목을 바꿨는가 · 코드 셀을 실행해 결과를 봤는가 · 실행 순서 오류를 스스로 복구했는가 · 드라이브에 사본을 저장했는가</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="lesson">
+    <div class="part"><span class="pn">준비 2차시</span><h2>Colab 활용: 폼 · 파일 · 드라이브 · 그래프 · 오류 · AI 코드 검증 · 공유</h2><span class="pt">50분</span></div>
+    <div class="formwrap"><table class="form">
+      <colgroup><col style="width:92px"><col><col style="width:70px"></colgroup>
+      <tbody>
+        <tr><th>학습목표</th><td colspan="2">코랩의 입력 폼, 파일 업로드·드라이브 연결, 패키지 설치 기능을 사용하고, 오류를 읽어 고치며, AI에게 받은 코드를 테스트로 검증한 뒤 노트북을 공유할 수 있다.</td></tr>
+        <tr><th>단계</th><th>교수 · 학습 활동</th><th>시간</th></tr>
+        <tr><td class="stage">도입</td><td><ul><li>전시 확인: 드라이브에 저장한 1차시 노트북을 다시 열어 "모두 실행" → 결과가 다시 나오는지 확인 (세션이 새로 시작되었음을 체감)</li><li>오늘의 흐름 안내: 입력 폼 → 파일 → 드라이브 → 명령어·패키지 → 그래프 → 오류 → AI 코드 검증 → 공유 제출</li></ul></td><td class="min">5분</td></tr>
+        <tr><td class="stage">전개</td><td><ul><li>[실습 C4 · 5분] 입력 폼 계산기: 슬라이더로 점심값을 바꾸면 한 달 식비가 바로 다시 계산되는 것 확인. 빈칸 1줄(✏️) 채우기. "# @param 한 줄이 입력 칸이 된다"를 보여 준다</li><li>[실습 C5 · 5분] 파일 만들고 읽기: %%writefile로 장보기.txt 만들기 → 왼쪽 📁 파일 패널에서 확인 → 파이썬으로 읽고 개수 세기 → 내 PC로 다운로드</li><li>[시연 · 실습 C6 · 5분, 선택] 구글 드라이브 연결: drive.mount → 권한 창에서 "내 계정"인지 확인 → MyDrive/colab_실습 폴더에 저장. 주의: 모르는 사람이 준 노트북에서는 드라이브 연결을 허락하지 않는다</li><li>[실습 C7 · 5분] !pip install 로 qrcode 패키지 설치 → 과정 사이트 주소로 QR 코드 만들기 → 스마트폰 카메라로 찍어 열리는지 확인</li><li>[실습 C8 · 3분] 한글 글꼴 설치 후 일주일 걸음 수 막대그래프 그리기 (숫자만 내 값으로 바꾸기)</li><li>[실습 C9 · 5분] 오류 읽고 고치기 3종(NameError · TypeError · SyntaxError): 빨간 글씨의 마지막 줄 읽기 → 고치기. 코랩의 "오류 설명"(Gemini) 버튼 또는 ChatGPT에 오류 줄을 붙여 넣어 뜻을 묻는 방법 시연</li><li>[실습 C10 · 7분] ★ AI에게 코드 받아 검증: 2단원의 코드 요청 템플릿으로 "짝수_합계" 함수를 요청 → 노트북에 붙여 넣기 → 테스트 4개가 모두 ✅인지 확인. 하나라도 ❌면 AI에게 실패한 테스트를 알려 주고 고쳐 달라고 요청</li></ul></td><td class="min">35분</td></tr>
+        <tr><td class="stage">정리</td><td><ul><li>공유 제출: 오른쪽 위 "공유" → 일반 액세스 "링크가 있는 모든 사용자 · 뷰어" → 링크 복사 → 과제 제출란에 붙여 넣기</li><li>자가 점검 체크리스트(사용 설명서 마지막 장) 체크 → 못 한 항목은 과제로</li><li>다음 연결: 각 단원 실습지의 파란색 PYTHON 미션(P1~P9)은 오늘 익힌 방법 그대로 "Colab에서 열기 → 사본 저장 → 위에서부터 실행"으로 진행한다</li></ul></td><td class="min">10분</td></tr>
+        <tr><th>교수방법</th><td colspan="2">시연 · 실습 · 짝 활동(오류 고치기)</td></tr>
+        <tr><th>준비물·매체</th><td colspan="2">PC(Chrome 권장), 구글 계정, 스마트폰(QR 확인), 실습 노트북(colab_basics.ipynb), ChatGPT 또는 Gemini</td></tr>
+        <tr><th>평가</th><td colspan="2">결과물 평가 — 공유 링크로 제출한 노트북에서 C4·C5·C9·C10 셀이 실행되어 ✅가 보이는가 · AI 코드 검증 과정(요청 → 테스트 → 수정 요청)을 설명할 수 있는가</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">준비</span><h2>수업 전 강사 점검표</h2><span class="pt">6항목</span></div>
+    
+    <div class="formwrap"><table class="form">
+      <thead><tr><th style="width:110px">시기</th><th>점검 내용</th><th style="width:56px">확인</th></tr></thead>
+      <tbody>
+      <tr><td class="nw">수업 1주 전</td><td>교육장 PC에서 colab.research.google.com 과 drive.google.com 이 열리는지, 보안 프로그램·방화벽이 막지 않는지 확인</td><td class="c">☐</td></tr>
+      <tr><td class="nw">수업 1주 전</td><td>실습 노트북 "Colab에서 열기" 링크가 열리는지 확인 (저장소가 비공개거나 브랜치 이름이 다르면 열리지 않음 → 내려받기 후 업로드로 대체)</td><td class="c">☐</td></tr>
+      <tr><td class="nw">수업 전날</td><td>교육생 구글 계정 로그인 가능 여부 공지 (비밀번호 · 2단계 인증용 휴대폰 지참). 계정이 없는 교육생은 1단원에서 만든 계정 사용</td><td class="c">☐</td></tr>
+      <tr><td class="nw">수업 당일</td><td>강사 PC에서 실습 노트북을 끝까지 "모두 실행"해 두기 — 한글 글꼴·qrcode 설치가 되는지, 오류 셀(9번)에서 멈추는 것까지 확인</td><td class="c">☐</td></tr>
+      <tr><td class="nw">수업 당일</td><td>브라우저는 Chrome 권장. 여러 구글 계정에 로그인된 PC는 오른쪽 위 프로필 사진으로 계정을 확인하게 한다</td><td class="c">☐</td></tr>
+      <tr><td class="nw">공통</td><td>메뉴 이름·무료 사용 한도·AI 기능은 자주 바뀝니다. 수업 전에 화면을 직접 확인하고, 다르면 사용 설명서의 문구만 말로 바꿔 안내하세요</td><td class="c">☐</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">운영</span><h2>문제 해결표</h2><span class="pt">수업 중 자주 나오는 문제</span></div>
+    <p class="lede">학생용 사용 설명서 10장과 같은 내용입니다.</p>
+    <div class="formwrap"><table class="form">
+      <thead><tr><th>증상</th><th>원인</th><th>대응</th></tr></thead>
+      <tbody>
+      <tr><td><strong>"연결 중…" 이 오래 계속된다</strong></td><td>처음 실행할 때 구글이 가상 컴퓨터를 준비하는 중. 접속자가 많으면 더 걸림</td><td>30초~1분 기다린다. 계속 안 되면 새로고침(F5) 후 다시 실행. 그래도 안 되면 런타임 → "런타임 연결 해제 및 삭제" 후 다시 연결</td></tr>
+      <tr><td><strong>NameError: name '○○' is not defined</strong></td><td>그 변수를 만든 위쪽 셀을 실행하지 않았거나, 세션이 다시 시작되어 기억이 지워짐. 또는 이름 오타</td><td>런타임 → "이전 셀 실행"(또는 "모두 실행"). 이름 철자(띄어쓰기·밑줄)를 확인</td></tr>
+      <tr><td><strong>어제 올린 파일이 없다 · FileNotFoundError</strong></td><td>업로드하거나 %%writefile 로 만든 파일은 세션이 끝나면 지워짐</td><td>파일을 다시 올리거나 만드는 셀을 다시 실행. 오래 둘 파일은 구글 드라이브에 저장</td></tr>
+      <tr><td><strong>"경고: 이 노트북은 Google에서 작성하지 않았습니다"</strong></td><td>GitHub 등 외부에서 연 노트북에 나오는 안전 안내</td><td>과정 공식 노트북이면 "무시하고 계속하기". 출처를 모르는 노트북은 열지 말고 강사에게 확인</td></tr>
+      <tr><td><strong>고친 내용이 저장이 안 된다 · "사본 저장" 알림</strong></td><td>다른 사람(GitHub)의 노트북을 열어서 내 드라이브에 저장 권한이 없음</td><td>파일 → "Drive에 사본 저장". 이후에는 드라이브의 "Colab Notebooks" 폴더에 있는 사본에서 작업</td></tr>
+      <tr><td><strong>ModuleNotFoundError: No module named '○○'</strong></td><td>그 패키지가 설치되어 있지 않음 (또는 세션이 새로 시작되어 설치가 지워짐)</td><td>!pip install ○○ 셀을 먼저 실행. 세션이 새로 시작되면 설치 셀도 다시 실행</td></tr>
+      <tr><td><strong>그래프 한글이 □□□ 로 깨진다</strong></td><td>코랩 기본 글꼴에 한글이 없음</td><td>노트북의 한글 글꼴 설치 셀을 먼저 실행. 그래도 깨지면 런타임 → "세션 다시 시작" 후 글꼴 셀부터 다시 실행</td></tr>
+      <tr><td><strong>셀이 계속 [*] 로 돌기만 한다</strong></td><td>input() 이 입력을 기다리는 중이거나, 끝나지 않는 반복문</td><td>셀 아래 입력 칸이 있는지 확인. 멈추려면 셀 왼쪽 ■(중지) 또는 런타임 → "실행 중단"</td></tr>
+      <tr><td><strong>드라이브 연결 창에서 계정이 여러 개 나온다</strong></td><td>PC 브라우저에 구글 계정이 여러 개 로그인됨</td><td>코랩 오른쪽 위 프로필과 같은 계정을 고른다. 공용 PC는 수업이 끝나면 반드시 로그아웃</td></tr>
+      <tr><td><strong>갑자기 "런타임 연결이 끊어졌습니다"</strong></td><td>오래 아무것도 안 했거나(무료 버전 유휴 시간 제한), 사용량 한도에 걸림</td><td>다시 연결 → 위에서부터 다시 실행. 노트북 내용(코드·글)은 드라이브에 남아 있으니 걱정하지 않아도 됨</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <div class="part"><span class="pn">평가</span><h2>평가 기준 (관찰 · 결과물)</h2><span class="pt">상 · 중 · 하</span></div>
+    <p class="lede">과정 평가의 「수업 참여」·「실습 결과물」에 반영합니다. 제출물은 뷰어 권한 공유 링크 1개입니다.</p>
+    <div class="formwrap"><table class="form">
+      <thead><tr><th style="width:130px">평가 항목</th><th>상</th><th>중</th><th>하</th></tr></thead>
+      <tbody>
+      <tr><td class="nw">노트북 만들기 · 저장</td><td>새 노트북 제목을 바꾸고 드라이브 사본 위치를 스스로 찾아 연다</td><td>안내를 보며 노트북을 만들고 저장한다</td><td>저장 위치를 찾지 못하거나 사본을 저장하지 않는다</td></tr>
+      <tr><td class="nw">셀 실행 · 실행 순서</td><td>실행 순서 오류를 설명하고 "이전 셀 실행"으로 스스로 복구한다</td><td>위에서부터 차례로 실행해 결과를 얻는다</td><td>실행 순서가 꼬여 결과를 얻지 못한다</td></tr>
+      <tr><td class="nw">파일 · 드라이브 · 패키지</td><td>파일을 만들어 읽고, 드라이브·패키지 설치까지 완료한다</td><td>파일 만들기·읽기와 패키지 설치를 완료한다</td><td>파일 셀에서 멈춘다</td></tr>
+      <tr><td class="nw">오류 읽기</td><td>오류 마지막 줄을 읽고 원인을 말로 설명한 뒤 고친다</td><td>AI나 짝의 도움을 받아 오류를 고친다</td><td>오류를 고치지 못한다</td></tr>
+      <tr><td class="nw">AI 코드 검증</td><td>AI 코드를 테스트로 검증하고, 실패 시 실패 내용을 알려 수정 요청까지 한다</td><td>AI 코드를 붙여 넣고 테스트를 실행한다</td><td>테스트 없이 AI 코드를 그대로 쓴다</td></tr>
+      <tr><td class="nw">공유 · 제출</td><td>뷰어 권한 링크로 제출하고, 링크가 열리는지 다른 계정(짝)으로 확인한다</td><td>공유 링크를 제출한다</td><td>제출하지 못하거나 링크가 열리지 않는다</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+</div>
+
+<footer><div class="wrap"><p>GUIDE · Colab 준비 2차시 · 차시별 교안 · 「디지털리터러시」 36시간 과정</p></div></footer>
+<script src="nav.js"></script>
+</html>

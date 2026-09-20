@@ -1,0 +1,602 @@
+<!-- Google Colab 사용 설명서 본문 — build.js 가 CSS·꼬리말·목차를 붙여 ../colab.html 로 만듭니다.
+     __ORG__ 기관명 · __NB__ 노트북 열기 상자 · __ERRORS__ 문제 해결표(colab.js 의 errors[]) 로 바뀝니다. -->
+<header class="top">
+  <div class="wrap masthead">
+    <div class="rule-tag">
+      <span class="eyebrow">__ORG__</span>
+      <span class="dash"></span>
+      <span class="eyebrow">사용 설명서 · 실습 예제</span>
+    </div>
+    <h1>Google Colab · <em>설치 없이 파이썬 시작하기</em></h1>
+    <p class="standfirst">구글 코랩(Colab)은 인터넷 창 하나로 파이썬을 실행하는 무료 서비스입니다. 이 문서는 처음 쓰는 분을 위해 접속부터 저장·공유까지 순서대로 설명하고, 따라 하는 실습 예제 10개를 담았습니다. 각 단원 실습지의 파란색 <strong>PYTHON 미션</strong>도 모두 코랩에서 진행합니다.</p>
+    <div class="lnk">
+      <a href="colab_lesson.html">교수자용 차시별 교안</a><a href="index.html">과정 표지</a><a href="plan.html">운영계획서</a>
+      <button class="printbtn" onclick="window.print()">🖨 인쇄 / PDF 저장</button>
+    </div>
+    <div class="rules">
+      <div class="rule"><div class="n">RULE 1</div><h3>먼저 "사본 저장"</h3><p>남이 준 노트북은 열자마자 <b>파일 → Drive에 사본 저장</b>. 그래야 고친 내용이 내 드라이브에 남습니다.</p></div>
+      <div class="rule"><div class="n">RULE 2</div><h3>위에서부터 순서대로</h3><p>코랩은 <b>실행한 셀만 기억</b>합니다. 이상하면 <b>런타임 → 모두 실행</b>이 가장 빠른 해결책입니다.</p></div>
+      <div class="rule"><div class="n">RULE 3</div><h3>개인정보·열쇠는 넣지 않기</h3><p>비밀번호·주민번호·계좌번호·API 키를 코드에 쓰지 않습니다. 출처 모르는 노트북에 드라이브 권한을 주지 않습니다.</p></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <div class="part"><span class="pn">한눈에 보기</span><h2>이 문서의 차례</h2><span class="pt">11장 · 예제 10개</span></div>
+    <p class="lede">1~8장은 읽으면서 따라 하는 설명, 9장은 실습 노트북으로 하는 예제입니다. 막히면 10장 문제 해결표를 먼저 보세요.</p>
+    <div class="tablewrap toc">
+      <table>
+        <thead><tr><th>장</th><th>내용</th><th>이런 걸 배워요</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><a href="#s1">구글 코랩이란?</a></td><td>코랩의 정체, 장점, 무료 사용의 한계</td></tr>
+          <tr><td>2</td><td><a href="#s2">시작하기</a></td><td>접속 · 새 노트북 · 이름 바꾸기 · 저장 위치</td></tr>
+          <tr><td>3</td><td><a href="#s3">화면 구성</a></td><td>메뉴 · 셀 · 사이드바 · 연결 상태 · 공유</td></tr>
+          <tr><td>4</td><td><a href="#s4">셀 다루기</a></td><td>코드 셀과 텍스트 셀, 실행 방법, 실행 번호</td></tr>
+          <tr><td>5</td><td><a href="#s5">런타임 이해하기</a></td><td>빌려 쓰는 컴퓨터 · 다시 시작 · 연결 끊김</td></tr>
+          <tr><td>6</td><td><a href="#s6">파일과 구글 드라이브</a></td><td>업로드 · 다운로드 · 드라이브 연결</td></tr>
+          <tr><td>7</td><td><a href="#s7">편리한 기능</a></td><td>입력 폼 · 명령어 · 패키지 설치 · AI 도우미</td></tr>
+          <tr><td>8</td><td><a href="#s8">저장 · 공유 · 제출</a></td><td>사본 저장 · 링크 공유 · 과정 노트북 열기</td></tr>
+          <tr><td>9</td><td><a href="#s9">실습 예제 10개</a></td><td>계산기 · 장보기 파일 · QR 코드 · 그래프 · 오류 · AI 코드 검증</td></tr>
+          <tr><td>10</td><td><a href="#s10">문제 해결표</a></td><td>수업에서 자주 나오는 문제와 대응</td></tr>
+          <tr><td>11</td><td><a href="#s11">단축키 · 안전 수칙 · 자가 점검</a></td><td>한 장으로 정리</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== 1 ===================== -->
+  <section id="s1">
+    <div class="part"><span class="pn">1장</span><h2>구글 코랩이란?</h2><span class="pt">개념</span></div>
+    <p class="lede">한 문장으로: <strong>"구글의 컴퓨터를 잠시 빌려, 인터넷 창에서 파이썬을 실행하는 무료 노트"</strong>입니다.</p>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">1-1</span><h3>코랩은 "코딩용 구글 문서"</h3></div>
+      <div class="sbody">
+        <p>구글 문서(Docs)에 글을 쓰면 내 PC가 아니라 구글 드라이브에 저장되듯, 코랩에 쓴 코드도 <strong>구글 드라이브</strong>에 저장됩니다. 코드를 실행하는 컴퓨터도 내 PC가 아니라 <strong>구글 데이터센터의 가상 컴퓨터</strong>입니다. 그래서 파이썬을 설치하지 않아도 되고, 느린 PC에서도 똑같이 돌아갑니다.</p>
+        <p>코랩의 문서 한 개를 <strong>노트북(Notebook)</strong>이라고 부릅니다. 노트북은 <strong>셀</strong>이라는 칸으로 나뉘고, 칸마다 코드나 설명 글을 적습니다. 파일 이름 끝은 <code>.ipynb</code>(아이파이앤비)이며, 전 세계에서 많이 쓰는 <strong>주피터(Jupyter) 노트북</strong>과 같은 형식입니다.</p>
+      </div>
+    </div>
+
+    <div class="cards4">
+      <div class="cd"><b>💻 설치가 필요 없다</b><span>Chrome 같은 인터넷 창과 구글 계정만 있으면 됩니다. 파이썬·경로 설정 없음.</span></div>
+      <div class="cd"><b>🆓 기본은 무료</b><span>무료로도 수업·과제에는 충분합니다. 무거운 인공지능 학습용 GPU도 쓸 수 있습니다(보장은 아님).</span></div>
+      <div class="cd"><b>☁️ 드라이브 저장 · 링크 공유</b><span>자동으로 드라이브에 저장되고, 구글 문서처럼 링크로 공유·제출합니다.</span></div>
+      <div class="cd"><b>✨ AI 도우미</b><span>코랩 안의 Gemini가 코드 작성·오류 설명을 돕습니다. (기능·이름은 자주 바뀝니다)</span></div>
+    </div>
+
+    <div class="box warn"><span class="lbl">무료 사용의 한계 — 꼭 알아 두기</span>
+      <ul>
+        <li><strong>오래 가만히 두면 연결이 끊깁니다.</strong> 한 번에 쓸 수 있는 시간에도 상한이 있습니다. 정확한 시간은 구글 정책·사용량에 따라 달라집니다.</li>
+        <li>연결이 끊기거나 세션을 다시 시작하면 <strong>변수와 업로드한 파일이 지워집니다.</strong> 코드와 글(노트북 자체)은 드라이브에 남습니다.</li>
+        <li>GPU 같은 고성능 장치는 사람이 몰리면 못 쓸 수 있습니다. 이 과정 실습에는 필요 없습니다.</li>
+        <li>더 오래·더 빠르게 쓰려면 유료 요금제가 있지만, <strong>이 과정은 무료 버전만으로 충분합니다.</strong></li>
+      </ul>
+    </div>
+
+    <div class="box q"><span class="lbl">이럴 때 코랩을 씁니다</span>
+      <p>AI가 준 파이썬 코드를 바로 실행해 볼 때 · 엑셀처럼 표를 계산하고 그래프를 그릴 때 · 공유 링크로 과제를 낼 때 · 설치가 막힌 공용 PC에서 파이썬을 써야 할 때</p>
+    </div>
+  </section>
+
+  <!-- ===================== 2 ===================== -->
+  <section id="s2">
+    <div class="part"><span class="pn">2장</span><h2>시작하기</h2><span class="pt">5분</span></div>
+    <p class="lede">Chrome 브라우저를 권장합니다. 1단원에서 만든 구글 계정을 준비하세요.</p>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">2-1</span><h3>접속하고 새 노트북 만들기</h3></div>
+      <div class="sbody">
+        <ol>
+          <li>주소창에 <code>colab.research.google.com</code> 을 입력합니다. (검색창에 "구글 코랩"을 검색해도 됩니다)</li>
+          <li>오른쪽 위 <strong>로그인</strong>을 눌러 구글 계정으로 로그인합니다. 이미 로그인되어 있다면 오른쪽 위 <strong>프로필 사진</strong>으로 내 계정이 맞는지 확인합니다.</li>
+          <li>처음 뜨는 창에서 <strong>+ 새 노트북</strong>을 누릅니다. 창이 안 뜨면 메뉴 <strong>파일 → 새 노트북</strong>(버전에 따라 "Drive의 새 노트북").</li>
+          <li>빈 코드 셀 하나가 있는 새 노트북이 열립니다.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">2-2</span><h3>노트북 이름 바꾸기</h3></div>
+      <div class="sbody">
+        <p>왼쪽 위의 <code>Untitled0.ipynb</code> 글자를 클릭하고 <code>홍길동_코랩연습.ipynb</code> 처럼 바꿉니다. <strong>끝의 <code>.ipynb</code>는 지우지 마세요.</strong></p>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">2-3</span><h3>어디에 저장될까?</h3></div>
+      <div class="sbody">
+        <p>새로 만든 노트북은 자동으로 <strong>구글 드라이브 → 내 드라이브 → Colab Notebooks</strong> 폴더에 저장됩니다. 다음에 열 때는 ① 코랩 첫 화면의 최근 목록, 또는 ② 드라이브의 이 폴더에서 파일을 더블클릭합니다.</p>
+        <div class="box check"><span class="lbl">확인</span><p>drive.google.com 을 새 탭으로 열어 <strong>Colab Notebooks</strong> 폴더에 내 노트북이 있는지 확인하세요.</p></div>
+      </div>
+    </div>
+
+    <div class="box q"><span class="lbl">스마트폰에서도 되나요?</span>
+      <p>스마트폰 브라우저로도 열어서 보고 실행할 수는 있지만, 화면이 작아 코드 작성은 불편합니다. 수업은 PC로 하고, 스마트폰은 결과 확인용으로 쓰세요.</p>
+    </div>
+  </section>
+
+  <!-- ===================== 3 ===================== -->
+  <section id="s3">
+    <div class="part"><span class="pn">3장</span><h2>화면 구성</h2><span class="pt">둘러보기</span></div>
+    <p class="lede">아래는 코랩 화면을 단순하게 그린 그림입니다. 번호를 표와 맞춰 보세요. 실제 화면의 아이콘 위치·이름은 업데이트로 조금씩 달라질 수 있습니다.</p>
+
+    <div class="mockwrap" aria-label="코랩 화면 구성 그림">
+      <div class="mock">
+        <div class="mk-top">
+          <span class="mk-logo">CO</span>
+          <span class="mk-file"><b>홍길동_코랩연습.ipynb</b> <i class="bd">1</i><br><small>파일 수정 보기 삽입 런타임 도구 도움말</small> <i class="bd">2</i></span>
+          <span class="mk-share">공유 <i class="bd">7</i></span>
+        </div>
+        <div class="mk-tool">
+          <span class="mk-btn">+ 코드</span><span class="mk-btn">+ 텍스트</span> <i class="bd">3</i>
+          <span class="mk-conn">✓ RAM ▮▮▯ 디스크 ▮▯▯ <i class="bd">6</i></span>
+        </div>
+        <div class="mk-body">
+          <div class="mk-side">
+            <span title="목차">☰</span><span title="찾기">🔍</span><span title="변수">{x}</span><span title="보안 비밀">🔑</span><span title="파일">📁</span>
+            <i class="bd">5</i>
+          </div>
+          <div class="mk-cells">
+            <div class="mk-cell code"><span class="mk-run">▶</span><span class="mk-no">[1]</span><code>print("안녕하세요, 코랩!")</code> <i class="bd">4</i></div>
+            <div class="mk-out">안녕하세요, 코랩!</div>
+            <div class="mk-cell text"><b>## 나의 소개</b><br>- 이름: 홍길동</div>
+            <div class="mk-cell code"><span class="mk-run">▶</span><span class="mk-no">[ ]</span><code>점심값 = 9000 * 20</code></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tablewrap" style="margin-top:14px">
+      <table>
+        <thead><tr><th>번호</th><th>이름</th><th>하는 일</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>노트북 이름</td><td>클릭해서 이름을 바꿉니다. 옆의 별(☆)을 누르면 즐겨찾기.</td></tr>
+          <tr><td>2</td><td>메뉴</td><td><strong>파일</strong>(새 노트북·사본 저장·다운로드) · <strong>수정</strong>(출력 지우기) · <strong>런타임</strong>(모두 실행·다시 시작) · <strong>도구</strong>(단축키·설정)</td></tr>
+          <tr><td>3</td><td>+ 코드 · + 텍스트</td><td>지금 셀 아래에 새 코드 셀 / 텍스트 셀을 추가합니다. 셀과 셀 사이에 마우스를 올려도 나타납니다.</td></tr>
+          <tr><td>4</td><td>셀 · ▶ 실행 버튼 · [번호]</td><td>코드를 쓰는 칸. ▶로 실행하면 아래에 결과가 나오고, 왼쪽에 실행 순서 번호가 붙습니다.</td></tr>
+          <tr><td>5</td><td>왼쪽 사이드바</td><td>☰ 목차 · 🔍 찾기/바꾸기 · {x} 변수 보기 · 🔑 보안 비밀(API 키 보관) · 📁 파일(업로드·다운로드)</td></tr>
+          <tr><td>6</td><td>연결 상태</td><td>초록 ✓와 RAM·디스크 막대가 보이면 가상 컴퓨터에 연결된 것. 클릭하면 연결·세션 관리를 할 수 있습니다.</td></tr>
+          <tr><td>7</td><td>공유</td><td>구글 문서처럼 사람·링크로 공유합니다. 과제 제출에 씁니다.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== 4 ===================== -->
+  <section id="s4">
+    <div class="part"><span class="pn">4장</span><h2>셀 다루기</h2><span class="pt">핵심</span></div>
+    <p class="lede">노트북은 셀을 쌓아 만듭니다. 셀은 딱 두 종류, <strong>코드 셀</strong>과 <strong>텍스트 셀</strong>입니다.</p>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">4-1</span><h3>코드 셀 — 실행하는 칸</h3></div>
+      <div class="sbody">
+        <p>파이썬 코드를 쓰고 실행하면 바로 아래에 결과가 나옵니다. 셀의 <strong>마지막 줄에 있는 값</strong>은 <code>print()</code> 없이도 보입니다.</p>
+<pre><span class="c"># 코드 셀에 입력</span>
+<span class="p">In ▶</span> 12000 * 3 + 4500
+<span class="o">Out  40500</span></pre>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">4-2</span><h3>실행하는 방법 3가지</h3></div>
+      <div class="sbody">
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>방법</th><th>동작</th><th>언제</th></tr></thead>
+            <tbody>
+              <tr><td>셀 왼쪽 <strong>▶</strong> 클릭</td><td>그 셀만 실행</td><td>처음 배울 때</td></tr>
+              <tr><td><kbd>Shift</kbd> + <kbd>Enter</kbd></td><td>실행하고 <strong>다음 셀로 이동</strong></td><td>위에서부터 차례로 실행할 때 (가장 많이 씀)</td></tr>
+              <tr><td><kbd>Ctrl</kbd> + <kbd>Enter</kbd></td><td>실행하고 <strong>그 자리에 머묾</strong></td><td>숫자를 바꿔 가며 여러 번 실행할 때</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="margin-top:10px">셀이 실행 중이면 ▶ 자리가 돌아가는 모양으로 바뀝니다. 멈추고 싶으면 그 버튼(■)을 다시 누르거나 <strong>런타임 → 실행 중단</strong>.</p>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">4-3</span><h3>실행 번호 [1] [2] [3] — "순서가 중요하다"</h3></div>
+      <div class="sbody">
+        <p>셀 왼쪽의 숫자는 <strong>실행한 순서</strong>입니다. 화면의 위아래 순서가 아닙니다. 코랩은 셀을 실행할 때마다 그 결과(변수)를 <strong>기억</strong>하고, 다른 셀에서 그 기억을 함께 씁니다.</p>
+<pre><span class="p">[1]</span> 이름 = "홍길동"          <span class="c"># 첫 번째 셀: 변수 만들기</span>
+<span class="p">[2]</span> print(이름, "님 반가워요")  <span class="c"># 두 번째 셀: 위 변수 쓰기</span>
+<span class="o">    홍길동 님 반가워요</span></pre>
+        <div class="box warn"><span class="lbl">자주 하는 실수</span>
+          <p>두 번째 셀만 실행하면 <code>NameError: name '이름' is not defined</code> — "이름이라는 걸 모른다"는 오류가 납니다. 위 셀을 먼저 실행하세요. 헷갈리면 <strong>런타임 → 모두 실행</strong> 또는 <strong>이전 셀 실행</strong>.</p></div>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">4-4</span><h3>텍스트 셀 — 설명을 쓰는 칸</h3></div>
+      <div class="sbody">
+        <p><strong>+ 텍스트</strong>로 만들고, 기호 몇 개로 제목·굵은 글씨·목록을 만듭니다(마크다운). 쓰고 나서 <kbd>Shift</kbd>+<kbd>Enter</kbd>를 누르면 예쁘게 바뀌고, 다시 고치려면 더블클릭합니다.</p>
+        <div class="tablewrap" style="margin-top:10px">
+          <table>
+            <thead><tr><th>이렇게 쓰면</th><th>이렇게 보여요</th></tr></thead>
+            <tbody>
+              <tr><td><code># 큰 제목</code> · <code>## 작은 제목</code></td><td>제목 크기의 글자 (왼쪽 ☰ 목차에도 나옵니다)</td></tr>
+              <tr><td><code>**굵게**</code></td><td><strong>굵게</strong></td></tr>
+              <tr><td><code>- 항목</code> · <code>1. 항목</code></td><td>글머리 기호 목록 · 번호 목록</td></tr>
+              <tr><td><code>[과정 사이트](https://bctcaiedu.github.io/digital36/)</code></td><td>누르면 열리는 링크</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">4-5</span><h3>셀 옮기기 · 지우기 · 바꾸기</h3></div>
+      <div class="sbody">
+        <p>셀을 클릭하면 오른쪽 위에 작은 도구 모음이 나옵니다: <strong>↑ ↓</strong>(위아래로 옮기기) · <strong>🗑</strong>(삭제) · <strong>⋮</strong>(더 보기). 실수로 지웠으면 <strong>수정 → 셀 삭제 실행취소</strong>(또는 <kbd>Ctrl</kbd>+<kbd>M</kbd> <kbd>Z</kbd>).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 5 ===================== -->
+  <section id="s5">
+    <div class="part"><span class="pn">5장</span><h2>런타임 이해하기</h2><span class="pt">빌려 쓰는 컴퓨터</span></div>
+    <p class="lede"><strong>런타임</strong> = 내 노트북의 코드를 실제로 실행해 주는, 구글이 빌려준 가상 컴퓨터입니다. 노트북(종이)과 런타임(계산기)이 따로 있다고 생각하면 쉽습니다.</p>
+
+    <div class="flow2">
+      <div class="fb"><b>📄 노트북</b><span>코드 · 글 · 마지막 결과 화면</span><em>구글 드라이브에 저장 → 계속 남음</em></div>
+      <div class="fa">실행 ▶</div>
+      <div class="fb"><b>🖥 런타임 (가상 컴퓨터)</b><span>변수 · 업로드한 파일 · 설치한 패키지</span><em>세션이 끝나면 → 모두 지워짐</em></div>
+    </div>
+
+    <div class="tablewrap" style="margin-top:16px">
+      <table>
+        <thead><tr><th>런타임 메뉴</th><th>하는 일</th><th>언제 쓰나</th></tr></thead>
+        <tbody>
+          <tr><td>모두 실행</td><td>맨 위부터 모든 셀을 차례로 실행</td><td>노트북을 다시 열었을 때 · 순서가 꼬였을 때</td></tr>
+          <tr><td>이전 셀 실행</td><td>지금 셀보다 위의 셀을 모두 실행</td><td>NameError가 났을 때</td></tr>
+          <tr><td>실행 중단</td><td>돌고 있는 셀을 멈춤</td><td>끝나지 않는 반복문 · 너무 오래 걸릴 때</td></tr>
+          <tr><td>세션 다시 시작<br><small>(이전 이름: 런타임 다시 시작)</small></td><td>기억(변수)을 모두 지우고 새로 시작. 파일은 남음</td><td>이상하게 동작할 때 · 글꼴 설치 뒤</td></tr>
+          <tr><td>런타임 연결 해제 및 삭제</td><td>가상 컴퓨터를 반납. 파일까지 모두 지워짐</td><td>완전히 처음부터 · 연결이 계속 안 될 때</td></tr>
+          <tr><td>런타임 유형 변경</td><td>CPU / GPU 등 선택</td><td>인공지능 학습 같은 무거운 작업 (이 과정은 필요 없음)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="box check"><span class="lbl">기억할 한 가지</span>
+      <p>연결이 끊겨도 당황하지 마세요. <strong>코드는 드라이브에 그대로 있습니다.</strong> 다시 연결하고 <strong>모두 실행</strong>하면 원래대로 돌아옵니다.</p></div>
+  </section>
+
+  <!-- ===================== 6 ===================== -->
+  <section id="s6">
+    <div class="part"><span class="pn">6장</span><h2>파일과 구글 드라이브</h2><span class="pt">올리기 · 내려받기 · 연결</span></div>
+    <p class="lede">파이썬으로 엑셀·CSV·텍스트 파일을 읽으려면 파일이 런타임(가상 컴퓨터) 안에 있어야 합니다.</p>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">6-1</span><h3>파일 올리기 (업로드)</h3></div>
+      <div class="sbody">
+        <ol>
+          <li>왼쪽 <strong>📁 파일</strong> 아이콘을 누릅니다.</li>
+          <li>PC의 파일을 이 창으로 <strong>끌어다 놓거나</strong>, 위쪽 업로드 아이콘을 누릅니다.</li>
+          <li>코드에서는 파일 이름만 쓰면 됩니다: <code>open("장보기.txt")</code></li>
+        </ol>
+<pre><span class="c"># 코드로 올리기 — 실행하면 "파일 선택" 버튼이 나옵니다</span>
+from google.colab import files
+올린것 = files.upload()</pre>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">6-2</span><h3>파일 내려받기 (다운로드)</h3></div>
+      <div class="sbody">
+        <p>📁 파일 창에서 파일 이름 옆 <strong>⋮ → 다운로드</strong>. 또는 코드로:</p>
+<pre>from google.colab import files
+files.download("장보기.txt")</pre>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">6-3</span><h3>구글 드라이브 연결 — 파일을 오래 두고 싶을 때</h3></div>
+      <div class="sbody">
+        <p>업로드한 파일은 세션이 끝나면 지워집니다. 드라이브를 연결하면 <strong>내 드라이브의 파일을 바로 읽고, 결과를 드라이브에 저장</strong>할 수 있습니다.</p>
+<pre>from google.colab import drive
+drive.mount("/content/drive")
+<span class="o">Mounted at /content/drive</span>
+<span class="c"># 이제 내 드라이브는 /content/drive/MyDrive/ 입니다</span>
+open("/content/drive/MyDrive/colab_실습/장보기.txt")</pre>
+        <ol>
+          <li>실행하면 권한 창이 뜹니다. <strong>코랩 오른쪽 위 프로필과 같은 계정</strong>을 고릅니다.</li>
+          <li>허용하면 📁 파일 창에 <code>drive</code> 폴더가 생깁니다.</li>
+        </ol>
+        <div class="box warn"><span class="lbl">안전 수칙</span>
+          <p>드라이브 연결은 그 노트북에 <strong>내 드라이브 전체</strong>를 읽고 쓸 권한을 주는 것입니다. <strong>내가 만든 노트북이나 과정 공식 노트북에서만</strong> 허용하세요. 공용 PC는 수업이 끝나면 반드시 로그아웃합니다.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 7 ===================== -->
+  <section id="s7">
+    <div class="part"><span class="pn">7장</span><h2>편리한 기능</h2><span class="pt">알면 쉬워지는 것들</span></div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">7-1</span><h3>입력 폼 — 코드를 몰라도 값을 바꾸는 칸</h3></div>
+      <div class="sbody">
+        <p>코드 줄 끝에 <code># @param</code>을 붙이면 셀 오른쪽에 <strong>입력 칸 · 슬라이더 · 체크박스 · 선택 목록</strong>이 생깁니다. 계산기를 만들어 다른 사람에게 줄 때 좋습니다.</p>
+<pre><span class="c"># @title 🍚 한 달 점심값 계산기 { run: "auto" }</span>
+점심값 = 9000   <span class="c"># @param {type:"slider", min:5000, max:15000, step:500}</span>
+주당_횟수 = 5   <span class="c"># @param {type:"integer"}</span>
+요일 = "월"     <span class="c"># @param ["월", "화", "수", "목", "금"]</span>
+커피 = True     <span class="c"># @param {type:"boolean"}</span></pre>
+        <p style="margin-top:9px"><code>{ run: "auto" }</code>를 붙이면 값을 바꿀 때마다 자동으로 다시 실행됩니다. 셀의 <strong>⋮ → 양식 → 코드 숨기기</strong>로 코드를 가리고 입력 칸만 보이게 할 수도 있습니다(메뉴 이름은 달라질 수 있음).</p>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">7-2</span><h3><code>!</code> 명령어와 패키지 설치</h3></div>
+      <div class="sbody">
+        <p>줄 앞에 <code>!</code>를 붙이면 파이썬이 아니라 가상 컴퓨터(리눅스)의 <strong>명령어</strong>가 됩니다. <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code> 같은 유명한 패키지는 <strong>이미 설치</strong>되어 있고, 없는 것만 설치하면 됩니다.</p>
+<pre>!ls                    <span class="c"># 지금 폴더의 파일 목록</span>
+!pip install -q qrcode <span class="c"># qrcode 패키지 설치 (-q: 조용히)</span>
+<span class="c"># ⚠️ 세션이 새로 시작되면 설치도 지워집니다 → 설치 셀을 맨 위에 두고 다시 실행</span></pre>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">7-3</span><h3>코랩 안의 AI 도우미 (Gemini)</h3></div>
+      <div class="sbody">
+        <p>코랩에는 구글의 AI인 <strong>Gemini</strong>가 들어 있습니다. 무료 계정에서도 쓸 수 있지만, 버튼 이름·위치·사용량은 자주 바뀝니다. 대표적인 쓰임은 세 가지입니다.</p>
+        <ul>
+          <li><strong>코드 만들기</strong> — 빈 코드 셀의 "생성"(AI로 생성) 안내를 누르고 "1부터 100까지 짝수의 합을 구해 줘"처럼 한국어로 요청</li>
+          <li><strong>오류 설명</strong> — 오류가 난 셀 아래의 "오류 설명" 버튼 → 원인과 고친 코드를 제안</li>
+          <li><strong>채팅</strong> — 화면의 Gemini 아이콘으로 대화창을 열어 노트북 내용에 대해 질문</li>
+        </ul>
+        <div class="box warn"><span class="lbl">AI 코드 사용 원칙 (2단원 복습)</span>
+          <p>AI가 준 코드는 <strong>① 실행해 보고 ② 답을 아는 예시로 테스트하고 ③ 모르는 줄은 설명을 요청</strong>한 뒤 씁니다. 버튼이 안 보이면 ChatGPT·Gemini 웹에 물어보고 코드를 복사해 와도 똑같습니다.</p></div>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">7-4</span><h3>그 밖에 알아 두면 좋은 기능</h3></div>
+      <div class="sbody">
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>기능</th><th>어디에</th><th>쓰임</th></tr></thead>
+            <tbody>
+              <tr><td>목차</td><td>왼쪽 ☰</td><td>텍스트 셀의 <code>#</code> 제목으로 목차가 자동으로 생김 · 긴 노트북 이동</td></tr>
+              <tr><td>변수 보기</td><td>왼쪽 {x}</td><td>지금 기억하고 있는 변수와 값 확인 (NameError 원인 찾기)</td></tr>
+              <tr><td>보안 비밀</td><td>왼쪽 🔑</td><td>API 키 같은 비밀값을 코드 밖에 보관. 코드에 직접 쓰지 않기</td></tr>
+              <tr><td>수정 기록</td><td>파일 → 수정 기록</td><td>예전 버전으로 되돌리기</td></tr>
+              <tr><td>출력 지우기</td><td>수정 → 모든 출력 지우기</td><td>공유 전에 결과 화면(개인정보가 찍혔을 수 있음) 지우기</td></tr>
+              <tr><td>단축키 목록</td><td>도구 → 단축키 (<kbd>Ctrl</kbd>+<kbd>M</kbd> <kbd>H</kbd>)</td><td>모든 단축키 확인·변경</td></tr>
+              <tr><td>다크 모드 등</td><td>도구 → 설정</td><td>테마 · 글자 크기 · 줄 번호 보이기</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 8 ===================== -->
+  <section id="s8">
+    <div class="part"><span class="pn">8장</span><h2>저장 · 공유 · 제출</h2><span class="pt">과제 내는 법</span></div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">8-1</span><h3>과정 노트북 열기 (GitHub에서 열기)</h3></div>
+      <div class="sbody">
+        <ol>
+          <li>실습지의 <strong>"Colab에서 열기"</strong>를 누릅니다.</li>
+          <li><strong>"경고: 이 노트북은 Google에서 작성하지 않았습니다"</strong>가 나오면 → 과정 공식 노트북이므로 <strong>무시하고 계속하기</strong>. (출처를 모르는 노트북이라면 멈추고 강사에게 확인)</li>
+          <li>바로 <strong>파일 → Drive에 사본 저장</strong>. 제목이 "<code>…의 사본</code>"으로 바뀐 새 탭에서 작업합니다.</li>
+        </ol>
+        <div class="box q"><span class="lbl">"Colab에서 열기"가 안 될 때</span>
+          <p><strong>노트북 내려받기(.ipynb)</strong> → 코랩 첫 화면(또는 파일 → 노트북 업로드) → <strong>업로드</strong> 탭에 파일을 끌어다 놓기.</p></div>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">8-2</span><h3>저장하기</h3></div>
+      <div class="sbody">
+        <p>내 드라이브에 있는 노트북은 <strong>자동 저장</strong>됩니다. 바로 저장하려면 <kbd>Ctrl</kbd>+<kbd>S</kbd>. 내 PC에도 파일로 갖고 싶으면 <strong>파일 → 다운로드 → .ipynb 다운로드</strong>(파이썬 파일만 필요하면 .py 다운로드).</p>
+      </div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">8-3</span><h3>링크로 공유 · 과제 제출</h3></div>
+      <div class="sbody">
+        <ol>
+          <li>오른쪽 위 <strong>공유</strong>를 누릅니다.</li>
+          <li><strong>일반 액세스</strong>를 "제한됨" → <strong>"링크가 있는 모든 사용자"</strong>로 바꾸고, 권한은 <strong>뷰어</strong>로 둡니다.</li>
+          <li><strong>링크 복사</strong> → 과제 제출란에 붙여 넣습니다.</li>
+          <li>짝에게 링크를 보내 <strong>열리는지 확인</strong>받습니다.</li>
+        </ol>
+        <div class="box warn"><span class="lbl">공유 전 확인</span>
+          <p>공유되는 것은 <strong>코드 · 글 · 실행 결과 화면</strong>입니다. 결과에 이름·전화번호 같은 개인정보가 찍혀 있으면 <strong>수정 → 모든 출력 지우기</strong> 후 공유하세요. 런타임 안의 파일(업로드한 파일)은 공유되지 않습니다.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 9 ===================== -->
+  <section id="s9">
+    <div class="part"><span class="pn">9장</span><h2>실습 예제 10개</h2><span class="pt">약 80분 · 2차시</span></div>
+    <p class="lede">아래 노트북을 열어 <strong>사본을 저장</strong>한 뒤, 번호 순서대로 진행합니다. ✏️ 표시가 있는 줄만 고치면 되고, ✅가 나오면 성공입니다.</p>
+    __NB__
+
+    <div class="mission" id="c1">
+      <div class="mhead"><span class="mn">예제 C1 · 1차시</span><h3>첫 코드 실행하기</h3></div>
+      <p>노트북 <strong>1번</strong>. 셀을 클릭하고 <kbd>Shift</kbd>+<kbd>Enter</kbd>. 처음에는 연결하느라 조금 기다립니다.</p>
+<pre>print("안녕하세요, 코랩!")
+<span class="o">안녕하세요, 코랩!</span>
+
+12000 * 3 + 4500        <span class="c"># 마지막 줄의 값은 print 없이도 보여요</span>
+<span class="o">40500</span></pre>
+      <div class="box check"><span class="lbl">확인</span><p>셀 왼쪽에 <code>[1]</code>, <code>[2]</code> 번호가 붙었나요? 오른쪽 위에 초록 ✓가 보이나요?</p></div>
+    </div>
+
+    <div class="mission" id="c2">
+      <div class="mhead"><span class="mn">예제 C2 · 1차시</span><h3>실행 순서와 변수 기억 — 일부러 기억 지워 보기</h3></div>
+      <p>노트북 <strong>2번</strong>. 2-1에서 이름과 태어난 해를 넣고, 2-3의 ✏️ 한 줄(<code>나이 = 올해 - 태어난_해</code>)을 채웁니다.</p>
+      <ol>
+        <li><strong>런타임 → 세션 다시 시작</strong>을 누릅니다.</li>
+        <li>2-2 셀만 실행 → <code>NameError</code> 확인.</li>
+        <li>2-2 셀을 클릭한 채 <strong>런타임 → 이전 셀 실행</strong> → 다시 2-2 실행 → 해결!</li>
+      </ol>
+      <div class="box q"><span class="lbl">생각해 보기</span><p>세션을 다시 시작했는데 화면의 코드와 예전 결과는 왜 그대로일까요? → <strong>노트북(종이)</strong>은 드라이브에, <strong>기억(변수)</strong>은 런타임에 있기 때문입니다.</p></div>
+    </div>
+
+    <div class="mission" id="c3">
+      <div class="mhead"><span class="mn">예제 C3 · 1차시</span><h3>텍스트 셀로 자기소개 쓰기</h3></div>
+      <p>노트북 <strong>3번</strong>. <strong>+ 텍스트</strong>로 새 셀을 만들고 아래처럼 씁니다. <kbd>Shift</kbd>+<kbd>Enter</kbd>로 미리보기.</p>
+<pre>## 나의 소개
+- 이름: **홍길동**
+- 이 과정에서 배우고 싶은 것: AI로 가계부 정리하기</pre>
+      <div class="box check"><span class="lbl">확인</span><p>왼쪽 ☰ 목차에 "나의 소개"가 나타났나요?</p></div>
+    </div>
+
+    <div class="mission" id="c4">
+      <div class="mhead"><span class="mn">예제 C4 · 2차시</span><h3>입력 폼으로 한 달 점심값 계산기</h3></div>
+      <p>노트북 <strong>4번</strong>. ✏️ 한 줄 <code>한달_점심값 = 점심값 * 주당_횟수 * 4</code> 를 채우고 실행한 뒤, 오른쪽 <strong>슬라이더</strong>를 움직여 보세요.</p>
+<pre><span class="o">한 달 점심값: 180,000원
+한 달 커피값: 90,000원
+합계        : 270,000원
+✅ 4 점심값 : 정답입니다!</span></pre>
+      <div class="box q"><span class="lbl">응용</span><p><code>커피값</code>의 4500을 내가 자주 마시는 음료 값으로 바꾸고, 폼에 <code># @param</code>으로 입력 칸을 하나 더 만들어 보세요.</p></div>
+    </div>
+
+    <div class="mission" id="c5">
+      <div class="mhead"><span class="mn">예제 C5 · 2차시</span><h3>장보기 파일 만들고 읽고 내려받기</h3></div>
+      <p>노트북 <strong>5번</strong>. <code>%%writefile</code>로 파일을 만들고 → 📁 파일 창에서 확인 → 파이썬으로 읽어 개수를 세고(✏️ <code>len(목록)</code>) → 내 PC로 내려받습니다.</p>
+<pre>%%writefile 장보기.txt
+우유
+계란
+두부
+<span class="c"># …</span>
+<span class="o">Writing 장보기.txt</span></pre>
+      <div class="box warn"><span class="lbl">주의</span><p>이 파일은 <strong>세션이 끝나면 지워집니다.</strong> 내일 다시 쓰려면 C6처럼 드라이브에 저장하세요.</p></div>
+    </div>
+
+    <div class="mission" id="c6">
+      <div class="mhead"><span class="mn">예제 C6 · 2차시 · 선택</span><h3>구글 드라이브에 저장하기</h3></div>
+      <p>노트북 <strong>6번</strong>. <code>drive.mount</code> → 권한 창에서 <strong>내 계정</strong> 선택 → <code>MyDrive/colab_실습</code> 폴더에 장보기 파일 저장.</p>
+      <ol>
+        <li>drive.google.com 새 탭 → <strong>내 드라이브 → colab_실습</strong> 폴더에 파일이 있는지 확인합니다.</li>
+        <li>세션을 다시 시작해도 드라이브의 파일은 남아 있는지 확인합니다.</li>
+      </ol>
+    </div>
+
+    <div class="mission" id="c7">
+      <div class="mhead"><span class="mn">예제 C7 · 2차시</span><h3>패키지 설치하고 QR 코드 만들기</h3></div>
+      <p>노트북 <strong>7번</strong>. <code>!ls</code>로 명령어를 써 보고, 이미 설치된 패키지 버전을 확인한 뒤, <code>!pip install -q qrcode</code>로 새 패키지를 설치해 <strong>과정 사이트 QR 코드</strong>를 만듭니다.</p>
+<pre>import qrcode
+qrcode.make("https://bctcaiedu.github.io/digital36/").save("qr.png")</pre>
+      <div class="box check"><span class="lbl">확인</span><p><strong>스마트폰 카메라</strong>로 화면의 QR 코드를 찍어 사이트가 열리면 성공! 주소를 바꿔 우리 가게·모임 안내용 QR도 만들어 보세요.</p></div>
+    </div>
+
+    <div class="mission" id="c8">
+      <div class="mhead"><span class="mn">예제 C8 · 2차시</span><h3>일주일 걸음 수 그래프</h3></div>
+      <p>노트북 <strong>8번</strong>. 먼저 <strong>한글 글꼴 설치</strong> 셀을 실행하고(약 20초), <code>걸음</code> 숫자 7개를 스마트폰 건강 앱의 <strong>내 걸음 수</strong>로 바꿔 막대그래프를 그립니다. 목표를 넘은 날은 초록색으로 표시됩니다.</p>
+      <div class="box warn"><span class="lbl">한글이 □□□로 깨지면</span><p>런타임 → <strong>세션 다시 시작</strong> → 글꼴 셀부터 다시 실행합니다.</p></div>
+    </div>
+
+    <div class="mission" id="c9">
+      <div class="mhead"><span class="mn">예제 C9 · 2차시</span><h3>오류 읽고 고치기 3종</h3></div>
+      <p>노트북 <strong>9번</strong>. 일부러 틀린 셀 3개를 실행해 오류를 보고, <strong>빨간 글씨의 마지막 줄</strong>을 읽어 고칩니다. 짝과 함께 원인을 말로 설명해 보세요.</p>
+      <div class="tablewrap" style="margin-top:10px">
+        <table>
+          <thead><tr><th>오류 (마지막 줄)</th><th>쉬운 뜻</th><th>이번 셀의 고칠 곳</th></tr></thead>
+          <tbody>
+            <tr><td><code>NameError</code></td><td>그런 이름을 모른다 (오타 · 아직 안 만듦)</td><td><code>과일들</code> → <code>과일</code></td></tr>
+            <tr><td><code>TypeError</code></td><td>종류가 안 맞는다 (글자 + 숫자)</td><td><code>str(내_나이)</code>로 글자로 바꾸기</td></tr>
+            <tr><td><code>SyntaxError</code></td><td>문법이 틀렸다 (콜론 · 괄호 · 따옴표)</td><td><code>if</code> 줄 끝에 <code>:</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="box q"><span class="lbl">AI에게 묻기</span><p>코랩의 <strong>"오류 설명"</strong> 버튼을 누르거나, 오류 마지막 줄을 ChatGPT에 붙여 넣고 "파이썬 초보가 이해하게 설명해 줘"라고 물어보세요. 설명을 듣고 <strong>직접</strong> 고치는 것이 목표입니다.</p></div>
+    </div>
+
+    <div class="mission" id="c10">
+      <div class="mhead"><span class="mn">예제 C10 · 2차시</span><h3>AI에게 코드 받아 테스트로 검증하기 ★</h3></div>
+      <p>노트북 <strong>10번</strong>. 2단원의 코드 요청 템플릿으로 함수를 요청하고, 코랩에서 <strong>답을 아는 예시 4개</strong>로 검증합니다.</p>
+<pre><span class="p">나 ▶</span> 너는 친절한 파이썬 선생님이야. 나는 파이썬 초보야.
+     숫자 리스트를 받아서 짝수만 더한 값을 돌려주는 함수 짝수_합계(숫자들)를 만들어 줘.
+     for 반복문과 if만 쓰고, 줄마다 한국어 주석을 달아 줘. 함수만 주고, 사용 예시는 빼 줘.
+<span class="o">AI ▶ def 짝수_합계(숫자들): … (합계 변수에 짝수만 더해 돌려주는 코드)</span>
+<span class="c"># 10-1 셀에 붙여 넣고 → 10-2 테스트 실행</span>
+<span class="o">✅ 10 기본 예시   [1,2,3,4] : 정답입니다!
+✅ 10 빈 리스트   [] : 정답입니다!
+✅ 10 음수 포함   [-2,5,8] : 정답입니다!
+✅ 10 홀수만      [1,3,5] : 정답입니다!</span></pre>
+      <ol>
+        <li>❌가 나오면 그 줄을 그대로 AI에게 보여 주고 "이 테스트가 실패해. 고쳐 줘"라고 요청합니다.</li>
+        <li>모두 ✅가 되면, AI에게 "이 코드를 한 줄씩 설명해 줘"라고 요청해 뜻을 이해합니다.</li>
+      </ol>
+      <div class="box warn"><span class="lbl">검증 원칙</span><p>테스트를 통과해도 <strong>내가 생각한 경우만</strong> 확인한 것입니다. 돈·건강·업무에 쓰는 코드일수록 여러 경우로 확인하고, 결과를 사람이 한 번 더 봅니다.</p></div>
+    </div>
+
+    <div class="mission" id="c11">
+      <div class="mhead"><span class="mn">도전 · 선택</span><h3>평 ↔ ㎡ 변환기 (드롭다운 폼)</h3></div>
+      <p>노트북 맨 끝. 드롭다운으로 방향을 고르면 계산 방법이 바뀌는 변환기입니다. ✏️ 두 줄(<code>값 * 한_평</code>, <code>값 / 한_평</code>)을 채우고 <strong>84㎡ → 약 25.41평</strong>이 나오면 성공. 완성하면 <strong>⋮ → 양식 → 코드 숨기기</strong>로 가족에게 줄 수 있는 계산기로 만들어 보세요.</p>
+    </div>
+
+    <div class="box check"><span class="lbl">제출</span>
+      <p>노트북 <strong>11번</strong>의 방법대로 <strong>뷰어 권한 공유 링크</strong>를 제출합니다. C4 · C5 · C9 · C10 셀에 ✅가 보이면 완료입니다.</p></div>
+  </section>
+
+  <!-- ===================== 10 ===================== -->
+  <section id="s10">
+    <div class="part"><span class="pn">10장</span><h2>문제 해결표</h2><span class="pt">막히면 여기부터</span></div>
+    <p class="lede">수업에서 실제로 자주 나오는 문제입니다. 해결이 안 되면 오류 마지막 줄을 복사해 강사나 AI에게 물어보세요.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>증상</th><th>원인</th><th>이렇게 하세요</th></tr></thead>
+        <tbody>
+__ERRORS__
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== 11 ===================== -->
+  <section id="s11">
+    <div class="part"><span class="pn">11장</span><h2>단축키 · 안전 수칙 · 자가 점검</h2><span class="pt">한 장 정리</span></div>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>단축키</th><th>동작</th><th>단축키</th><th>동작</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>Shift</kbd>+<kbd>Enter</kbd></td><td>실행 후 다음 셀로</td><td><kbd>Ctrl</kbd>+<kbd>M</kbd> <kbd>B</kbd></td><td>아래에 코드 셀 추가</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>Enter</kbd></td><td>실행 후 제자리</td><td><kbd>Ctrl</kbd>+<kbd>M</kbd> <kbd>A</kbd></td><td>위에 코드 셀 추가</td></tr>
+          <tr><td><kbd>Alt</kbd>+<kbd>Enter</kbd></td><td>실행 후 아래에 새 셀</td><td><kbd>Ctrl</kbd>+<kbd>M</kbd> <kbd>D</kbd></td><td>셀 삭제</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>저장</td><td><kbd>Ctrl</kbd>+<kbd>M</kbd> <kbd>M</kbd> / <kbd>Y</kbd></td><td>텍스트 셀로 / 코드 셀로 바꾸기</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>/</kbd></td><td>선택한 줄 주석 켜기·끄기</td><td><kbd>Ctrl</kbd>+<kbd>M</kbd> <kbd>I</kbd></td><td>실행 중단</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>F9</kbd></td><td>모두 실행</td><td><kbd>Ctrl</kbd>+<kbd>M</kbd> <kbd>H</kbd></td><td>단축키 전체 목록</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="lede" style="margin-top:8px">Mac은 <kbd>Ctrl</kbd> 대신 <kbd>⌘ Cmd</kbd>. <kbd>Ctrl</kbd>+<kbd>M</kbd> <kbd>B</kbd>는 "Ctrl+M을 누르고 손을 뗀 뒤 B"입니다. 단축키는 도구 → 단축키에서 바꿀 수 있습니다.</p>
+
+    <div class="box warn"><span class="lbl">안전 수칙 5가지</span>
+      <ul>
+        <li>코드·텍스트 셀에 <strong>비밀번호 · 주민번호 · 계좌번호 · 카드번호</strong>를 쓰지 않습니다.</li>
+        <li>AI 서비스의 <strong>API 키</strong>는 코드에 직접 쓰지 않고 🔑 보안 비밀에 보관합니다. 공유 노트북에 키가 보이면 즉시 키를 폐기합니다.</li>
+        <li><strong>출처를 모르는 노트북</strong>은 실행하지 않고, 드라이브 연결 권한을 주지 않습니다.</li>
+        <li>공유 전 <strong>수정 → 모든 출력 지우기</strong>로 결과 화면의 개인정보를 확인합니다.</li>
+        <li>공용 PC에서는 수업이 끝나면 <strong>구글 로그아웃</strong>합니다.</li>
+      </ul>
+    </div>
+
+    <div class="selfcheck" style="margin-top:18px">
+      <h3>자가 점검 체크리스트</h3>
+      <ul>
+        <li>코랩이 "구글의 컴퓨터를 빌려 쓰는 노트"라는 것을 설명할 수 있다.</li>
+        <li>새 노트북을 만들고 이름을 바꿔 드라이브의 Colab Notebooks 폴더에서 찾을 수 있다.</li>
+        <li>코드 셀을 <kbd>Shift</kbd>+<kbd>Enter</kbd>로 실행하고 실행 번호의 뜻을 안다.</li>
+        <li>NameError가 나면 "이전 셀 실행" 또는 "모두 실행"으로 스스로 복구할 수 있다.</li>
+        <li>텍스트 셀에 제목·굵게·목록을 써서 설명을 남길 수 있다.</li>
+        <li>입력 폼(<code># @param</code>)으로 값을 바꿔 계산기를 쓸 수 있다.</li>
+        <li>파일을 올리고 내려받을 수 있고, 세션이 끝나면 지워진다는 것을 안다.</li>
+        <li><code>!pip install</code>로 패키지를 설치해 QR 코드를 만들었다.</li>
+        <li>오류의 마지막 줄을 읽고 NameError · TypeError · SyntaxError를 고쳤다.</li>
+        <li>AI에게 받은 코드를 테스트로 검증하고, 뷰어 권한 공유 링크로 제출했다.</li>
+      </ul>
+    </div>
+
+    <div class="box q"><span class="lbl">다음 단계</span>
+      <p>이제 각 단원 실습지의 파란색 <strong>PYTHON 미션(P1~P9)</strong>을 같은 방법으로 진행합니다: <strong>Colab에서 열기 → Drive에 사본 저장 → 위에서부터 실행 → ✏️ 채우기 → ✅ 확인</strong>.</p></div>
+  </section>
+
+</div>
