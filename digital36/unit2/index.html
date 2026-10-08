@@ -128,12 +128,27 @@
   .toast.show{display:block}
   @media (max-width:760px){ .bar .brand{width:100%;margin-bottom:4px} .cap p{font-size:13.5px} }
 
+  /* ---------- 영상 슬라이드 (videos.js) ---------- */
+  .vgrid{display:grid;gap:2.4cqw;margin-top:2.6cqh;align-items:start}
+  .vgrid.n1{grid-template-columns:minmax(0,48cqw)}
+  .vgrid.n2{grid-template-columns:repeat(2,1fr)}
+  .vgrid.n3{grid-template-columns:repeat(3,1fr)}
+  .vcard{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:#fff;border:1px solid #D6DFD8;border-radius:1.2cqh;overflow:hidden;transition:.15s}
+  .vcard:hover{border-color:var(--pine);transform:translateY(-.4cqh);box-shadow:0 1cqh 3cqh rgba(16,104,74,.15)}
+  .vth{position:relative;display:block;aspect-ratio:16/9;background:#111}
+  .vth img{width:100%;height:100%;object-fit:cover;display:block}
+  .vth i{position:absolute;inset:0;margin:auto;width:8cqh;height:8cqh;border-radius:50%;background:rgba(194,24,91,.9);color:#fff;font-style:normal;display:grid;place-items:center;font-size:3.4cqh}
+  .vth b{position:absolute;right:1cqh;bottom:1cqh;background:rgba(0,0,0,.8);color:#fff;font:600 1.8cqh var(--mono);padding:.3cqh .9cqh;border-radius:.6cqh}
+  .vcard .vt{font-size:2.5cqh;font-weight:700;line-height:1.35;padding:1.4cqh 1.6cqh .4cqh;color:var(--ink)}
+  .vcard .vc{font-size:1.9cqh;color:#6C7A72;padding:0 1.6cqh}
+  .vcard .vd{font-size:2.1cqh;color:#3A453E;padding:.6cqh 1.6cqh 1.6cqh}
+
 </style>
 
 <div class="bar">
   <span class="brand">UNIT 02 · ChatGPT 첫걸음: 질문하고 답받기 · 강의 슬라이드</span>
   <button id="prev" title="이전 (←)">◀</button>
-  <span class="count" id="count">1 / 31</span>
+  <span class="count" id="count">1 / 37</span>
   <button id="next" title="다음 (→)">▶</button>
   <button class="play" id="play" title="재생 / 정지 (Space)">▶ 재생</button>
   <button id="auto" class="on" title="나레이션이 끝나면 자동으로 다음 장">자동 진행</button>
@@ -244,6 +259,13 @@
     
   <div class="nar">스마트폰에서는 앱을 설치해서 씁니다. 플레이 스토어나 앱 스토어에서 챗지피티를 검색하는데, 비슷한 이름과 아이콘의 유료 앱이 많으니 개발사가 오픈에이아이인지 꼭 확인하세요. 앱에서는 말로 질문하는 방법이 두 가지 있습니다. 마이크 버튼을 누르면 내 말이 글자로 받아 적히고, 확인한 뒤 보내면 됩니다. 음성 대화 버튼을 누르면 전화 통화처럼 말로 묻고 말로 답을 듣습니다. 요리하면서, 운전 준비하면서 손을 쓰기 어려울 때 편리합니다. 말할 때는 짧고 또박또박 하시면 됩니다.</div>
 </section>
+<section class="slide">
+    <div class="eb">Watch · 1차시 함께 볼 영상</div>
+    <h2>영상으로 더 알아보기</h2>
+    <div class="sub">영상을 누르면 유튜브에서 열립니다 · 수업 뒤 복습용으로도 좋아요</div>
+    <div class="fill"><div class="vgrid n2"><a class="vcard" href="https://www.youtube.com/watch?v=cWVZ1Cv8PQU" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/cWVZ1Cv8PQU/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>15:47</b></span><span class="vt">챗GPT 무료 버전 초보자를 위한 기본 사용법</span><span class="vc">디지털거북이</span><span class="vd">회원가입부터 첫 질문까지 차근차근</span></a><a class="vcard" href="https://www.youtube.com/watch?v=og3-LK6Udhs" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/og3-LK6Udhs/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>14:15</b></span><span class="vt">챗GPT와 말로 대화해보세요! 스마트폰 음성 대화 사용법</span><span class="vc">다시시작</span><span class="vd">말로 묻고 말로 듣는 음성 대화</span></a></div></div>
+  <div class="nar">이번 차시 내용을 영상으로 한 번 더 볼까요? 화면의 영상을 누르면 유튜브에서 열립니다. 첫 번째 영상은 회원가입부터 첫 질문까지 차근차근 입니다. 두 번째 영상은 말로 묻고 말로 듣는 음성 대화 입니다. 수업이 끝난 뒤 복습할 때 보셔도 좋습니다.</div>
+</section>
 <section class="slide dk">
     <div class="fill">
       <div class="eb">2차시 · 50분</div>
@@ -298,6 +320,13 @@
     <div class="foot">4번처럼 건강 질문은 "참고용"입니다. 약·치료 결정은 반드시 의사와 상의하세요.</div>
   <div class="nar">실제로 고쳐 보겠습니다. 여행지 추천, 이 질문은 누구와, 며칠, 어떤 조건인지가 빠져 있습니다. 부모님을 모시고 가는 이박 삼일, 많이 걷지 않는 곳으로 바꾸면 훨씬 쓸모 있는 답이 나옵니다. 문자 써 줘도 누가, 누구에게, 무슨 내용을, 얼마나 길게가 빠졌습니다. 네 번째 혈압 질문을 보세요. 건강 질문에는 병원에 가야 하는 경우도 알려 달라고 덧붙였습니다. 건강이나 돈, 법률에 관한 에이아이의 답은 참고용입니다. 약을 끊거나 바꾸는 결정은 반드시 의사와 상의하셔야 합니다.</div>
 </section>
+<section class="slide">
+    <div class="eb">Watch · 2차시 함께 볼 영상</div>
+    <h2>영상으로 더 알아보기</h2>
+    <div class="sub">영상을 누르면 유튜브에서 열립니다 · 수업 뒤 복습용으로도 좋아요</div>
+    <div class="fill"><div class="vgrid n1"><a class="vcard" href="https://www.youtube.com/watch?v=Y6avWpky4Q8" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/Y6avWpky4Q8/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>6:27</b></span><span class="vt">99%가 모르는 프롬프트 작성법 9가지 (2026 최신버전)</span><span class="vc">홍아린 AI</span><span class="vd">역할 · 상황 · 형식을 넣는 질문법</span></a></div></div>
+  <div class="nar">이번 차시 내용을 영상으로 한 번 더 볼까요? 화면의 영상을 누르면 유튜브에서 열립니다. 첫 번째 영상은 역할 , 상황 , 형식을 넣는 질문법 입니다. 수업이 끝난 뒤 복습할 때 보셔도 좋습니다.</div>
+</section>
 <section class="slide dk">
     <div class="fill">
       <div class="eb">3차시 · 50분</div>
@@ -350,6 +379,13 @@
     
   <div class="nar">따뜻한 느낌으로 써 달라고 하면, 에이아이가 생각하는 따뜻함과 내가 생각하는 따뜻함이 다를 수 있습니다. 이럴 때는 예시를 하나 보여 주세요. 오늘 저녁, 엄마가 차려 준 밥상처럼, 이런 예시 한 줄만 붙여도 에이아이는 길이와 말투와 분위기를 한꺼번에 알아챕니다. 말로 설명하기 어려운 것일수록 예시가 힘을 발휘합니다.</div>
 </section>
+<section class="slide">
+    <div class="eb">Watch · 3차시 함께 볼 영상</div>
+    <h2>영상으로 더 알아보기</h2>
+    <div class="sub">영상을 누르면 유튜브에서 열립니다 · 수업 뒤 복습용으로도 좋아요</div>
+    <div class="fill"><div class="vgrid n1"><a class="vcard" href="https://www.youtube.com/watch?v=yBNqT7nETjM" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/yBNqT7nETjM/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>14:41</b></span><span class="vt">초보자도 바로 쓰는 프롬프트 공식</span><span class="vc">이원철TV</span><span class="vd">대화를 이어 가며 답을 다듬는 법</span></a></div></div>
+  <div class="nar">이번 차시 내용을 영상으로 한 번 더 볼까요? 화면의 영상을 누르면 유튜브에서 열립니다. 첫 번째 영상은 대화를 이어 가며 답을 다듬는 법 입니다. 수업이 끝난 뒤 복습할 때 보셔도 좋습니다.</div>
+</section>
 <section class="slide dk">
     <div class="fill">
       <div class="eb">4차시 · 50분</div>
@@ -401,6 +437,13 @@
       <div class="banner" style="margin-top:2cqh">AI끼리 답이 같아도 사실이라는 보장은 없습니다. 최종 확인은 공식 자료로 합니다.</div></div>
     
   <div class="nar">틀린 답을 잡아내는 교차 확인 네 단계입니다. 첫째, 에이아이에게 되묻습니다. 출처가 어디인지, 확실하지 않은 부분은 표시해 달라고 합니다. 둘째, 제미나이나 코파일럿 같은 다른 에이아이에게 같은 질문을 던져 비교합니다. 셋째, 가장 중요한 단계입니다. 검색이나 공식 누리집, 서점 사이트, 지도 앱에서 원래 자료를 직접 확인합니다. 넷째, 맞음, 틀림, 확인 불가로 판정하고 무엇으로 확인했는지 적어 둡니다. 주의할 점이 있습니다. 에이아이 두 개가 같은 답을 해도 둘 다 틀릴 수 있습니다. 마지막 확인은 반드시 공식 자료로 하세요.</div>
+</section>
+<section class="slide">
+    <div class="eb">Watch · 4차시 함께 볼 영상</div>
+    <h2>영상으로 더 알아보기</h2>
+    <div class="sub">영상을 누르면 유튜브에서 열립니다 · 수업 뒤 복습용으로도 좋아요</div>
+    <div class="fill"><div class="vgrid n2"><a class="vcard" href="https://www.youtube.com/watch?v=t4FIMh_LNcg" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/t4FIMh_LNcg/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>4:49</b></span><span class="vt">모르면 찍는 인공지능? 생성형 AI의 거짓말과 환각</span><span class="vc">EBS 지식채널e</span><span class="vd">AI는 왜 그럴듯한 거짓말을 할까</span></a><a class="vcard" href="https://www.youtube.com/watch?v=4JDVS-JyYNc" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/4JDVS-JyYNc/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>15:13</b></span><span class="vt">AI 헛소리는 버그 아니다… 할루시네이션 구조적 이유, 최신 기술, 꿀팁</span><span class="vc">안될공학 - IT 테크 신기술</span><span class="vd">환각이 생기는 이유와 줄이는 방법</span></a></div></div>
+  <div class="nar">이번 차시 내용을 영상으로 한 번 더 볼까요? 화면의 영상을 누르면 유튜브에서 열립니다. 첫 번째 영상은 AI는 왜 그럴듯한 거짓말을 할까 입니다. 두 번째 영상은 환각이 생기는 이유와 줄이는 방법 입니다. 수업이 끝난 뒤 복습할 때 보셔도 좋습니다.</div>
 </section>
 <section class="slide dk">
     <div class="fill">
@@ -457,6 +500,13 @@
     
   <div class="nar">사진을 올릴 때 가장 조심할 점입니다. 신분증, 통장, 카드 사진은 절대 올리지 마세요. 주민번호나 주소, 연락처가 적힌 고지서나 진단서, 계약서도 마찬가지입니다. 다른 사람의 얼굴이나 단체방 대화를 동의 없이 올리는 것도 안 됩니다. 꼭 필요하다면 개인정보 부분을 가리거나 잘라 내고 올리세요. 그리고 내 대화가 저장되거나 서비스 개선에 쓰이는지는 설정에서 확인할 수 있습니다. 대화 기록을 남기지 않는 임시 채팅 기능도 있으니 필요할 때 활용하세요.</div>
 </section>
+<section class="slide">
+    <div class="eb">Watch · 5차시 함께 볼 영상</div>
+    <h2>영상으로 더 알아보기</h2>
+    <div class="sub">영상을 누르면 유튜브에서 열립니다 · 수업 뒤 복습용으로도 좋아요</div>
+    <div class="fill"><div class="vgrid n1"><a class="vcard" href="https://www.youtube.com/watch?v=lXTGq-w_ej8" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/lXTGq-w_ej8/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>11:12</b></span><span class="vt">인생이 편해지는 휴대폰 AI기능 · 왕초보 제미나이 사용법 10분 총정리</span><span class="vc">욜디_컴퓨터 인터넷 기초강의</span><span class="vd">카메라로 찍어서 AI에게 묻기</span></a></div></div>
+  <div class="nar">이번 차시 내용을 영상으로 한 번 더 볼까요? 화면의 영상을 누르면 유튜브에서 열립니다. 첫 번째 영상은 카메라로 찍어서 AI에게 묻기 입니다. 수업이 끝난 뒤 복습할 때 보셔도 좋습니다.</div>
+</section>
 <section class="slide dk">
     <div class="fill">
       <div class="eb">6차시 · 50분</div>
@@ -496,6 +546,13 @@
       </div></div>
     <div class="foot">10번 "확인하기" 템플릿은 중요한 답을 받을 때마다 뒤에 붙여 쓰세요.</div>
   <div class="nar">실습에서 채울 템플릿 열 가지입니다. 일번부터 삼번은 글쓰기로 문자나 안내문 쓰기, 글 다듬기, 답장 초안입니다. 사번과 오번은 이해하기로 어려운 말 풀기와 사진이나 문서 요약입니다. 육번과 칠번은 계획하기, 팔번은 여러 선택지 비교, 구번은 앱이나 기기 사용법 배우기입니다. 그리고 십번이 확인하기입니다. 이 답에서 틀릴 수 있는 부분과 확인 방법을 알려 달라는 질문인데, 지난 시간에 배운 환각 확인을 습관으로 만드는 템플릿입니다. 중요한 답을 받을 때마다 붙여 쓰세요.</div>
+</section>
+<section class="slide">
+    <div class="eb">Watch · 6차시 함께 볼 영상</div>
+    <h2>영상으로 더 알아보기</h2>
+    <div class="sub">영상을 누르면 유튜브에서 열립니다 · 수업 뒤 복습용으로도 좋아요</div>
+    <div class="fill"><div class="vgrid n1"><a class="vcard" href="https://www.youtube.com/watch?v=H1WnRp8sNrQ" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/H1WnRp8sNrQ/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>28:17</b></span><span class="vt">나만의 프롬프트 비서 만들기</span><span class="vc">직장인 GPT 멘토</span><span class="vd">자주 쓰는 질문을 템플릿으로</span></a></div></div>
+  <div class="nar">이번 차시 내용을 영상으로 한 번 더 볼까요? 화면의 영상을 누르면 유튜브에서 열립니다. 첫 번째 영상은 자주 쓰는 질문을 템플릿으로 입니다. 수업이 끝난 뒤 복습할 때 보셔도 좋습니다.</div>
 </section>
 <section class="slide dk">
     <div class="fill">
@@ -711,7 +768,7 @@
     else if (e.key === 'Home'){ go(-idx); }
     else if (e.key === 'End'){ go(slides.length-1-idx); }
   });
-  $('stage').addEventListener('click', e => { if (e.clientX > window.innerWidth/2) go(1); else go(-1); });
+  $('stage').addEventListener('click', e => { if (e.target.closest('a, button, iframe')) return; if (e.clientX > window.innerWidth/2) go(1); else go(-1); });
   window.addEventListener('beforeunload', () => { try{ synth.cancel(); }catch(e){} });
   window.deckGo = n => { const was = playing; stop(); show(n); if (was) setTimeout(startSpeaking, 150); };
 })();

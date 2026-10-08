@@ -124,6 +124,23 @@
     .shead{gap:8px;flex-wrap:wrap}
   }
 
+  /* ---------- AI × PYTHON 미션 · 함께 볼 영상 ---------- */
+  .mission.py.ai{border-left-color:#7B3FC4}
+  .mission.py.ai .mn{color:#7B3FC4}
+  .vbox{margin:14px 0 4px;padding:12px 14px;border:1px dashed var(--line-strong);border-radius:6px;background:var(--surface)}
+  .vbox .lbl{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:#C2185B;margin-bottom:10px}
+  .vlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+  .vcard{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .vcard:hover{border-color:#C2185B}
+  .vth{position:relative;display:block;aspect-ratio:16/9;background:#111}
+  .vth img{width:100%;height:100%;object-fit:cover;display:block}
+  .vth i{position:absolute;inset:0;margin:auto;width:36px;height:36px;border-radius:50%;background:rgba(194,24,91,.9);color:#fff;font-style:normal;display:grid;place-items:center;font-size:14px}
+  .vth b{position:absolute;right:5px;bottom:5px;background:rgba(0,0,0,.8);color:#fff;font:600 10.5px var(--mono);padding:1px 5px;border-radius:3px}
+  .vcard .vt{font-size:13.5px;font-weight:700;line-height:1.4;padding:8px 10px 2px;color:var(--ink)}
+  .vcard .vc{font-size:11.5px;color:var(--muted);padding:0 10px}
+  .vcard .vd{font-size:12.5px;color:var(--ink-2);padding:3px 10px 10px}
+  @media print{ .vth{display:none} .vlist{grid-template-columns:1fr} }
+
 
   .form{width:100%;border-collapse:collapse;min-width:0;background:var(--surface);font-size:14px}
   .form th,.form td{border:1px solid var(--line-strong);padding:10px 12px;vertical-align:middle;text-align:left}
@@ -202,7 +219,8 @@
         <tr><td class="stage">도입</td><td><ul><li>강사·교육생 인사, 과정 목표와 36시간 5단원 구성 안내</li><li>"최근 스마트폰으로 하다가 막혔던 일" 한 가지씩 말하기로 동기유발</li></ul></td><td class="min">5분</td></tr>
         <tr><td class="stage">전개</td><td><ul><li>수업 규칙 안내: 50분 수업·10분 휴식, 무료 버전 사용, 개인정보 입력 금지 원칙</li><li>실습 미션 1: 이름표 만들기와 구글 계정 로그인 상태 확인 (계정 없는 교육생 파악·도움)</li><li>설명: 디지털 리터러시 4요소(다루기·찾고 판단하기·소통하고 만들기·지키기)와 AI 시대에 더해지는 힘</li><li>실습 미션 2: 사전 디지털 역량 자가진단 10문항 작성(1~5점), 총점 계산</li><li>가장 낮은 점수 문항 2개를 골라 "과정에서 꼭 배우고 싶은 것" 한 줄 쓰기</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>자가진단 결과는 성적이 아니며 5단원 사후 진단과 비교함을 안내</li><li>2차시 예고: 내 하루 속 AI 찾기</li></ul></td><td class="min">10분</td></tr>
-        <tr><td class="stage">확장<br>(선택)</td><td><ul><li><strong>파이썬 P1</strong> 사전 자가진단 점수 분석기 — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="../python/unit1_python.ipynb" download>노트북</a> · <a href="../python/answers/unit1_python_answers.ipynb" download>답안</a></li></ul></td><td class="min">선택</td></tr>
+        <tr><td class="stage">확장<br>(선택)</td><td><ul><li><strong>파이썬 P1</strong> 사전 자가진단 점수 분석기 — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit1_python.ipynb" target="_blank" rel="noopener">Colab</a> · <a href="../python/unit1_python.ipynb" download>노트북</a> · <a href="../python/answers/unit1_python_answers.ipynb" download>답안</a></li></ul></td><td class="min">선택</td></tr>
+        <tr><td class="stage">영상<br>(참고)</td><td><ul><li><a href="https://www.youtube.com/watch?v=x1vuS1iIVpk" target="_blank" rel="noopener">▶ 디지털리터러시란 무엇인가?</a> <small>(CDL(디지털리터러시협회) · 3:34)</small> — 디지털 리터러시가 왜 필요한지 3분 만에 정리</li></ul></td><td class="min">선택</td></tr>
         <tr><th>교수방법</th><td colspan="2">강의 · 발문 · 자기평가 실습</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 구글 계정, 자가진단 실습지</td></tr>
         <tr><th>평가</th><td colspan="2">자가진단지 — 10문항 점수와 배우고 싶은 점을 모두 작성했는가</td></tr>
@@ -221,6 +239,7 @@
         <tr><td class="stage">전개</td><td><ul><li>설명: 키오스크·모바일 뱅킹·정부24·추천 알고리즘·길찾기·음성 비서 사례</li><li>설명: 추천 알고리즘의 원리(흔적→비교→추천)와 필터 버블, 조절 방법</li><li>실습 미션 3: 내 하루 속 AI 찾기 — 시간대별 5개 이상 기록</li><li>실습 미션 4: 유튜브 첫 화면을 짝과 비교하고 "관심 없음"·시청 기록 메뉴 찾아보기</li><li>짝 활동: 찾은 사례 중 1개의 편리한 점·걱정되는 점 공유</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>모둠별 가장 의외였던 AI 사례 1개 발표</li><li>3차시 예고: 파일 관리와 구글 드라이브</li></ul></td><td class="min">10분</td></tr>
         
+        <tr><td class="stage">영상<br>(참고)</td><td><ul><li><a href="https://www.youtube.com/watch?v=HxEa4bOoNfU" target="_blank" rel="noopener">▶ 취향을 저격하는 '추천 알고리즘'의 작동 원리</a> <small>(방송미디어통신위원회 · 3:12)</small> — 유튜브·쇼핑 추천이 나를 아는 방법</li><li><a href="https://www.youtube.com/watch?v=iZgEq20potM" target="_blank" rel="noopener">▶ 키오스크 넘어 챗GPT까지…AI 배우는 어르신들</a> <small>(연합뉴스TV · 2:09)</small> — 일상에 들어온 AI, 배우는 사람들의 이야기</li></ul></td><td class="min">선택</td></tr>
         <tr><th>교수방법</th><td colspan="2">강의 · 시연 · 짝 활동 · 실습</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 유튜브 앱, 실습지</td></tr>
         <tr><th>평가</th><td colspan="2">실습지 확인 — 일상 속 AI 사례를 5개 이상 찾고 장단점을 적었는가</td></tr>
@@ -239,6 +258,7 @@
         <tr><td class="stage">전개</td><td><ul><li>설명: 파일·폴더·확장자, PC 파일 탐색기와 스마트폰 내 파일/파일 앱</li><li>실습 미션 5: 바탕화면에 "디지털리터러시" 폴더 만들기, 파일 이름 규칙(날짜_내용)으로 저장</li><li>설명·시연: 클라우드 개념, 구글 드라이브 업로드와 공유 권한(제한됨 / 링크가 있는 모든 사용자)</li><li>실습 미션 6: 드라이브에 폴더 만들고 파일 업로드 → 뷰어 권한 링크 복사 → 짝에게 보내 열어 보기</li><li>실습 미션 7: 스마트폰 사진 1장을 드라이브 앱으로 올리고 PC에서 확인</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>신분증·통장 사본을 링크 공유하면 안 되는 이유 확인</li><li>4차시 예고: 검색 기본</li></ul></td><td class="min">10분</td></tr>
         
+        <tr><td class="stage">영상<br>(참고)</td><td><ul><li><a href="https://www.youtube.com/watch?v=CnR1OmToHHQ" target="_blank" rel="noopener">▶ 5분만에 배우는 구글드라이브 사용법 · 공유 링크 만들기</a> <small>(캡틴스튜디오 · 5:29)</small> — 업로드 · 폴더 · 링크 공유를 한 번에</li></ul></td><td class="min">선택</td></tr>
         <tr><th>교수방법</th><td colspan="2">강의 · 시연 · 짝 확인 실습</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 구글 계정, Google 드라이브 앱</td></tr>
         <tr><th>평가</th><td colspan="2">결과물 확인 — 짝이 공유 링크로 파일을 열 수 있었는가</td></tr>
@@ -257,6 +277,7 @@
         <tr><td class="stage">전개</td><td><ul><li>설명: 문장 대신 핵심 단어 — 줄이기·더하기·바꾸기</li><li>실습 미션 8: 긴 문장 검색과 핵심 단어 검색 결과 비교</li><li>설명·시연: 검색 연산자 " " · - · site: · filetype: 와 기간 설정 도구</li><li>실습 미션 9: 연산자 4종을 각각 1번씩 써서 결과 캡처</li><li>설명: 믿을 만한 출처 5가지 확인(누가·언제·근거·광고·교차 확인) → 실습 미션 10: 생활 문제 1개를 검색으로 해결하고 기록</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>찾은 답과 출처를 짝과 서로 검증</li><li>5차시 예고: AI는 어떻게 답을 만들까</li></ul></td><td class="min">10분</td></tr>
         
+        <tr><td class="stage">영상<br>(참고)</td><td><ul><li><a href="https://www.youtube.com/watch?v=D_afoqG2tJ8" target="_blank" rel="noopener">▶ 진짜 제대로 검색하는 방법</a> <small>(1분만 · 1:00)</small> — 1분 만에 배우는 검색 꿀팁</li><li><a href="https://www.youtube.com/watch?v=z5DiUvToPAM" target="_blank" rel="noopener">▶ [검색 잘하는 법] 검색 연산자와 상세검색</a> <small>(대멀쌤 · 3:01)</small> — 큰따옴표 · 빼기 · site: 연산자</li></ul></td><td class="min">선택</td></tr>
         <tr><th>교수방법</th><td colspan="2">강의 · 시연 · 문제해결 실습</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 인터넷 브라우저, 실습지</td></tr>
         <tr><th>평가</th><td colspan="2">실습지 확인 — 검색어·찾은 답·출처·날짜를 모두 기록했는가</td></tr>
@@ -274,7 +295,8 @@
         <tr><td class="stage">도입</td><td><ul><li>뉴스 속 AI 용어(머신러닝, 생성형 AI, LLM) 들어 본 것 손들기</li><li>전시 확인: 믿을 만한 출처 확인 5가지</li></ul></td><td class="min">5분</td></tr>
         <tr><td class="stage">전개</td><td><ul><li>설명: 큰 상자·작은 상자로 보는 AI → 머신러닝 → 딥러닝 → 생성형 AI → LLM</li><li>실습 미션 11: "다음 단어 맞히기" 모둠 게임 — 문장 이어 가기와 후보 단어 투표</li><li>시연: AI에게 문장 뒤 후보 단어를 물어보고 사람의 답과 비교</li><li>설명: 원리에서 나오는 AI의 강점과 약점(환각, 최신 정보, 책임은 사용자)</li><li>실습 미션 12: "생성형 AI는 ○○하는 기계다" 내 말로 한 문장 정의 만들기</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>건강·돈·법률은 참고용, 최종 판단은 전문가·공식기관 원칙 확인</li><li>6차시 예고: AI 앱 설치와 서비스 비교</li></ul></td><td class="min">10분</td></tr>
-        <tr><td class="stage">확장<br>(선택)</td><td><ul><li><strong>파이썬 P2</strong> "오늘" 다음에 오는 단어 세어 보기 — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="../python/unit1_python.ipynb" download>노트북</a> · <a href="../python/answers/unit1_python_answers.ipynb" download>답안</a></li></ul></td><td class="min">선택</td></tr>
+        <tr><td class="stage">확장<br>(선택)</td><td><ul><li><strong>파이썬 P2</strong> "오늘" 다음에 오는 단어 세어 보기 — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit1_python.ipynb" target="_blank" rel="noopener">Colab</a> · <a href="../python/unit1_python.ipynb" download>노트북</a> · <a href="../python/answers/unit1_python_answers.ipynb" download>답안</a></li></ul></td><td class="min">선택</td></tr>
+        <tr><td class="stage">영상<br>(참고)</td><td><ul><li><a href="https://www.youtube.com/watch?v=HnvitMTkXro" target="_blank" rel="noopener">▶ LLM 설명 (요약버전)</a> <small>(3Blue1Brown 한국어 · 7:54)</small> — 챗GPT가 다음 단어를 고르는 원리를 그림으로</li><li><a href="https://www.youtube.com/watch?v=jPs3n9Vou9c" target="_blank" rel="noopener">▶ 이 영상 하나면 '인공지능', '머신러닝', '딥러닝' 이해가 됩니다</a> <small>(메타코드M · 6:30)</small> — AI · 머신러닝 · 딥러닝의 관계 6분 정리</li></ul></td><td class="min">선택</td></tr>
         <tr><th>교수방법</th><td colspan="2">강의 · 게임 활동 · 시연</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 포스트잇, 실습지</td></tr>
         <tr><th>평가</th><td colspan="2">발표 관찰 — 생성형 AI의 원리와 틀릴 수 있는 이유를 자기 말로 설명했는가</td></tr>
@@ -292,7 +314,8 @@
         <tr><td class="stage">도입</td><td><ul><li>전시 확인: LLM이 답을 만드는 방식 한 문장</li><li>"AI 앱이라고 설치했는데 결제를 요구했다" 사례로 가짜 앱 주의 환기</li></ul></td><td class="min">5분</td></tr>
         <tr><td class="stage">전개</td><td><ul><li>설명: ChatGPT·Gemini·Copilot·Claude·Perplexity의 특징과 무료 버전 제한</li><li>실습 미션 13: 앱 장터에서 개발사 이름 확인 후 ChatGPT·Gemini 앱 설치, 구글 계정으로 로그인</li><li>시연: PC 브라우저에서 Copilot·Claude·Perplexity 접속 방법</li><li>실습 미션 14: 같은 질문 2개를 3개 이상 AI에 입력하고 4가지 기준 비교표 작성</li><li>모둠 공유: "이럴 땐 이 AI" 한 가지씩 정리</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>개인정보를 질문에 넣지 않기 원칙 재확인</li><li>7차시 예고: 계정 보안 점검</li></ul></td><td class="min">10분</td></tr>
-        
+        <tr><td class="stage">확장<br>(선택)</td><td><ul><li><strong>AI × 파이썬 A1</strong> AI에게 같은 질문 3번 — 답이 매번 다를까? — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit1_ai.ipynb" target="_blank" rel="noopener">Colab</a> · <a href="../python/unit1_ai.ipynb" download>노트북</a> · <a href="../python/answers/unit1_ai_answers.ipynb" download>답안</a></li></ul></td><td class="min">선택</td></tr>
+        <tr><td class="stage">영상<br>(참고)</td><td><ul><li><a href="https://www.youtube.com/watch?v=fgeGwHyL2S4" target="_blank" rel="noopener">▶ AI툴 4대장 비교 총정리 (GPT·Gemini·Claude·Copilot)</a> <small>(AI 전환공식 김건우 · 12:12)</small> — 어떤 AI를 언제 쓰면 좋을까</li></ul></td><td class="min">선택</td></tr>
         <tr><th>교수방법</th><td colspan="2">강의 · 시연 · 비교 실습 · 모둠 공유</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 구글 계정, 비교표 실습지</td></tr>
         <tr><th>평가</th><td colspan="2">비교표 확인 — 3개 이상 서비스를 4가지 기준으로 비교했는가</td></tr>
@@ -310,7 +333,8 @@
         <tr><td class="stage">도입</td><td><ul><li>"받아 본 수상한 문자" 경험 나누기(개인정보는 가리고)</li><li>전시 확인: AI에게 넣지 말아야 할 정보</li></ul></td><td class="min">5분</td></tr>
         <tr><td class="stage">전개</td><td><ul><li>설명: 비밀번호 3원칙과 2단계 인증의 원리</li><li>실습 미션 15: 구글 계정 보안 점검 — 보안 진단 실행, 2단계 인증 설정 확인, 복구 전화번호 확인</li><li>설명: 스미싱 4유형과 대처(링크 금지, 앱 설치 요구 의심, 118·112)</li><li>설명: AI 목소리·영상 사기 사례와 3단계 대응(멈추기·다시 걸기·가족 암호)</li><li>실습 미션 16: 스미싱 문자 구별 퀴즈 풀기와 우리 가족 확인 질문 정하기</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>오늘 집에 가서 가족과 할 일 1가지 약속</li><li>8차시 예고: AI 윤리 사례 토론</li></ul></td><td class="min">10분</td></tr>
-        <tr><td class="stage">확장<br>(선택)</td><td><ul><li><strong>파이썬 P3</strong> 스미싱 문자 경고등 만들기 — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="../python/unit1_python.ipynb" download>노트북</a> · <a href="../python/answers/unit1_python_answers.ipynb" download>답안</a></li></ul></td><td class="min">선택</td></tr>
+        <tr><td class="stage">확장<br>(선택)</td><td><ul><li><strong>파이썬 P3</strong> 스미싱 문자 경고등 만들기 — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit1_python.ipynb" target="_blank" rel="noopener">Colab</a> · <a href="../python/unit1_python.ipynb" download>노트북</a> · <a href="../python/answers/unit1_python_answers.ipynb" download>답안</a></li><li><strong>AI × 파이썬 A2</strong> AI 스미싱 판별관 vs 파이썬 경고등 — 누가 더 잘 잡을까? — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit1_ai.ipynb" target="_blank" rel="noopener">Colab</a> · <a href="../python/unit1_ai.ipynb" download>노트북</a> · <a href="../python/answers/unit1_ai_answers.ipynb" download>답안</a></li></ul></td><td class="min">선택</td></tr>
+        <tr><td class="stage">영상<br>(참고)</td><td><ul><li><a href="https://www.youtube.com/watch?v=DMJ0Jrxu_Oo" target="_blank" rel="noopener">▶ "올 것이 왔다"…결국 터진 AI 보이스피싱</a> <small>(비디오머그 - VIDEOMUG · 1:30)</small> — 가족 목소리를 흉내 내는 AI 사기</li><li><a href="https://www.youtube.com/watch?v=gmcR0BxxeLg" target="_blank" rel="noopener">▶ 보이스피싱, 문자스미싱 차단방법! 무조건 설정하세요!</a> <small>(랜선효도 · 2:43)</small> — 스마트폰 설정으로 스미싱 막기</li><li><a href="https://www.youtube.com/watch?v=Q-qhcrBgHiI" target="_blank" rel="noopener">▶ 구글 2단계 인증 설정하는 방법 (모바일 기준)</a> <small>(마케팅길라잡이 · 6:12)</small> — 내 계정을 지키는 가장 쉬운 방법</li></ul></td><td class="min">선택</td></tr>
         <tr><th>교수방법</th><td colspan="2">강의 · 시연 · 개별 점검 실습 · 퀴즈</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 구글 계정, 스미싱 사례 카드</td></tr>
         <tr><th>평가</th><td colspan="2">관찰 체크리스트 — 보안 진단을 실행하고 2단계 인증 설정 여부를 확인했는가</td></tr>
@@ -329,6 +353,7 @@
         <tr><td class="stage">전개</td><td><ul><li>설명: 저작권·딥페이크·편향 세 가지와 "AI 활용 표시" 습관</li><li>실습 미션 17: 모둠 사례 토론 — 사례 1개 선택, 괜찮다/문제다/조건부 판단과 이유 정리</li><li>모둠 발표와 다른 모둠 의견 듣기</li><li>실습 미션 18: 나의 AI 사용 약속 3가지 쓰기</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>1단원 전체 정리와 체크리스트 점검, 과제 안내</li><li>2단원 예고: ChatGPT 첫걸음 — 질문하고 답받기</li></ul></td><td class="min">10분</td></tr>
         
+        <tr><td class="stage">영상<br>(참고)</td><td><ul><li><a href="https://www.youtube.com/watch?v=OQE6a1cfgsM" target="_blank" rel="noopener">▶ 진짜같은 가짜, 딥페이크 직접 제작해보니…</a> <small>(KBS News · 9:39)</small> — 딥페이크는 얼마나 쉽게 만들어질까</li><li><a href="https://www.youtube.com/watch?v=IMYOSuQw2mE" target="_blank" rel="noopener">▶ 'AI 그림도 저작권이 있을까요?'</a> <small>(MBC경남 NEWS · 2:22)</small> — AI 창작물과 저작권 퀴즈</li></ul></td><td class="min">선택</td></tr>
         <tr><th>교수방법</th><td colspan="2">강의 · 모둠 토론 · 발표</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 사례 카드, 토론지</td></tr>
         <tr><th>평가</th><td colspan="2">토론 관찰 — 사례에 대해 근거를 들어 판단을 말하고 AI 사용 약속을 작성했는가</td></tr>

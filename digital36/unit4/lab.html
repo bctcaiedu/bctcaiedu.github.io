@@ -124,6 +124,23 @@
     .shead{gap:8px;flex-wrap:wrap}
   }
 
+  /* ---------- AI × PYTHON 미션 · 함께 볼 영상 ---------- */
+  .mission.py.ai{border-left-color:#7B3FC4}
+  .mission.py.ai .mn{color:#7B3FC4}
+  .vbox{margin:14px 0 4px;padding:12px 14px;border:1px dashed var(--line-strong);border-radius:6px;background:var(--surface)}
+  .vbox .lbl{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:#C2185B;margin-bottom:10px}
+  .vlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+  .vcard{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .vcard:hover{border-color:#C2185B}
+  .vth{position:relative;display:block;aspect-ratio:16/9;background:#111}
+  .vth img{width:100%;height:100%;object-fit:cover;display:block}
+  .vth i{position:absolute;inset:0;margin:auto;width:36px;height:36px;border-radius:50%;background:rgba(194,24,91,.9);color:#fff;font-style:normal;display:grid;place-items:center;font-size:14px}
+  .vth b{position:absolute;right:5px;bottom:5px;background:rgba(0,0,0,.8);color:#fff;font:600 10.5px var(--mono);padding:1px 5px;border-radius:3px}
+  .vcard .vt{font-size:13.5px;font-weight:700;line-height:1.4;padding:8px 10px 2px;color:var(--ink)}
+  .vcard .vc{font-size:11.5px;color:var(--muted);padding:0 10px}
+  .vcard .vd{font-size:12.5px;color:var(--ink-2);padding:3px 10px 10px}
+  @media print{ .vth{display:none} .vlist{grid-template-columns:1fr} }
+
   pre{white-space:pre-wrap;word-break:keep-all;font-family:var(--sans);font-size:13.5px}
   .mission.py{border-left-color:var(--ask)}
   .mission.py .mn{color:var(--ask)}
@@ -196,6 +213,7 @@
       <div class="box warn"><span class="lbl">주의</span>
         <p>실제로 받은 메시지를 넣을 때는 <strong>보낸 사람 이름·전화번호·단톡방 이름</strong>을 지우고 내용만 붙여 넣으세요.</p></div>
     </div>
+    <div class="vbox"><span class="lbl">📺 함께 보면 좋은 영상 — 미션을 마치고 남는 시간에</span><div class="vlist"><a class="vcard" href="https://www.youtube.com/watch?v=XSfXW27BEHU" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/XSfXW27BEHU/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>0:38</b></span><span class="vt">AI 영상 vs 실제 영상, 당신은 구분할 수 있나요?</span><span class="vc">미래나</span><span class="vd">38초 퀴즈 — 함께 맞혀 보기</span></a><a class="vcard" href="https://www.youtube.com/watch?v=6AcEyXUaAfY" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/6AcEyXUaAfY/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>4:59</b></span><span class="vt">가짜뉴스 구별하는 방법</span><span class="vc">생각의 감칠맛, 다시답</span><span class="vd">가짜뉴스의 특징과 확인 습관</span></a><a class="vcard" href="https://www.youtube.com/watch?v=5cm1iuQMS_4" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/5cm1iuQMS_4/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>0:58</b></span><span class="vt">가짜뉴스 구별법 눈여겨봐야 할 특징 3가지</span><span class="vc">경기도 지식 GSEEK</span><span class="vd">1분 요약</span></a></div></div>
   </section>
 
   <section>
@@ -236,6 +254,7 @@
       <div class="box warn"><span class="lbl">건강·금융·법률 정보</span>
         <p>AI 답은 참고용입니다. 접종·약·연금·계약 같은 내용은 <strong>보건소·해당 기관 누리집이나 전화</strong>로 최종 확인하세요.</p></div>
     </div>
+    <div class="vbox"><span class="lbl">📺 함께 보면 좋은 영상 — 미션을 마치고 남는 시간에</span><div class="vlist"><a class="vcard" href="https://www.youtube.com/watch?v=vZ1uRZk93dw" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/vZ1uRZk93dw/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>5:45</b></span><span class="vt">구글 검색을 넘어서는 AI의 등장? 퍼플렉시티 알아보기</span><span class="vc">디지털거북이</span><span class="vd">출처를 보여 주는 AI 검색</span></a></div></div>
   </section>
 
   <section>
@@ -281,6 +300,25 @@
         <div class="dlrow"><span class="k">바뀐 판정</span><span class="v">______<small>AI 도움 후 워크시트에서 새로 채운 칸</small></span></div>
       </div>
     </div>
+
+    <div class="mission py ai">
+      <div class="mhead"><span class="mn">AI × PYTHON A7 · 선택</span><h3>환각 탐정 — AI 답안지를 파이썬이 채점한다</h3></div>
+      
+      <p>정답을 이미 아는 질문 6개를 AI에게 내고, 파이썬이 <strong>답안지를 자동 채점</strong>합니다. 틀린 문제는 3차시의 <strong>사실 확인 3단계</strong>(출처 → 날짜 → 교차 확인)로 직접 바로잡습니다.</p>
+      <p><strong>쓰는 파이썬:</strong> 리스트 안의 튜플 · <code>for</code> · <code>in</code> 으로 정답 포함 여부 확인 · 정확도(%)</p>
+      <div class="nb"><b>📓 Colab 노트북</b>
+        <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit4_ai.ipynb" target="_blank" rel="noopener">Colab에서 열기</a>
+        <a href="../python/unit4_ai.ipynb" download>노트북 내려받기 (.ipynb)</a>
+        <small>Colab에서 열기가 안 되면: 내려받기 → colab.research.google.com → 파일 → 노트북 업로드. 구글 계정으로 로그인합니다.</small></div>
+      <ol>
+        <li><strong>A7-1</strong>: 문제와 정답 키워드를 확인합니다. 문제를 내 지역 · 관심사로 바꿔도 됩니다.</li>
+        <li><strong>A7-2 ✏️</strong>: 빈칸 한 줄 — 답에 정답 키워드가 들어 있으면 <code>맞힘</code>을 1 올립니다.</li>
+        <li><strong>A7-3</strong>: 정확도를 보고, 틀린 문제는 공식 사이트에서 확인해 실습지에 기록합니다.</li>
+      </ol>
+      <div class="box q"><span class="lbl">생각해 보기</span>
+        <p>키워드만 보는 채점은 완벽하지 않습니다. "아니요, 서울이 아니라…"처럼 <strong>부정문</strong>은 어떻게 될까요? 자동 채점도 결국 <strong>사람의 확인</strong>이 필요합니다.</p></div>
+    </div>
+    <div class="vbox"><span class="lbl">📺 함께 보면 좋은 영상 — 미션을 마치고 남는 시간에</span><div class="vlist"><a class="vcard" href="https://www.youtube.com/watch?v=p2XJ7iOGzyc" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/p2XJ7iOGzyc/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>4:19</b></span><span class="vt">[팩트체크넷] 쉽게 따라하는 팩트체크</span><span class="vc">팩트체크넷</span><span class="vd">출처 → 날짜 → 교차 확인</span></a></div></div>
   </section>
 
   <section>
@@ -342,6 +380,7 @@
       <div class="box warn"><span class="lbl">주의</span>
         <p>가족 암호의 <strong>답</strong>은 메모·단톡방·AI에 적지 마세요. 가족끼리 직접 말로만 정합니다.</p></div>
     </div>
+    <div class="vbox"><span class="lbl">📺 함께 보면 좋은 영상 — 미션을 마치고 남는 시간에</span><div class="vlist"><a class="vcard" href="https://www.youtube.com/watch?v=R_F4B4ByOuQ" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/R_F4B4ByOuQ/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>8:11</b></span><span class="vt">'이것'만 알면 절대 속지 않는다! 가짜 뉴스와 딥페이크 구별 꿀팁</span><span class="vc">디지털거북이</span><span class="vd">딥페이크를 알아보는 눈 기르기</span></a></div></div>
   </section>
 
   <section>
@@ -403,6 +442,23 @@
       <div class="box check"><span class="lbl">더 해 보기 (선택)</span>
         <p>음성으로 요약해 주는 기능이 보이면 만들어 들어 보세요. 만드는 데 몇 분 걸릴 수 있습니다.</p></div>
     </div>
+
+    <div class="mission py ai">
+      <div class="mhead"><span class="mn">AI × PYTHON A8 · 선택</span><h3>세 줄 요약 공장 — 기사 3개를 한 번에 요약하고 비교</h3></div>
+      
+      <p>5차시에 NotebookLM으로 자료를 요약했습니다. 이번에는 파이썬으로 <strong>기사 3개를 반복문으로 요약</strong>하고, 원문 대비 얼마나 줄었는지(%) 계산합니다. 마지막으로 세 기사의 <strong>공통점</strong>을 AI에게 묻습니다.</p>
+      <p><strong>쓰는 파이썬:</strong> 리스트 · <code>for</code> · <code>len()</code> · 비율 계산 · <code>round()</code></p>
+      <div class="nb"><b>📓 Colab 노트북</b>
+        <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit4_ai.ipynb" target="_blank" rel="noopener">Colab에서 열기</a>
+        <a href="../python/unit4_ai.ipynb" download>노트북 내려받기 (.ipynb)</a>
+        <small>Colab에서 열기가 안 되면: 내려받기 → colab.research.google.com → 파일 → 노트북 업로드. 구글 계정으로 로그인합니다.</small></div>
+      <ol>
+        <li><strong>A8-1</strong>: 예시 기사 3개를 확인합니다 (수업용으로 지어낸 짧은 글).</li>
+        <li><strong>A8-2 ✏️</strong>: 빈칸 한 줄 — 요약이 원문의 몇 %인지 계산합니다.</li>
+        <li><strong>A8-3</strong>: 세 요약을 합쳐 공통점과 출처 표기 예시를 만듭니다.</li>
+      </ol>
+    </div>
+    <div class="vbox"><span class="lbl">📺 함께 보면 좋은 영상 — 미션을 마치고 남는 시간에</span><div class="vlist"><a class="vcard" href="https://www.youtube.com/watch?v=xzrz_sbPTT4" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/xzrz_sbPTT4/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>18:25</b></span><span class="vt">구글 Notebook LM 무료 사용법 · 문서, 링크 요약 분석</span><span class="vc">디지털거북이</span><span class="vd">자료 여러 개를 한 번에 요약</span></a></div></div>
   </section>
 
   <section>
@@ -503,6 +559,7 @@
       <div class="box check"><span class="lbl">도전 문제 (선택)</span>
         <p>노트북 끝 <strong>도전</strong>: 데이터를 CSV로 저장해 <code>csv.DictReader</code>로 읽고, 증가율·같은 방향/반대 방향 달 수를 계산한 뒤 두 칸 그래프를 그립니다.</p></div>
     </div>
+    <div class="vbox"><span class="lbl">📺 함께 보면 좋은 영상 — 미션을 마치고 남는 시간에</span><div class="vlist"><a class="vcard" href="https://www.youtube.com/watch?v=hnn9oL_-WmA" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/hnn9oL_-WmA/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>5:09</b></span><span class="vt">구글시트 꼭 알아야 할 6가지 기초</span><span class="vc">오토시트</span><span class="vd">만들기 · 공유 · 복원</span></a></div></div>
   </section>
 
   <section>
@@ -574,6 +631,7 @@ AI 사용 : 없음.</pre>
       <div class="box check"><span class="lbl">제출 전 확인</span>
         <p>리포트에 내 전화번호·주소 같은 개인정보가 들어가 있지 않은지 확인하고, 공유 권한을 <strong>뷰어</strong>로 바꿔 과제로 제출합니다.</p></div>
     </div>
+    
   </section>
 
   <section>

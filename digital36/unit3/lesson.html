@@ -124,6 +124,23 @@
     .shead{gap:8px;flex-wrap:wrap}
   }
 
+  /* ---------- AI × PYTHON 미션 · 함께 볼 영상 ---------- */
+  .mission.py.ai{border-left-color:#7B3FC4}
+  .mission.py.ai .mn{color:#7B3FC4}
+  .vbox{margin:14px 0 4px;padding:12px 14px;border:1px dashed var(--line-strong);border-radius:6px;background:var(--surface)}
+  .vbox .lbl{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:#C2185B;margin-bottom:10px}
+  .vlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+  .vcard{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .vcard:hover{border-color:#C2185B}
+  .vth{position:relative;display:block;aspect-ratio:16/9;background:#111}
+  .vth img{width:100%;height:100%;object-fit:cover;display:block}
+  .vth i{position:absolute;inset:0;margin:auto;width:36px;height:36px;border-radius:50%;background:rgba(194,24,91,.9);color:#fff;font-style:normal;display:grid;place-items:center;font-size:14px}
+  .vth b{position:absolute;right:5px;bottom:5px;background:rgba(0,0,0,.8);color:#fff;font:600 10.5px var(--mono);padding:1px 5px;border-radius:3px}
+  .vcard .vt{font-size:13.5px;font-weight:700;line-height:1.4;padding:8px 10px 2px;color:var(--ink)}
+  .vcard .vc{font-size:11.5px;color:var(--muted);padding:0 10px}
+  .vcard .vd{font-size:12.5px;color:var(--ink-2);padding:3px 10px 10px}
+  @media print{ .vth{display:none} .vlist{grid-template-columns:1fr} }
+
 
   .form{width:100%;border-collapse:collapse;min-width:0;background:var(--surface);font-size:14px}
   .form th,.form td{border:1px solid var(--line-strong);padding:10px 12px;vertical-align:middle;text-align:left}
@@ -201,7 +218,8 @@
         <tr><td class="stage">도입</td><td><ul><li>2단원 좋은 질문 4요소(역할·상황·요청·형식) 확인 질문</li><li>"최근 쓰기 막막했던 글" 한 가지씩 말해 보기로 동기유발</li></ul></td><td class="min">5분</td></tr>
         <tr><td class="stage">전개</td><td><ul><li>AI 글쓰기 4단계(상황 → 초안 → 고치기 → 최종 확인) 설명</li><li>개인정보는 [이름]·[연락처] 빈칸으로 두는 원칙 안내</li><li>실습 미션 1 — 단체 문자와 관리사무소 이메일 초안 만들고 2번 다듬기</li><li>실습 미션 2 — 동아리 모집 안내문 만들기</li><li>실습 미션 3 — 경험 메모를 재료로 자기소개서 초안 만들고 지어낸 내용 찾아 지우기</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>잘 다듬어진 문자 2~3개 화면 공유, 어떤 요청으로 좋아졌는지 발표</li><li>다음 차시 예고 — 번역 앱 설치(파파고 또는 구글 번역) 안내</li></ul></td><td class="min">10분</td></tr>
-        
+        <tr><td class="stage">확장<br>(선택)</td><td><ul><li><strong>AI × 파이썬 A5</strong> AI 문서 공장 — 문자 3종을 한 번에 만들고 파일로 저장 — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit3_ai.ipynb" target="_blank" rel="noopener">Colab</a> · <a href="../python/unit3_ai.ipynb" download>노트북</a> · <a href="../python/answers/unit3_ai_answers.ipynb" download>답안</a></li></ul></td><td class="min">선택</td></tr>
+        <tr><td class="stage">영상<br>(참고)</td><td><ul><li><a href="https://www.youtube.com/watch?v=UbOnClyIW_U" target="_blank" rel="noopener">▶ AI로 메일 예쁘게 보내기 · 챗GPT + 클로드 활용법</a> <small>(윤자동 · 13:33)</small> — AI로 이메일 초안 쓰고 다듬기</li></ul></td><td class="min">선택</td></tr>
         <tr><th>교수방법</th><td colspan="2">강의 · 시연 · 실습</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 구글 계정, ChatGPT 또는 Gemini</td></tr>
         <tr><th>평가</th><td colspan="2">관찰 체크리스트 — 문서 3종 초안을 만들고 2번 이상 다듬었는가, 개인정보를 빈칸으로 처리했는가</td></tr>
@@ -220,6 +238,7 @@
         <tr><td class="stage">전개</td><td><ul><li>번역 도구 비교(글자·사진·대화 번역, AI 챗봇, AI 음성 대화)와 중요 서류 번역 시 주의점 설명</li><li>카메라 번역 시연 — 외국어 메뉴판 인쇄물 비추기</li><li>실습 미션 4 — 번역 앱 3가지 기능(입력·카메라·대화) 써 보기</li><li>실습 미션 5 — AI 음성 역할극: 호텔 체크인 또는 외국인 이웃 분리수거 안내, 짝과 역할 바꿔 한 번 더</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>AI가 고쳐 준 표현 중 기억할 문장 1개씩 발표</li><li>다음 차시 예고 — 집 냉장고 사진을 미리 찍어 오기(개인정보가 안 나오게)</li></ul></td><td class="min">10분</td></tr>
         
+        <tr><td class="stage">영상<br>(참고)</td><td><ul><li><a href="https://www.youtube.com/watch?v=VkDPChXI9ws" target="_blank" rel="noopener">▶ 파파고 번역기 사용법 — 텍스트 · 음성 · 대화 · 이미지 번역</a> <small>(디지털튜터_디튜킴 · 8:58)</small> — 여행 · 민원에서 바로 쓰는 번역</li><li><a href="https://www.youtube.com/watch?v=mzQAGRrJV4I" target="_blank" rel="noopener">▶ '이것'만 누르면 1초 만에 통역 끝! 구글 번역기 완전 정복</a> <small>(옆집언니TV · 11:11)</small> — 대화 통역 · 카메라 번역 · 오프라인</li></ul></td><td class="min">선택</td></tr>
         <tr><th>교수방법</th><td colspan="2">강의 · 시연 · 실습 · 역할극</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 이어폰(마이크 포함), 번역 앱, 외국어 메뉴판 인쇄물</td></tr>
         <tr><th>평가</th><td colspan="2">관찰 체크리스트 — 번역 기능 3가지를 사용했는가, 음성 역할극을 5번 이상 주고받았는가</td></tr>
@@ -237,7 +256,8 @@
         <tr><td class="stage">도입</td><td><ul><li>"오늘 저녁 뭐 먹지?" 질문으로 동기유발</li><li>지난 차시 사진(카메라 번역) 활용 경험 상기</li></ul></td><td class="min">5분</td></tr>
         <tr><td class="stage">전개</td><td><ul><li>냉장고 사진 레시피 4단계 — "알아본 재료 목록부터" 요령 시연</li><li>실습 미션 6 — 냉장고 사진으로 메뉴 3가지 받기</li><li>여행 일정 조건 넣기와 영업시간·교통 정보 재확인 원칙 설명</li><li>실습 미션 7 — 1박 2일 여행 일정표 만들고 계획 B 받기, 장소 1곳 공식 정보로 확인</li><li>실습 미션 8 — 건강정보 안전하게 묻기: 진료 전 질문 목록 만들기, 위험한 질문과 비교</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>여행 일정에서 AI 정보가 실제와 달랐던 사례 공유</li><li>건강·금융·공공서비스는 "AI 답은 참고용" 원칙 재확인, 다음 차시 예고</li></ul></td><td class="min">10분</td></tr>
-        
+        <tr><td class="stage">확장<br>(선택)</td><td><ul><li><strong>AI × 파이썬 A6</strong> AI 여행 예산 검산기 — AI의 계산을 믿지 말고 파이썬으로! — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit3_ai.ipynb" target="_blank" rel="noopener">Colab</a> · <a href="../python/unit3_ai.ipynb" download>노트북</a> · <a href="../python/answers/unit3_ai_answers.ipynb" download>답안</a></li></ul></td><td class="min">선택</td></tr>
+        <tr><td class="stage">영상<br>(참고)</td><td><ul><li><a href="https://www.youtube.com/watch?v=7I9VNukpPFk" target="_blank" rel="noopener">▶ 냉장고 사진 한 장으로 AI가 짜주는 '미슐랭 레시피'</a> <small>(직장인 납득이의 AI 생존기 · 6:51)</small> — 사진으로 묻는 생활 AI</li></ul></td><td class="min">선택</td></tr>
         <tr><th>교수방법</th><td colspan="2">강의 · 시연 · 실습</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 구글 계정, 냉장고 사진(또는 강사 제공 예시 사진), 지도 앱</td></tr>
         <tr><th>평가</th><td colspan="2">결과물 확인 — 여행 일정표를 만들고 1곳 이상 공식 정보로 확인했는가, 건강 질문을 진단 요청 없이 작성했는가</td></tr>
@@ -255,7 +275,8 @@
         <tr><td class="stage">도입</td><td><ul><li>"지난달 어디에 돈을 제일 많이 썼을까?" 짐작해 보기</li><li>지난 차시 "최신 정보는 공식 확인" 원칙 상기</li></ul></td><td class="min">5분</td></tr>
         <tr><td class="stage">전개</td><td><ul><li>가상 지출 메모로 분류표 만들기 시연, 합계 계산기 재확인</li><li>실습 미션 9 — 가상 지출 메모를 분류표로 만들고 계산기로 합계 검증, 이어서 내 지출 항목(금액만)으로 한 번 더</li><li>요금제 비교 4단계와 "없는 내용은 없음" 요청 설명</li><li>실습 미션 10 — 가상 요금제 3종 비교표 만들고, AI에게 투자 추천을 물었을 때의 답 살펴보며 한계 토의</li><li>금융 개인정보(계좌·카드번호·비밀번호) 금지 원칙 설명</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>AI가 계산을 틀렸던 사례가 있었는지 확인</li><li>다음 차시 예고 — 정부24·복지로 둘러보기</li></ul></td><td class="min">10분</td></tr>
-        <tr><td class="stage">확장<br>(선택)</td><td><ul><li><strong>파이썬 P6</strong> 지출 합계를 파이썬으로 검산하고, 요금제를 기간별로 비교하기 — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="../python/unit3_python.ipynb" download>노트북</a> · <a href="../python/answers/unit3_python_answers.ipynb" download>답안</a></li></ul></td><td class="min">선택</td></tr>
+        <tr><td class="stage">확장<br>(선택)</td><td><ul><li><strong>파이썬 P6</strong> 지출 합계를 파이썬으로 검산하고, 요금제를 기간별로 비교하기 — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit3_python.ipynb" target="_blank" rel="noopener">Colab</a> · <a href="../python/unit3_python.ipynb" download>노트북</a> · <a href="../python/answers/unit3_python_answers.ipynb" download>답안</a></li></ul></td><td class="min">선택</td></tr>
+        
         <tr><th>교수방법</th><td colspan="2">강의 · 시연 · 실습 · 토의</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰 계산기, 구글 계정, 가상 지출·요금제 자료(실습지)</td></tr>
         <tr><th>평가</th><td colspan="2">결과물 확인 — 분류표 합계를 계산기로 검증했는가, AI 금융 조언의 한계를 한 문장으로 말할 수 있는가</td></tr>
@@ -274,6 +295,7 @@
         <tr><td class="stage">전개</td><td><ul><li>정부24와 복지로의 역할 비교, 검색창 중심 찾기 요령(대상·내용·신청·문의처) 설명</li><li>실습 미션 11 — AI로 검색어 추천받고 복지로·정부24에서 지원제도 2개 찾아 표 채우기(로그인 없이 검색)</li><li>가상 공문서 쉽게 풀기 시연 — 할 일·기한·가져갈 것 표 만들기</li><li>실습 미션 12 — 가상 안내문을 쉬운 말로 풀고, AI 요약을 원문과 대조해 빠진 정보 찾기</li><li>확인 채널 안내 — 129, 110, 행정복지센터, 의심 문자는 118</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>찾은 지원제도 1개씩 발표(대상·문의처 중심)</li><li>다음 차시 예고 — Canva 가입을 위한 구글 계정 로그인 확인</li></ul></td><td class="min">10분</td></tr>
         
+        <tr><td class="stage">영상<br>(참고)</td><td><ul><li><a href="https://www.youtube.com/watch?v=-cHrBWyH4nY" target="_blank" rel="noopener">▶ 생활 39. 정부24 활용하기</a> <small>(AI디지털배움터 · 16:46)</small> — 민원서류 발급과 정부 서비스 찾기</li><li><a href="https://www.youtube.com/watch?v=061dp5xKpHM" target="_blank" rel="noopener">▶ 내가 받을 수 있는 복지혜택, 한 번에 검색하는법</a> <small>(캔들스토리TV · 4:37)</small> — 복지로에서 맞춤 혜택 찾기</li></ul></td><td class="min">선택</td></tr>
         <tr><th>교수방법</th><td colspan="2">강의 · 시연 · 실습</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 구글 계정, 가상 공문서 예시(실습지)</td></tr>
         <tr><th>평가</th><td colspan="2">결과물 확인 — 지원제도 2개의 대상·신청방법·문의처를 기록했는가, AI 요약을 원문과 대조했는가</td></tr>
@@ -292,6 +314,7 @@
         <tr><td class="stage">전개</td><td><ul><li>그림 주문 6요소(주제·분위기·스타일·색감·비율·넣지 말 것)와 무료 생성 횟수 제한 설명</li><li>실습 미션 13 — ChatGPT 또는 Gemini로 포스터 배경 그림 만들고 2번 고치기</li><li>Canva 로그인·템플릿 검색·왕관(유료) 표시 구별 시연</li><li>실습 미션 14 — Canva 템플릿에 AI 그림과 글자를 넣어 포스터 완성·다운로드</li><li>저작권·초상권·딥페이크 주의와 "AI 생성 이미지" 표기 설명</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>완성 포스터 갤러리 워크(서로 보고 좋은 점 1개 말하기)</li><li>다음 차시 예고 — 해결하고 싶은 생활 문제 1개 생각해 오기</li></ul></td><td class="min">10분</td></tr>
         
+        <tr><td class="stage">영상<br>(참고)</td><td><ul><li><a href="https://www.youtube.com/watch?v=DoTPYepN71g" target="_blank" rel="noopener">▶ 캔바 10분만에 기본기능 모두 마스터하기</a> <small>(스마트플립러닝연구회 · 8:14)</small> — 템플릿으로 포스터 만들기</li><li><a href="https://www.youtube.com/watch?v=iKqo9rht2JE" target="_blank" rel="noopener">▶ 사진 한 장으로 만드는 AI 추석 인사 카드 (챗GPT 활용)</a> <small>(디지털거북이 · 8:13)</small> — AI로 인사 카드 · 짧은 영상 만들기</li></ul></td><td class="min">선택</td></tr>
         <tr><th>교수방법</th><td colspan="2">강의 · 시연 · 실습 · 발표</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 구글 계정, ChatGPT 또는 Gemini, Canva(무료)</td></tr>
         <tr><th>평가</th><td colspan="2">결과물 확인 — 포스터를 완성해 저장했는가, 실제 인물 얼굴·남의 이미지를 쓰지 않았는가</td></tr>
@@ -309,6 +332,7 @@
         <tr><td class="stage">도입</td><td><ul><li>3단원 1~6차시 결과물 되돌아보기</li><li>해결할 생활 문제 한 문장으로 적기</li></ul></td><td class="min">5분</td></tr>
         <tr><td class="stage">전개</td><td><ul><li>문제→질문→결과→확인 4단계와 기록 예시 설명</li><li>실습 미션 15 — 해결 기록표 작성: 질문 2번 이상 다듬기, 결과 캡처, 확인 방법 기록</li><li>순회 지도 — 확인 단계와 개인정보 가림 여부 중점 점검</li><li>실습 미션 16 — 짝과 기록표 바꿔 읽고 확인 칸 점검, 1분 발표</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>잘된 기록 2~3개 발표와 피드백</li><li>단원 과제 안내 및 4단원(생성형 AI와 정보활용 능력) 예고</li></ul></td><td class="min">10분</td></tr>
+        
         
         <tr><th>교수방법</th><td colspan="2">실습 · 동료 점검 · 발표</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 구글 계정, 해결 기록표(실습지)</td></tr>

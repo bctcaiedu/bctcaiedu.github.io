@@ -56,6 +56,26 @@ const JS = {
   nav:  read('js/nav.tpl.js')
 };
 
+const VID = require('./videos.js');
+const ytThumb = id => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`;
+const ytUrl = id => `https://www.youtube.com/watch?v=${id}`;
+const vidsOf = (unit, no) => ((VID.units[unit] || {})[no] || []).filter(id => VID.V[id]);
+const vidCard = id => { const v = VID.V[id]; return `<a class="vcard" href="${ytUrl(id)}" target="_blank" rel="noopener"><span class="vth"><img src="${ytThumb(id)}" alt="" loading="lazy"><i>▶</i><b>${v.len}</b></span><span class="vt">${v.t}</span><span class="vc">${v.ch}${v.en ? ' · 영어' : ''}</span><span class="vd">${v.d}</span></a>`; };
+const vidLi = id => { const v = VID.V[id]; return `<li><a href="${ytUrl(id)}" target="_blank" rel="noopener">▶ ${v.t}</a> <small>(${v.ch} · ${v.len})</small> — ${v.d}</li>`; };
+const ORDINAL = ['첫 번째', '두 번째', '세 번째', '네 번째'];
+function vidSlide(D, no) {
+  const ids = vidsOf(D.unit, no);
+  if (!ids.length) return '';
+  const nar = `이번 차시 내용을 영상으로 한 번 더 볼까요? 화면의 영상을 누르면 유튜브에서 열립니다. ` +
+    ids.map((id, i) => `${ORDINAL[i]} 영상은 ${VID.V[id].d.replace(/[—·]/g, ',')} 입니다.`).join(' ') +
+    ` 수업이 끝난 뒤 복습할 때 보셔도 좋습니다.`;
+  return slide('', `
+    <div class="eb">Watch · ${no}차시 함께 볼 영상</div>
+    <h2>영상으로 더 알아보기</h2>
+    <div class="sub">영상을 누르면 유튜브에서 열립니다 · 수업 뒤 복습용으로도 좋아요</div>
+    <div class="fill"><div class="vgrid n${ids.length}">${ids.map(vidCard).join('')}</div></div>`, nar);
+}
+
 const META =
   '<meta charset="utf-8">\n' +
   '<meta name="viewport" content="width=device-width, initial-scale=1">';
@@ -130,8 +150,11 @@ function buildDeck(D) {
     </div></div>
     <div class="foot">1차시 = 50분 수업 + 10분 휴식 · 설명 15~20분, 실습 30~35분</div>`, D.blocksNar));
 
+  let secNo = 0;
   D.slides.forEach(s => {
     if (s.section) {
+      if (secNo > 0) { const vs = vidSlide(D, secNo); if (vs) S.push(vs); }
+      secNo++;
       S.push(slide('dk', `
     <div class="fill">
       <div class="eb">${s.eb || ''}</div>
@@ -148,6 +171,8 @@ function buildDeck(D) {
     ${s.foot ? `<div class="foot">${s.foot}</div>` : ''}`, s.nar));
     }
   });
+
+  { const vs = vidSlide(D, secNo); if (vs) S.push(vs); }
 
   S.push(slide('dk', `
     <div class="eb">Assignment ${pad(D.unit)} · ${D.assignment.due || '다음 수업 시작 전'}</div>
@@ -226,7 +251,8 @@ function pyRows(D, no) {
   const part = D.lab.parts[no - 1];
   const ms = part ? (part.missions || []).filter(m => m.py) : [];
   if (!ms.length) return '';
-  return `<tr><td class="stage">확장<br>(선택)</td><td><ul>${ms.map(m => `<li><strong>파이썬 ${m.n}</strong> ${m.h} — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="../python/${D.py.notebook.file}" download>노트북</a> · <a href="../python/answers/${answerName(D.py.notebook.file)}" download>답안</a></li>`).join('')}</ul></td><td class="min">선택</td></tr>`;
+  const nbOf = m => (m.ai ? D.ai : D.py).notebook.file;
+  return `<tr><td class="stage">확장<br>(선택)</td><td><ul>${ms.map(m => `<li><strong>${m.ai ? 'AI × 파이썬' : '파이썬'} ${m.n}</strong> ${m.h} — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="${colabUrl(nbOf(m))}" target="_blank" rel="noopener">Colab</a> · <a href="../python/${nbOf(m)}" download>노트북</a> · <a href="../python/answers/${answerName(nbOf(m))}" download>답안</a></li>`).join('')}</ul></td><td class="min">선택</td></tr>`;
 }
 
 /* =================================================================
@@ -265,6 +291,7 @@ function buildLesson(D, all) {
         <tr><td class="stage">전개</td><td>${li(L.main)}</td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td>${li(L.close)}</td><td class="min">10분</td></tr>
         ${pyRows(D, L.no)}
+        ${vidsOf(D.unit, L.no).length ? `<tr><td class="stage">영상<br>(참고)</td><td><ul>${vidsOf(D.unit, L.no).map(vidLi).join('')}</ul></td><td class="min">선택</td></tr>` : ''}
         <tr><th>교수방법</th><td colspan="2">${L.method}</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">${L.material}</td></tr>
         <tr><th>평가</th><td colspan="2">${L.eval}</td></tr>
@@ -325,10 +352,11 @@ function buildLab(D) {
       <div class="sbody">${s.body}</div>
     </div>`).join('\n')}
     ${(p.missions || []).map(m => `
-    <div class="mission${m.py ? ' py' : ''}">
-      <div class="mhead"><span class="mn">${m.py ? `PYTHON ${m.n} · 선택` : `MISSION ${pad(m.n)}`}</span><h3>${m.h}</h3></div>
+    <div class="mission${m.py ? ' py' : ''}${m.ai ? ' ai' : ''}">
+      <div class="mhead"><span class="mn">${m.ai ? `AI × PYTHON ${m.n} · 선택` : m.py ? `PYTHON ${m.n} · 선택` : `MISSION ${pad(m.n)}`}</span><h3>${m.h}</h3></div>
       ${m.body}
     </div>`).join('\n')}
+    ${(() => { const ids = vidsOf(D.unit, +String(p.pn).replace(/\D/g, '')); return ids.length ? `<div class="vbox"><span class="lbl">📺 함께 보면 좋은 영상 — 미션을 마치고 남는 시간에</span><div class="vlist">${ids.map(vidCard).join('')}</div></div>` : ''; })()}
   </section>`).join('\n');
 
   const errs = `
@@ -497,7 +525,7 @@ function buildPlan(all) {
     rows += `\n        <tr class="u"><td colspan="5">${U.unit}단원 · ${U.title} (${U.hours}시간)</td></tr>`;
     U.lesson.forEach(L => {
       const lab = U.lab.parts[L.no - 1];
-      const missions = lab ? (lab.missions || []).map(m => m.py ? `<em>(선택) 파이썬 ${m.n}: ${m.h}</em>` : m.h.replace(/ ★$/, '')).join(' / ') : '';
+      const missions = lab ? (lab.missions || []).map(m => m.py ? `<em>(선택) ${m.ai ? 'AI × 파이썬' : '파이썬'} ${m.n}: ${m.h}</em>` : m.h.replace(/ ★$/, '')).join(' / ') : '';
       rows += `\n        <tr><td class="c">${off + L.no}</td><td>${L.title}</td><td>${L.objective}</td><td>${missions}</td><td class="c">${L.method}</td></tr>`;
     });
   });
@@ -589,6 +617,21 @@ ${DOC_EXTRA}
 <script src="nav.js"></script>
 </html>
 `;
+}
+
+function aiSection(all) {
+  const U = all.filter(D => D.ai);
+  if (!U.length) return '';
+  const rows = U.map(D => `
+      <tr><td>${D.unit}단원</td><td>${D.ai.missions.map(m => `<b>${m.n}</b> ${m.h} <span class="mut">(${m.part}차시)</span>`).join('<br>')}</td>
+        <td class="act"><a href="${colabUrl(D.ai.notebook.file)}" target="_blank" rel="noopener">Colab</a><a href="python/${D.ai.notebook.file}" download>.ipynb</a></td></tr>`).join('');
+  return `<h2 class="sec">AI × 파이썬 실습 · 선택 · NEW</h2>
+  <p class="pyintro">파이썬에서 <b><code>AI("질문")</code> 한 줄로 생성형 AI를 직접 불러</b> 실험합니다. 같은 질문 3번 · 스미싱 판별 대결 · 프롬프트 조립기 · 기억하는 챗봇 · 문서 공장 · 예산 검산 · 환각 채점 · 요약 공장 · AI 비서 지침서 · 루틴 코치까지 단원마다 2개씩.
+  Colab 내장 AI → Gemini API 키 → <b>연습 모드</b> 순서로 자동 연결되어, 계정 사정과 관계없이 끝까지 실습할 수 있습니다.</p>
+  <div class="pytable ai"><table>
+    <thead><tr><th>단원</th><th>미션</th><th>노트북</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
 }
 
 function pySection(all) {
@@ -689,6 +732,13 @@ ${FONTS}
   @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .bonus.colab .dn{color:#6FB3DC}}
   :root[data-theme="dark"] .bonus.colab .dn{color:#6FB3DC}
   .colabsub{font-size:13.5px;margin:0 0 48px;color:var(--muted)}
+  .bonus.vids{border-left-color:#C2185B}
+  .bonus.vids:hover{border-color:#C2185B;box-shadow:0 4px 18px rgba(194,24,91,.10)}
+  .bonus.vids .dn{color:#C2185B}
+  .pytable.ai{border-left-color:#7B3FC4}
+  .pytable.ai .act a{border-color:#7B3FC4;color:#7B3FC4}
+  .pytable.ai .act a:first-child{background:#7B3FC4;color:#fff}
+  .pyintro code{font-family:var(--mono);font-size:.92em;background:var(--chip);padding:1px 5px;border-radius:3px}
   .colabsub a{color:var(--pine);font-weight:600}
   .bonus .chips i{font-style:normal;font-family:var(--mono);font-size:11px;padding:4px 9px;border-radius:4px;background:var(--chip);border:1px solid var(--line)}
   @media (max-width:760px){ .grid,.flow{grid-template-columns:1fr} header{padding:44px 0 38px} .wrap{padding:0 16px} }
@@ -722,6 +772,16 @@ ${FONTS}
 
   ${pySection(all)}
 
+  ${aiSection(all)}
+
+  <h2 class="sec">AI 트렌드 영상관 · NEW</h2>
+  <a class="bonus vids" href="videos.html">
+    <span class="dn">VIDEOS · AI 최신 트렌드 ${VID.trends.reduce((n, g) => n + g.ids.length, 0)}편 + 차시별 영상 ${Object.values(VID.units).reduce((n, u) => n + Object.values(u).reduce((m, a) => m + a.length, 0), 0)}편</span>
+    <b>요즘 AI는 어디까지 왔을까? — 유튜브로 보는 AI 트렌드와 수업 복습 영상</b>
+    <span class="bd">AI 에이전트 · 구글 I/O 2026 · 영상 생성 AI · 휴머노이드 로봇 · 바이브 코딩 · AI와 일자리. 단원 · 차시별로 고른 쉬운 한국어 영상도 함께 모았습니다.</span>
+    <span class="chips"><i>AI 에이전트</i><i>구글 I/O 2026</i><i>소라 · 비오</i><i>CES 2026 로봇</i><i>차시별 복습</i></span>
+  </a>
+
   <h2 class="sec">보너스 실습 · 게임형</h2>
   <a class="bonus" href="bonus.html">
     <span class="dn">BONUS · 미션 15개 + 파이썬 2개</span>
@@ -749,6 +809,108 @@ ${cards}
 /* =================================================================
    6-1. 보너스 실습지  (bonus.html) — 본문은 _src/bonus.html
    ================================================================= */
+function buildVideos(all) {
+  const card = id => { const v = VID.V[id]; return `<button class="vc" data-id="${id}"><span class="th"><img src="${ytThumb(id)}" alt="" loading="lazy"><i>▶</i><b>${v.len}</b></span><span class="t">${v.t}</span><span class="c">${v.ch}${v.en ? ' · 영어' : ''}</span><span class="d">${v.d}</span></button>`; };
+  const trends = VID.trends.map(g => `<h3>${g.h}</h3><div class="grid">${g.ids.filter(id => VID.V[id]).map(card).join('')}</div>`).join('\n');
+  const units = all.map(D => {
+    const u = VID.units[D.unit] || {};
+    const rows = Object.keys(u).map(Number).sort((a, b) => a - b).map(no => {
+      const L = D.lesson[no - 1];
+      return `<h4>${no}차시 · ${L ? L.title : ''}</h4><div class="grid">${u[no].filter(id => VID.V[id]).map(card).join('')}</div>`;
+    }).join('');
+    return `<section class="unit" id="u${D.unit}"><h3><a href="unit${D.unit}/index.html">UNIT ${pad(D.unit)} · ${D.title}</a></h3>${rows}</section>`;
+  }).join('\n');
+  const colabIds = ['KyJ56582gsc'];
+  return `<!doctype html>
+<html lang="ko">
+${META}
+<title>AI 트렌드 영상관 · ${COURSE}</title>
+${FONTS}
+<style>
+  :root{--ink:#0E1A15;--pine:#10684A;--rose:#C2185B;--light:#F4F7F4;--card:#fff;--title:#0E1A15;--body:#3A453E;--muted:#6C7A72;--line:#DBE2DC;--chip:#EDF1EC;
+        --mono:"IBM Plex Mono",ui-monospace,monospace;--sans:"IBM Plex Sans KR","Malgun Gothic",system-ui,sans-serif}
+  @media (prefers-color-scheme:dark){:root{--light:#0F1311;--card:#161C19;--title:#E7ECE8;--body:#C2CCC6;--muted:#94A29A;--line:#27302B;--chip:#1C2320}}
+  *{box-sizing:border-box} body{margin:0;background:var(--light);color:var(--body);font-family:var(--sans);line-height:1.6}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+  header{background:var(--ink);color:#fff;padding:54px 0 44px;margin-bottom:36px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:#F48FB1}
+  header h1{font-size:clamp(28px,4.4vw,44px);line-height:1.2;margin:12px 0 8px;letter-spacing:-.03em}
+  header p{color:#9FB3AA;margin:0;max-width:70ch}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+  .tabs a{font-family:var(--mono);font-size:12px;color:#fff;text-decoration:none;border:1px solid #2A3A32;border-radius:999px;padding:6px 13px}
+  .tabs a:hover{background:var(--rose);border-color:var(--rose)}
+  h2.sec{font-size:13px;font-family:var(--mono);letter-spacing:.14em;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;margin:40px 0 6px}
+  h3{font-size:20px;color:var(--title);letter-spacing:-.02em;margin:26px 0 12px} h3 a{color:inherit;text-decoration:none}
+  h4{font-size:14.5px;color:var(--pine);margin:18px 0 10px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+  .vc{all:unset;cursor:pointer;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;transition:.15s}
+  .vc:hover,.vc:focus-visible{border-color:var(--rose);box-shadow:0 6px 20px rgba(194,24,91,.12);transform:translateY(-2px)}
+  .th{position:relative;aspect-ratio:16/9;background:#111;display:block}
+  .th img{width:100%;height:100%;object-fit:cover;display:block}
+  .th i{position:absolute;inset:0;margin:auto;width:46px;height:46px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font-style:normal;display:grid;place-items:center;font-size:18px}
+  .th b{position:absolute;right:6px;bottom:6px;background:rgba(0,0,0,.78);color:#fff;font:600 11px var(--mono);padding:2px 6px;border-radius:4px}
+  .t{font-weight:700;color:var(--title);font-size:14.5px;line-height:1.4;padding:10px 12px 2px}
+  .c{font-size:12px;color:var(--muted);padding:0 12px}
+  .d{font-size:13px;padding:4px 12px 12px}
+  .note{font-size:13px;color:var(--muted);margin:6px 0 0}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
+  .modal.on{display:flex}
+  .mbox{width:min(960px,100%);background:#000;border-radius:10px;overflow:hidden}
+  .mbox iframe{width:100%;aspect-ratio:16/9;border:0;display:block}
+  .mbar{display:flex;gap:10px;align-items:center;padding:10px 12px;background:#111;color:#ddd;font-size:13.5px}
+  .mbar span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mbar a,.mbar button{color:#fff;background:var(--rose);border:0;border-radius:6px;padding:6px 11px;text-decoration:none;font:inherit;cursor:pointer}
+  .mbar button{background:#333}
+  footer{margin-top:56px;border-top:1px solid var(--line);padding:24px 0 48px;font-size:13px;color:var(--muted)}
+  @media (max-width:640px){.wrap{padding:0 16px} header{padding:40px 0 32px}}
+</style>
+
+<header><div class="wrap">
+  <div class="eyebrow">${ORG} · ${COURSE_LONG}</div>
+  <h1>AI 트렌드 영상관 📺</h1>
+  <p>요즘 AI가 어디까지 왔는지 보고, 수업에서 배운 내용을 영상으로 복습합니다. 영상을 누르면 이 화면에서 바로 재생되고, 재생이 안 되면 <b>유튜브에서 열기</b>를 누르세요.</p>
+  <div class="tabs"><a href="#trend">🔥 AI 트렌드</a>${all.map(D => `<a href="#u${D.unit}">${D.unit}단원</a>`).join('')}<a href="#colab">🐍 Colab</a></div>
+</div></header>
+
+<div class="wrap">
+  <h2 class="sec" id="trend">AI TRENDS · 2026</h2>
+  <p class="note">수업 시작 5분 "이번 주 AI 소식"이나 쉬는 시간에 함께 보기 좋은 영상입니다. 영상 속 서비스 · 가격 · 기능은 빠르게 바뀌니 최신 정보는 공식 사이트에서 확인하세요.</p>
+  ${trends}
+
+  <h2 class="sec">단원별 · 차시별 영상</h2>
+  ${units}
+
+  <h2 class="sec" id="colab">COLAB · 파이썬 실습 준비</h2>
+  <div class="grid">${colabIds.map(card).join('')}</div>
+</div>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true"><div class="mbox">
+  <iframe id="frame" title="유튜브 영상" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+  <div class="mbar"><span id="mtitle"></span><a id="mopen" target="_blank" rel="noopener">유튜브에서 열기</a><button id="mclose">닫기 ✕</button></div>
+</div></div>
+
+<footer><div class="wrap"><p>영상은 각 채널의 저작물입니다. 수업에서는 링크로 연결해 시청하며, 내려받거나 다시 올리지 않습니다. 영상이 사라졌다면 <code>_src/videos.js</code>에서 바꾸고 다시 빌드하세요.</p></div></footer>
+<script>
+  var M = document.getElementById('modal'), F = document.getElementById('frame');
+  document.addEventListener('click', function (e) {
+    var c = e.target.closest('.vc');
+    if (c) {
+      var id = c.dataset.id;
+      F.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0';
+      document.getElementById('mtitle').textContent = c.querySelector('.t').textContent;
+      document.getElementById('mopen').href = 'https://www.youtube.com/watch?v=' + id;
+      M.classList.add('on');
+      return;
+    }
+    if (e.target === M || e.target.id === 'mclose') { M.classList.remove('on'); F.src = ''; }
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { M.classList.remove('on'); F.src = ''; } });
+</script>
+<script src="nav.js"></script>
+</html>
+`;
+}
+
 function buildBonus() {
   const body = read('bonus.html')
     .replace(/^<!--[\s\S]*?-->\n/, '')
@@ -964,9 +1126,13 @@ function dedent(src) {
 
 function mergePython(D) {
   const f = path.join(SRC, 'python', `unit${D.unit}.js`);
-  if (!fs.existsSync(f)) return;
-  const P = require(f);
-  D.py = P;
+  if (fs.existsSync(f)) mergeOne(D, require(f), false);
+  const fa = path.join(SRC, 'python', `unit${D.unit}_ai.js`);
+  if (fs.existsSync(fa)) mergeOne(D, require(fa), true);
+}
+
+function mergeOne(D, P, isAI) {
+  if (isAI) D.ai = P; else D.py = P;
   const file = P.notebook.file;
   const nb = `<div class="nb"><b>📓 Colab 노트북</b>
         <a href="${colabUrl(file)}" target="_blank" rel="noopener">Colab에서 열기</a>
@@ -976,7 +1142,7 @@ function mergePython(D) {
     const part = D.lab.parts[m.part - 1];
     if (!part) { console.warn(`  ⚠ unit${D.unit} 파이썬 미션 ${m.n}: ${m.part}차시가 없습니다`); return; }
     part.missions = (part.missions || []).filter(x => x.n !== m.n);
-    part.missions.push({ n: m.n, h: m.h, py: true, body: m.body.replace('__NB__', nb) });
+    part.missions.push({ n: m.n, h: m.h, py: true, ai: isAI, body: m.body.replace('__NB__', nb) });
   });
 }
 
@@ -1009,11 +1175,11 @@ function buildNotebook(P, answer) {
 function writeNotebooks(all) {
   const dir = path.join(ROOT, 'python');
   fs.mkdirSync(path.join(dir, 'answers'), { recursive: true });
-  all.filter(D => D.py).forEach(D => {
-    const file = D.py.notebook.file;
-    fs.writeFileSync(path.join(dir, file), buildNotebook(D.py, false));
-    fs.writeFileSync(path.join(dir, 'answers', answerName(file)), buildNotebook(D.py, true));
-  });
+  all.forEach(D => [D.py, D.ai].filter(Boolean).forEach(P => {
+    const file = P.notebook.file;
+    fs.writeFileSync(path.join(dir, file), buildNotebook(P, false));
+    fs.writeFileSync(path.join(dir, 'answers', answerName(file)), buildNotebook(P, true));
+  }));
   fs.writeFileSync(path.join(dir, CB.notebook.file), buildNotebook(CB, false));
   fs.writeFileSync(path.join(dir, 'answers', answerName(CB.notebook.file)), buildNotebook(CB, true));
 }
@@ -1066,6 +1232,7 @@ fs.writeFileSync(path.join(ROOT, 'index.html'), buildIndex(all));
 fs.writeFileSync(path.join(ROOT, 'plan.html'), buildPlan(all));
 fs.writeFileSync(path.join(ROOT, 'nav.js'), buildNav(all));
 fs.writeFileSync(path.join(ROOT, 'bonus.html'), buildBonus());
+fs.writeFileSync(path.join(ROOT, 'videos.html'), buildVideos(all));
 fs.writeFileSync(path.join(ROOT, 'colab.html'), buildColabGuide());
 fs.writeFileSync(path.join(ROOT, 'colab_lesson.html'), buildColabLesson());
 writeNotebooks(all);

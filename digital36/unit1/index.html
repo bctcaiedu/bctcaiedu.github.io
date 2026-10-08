@@ -128,12 +128,27 @@
   .toast.show{display:block}
   @media (max-width:760px){ .bar .brand{width:100%;margin-bottom:4px} .cap p{font-size:13.5px} }
 
+  /* ---------- 영상 슬라이드 (videos.js) ---------- */
+  .vgrid{display:grid;gap:2.4cqw;margin-top:2.6cqh;align-items:start}
+  .vgrid.n1{grid-template-columns:minmax(0,48cqw)}
+  .vgrid.n2{grid-template-columns:repeat(2,1fr)}
+  .vgrid.n3{grid-template-columns:repeat(3,1fr)}
+  .vcard{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:#fff;border:1px solid #D6DFD8;border-radius:1.2cqh;overflow:hidden;transition:.15s}
+  .vcard:hover{border-color:var(--pine);transform:translateY(-.4cqh);box-shadow:0 1cqh 3cqh rgba(16,104,74,.15)}
+  .vth{position:relative;display:block;aspect-ratio:16/9;background:#111}
+  .vth img{width:100%;height:100%;object-fit:cover;display:block}
+  .vth i{position:absolute;inset:0;margin:auto;width:8cqh;height:8cqh;border-radius:50%;background:rgba(194,24,91,.9);color:#fff;font-style:normal;display:grid;place-items:center;font-size:3.4cqh}
+  .vth b{position:absolute;right:1cqh;bottom:1cqh;background:rgba(0,0,0,.8);color:#fff;font:600 1.8cqh var(--mono);padding:.3cqh .9cqh;border-radius:.6cqh}
+  .vcard .vt{font-size:2.5cqh;font-weight:700;line-height:1.35;padding:1.4cqh 1.6cqh .4cqh;color:var(--ink)}
+  .vcard .vc{font-size:1.9cqh;color:#6C7A72;padding:0 1.6cqh}
+  .vcard .vd{font-size:2.1cqh;color:#3A453E;padding:.6cqh 1.6cqh 1.6cqh}
+
 </style>
 
 <div class="bar">
   <span class="brand">UNIT 01 · 인공지능 시대의 디지털 리터러시 · 강의 슬라이드</span>
   <button id="prev" title="이전 (←)">◀</button>
-  <span class="count" id="count">1 / 34</span>
+  <span class="count" id="count">1 / 42</span>
   <button id="next" title="다음 (→)">▶</button>
   <button class="play" id="play" title="재생 / 정지 (Space)">▶ 재생</button>
   <button id="auto" class="on" title="나레이션이 끝나면 자동으로 다음 장">자동 진행</button>
@@ -246,6 +261,13 @@
     
   <div class="nar">이제 사전 디지털 역량 자가진단을 하겠습니다. 실습지에 열 문항이 있고, 문항마다 일점에서 오점 사이로 점수를 매깁니다. 일점은 전혀 못 한다, 이점은 도움이 있으면 한다, 삼점은 혼자 할 수 있다, 사점은 익숙하게 한다, 오점은 남에게 가르칠 수 있다입니다. 점수는 성적이 아니니 부담 갖지 마시고 솔직하게 적어 주세요. 오단원 마지막 시간에 똑같은 열 문항으로 다시 진단해서 얼마나 달라졌는지 비교합니다.</div>
 </section>
+<section class="slide">
+    <div class="eb">Watch · 1차시 함께 볼 영상</div>
+    <h2>영상으로 더 알아보기</h2>
+    <div class="sub">영상을 누르면 유튜브에서 열립니다 · 수업 뒤 복습용으로도 좋아요</div>
+    <div class="fill"><div class="vgrid n1"><a class="vcard" href="https://www.youtube.com/watch?v=x1vuS1iIVpk" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/x1vuS1iIVpk/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>3:34</b></span><span class="vt">디지털리터러시란 무엇인가?</span><span class="vc">CDL(디지털리터러시협회)</span><span class="vd">디지털 리터러시가 왜 필요한지 3분 만에 정리</span></a></div></div>
+  <div class="nar">이번 차시 내용을 영상으로 한 번 더 볼까요? 화면의 영상을 누르면 유튜브에서 열립니다. 첫 번째 영상은 디지털 리터러시가 왜 필요한지 3분 만에 정리 입니다. 수업이 끝난 뒤 복습할 때 보셔도 좋습니다.</div>
+</section>
 <section class="slide dk">
     <div class="fill">
       <div class="eb">2차시 · 50분</div>
@@ -300,6 +322,13 @@
     
   <div class="nar">이제 실습입니다. 내 하루를 아침부터 저녁까지 떠올리면서 인공지능이나 디지털 서비스를 쓴 순간을 찾아 적어 보세요. 아침 알람과 날씨 앱, 출근길 지도 앱의 도착 시간, 점심 키오스크 주문, 저녁의 쇼핑 추천과 유튜브 추천까지 생각보다 많을 겁니다. 최소 다섯 개를 찾아 주세요. 그리고 그중 하나는 편리한 점과 걱정되는 점을 함께 적어 봅니다. 걱정되는 점을 생각해 보는 것이 바로 디지털 리터러시의 시작입니다.</div>
 </section>
+<section class="slide">
+    <div class="eb">Watch · 2차시 함께 볼 영상</div>
+    <h2>영상으로 더 알아보기</h2>
+    <div class="sub">영상을 누르면 유튜브에서 열립니다 · 수업 뒤 복습용으로도 좋아요</div>
+    <div class="fill"><div class="vgrid n2"><a class="vcard" href="https://www.youtube.com/watch?v=HxEa4bOoNfU" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/HxEa4bOoNfU/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>3:12</b></span><span class="vt">취향을 저격하는 '추천 알고리즘'의 작동 원리</span><span class="vc">방송미디어통신위원회</span><span class="vd">유튜브·쇼핑 추천이 나를 아는 방법</span></a><a class="vcard" href="https://www.youtube.com/watch?v=iZgEq20potM" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/iZgEq20potM/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>2:09</b></span><span class="vt">키오스크 넘어 챗GPT까지…AI 배우는 어르신들</span><span class="vc">연합뉴스TV</span><span class="vd">일상에 들어온 AI, 배우는 사람들의 이야기</span></a></div></div>
+  <div class="nar">이번 차시 내용을 영상으로 한 번 더 볼까요? 화면의 영상을 누르면 유튜브에서 열립니다. 첫 번째 영상은 유튜브,쇼핑 추천이 나를 아는 방법 입니다. 두 번째 영상은 일상에 들어온 AI, 배우는 사람들의 이야기 입니다. 수업이 끝난 뒤 복습할 때 보셔도 좋습니다.</div>
+</section>
 <section class="slide dk">
     <div class="fill">
       <div class="eb">3차시 · 50분</div>
@@ -336,6 +365,13 @@
       <div class="banner" style="margin-top:2cqh">"링크가 있는 모든 사용자" = 링크를 받은 누구나 열 수 있음. 신분증·통장 사본은 이렇게 공유하지 마세요.</div></div>
     <div class="foot">메뉴 이름은 업데이트로 조금씩 달라질 수 있습니다.</div>
   <div class="nar">클라우드는 인터넷 위에 있는 내 서랍입니다. 파일을 올려 두면 피씨에서도, 스마트폰에서도, 다른 사람 컴퓨터에서도 로그인만 하면 꺼내 볼 수 있습니다. 구글 드라이브는 구글 계정마다 무료로 십오 기가바이트를 주는데, 지메일과 구글 포토와 함께 나눠 씁니다. 사용법은 네 단계입니다. 올리고, 어디서나 열고, 공유하고, 권한을 고릅니다. 여기서 가장 중요한 것이 권한입니다. 링크가 있는 모든 사용자로 바꾸면 링크를 받은 사람은 누구나 열 수 있습니다. 링크가 한 번 퍼지면 되돌리기 어려우니 신분증이나 통장 사본 같은 파일은 절대 이렇게 공유하지 마세요.</div>
+</section>
+<section class="slide">
+    <div class="eb">Watch · 3차시 함께 볼 영상</div>
+    <h2>영상으로 더 알아보기</h2>
+    <div class="sub">영상을 누르면 유튜브에서 열립니다 · 수업 뒤 복습용으로도 좋아요</div>
+    <div class="fill"><div class="vgrid n1"><a class="vcard" href="https://www.youtube.com/watch?v=CnR1OmToHHQ" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/CnR1OmToHHQ/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>5:29</b></span><span class="vt">5분만에 배우는 구글드라이브 사용법 · 공유 링크 만들기</span><span class="vc">캡틴스튜디오</span><span class="vd">업로드 · 폴더 · 링크 공유를 한 번에</span></a></div></div>
+  <div class="nar">이번 차시 내용을 영상으로 한 번 더 볼까요? 화면의 영상을 누르면 유튜브에서 열립니다. 첫 번째 영상은 업로드 , 폴더 , 링크 공유를 한 번에 입니다. 수업이 끝난 뒤 복습할 때 보셔도 좋습니다.</div>
 </section>
 <section class="slide dk">
     <div class="fill">
@@ -397,6 +433,13 @@
     
   <div class="nar">검색 결과 맨 위에 있다고 가장 정확한 정보는 아닙니다. 광고일 수도 있고 오래된 글일 수도 있습니다. 다섯 가지를 확인하세요. 누가 썼는지, 언제 썼는지, 근거가 있는지, 무언가를 팔려는 글인지, 그리고 다른 출처에서도 같은 내용이 나오는지입니다. 주소에 지오 점 케이알이 붙으면 정부 기관, 에이씨 점 케이알이면 대학입니다. 반대로 출처 없는 캡처 이미지, 협찬 받은 후기, 날짜가 없는 글은 한 번 더 의심해 보세요. 이 다섯 가지 확인은 앞으로 인공지능의 답을 확인할 때도 그대로 씁니다.</div>
 </section>
+<section class="slide">
+    <div class="eb">Watch · 4차시 함께 볼 영상</div>
+    <h2>영상으로 더 알아보기</h2>
+    <div class="sub">영상을 누르면 유튜브에서 열립니다 · 수업 뒤 복습용으로도 좋아요</div>
+    <div class="fill"><div class="vgrid n2"><a class="vcard" href="https://www.youtube.com/watch?v=D_afoqG2tJ8" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/D_afoqG2tJ8/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>1:00</b></span><span class="vt">진짜 제대로 검색하는 방법</span><span class="vc">1분만</span><span class="vd">1분 만에 배우는 검색 꿀팁</span></a><a class="vcard" href="https://www.youtube.com/watch?v=z5DiUvToPAM" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/z5DiUvToPAM/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>3:01</b></span><span class="vt">[검색 잘하는 법] 검색 연산자와 상세검색</span><span class="vc">대멀쌤</span><span class="vd">큰따옴표 · 빼기 · site: 연산자</span></a></div></div>
+  <div class="nar">이번 차시 내용을 영상으로 한 번 더 볼까요? 화면의 영상을 누르면 유튜브에서 열립니다. 첫 번째 영상은 1분 만에 배우는 검색 꿀팁 입니다. 두 번째 영상은 큰따옴표 , 빼기 , site: 연산자 입니다. 수업이 끝난 뒤 복습할 때 보셔도 좋습니다.</div>
+</section>
 <section class="slide dk">
     <div class="fill">
       <div class="eb">5차시 · 50분</div>
@@ -454,6 +497,13 @@
     
   <div class="nar">다음 단어 맞히기 원리를 알면 인공지능의 장단점이 저절로 보입니다. 장점은 말을 아주 자연스럽게 한다는 것입니다. 요약, 번역, 글 다듬기에 뛰어납니다. 그런데 인공지능은 맞는 말이 아니라 그럴듯한 말을 고릅니다. 그래서 자신 있는 말투로 틀린 내용을 말할 때가 있는데, 이것을 환각이라고 부릅니다. 또 학습이 끝난 뒤에 생긴 일은 모를 수 있습니다. 그러니 건강, 돈, 법률처럼 중요한 문제는 인공지능의 답을 참고만 하고, 최종 판단은 반드시 전문가나 공식 기관에 확인하세요. 이 원칙은 과정 내내 반복하겠습니다.</div>
 </section>
+<section class="slide">
+    <div class="eb">Watch · 5차시 함께 볼 영상</div>
+    <h2>영상으로 더 알아보기</h2>
+    <div class="sub">영상을 누르면 유튜브에서 열립니다 · 수업 뒤 복습용으로도 좋아요</div>
+    <div class="fill"><div class="vgrid n2"><a class="vcard" href="https://www.youtube.com/watch?v=HnvitMTkXro" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/HnvitMTkXro/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>7:54</b></span><span class="vt">LLM 설명 (요약버전)</span><span class="vc">3Blue1Brown 한국어</span><span class="vd">챗GPT가 다음 단어를 고르는 원리를 그림으로</span></a><a class="vcard" href="https://www.youtube.com/watch?v=jPs3n9Vou9c" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/jPs3n9Vou9c/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>6:30</b></span><span class="vt">이 영상 하나면 '인공지능', '머신러닝', '딥러닝' 이해가 됩니다</span><span class="vc">메타코드M</span><span class="vd">AI · 머신러닝 · 딥러닝의 관계 6분 정리</span></a></div></div>
+  <div class="nar">이번 차시 내용을 영상으로 한 번 더 볼까요? 화면의 영상을 누르면 유튜브에서 열립니다. 첫 번째 영상은 챗GPT가 다음 단어를 고르는 원리를 그림으로 입니다. 두 번째 영상은 AI , 머신러닝 , 딥러닝의 관계 6분 정리 입니다. 수업이 끝난 뒤 복습할 때 보셔도 좋습니다.</div>
+</section>
 <section class="slide dk">
     <div class="fill">
       <div class="eb">6차시 · 50분</div>
@@ -495,6 +545,13 @@
       <div class="banner" style="margin-top:2cqh">로그인은 본인 구글 계정으로. 옆 사람 계정이나 공용 PC 자동 로그인은 사용하지 마세요.</div></div>
     
   <div class="nar">이제 비교 실습입니다. 먼저 스마트폰에 챗지피티와 제미나이 앱을 설치하고 구글 계정으로 로그인합니다. 나머지 세 개는 피씨 인터넷 창에서 주소를 입력해 열어도 됩니다. 그다음 똑같은 질문을 복사해서 모든 인공지능에게 붙여 넣습니다. 하나는 생활 질문, 하나는 오늘 날씨처럼 최신 정보가 필요한 질문입니다. 답을 받으면 네 가지 기준으로 비교합니다. 이해하기 쉬운지, 구체적인지, 출처가 있는지, 최신 정보인지입니다. 어느 인공지능이 가장 좋다는 정답은 없습니다. 목적에 따라 골라 쓰는 눈을 기르는 것이 오늘의 목표입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Watch · 6차시 함께 볼 영상</div>
+    <h2>영상으로 더 알아보기</h2>
+    <div class="sub">영상을 누르면 유튜브에서 열립니다 · 수업 뒤 복습용으로도 좋아요</div>
+    <div class="fill"><div class="vgrid n1"><a class="vcard" href="https://www.youtube.com/watch?v=fgeGwHyL2S4" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/fgeGwHyL2S4/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>12:12</b></span><span class="vt">AI툴 4대장 비교 총정리 (GPT·Gemini·Claude·Copilot)</span><span class="vc">AI 전환공식 김건우</span><span class="vd">어떤 AI를 언제 쓰면 좋을까</span></a></div></div>
+  <div class="nar">이번 차시 내용을 영상으로 한 번 더 볼까요? 화면의 영상을 누르면 유튜브에서 열립니다. 첫 번째 영상은 어떤 AI를 언제 쓰면 좋을까 입니다. 수업이 끝난 뒤 복습할 때 보셔도 좋습니다.</div>
 </section>
 <section class="slide dk">
     <div class="fill">
@@ -549,6 +606,13 @@
     
   <div class="nar">이제는 인공지능으로 목소리와 얼굴까지 흉내 내는 사기가 나왔습니다. 짧은 음성이나 영상만 있어도 비슷한 목소리를 만들어 낼 수 있기 때문입니다. 딸의 목소리로 사고가 났으니 돈을 보내 달라고 하거나, 영상통화 속 지인이 투자를 권하기도 합니다. 대처는 세 단계입니다. 먼저 멈추세요. 급하다, 아무한테도 말하지 말라는 말은 사기의 신호입니다. 그다음 전화를 끊고, 내 휴대폰에 저장된 번호로 직접 다시 걸어 확인하세요. 그리고 오늘 집에 가시면 가족끼리만 아는 확인 질문을 하나 정해 두세요. 이것이 가장 간단하고 확실한 방법입니다.</div>
 </section>
+<section class="slide">
+    <div class="eb">Watch · 7차시 함께 볼 영상</div>
+    <h2>영상으로 더 알아보기</h2>
+    <div class="sub">영상을 누르면 유튜브에서 열립니다 · 수업 뒤 복습용으로도 좋아요</div>
+    <div class="fill"><div class="vgrid n3"><a class="vcard" href="https://www.youtube.com/watch?v=DMJ0Jrxu_Oo" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/DMJ0Jrxu_Oo/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>1:30</b></span><span class="vt">"올 것이 왔다"…결국 터진 AI 보이스피싱</span><span class="vc">비디오머그 - VIDEOMUG</span><span class="vd">가족 목소리를 흉내 내는 AI 사기</span></a><a class="vcard" href="https://www.youtube.com/watch?v=gmcR0BxxeLg" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/gmcR0BxxeLg/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>2:43</b></span><span class="vt">보이스피싱, 문자스미싱 차단방법! 무조건 설정하세요!</span><span class="vc">랜선효도</span><span class="vd">스마트폰 설정으로 스미싱 막기</span></a><a class="vcard" href="https://www.youtube.com/watch?v=Q-qhcrBgHiI" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/Q-qhcrBgHiI/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>6:12</b></span><span class="vt">구글 2단계 인증 설정하는 방법 (모바일 기준)</span><span class="vc">마케팅길라잡이</span><span class="vd">내 계정을 지키는 가장 쉬운 방법</span></a></div></div>
+  <div class="nar">이번 차시 내용을 영상으로 한 번 더 볼까요? 화면의 영상을 누르면 유튜브에서 열립니다. 첫 번째 영상은 가족 목소리를 흉내 내는 AI 사기 입니다. 두 번째 영상은 스마트폰 설정으로 스미싱 막기 입니다. 세 번째 영상은 내 계정을 지키는 가장 쉬운 방법 입니다. 수업이 끝난 뒤 복습할 때 보셔도 좋습니다.</div>
+</section>
 <section class="slide dk">
     <div class="fill">
       <div class="eb">8차시 · 50분</div>
@@ -588,6 +652,13 @@
       <div class="bannerG" style="margin-top:2cqh">토론 규칙 — 정답 맞히기가 아닙니다. "왜 그렇게 생각하는지" 이유를 말하고, 다른 의견은 끝까지 듣기</div></div>
     
   <div class="nar">이제 모둠 토론입니다. 네 가지 사례가 있습니다. 동창회 포스터에 유명 캐릭터 그림을 넣은 경우, 돌아가신 부모님 사진으로 인공지능 영상을 만든 경우, 정치인 합성 영상을 재미로 퍼 나른 경우, 그리고 인공지능 면접이 특정 나이대에게 낮은 점수를 준 경우입니다. 모둠별로 하나를 골라서 괜찮다, 문제다, 조건에 따라 다르다 중 하나를 정하고 이유를 정리해 주세요. 두 번째 사례처럼 같은 행동도 가족끼리만 보느냐, 전체 공개하느냐에 따라 판단이 달라질 수 있습니다. 정답을 맞히는 시간이 아니라 이유를 말하고 듣는 시간입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Watch · 8차시 함께 볼 영상</div>
+    <h2>영상으로 더 알아보기</h2>
+    <div class="sub">영상을 누르면 유튜브에서 열립니다 · 수업 뒤 복습용으로도 좋아요</div>
+    <div class="fill"><div class="vgrid n2"><a class="vcard" href="https://www.youtube.com/watch?v=OQE6a1cfgsM" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/OQE6a1cfgsM/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>9:39</b></span><span class="vt">진짜같은 가짜, 딥페이크 직접 제작해보니…</span><span class="vc">KBS News</span><span class="vd">딥페이크는 얼마나 쉽게 만들어질까</span></a><a class="vcard" href="https://www.youtube.com/watch?v=IMYOSuQw2mE" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/IMYOSuQw2mE/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>2:22</b></span><span class="vt">'AI 그림도 저작권이 있을까요?'</span><span class="vc">MBC경남 NEWS</span><span class="vd">AI 창작물과 저작권 퀴즈</span></a></div></div>
+  <div class="nar">이번 차시 내용을 영상으로 한 번 더 볼까요? 화면의 영상을 누르면 유튜브에서 열립니다. 첫 번째 영상은 딥페이크는 얼마나 쉽게 만들어질까 입니다. 두 번째 영상은 AI 창작물과 저작권 퀴즈 입니다. 수업이 끝난 뒤 복습할 때 보셔도 좋습니다.</div>
 </section>
 <section class="slide dk">
     <div class="eb">Assignment 01 · 다음 수업 시작 전</div>
@@ -765,7 +836,7 @@
     else if (e.key === 'Home'){ go(-idx); }
     else if (e.key === 'End'){ go(slides.length-1-idx); }
   });
-  $('stage').addEventListener('click', e => { if (e.clientX > window.innerWidth/2) go(1); else go(-1); });
+  $('stage').addEventListener('click', e => { if (e.target.closest('a, button, iframe')) return; if (e.clientX > window.innerWidth/2) go(1); else go(-1); });
   window.addEventListener('beforeunload', () => { try{ synth.cancel(); }catch(e){} });
   window.deckGo = n => { const was = playing; stop(); show(n); if (was) setTimeout(startSpeaking, 150); };
 })();

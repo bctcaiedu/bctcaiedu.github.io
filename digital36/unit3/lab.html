@@ -124,6 +124,23 @@
     .shead{gap:8px;flex-wrap:wrap}
   }
 
+  /* ---------- AI × PYTHON 미션 · 함께 볼 영상 ---------- */
+  .mission.py.ai{border-left-color:#7B3FC4}
+  .mission.py.ai .mn{color:#7B3FC4}
+  .vbox{margin:14px 0 4px;padding:12px 14px;border:1px dashed var(--line-strong);border-radius:6px;background:var(--surface)}
+  .vbox .lbl{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:#C2185B;margin-bottom:10px}
+  .vlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+  .vcard{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .vcard:hover{border-color:#C2185B}
+  .vth{position:relative;display:block;aspect-ratio:16/9;background:#111}
+  .vth img{width:100%;height:100%;object-fit:cover;display:block}
+  .vth i{position:absolute;inset:0;margin:auto;width:36px;height:36px;border-radius:50%;background:rgba(194,24,91,.9);color:#fff;font-style:normal;display:grid;place-items:center;font-size:14px}
+  .vth b{position:absolute;right:5px;bottom:5px;background:rgba(0,0,0,.8);color:#fff;font:600 10.5px var(--mono);padding:1px 5px;border-radius:3px}
+  .vcard .vt{font-size:13.5px;font-weight:700;line-height:1.4;padding:8px 10px 2px;color:var(--ink)}
+  .vcard .vc{font-size:11.5px;color:var(--muted);padding:0 10px}
+  .vcard .vd{font-size:12.5px;color:var(--ink-2);padding:3px 10px 10px}
+  @media print{ .vth{display:none} .vlist{grid-template-columns:1fr} }
+
   pre{white-space:pre-wrap;word-break:keep-all;font-family:var(--sans);font-size:13.5px}
   .mission.py{border-left-color:var(--ask)}
   .mission.py .mn{color:var(--ask)}
@@ -215,6 +232,23 @@
       <div class="box q"><span class="lbl">생각해 보기</span>
         <p>AI가 쓴 자기소개서를 그대로 내면 면접에서 어떤 일이 생길까요? 내 말투와 다른 문장을 1개 찾아 고쳐 보세요.</p></div>
     </div>
+
+    <div class="mission py ai">
+      <div class="mhead"><span class="mn">AI × PYTHON A5 · 선택</span><h3>AI 문서 공장 — 문자 3종을 한 번에 만들고 파일로 저장</h3></div>
+      
+      <p>1차시에 하나씩 만들었던 생활 문서를 <strong>반복문으로 한꺼번에</strong> 만듭니다. 상황 목록만 바꾸면 초대 문자 · 감사 문자 · 사과 문자가 줄줄이 나오고, 결과를 <strong>텍스트 파일</strong>로 저장해 내려받습니다.</p>
+      <p><strong>쓰는 파이썬:</strong> 딕셔너리 · <code>for</code> · f-문자열 · 파일 쓰기 <code>with open()</code></p>
+      <div class="nb"><b>📓 Colab 노트북</b>
+        <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit3_ai.ipynb" target="_blank" rel="noopener">Colab에서 열기</a>
+        <a href="../python/unit3_ai.ipynb" download>노트북 내려받기 (.ipynb)</a>
+        <small>Colab에서 열기가 안 되면: 내려받기 → colab.research.google.com → 파일 → 노트북 업로드. 구글 계정으로 로그인합니다.</small></div>
+      <ol>
+        <li><strong>A5-1</strong>: <code>상황들</code> 딕셔너리의 내용을 내 상황으로 바꿉니다.</li>
+        <li><strong>A5-2 ✏️</strong>: 빈칸 한 줄 — 만든 문서를 <code>결과</code> 딕셔너리에 저장합니다.</li>
+        <li><strong>A5-3</strong>: <code>내문서.txt</code>로 저장하고 왼쪽 📁 파일 탭에서 내려받습니다. 보내기 전에 <strong>사실 · 날짜 · 이름</strong>을 직접 고칩니다.</li>
+      </ol>
+    </div>
+    <div class="vbox"><span class="lbl">📺 함께 보면 좋은 영상 — 미션을 마치고 남는 시간에</span><div class="vlist"><a class="vcard" href="https://www.youtube.com/watch?v=UbOnClyIW_U" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/UbOnClyIW_U/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>13:33</b></span><span class="vt">AI로 메일 예쁘게 보내기 · 챗GPT + 클로드 활용법</span><span class="vc">윤자동</span><span class="vd">AI로 이메일 초안 쓰고 다듬기</span></a></div></div>
   </section>
 
   <section>
@@ -264,6 +298,7 @@
       <div class="box check"><span class="lbl">확인</span>
         <p>AI가 고쳐 준 표현 중 <strong>꼭 기억할 문장 1개</strong>를 적어 두세요. 정리 시간에 발표합니다.</p></div>
     </div>
+    <div class="vbox"><span class="lbl">📺 함께 보면 좋은 영상 — 미션을 마치고 남는 시간에</span><div class="vlist"><a class="vcard" href="https://www.youtube.com/watch?v=VkDPChXI9ws" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/VkDPChXI9ws/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>8:58</b></span><span class="vt">파파고 번역기 사용법 — 텍스트 · 음성 · 대화 · 이미지 번역</span><span class="vc">디지털튜터_디튜킴</span><span class="vd">여행 · 민원에서 바로 쓰는 번역</span></a><a class="vcard" href="https://www.youtube.com/watch?v=mzQAGRrJV4I" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/mzQAGRrJV4I/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>11:11</b></span><span class="vt">'이것'만 누르면 1초 만에 통역 끝! 구글 번역기 완전 정복</span><span class="vc">옆집언니TV</span><span class="vd">대화 통역 · 카메라 번역 · 오프라인</span></a></div></div>
   </section>
 
   <section>
@@ -326,6 +361,25 @@
       <div class="box warn"><span class="lbl">꼭 기억하세요</span>
         <p>AI 답은 <strong>참고용</strong>입니다. 병명·약 복용·치료 결정은 <strong>의사·약사·보건소</strong>에서 확인합니다. 진료기록 원문, 처방전 사진의 이름·주민번호는 올리지 마세요. 갑자기 심하게 아프면 AI가 아니라 <strong>119</strong>입니다.</p></div>
     </div>
+
+    <div class="mission py ai">
+      <div class="mhead"><span class="mn">AI × PYTHON A6 · 선택</span><h3>AI 여행 예산 검산기 — AI의 계산을 믿지 말고 파이썬으로!</h3></div>
+      
+      <p>AI에게 1박 2일 여행 예산표를 <strong>"항목,금액" 형식</strong>으로 받아, 파이썬이 한 줄씩 읽어 <strong>직접 합계</strong>를 냅니다. AI가 말한 총액과 파이썬 계산이 같은지 비교해 보세요. 생성형 AI는 <strong>계산에서 종종 틀립니다.</strong></p>
+      <p><strong>쓰는 파이썬:</strong> 문자열 <code>split("\n")</code> · <code>split(",")</code> · <code>int()</code> · 누적 합계 · <code>if</code></p>
+      <div class="nb"><b>📓 Colab 노트북</b>
+        <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit3_ai.ipynb" target="_blank" rel="noopener">Colab에서 열기</a>
+        <a href="../python/unit3_ai.ipynb" download>노트북 내려받기 (.ipynb)</a>
+        <small>Colab에서 열기가 안 되면: 내려받기 → colab.research.google.com → 파일 → 노트북 업로드. 구글 계정으로 로그인합니다.</small></div>
+      <ol>
+        <li><strong>A6-1</strong>: AI에게 예산표를 정해진 형식으로 요청합니다.</li>
+        <li><strong>A6-2 ✏️</strong>: 빈칸 한 줄 — 금액을 숫자로 바꿔 <code>합계</code>에 더합니다.</li>
+        <li><strong>A6-3</strong>: AI가 적은 "총액"과 파이썬 합계를 비교하고, 예산 한도를 넘는지 검사합니다.</li>
+      </ol>
+      <div class="box check"><span class="lbl">확인</span>
+        <p>AI의 숫자 · 날짜 · 가격은 <strong>반드시 다시 계산하고, 공식 사이트에서 확인</strong>합니다. 이것이 "AI 답 검증"의 기본입니다.</p></div>
+    </div>
+    <div class="vbox"><span class="lbl">📺 함께 보면 좋은 영상 — 미션을 마치고 남는 시간에</span><div class="vlist"><a class="vcard" href="https://www.youtube.com/watch?v=7I9VNukpPFk" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/7I9VNukpPFk/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>6:51</b></span><span class="vt">냉장고 사진 한 장으로 AI가 짜주는 '미슐랭 레시피'</span><span class="vc">직장인 납득이의 AI 생존기</span><span class="vd">사진으로 묻는 생활 AI</span></a></div></div>
   </section>
 
   <section>
@@ -410,6 +464,7 @@
       <div class="box check"><span class="lbl">도전 문제 (선택)</span>
         <p>노트북 끝 <strong>도전</strong>: 지출 메모를 CSV 파일로 저장·읽기 → 항목 이름으로 <strong>자동 분류</strong>하는 함수 → 딕셔너리로 분류별 합계 → matplotlib 그래프.</p></div>
     </div>
+    
   </section>
 
   <section>
@@ -467,6 +522,7 @@
       <div class="box warn"><span class="lbl">실제 안내문을 쓸 때</span>
         <p>사진을 올리기 전에 <strong>이름·주소·주민번호·계좌번호</strong>를 가리거나 잘라 내세요. 지원 자격이 되는지는 AI가 아니라 담당 기관이 판단합니다. 의심스러운 문자는 <strong>118</strong>에 상담하세요.</p></div>
     </div>
+    <div class="vbox"><span class="lbl">📺 함께 보면 좋은 영상 — 미션을 마치고 남는 시간에</span><div class="vlist"><a class="vcard" href="https://www.youtube.com/watch?v=-cHrBWyH4nY" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/-cHrBWyH4nY/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>16:46</b></span><span class="vt">생활 39. 정부24 활용하기</span><span class="vc">AI디지털배움터</span><span class="vd">민원서류 발급과 정부 서비스 찾기</span></a><a class="vcard" href="https://www.youtube.com/watch?v=061dp5xKpHM" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/061dp5xKpHM/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>4:37</b></span><span class="vt">내가 받을 수 있는 복지혜택, 한 번에 검색하는법</span><span class="vc">캔들스토리TV</span><span class="vd">복지로에서 맞춤 혜택 찾기</span></a></div></div>
   </section>
 
   <section>
@@ -515,6 +571,7 @@
       <div class="box q"><span class="lbl">생각해 보기</span>
         <p>동호회 회원들의 단체 사진을 포스터에 넣고 싶다면, 넣기 전에 무엇을 해야 할까요?</p></div>
     </div>
+    <div class="vbox"><span class="lbl">📺 함께 보면 좋은 영상 — 미션을 마치고 남는 시간에</span><div class="vlist"><a class="vcard" href="https://www.youtube.com/watch?v=DoTPYepN71g" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/DoTPYepN71g/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>8:14</b></span><span class="vt">캔바 10분만에 기본기능 모두 마스터하기</span><span class="vc">스마트플립러닝연구회</span><span class="vd">템플릿으로 포스터 만들기</span></a><a class="vcard" href="https://www.youtube.com/watch?v=iKqo9rht2JE" target="_blank" rel="noopener"><span class="vth"><img src="https://i.ytimg.com/vi/iKqo9rht2JE/mqdefault.jpg" alt="" loading="lazy"><i>▶</i><b>8:13</b></span><span class="vt">사진 한 장으로 만드는 AI 추석 인사 카드 (챗GPT 활용)</span><span class="vc">디지털거북이</span><span class="vd">AI로 인사 카드 · 짧은 영상 만들기</span></a></div></div>
   </section>
 
   <section>
@@ -563,6 +620,7 @@
       <div class="box check"><span class="lbl">과제 안내</span>
         <p>오늘 기록표에 이번 단원 결과물 1개(문서 · 여행 일정표 · 지출 분류표 · 포스터 중 택1)를 붙이면 단원 과제가 됩니다. 다음 수업 시작 전까지 구글 드라이브 공유 링크로 제출하세요.</p></div>
     </div>
+    
   </section>
 
   <section>

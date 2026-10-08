@@ -124,6 +124,23 @@
     .shead{gap:8px;flex-wrap:wrap}
   }
 
+  /* ---------- AI × PYTHON 미션 · 함께 볼 영상 ---------- */
+  .mission.py.ai{border-left-color:#7B3FC4}
+  .mission.py.ai .mn{color:#7B3FC4}
+  .vbox{margin:14px 0 4px;padding:12px 14px;border:1px dashed var(--line-strong);border-radius:6px;background:var(--surface)}
+  .vbox .lbl{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:#C2185B;margin-bottom:10px}
+  .vlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+  .vcard{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .vcard:hover{border-color:#C2185B}
+  .vth{position:relative;display:block;aspect-ratio:16/9;background:#111}
+  .vth img{width:100%;height:100%;object-fit:cover;display:block}
+  .vth i{position:absolute;inset:0;margin:auto;width:36px;height:36px;border-radius:50%;background:rgba(194,24,91,.9);color:#fff;font-style:normal;display:grid;place-items:center;font-size:14px}
+  .vth b{position:absolute;right:5px;bottom:5px;background:rgba(0,0,0,.8);color:#fff;font:600 10.5px var(--mono);padding:1px 5px;border-radius:3px}
+  .vcard .vt{font-size:13.5px;font-weight:700;line-height:1.4;padding:8px 10px 2px;color:var(--ink)}
+  .vcard .vc{font-size:11.5px;color:var(--muted);padding:0 10px}
+  .vcard .vd{font-size:12.5px;color:var(--ink-2);padding:3px 10px 10px}
+  @media print{ .vth{display:none} .vlist{grid-template-columns:1fr} }
+
 
   .form{width:100%;border-collapse:collapse;min-width:0;background:var(--surface);font-size:14px}
   .form th,.form td{border:1px solid var(--line-strong);padding:10px 12px;vertical-align:middle;text-align:left}
@@ -202,6 +219,7 @@
         <tr><td class="stage">전개</td><td><ul><li>ChatGPT 화면 4구역(대화 목록·대화 창·입력창·마이크/음성 버튼) 설명</li><li>무료와 유료의 차이, 사용량 제한과 모델 변경 가능성 안내 (결제 창 누르지 않기)</li><li>실습 미션 1: PC 웹에서 로그인하고 첫 질문 3개, 새 대화 열기·대화 이름 확인</li><li>실습 미션 2: 스마트폰 앱 설치(개발사 확인) → 마이크 받아쓰기와 음성 대화로 질문</li><li>개인정보 주의: 질문에 이름·연락처·주민번호 넣지 않기</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>글 질문과 음성 질문의 장단점 한 가지씩 발표</li><li>다음 차시 예고: 같은 AI인데 왜 사람마다 답이 다를까 — 좋은 질문의 4요소</li></ul></td><td class="min">10분</td></tr>
         
+        <tr><td class="stage">영상<br>(참고)</td><td><ul><li><a href="https://www.youtube.com/watch?v=cWVZ1Cv8PQU" target="_blank" rel="noopener">▶ 챗GPT 무료 버전 초보자를 위한 기본 사용법</a> <small>(디지털거북이 · 15:47)</small> — 회원가입부터 첫 질문까지 차근차근</li><li><a href="https://www.youtube.com/watch?v=og3-LK6Udhs" target="_blank" rel="noopener">▶ 챗GPT와 말로 대화해보세요! 스마트폰 음성 대화 사용법</a> <small>(다시시작 · 14:15)</small> — 말로 묻고 말로 듣는 음성 대화</li></ul></td><td class="min">선택</td></tr>
         <tr><th>교수방법</th><td colspan="2">강의 · 시연 · 실습</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 구글 계정, 이어폰(선택)</td></tr>
         <tr><th>평가</th><td colspan="2">관찰 체크리스트 — PC와 앱에서 각각 로그인해 글·음성 질문을 1회 이상 했는가</td></tr>
@@ -219,7 +237,8 @@
         <tr><td class="stage">도입</td><td><ul><li>전시 확인: 지난 시간 첫 질문 중 답이 아쉬웠던 경험 나누기</li><li>동기유발: "운동 추천해 줘"와 4요소를 넣은 질문의 답을 나란히 띄워 비교</li></ul></td><td class="min">5분</td></tr>
         <tr><td class="stage">전개</td><td><ul><li>4요소(역할·상황·요청·형식) 설명과 예시, 상황·요청이 가장 중요함을 강조</li><li>건강·금융·법률 질문은 참고용이며 최종 판단은 전문가·공식기관임을 안내</li><li>실습 미션 3: 나쁜 질문 4개를 4요소로 고쳐 쓰고 답 비교</li><li>실습 미션 4: 형식 바꾸기 — 같은 질문을 표·번호 목록·3줄 요약으로 받아 보기</li><li>짝 활동: 서로 고친 질문을 바꿔 보고 빠진 요소 찾아 주기</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>가장 달라진 답 한 쌍을 골라 발표</li><li>다음 차시 예고: 한 번에 끝내지 않고 대화를 이어 가며 다듬기</li></ul></td><td class="min">10분</td></tr>
-        
+        <tr><td class="stage">확장<br>(선택)</td><td><ul><li><strong>AI × 파이썬 A3</strong> 프롬프트 4요소 조립기 — 나쁜 질문 vs 좋은 질문 대결 — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit2_ai.ipynb" target="_blank" rel="noopener">Colab</a> · <a href="../python/unit2_ai.ipynb" download>노트북</a> · <a href="../python/answers/unit2_ai_answers.ipynb" download>답안</a></li></ul></td><td class="min">선택</td></tr>
+        <tr><td class="stage">영상<br>(참고)</td><td><ul><li><a href="https://www.youtube.com/watch?v=Y6avWpky4Q8" target="_blank" rel="noopener">▶ 99%가 모르는 프롬프트 작성법 9가지 (2026 최신버전)</a> <small>(홍아린 AI · 6:27)</small> — 역할 · 상황 · 형식을 넣는 질문법</li></ul></td><td class="min">선택</td></tr>
         <tr><th>교수방법</th><td colspan="2">강의 · 비교 시연 · 실습 · 짝 활동</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 구글 계정, 실습지</td></tr>
         <tr><th>평가</th><td colspan="2">실습지 확인 — 고친 질문에 4요소 중 3개 이상이 들어갔는가</td></tr>
@@ -237,7 +256,8 @@
         <tr><td class="stage">도입</td><td><ul><li>전시 확인: 4요소를 말로 복습 (역할·상황·요청·형식)</li><li>동기유발: 첫 답이 마음에 안 들 때 창을 닫았던 경험 묻기</li></ul></td><td class="min">5분</td></tr>
         <tr><td class="stage">전개</td><td><ul><li>답을 다듬는 3가지 방법(추가 질문·수정 요청·예시 보여주기) 설명</li><li>같은 대화 창에서 이어 쓰기 vs 주제가 바뀌면 새 대화 열기</li><li>시연: 모임 안내 문자를 3번 다듬어 완성하는 과정</li><li>실습 미션 5: 내 상황에 맞는 문자·안내문을 3번 이상 다듬기 (다듬기 기록표 작성)</li><li>실습 미션 6: 예시를 보여 주고 같은 느낌의 문구 받기, "답변 다시 생성"으로 다른 답 비교</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>첫 답과 마지막 답을 비교해 가장 효과 있던 요청 말하기</li><li>다음 차시 예고: AI가 자신 있게 틀리는 순간 — 환각</li></ul></td><td class="min">10분</td></tr>
-        
+        <tr><td class="stage">확장<br>(선택)</td><td><ul><li><strong>AI × 파이썬 A4</strong> 기억하는 나만의 챗봇 만들기 — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit2_ai.ipynb" target="_blank" rel="noopener">Colab</a> · <a href="../python/unit2_ai.ipynb" download>노트북</a> · <a href="../python/answers/unit2_ai_answers.ipynb" download>답안</a></li></ul></td><td class="min">선택</td></tr>
+        <tr><td class="stage">영상<br>(참고)</td><td><ul><li><a href="https://www.youtube.com/watch?v=yBNqT7nETjM" target="_blank" rel="noopener">▶ 초보자도 바로 쓰는 프롬프트 공식</a> <small>(이원철TV · 14:41)</small> — 대화를 이어 가며 답을 다듬는 법</li></ul></td><td class="min">선택</td></tr>
         <tr><th>교수방법</th><td colspan="2">시연 · 실습 · 발표</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC 또는 스마트폰, 구글 계정, 다듬기 기록표</td></tr>
         <tr><th>평가</th><td colspan="2">기록표 확인 — 한 대화 안에서 3번 이상 다듬고 무엇을 바꿨는지 적었는가</td></tr>
@@ -255,7 +275,8 @@
         <tr><td class="stage">도입</td><td><ul><li>동기유발: AI가 만든 그럴듯한 가짜 정보(없는 책 소개 등) 화면을 보여 주고 진짜인지 맞혀 보기</li><li>전시 확인: "다음 단어 맞히기" 원리와 환각의 관계 짚기</li></ul></td><td class="min">5분</td></tr>
         <tr><td class="stage">전개</td><td><ul><li>환각의 원인 4가지(말이 자연스러움≠사실, 학습 시점, 자료가 적은 내용, 모른다고 잘 안 함)</li><li>틀린 답이 잘 나오는 질문 유형(없는 책, 작은 지역 정보, 최근 일, 정확한 숫자) 소개 — 항상 틀리는 것은 아님을 안내</li><li>교차 확인 4단계(되묻기 → 다른 AI → 검색·공식 자료 → 판정 기록) 설명</li><li>실습 미션 7: 유형별 질문 4개 던지고 답 기록</li><li>실습 미션 8: 교차 확인 4단계로 판정표 작성 (맞음·틀림·확인 불가)</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>조별로 "가장 그럴듯했던 틀린 답" 공유</li><li>다음 차시 예고: 사진과 파일로 질문하기 — 여기서도 확인은 필수</li></ul></td><td class="min">10분</td></tr>
-        <tr><td class="stage">확장<br>(선택)</td><td><ul><li><strong>파이썬 P4</strong> AI가 짠 코드에서 틀린 곳 찾기 — "실행된다 ≠ 맞다" — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="../python/unit2_python.ipynb" download>노트북</a> · <a href="../python/answers/unit2_python_answers.ipynb" download>답안</a></li></ul></td><td class="min">선택</td></tr>
+        <tr><td class="stage">확장<br>(선택)</td><td><ul><li><strong>파이썬 P4</strong> AI가 짠 코드에서 틀린 곳 찾기 — "실행된다 ≠ 맞다" — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit2_python.ipynb" target="_blank" rel="noopener">Colab</a> · <a href="../python/unit2_python.ipynb" download>노트북</a> · <a href="../python/answers/unit2_python_answers.ipynb" download>답안</a></li></ul></td><td class="min">선택</td></tr>
+        <tr><td class="stage">영상<br>(참고)</td><td><ul><li><a href="https://www.youtube.com/watch?v=t4FIMh_LNcg" target="_blank" rel="noopener">▶ 모르면 찍는 인공지능? 생성형 AI의 거짓말과 환각</a> <small>(EBS 지식채널e · 4:49)</small> — AI는 왜 그럴듯한 거짓말을 할까</li><li><a href="https://www.youtube.com/watch?v=4JDVS-JyYNc" target="_blank" rel="noopener">▶ AI 헛소리는 버그 아니다… 할루시네이션 구조적 이유, 최신 기술, 꿀팁</a> <small>(안될공학 - IT 테크 신기술 · 15:13)</small> — 환각이 생기는 이유와 줄이는 방법</li></ul></td><td class="min">선택</td></tr>
         <tr><th>교수방법</th><td colspan="2">강의 · 탐구 실습 · 조별 공유</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 구글 계정, 판정표</td></tr>
         <tr><th>평가</th><td colspan="2">판정표 확인 — 질문 2개 이상에 대해 AI가 아닌 자료로 확인하고 근거를 적었는가</td></tr>
@@ -274,6 +295,7 @@
         <tr><td class="stage">전개</td><td><ul><li>+ 버튼으로 사진 찍기·앨범에서 고르기·파일 올리기 시연, 사진 잘 찍는 요령</li><li>올리면 안 되는 사진·파일(신분증·통장·개인정보 서류·타인 얼굴)과 가리고 올리기, 설정에서 대화 저장 여부 확인·임시 채팅 안내</li><li>실습 미션 9: 스마트폰으로 생활 안내문·설명서를 찍어 질문하기</li><li>실습 미션 10: 강사 제공 PDF를 요약 → 항목별 표 → 쪽수 묻기 → 원문 대조</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>AI가 잘못 읽거나 빠뜨린 부분이 있었는지 공유</li><li>다음 차시 예고: 잘 된 질문을 모아 나만의 프롬프트 노트 만들기</li></ul></td><td class="min">10분</td></tr>
         
+        <tr><td class="stage">영상<br>(참고)</td><td><ul><li><a href="https://www.youtube.com/watch?v=lXTGq-w_ej8" target="_blank" rel="noopener">▶ 인생이 편해지는 휴대폰 AI기능 · 왕초보 제미나이 사용법 10분 총정리</a> <small>(욜디_컴퓨터 인터넷 기초강의 · 11:12)</small> — 카메라로 찍어서 AI에게 묻기</li></ul></td><td class="min">선택</td></tr>
         <tr><th>교수방법</th><td colspan="2">시연 · 실습 · 공유</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 구글 계정, 강사 제공 안내문 PDF, 생활 안내문·설명서(개인정보 없는 것)</td></tr>
         <tr><th>평가</th><td colspan="2">관찰 체크리스트 — 사진 질문 1회, PDF 요약 후 원문 대조 1회 이상 했는가, 개인정보를 올리지 않았는가</td></tr>
@@ -291,7 +313,8 @@
         <tr><td class="stage">도입</td><td><ul><li>전시 확인: 1~5차시에서 가장 잘 된 질문 하나씩 떠올리기</li><li>동기유발: 같은 질문을 매번 새로 쓰는 번거로움 — 템플릿이면 빈칸만 바꾸면 된다는 시연</li></ul></td><td class="min">5분</td></tr>
         <tr><td class="stage">전개</td><td><ul><li>템플릿 구조(4요소 + 대괄호 빈칸) 설명</li><li>생활 템플릿 10종(글쓰기·이해하기·계획하기·비교하기·배우기·확인하기) 소개</li><li>실습 미션 11: 구글 Keep 또는 구글 문서에 프롬프트 노트 만들기</li><li>실습 미션 12: 템플릿 10개 표 채우기 → 그중 3개를 실제로 채워 써 보고 결과 평가</li><li>짝 활동: 서로의 템플릿 하나를 바꿔 써 보고 개선점 제안</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>가장 쓸모 있을 것 같은 템플릿 1개씩 소개</li><li>다음 차시 예고: 미니 프로젝트 — 해결하고 싶은 생활 문제 하나 생각해 오기</li></ul></td><td class="min">10분</td></tr>
-        <tr><td class="stage">확장<br>(선택)</td><td><ul><li><strong>파이썬 P5</strong> 코드 요청 템플릿으로 AI에게 함수 받고 테스트하기 — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="../python/unit2_python.ipynb" download>노트북</a> · <a href="../python/answers/unit2_python_answers.ipynb" download>답안</a></li></ul></td><td class="min">선택</td></tr>
+        <tr><td class="stage">확장<br>(선택)</td><td><ul><li><strong>파이썬 P5</strong> 코드 요청 템플릿으로 AI에게 함수 받고 테스트하기 — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit2_python.ipynb" target="_blank" rel="noopener">Colab</a> · <a href="../python/unit2_python.ipynb" download>노트북</a> · <a href="../python/answers/unit2_python_answers.ipynb" download>답안</a></li></ul></td><td class="min">선택</td></tr>
+        <tr><td class="stage">영상<br>(참고)</td><td><ul><li><a href="https://www.youtube.com/watch?v=H1WnRp8sNrQ" target="_blank" rel="noopener">▶ 나만의 프롬프트 비서 만들기</a> <small>(직장인 GPT 멘토 · 28:17)</small> — 자주 쓰는 질문을 템플릿으로</li></ul></td><td class="min">선택</td></tr>
         <tr><th>교수방법</th><td colspan="2">강의 · 실습 · 짝 활동</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC 또는 스마트폰, 구글 계정(Keep·문서), 템플릿 표</td></tr>
         <tr><th>평가</th><td colspan="2">결과물 확인 — 템플릿 10개를 저장하고 3개 이상 실제로 사용해 보았는가</td></tr>
@@ -309,6 +332,7 @@
         <tr><td class="stage">도입</td><td><ul><li>단원 전체 흐름 복습: 4요소 → 다듬기 → 확인 → 템플릿</li><li>프로젝트 안내: 진행 5단계, 기록 양식, 발표 4구성과 평가 기준 제시</li></ul></td><td class="min">5분</td></tr>
         <tr><td class="stage">전개</td><td><ul><li>실습 미션 13: 문제 고르기(작고 구체적인 것) → 4요소 첫 질문</li><li>실습 미션 13 계속: 3번 이상 다듬고 중요한 사실 2가지를 교차 확인</li><li>실습 미션 14: 기록 양식 작성 (문제·질문 변화·결과·확인·배운 점)</li><li>실습 미션 15: 3분 발표 (내 문제 → 질문의 변화 → 결과와 확인 → 배운 점), 청중은 칭찬 1개·질문 1개</li></ul></td><td class="min">35분</td></tr>
         <tr><td class="stage">정리</td><td><ul><li>동료 평가 결과와 강사 피드백, 단원 과제 안내</li><li>다음 단원 예고: 3단원 「실생활에 유용한 AI 활용」</li></ul></td><td class="min">10분</td></tr>
+        
         
         <tr><th>교수방법</th><td colspan="2">프로젝트 실습 · 발표 · 동료 평가</td></tr>
         <tr><th>준비물·매체</th><td colspan="2">PC, 스마트폰, 구글 계정, 기록 양식, 프롬프트 노트</td></tr>

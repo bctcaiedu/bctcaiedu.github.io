@@ -67,6 +67,13 @@
   @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .bonus.colab .dn{color:#6FB3DC}}
   :root[data-theme="dark"] .bonus.colab .dn{color:#6FB3DC}
   .colabsub{font-size:13.5px;margin:0 0 48px;color:var(--muted)}
+  .bonus.vids{border-left-color:#C2185B}
+  .bonus.vids:hover{border-color:#C2185B;box-shadow:0 4px 18px rgba(194,24,91,.10)}
+  .bonus.vids .dn{color:#C2185B}
+  .pytable.ai{border-left-color:#7B3FC4}
+  .pytable.ai .act a{border-color:#7B3FC4;color:#7B3FC4}
+  .pytable.ai .act a:first-child{background:#7B3FC4;color:#fff}
+  .pyintro code{font-family:var(--mono);font-size:.92em;background:var(--chip);padding:1px 5px;border-radius:3px}
   .colabsub a{color:var(--pine);font-weight:600}
   .bonus .chips i{font-style:normal;font-family:var(--mono);font-size:11px;padding:4px 9px;border-radius:4px;background:var(--chip);border:1px solid var(--line)}
   @media (max-width:760px){ .grid,.flow{grid-template-columns:1fr} header{padding:44px 0 38px} .wrap{padding:0 16px} }
@@ -114,6 +121,32 @@
       <tr><td>5단원</td><td><b>P8</b> 루틴을 캘린더 파일(.ics)로 만들어 한 번에 등록하기 <span class="mut">(2차시)</span><br><b>P9</b> 습관 기록 달성률 계산해 루틴북에 붙이기 <span class="mut">(6차시)</span></td>
         <td class="act"><a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit5_python.ipynb" target="_blank" rel="noopener">Colab</a><a href="python/unit5_python.ipynb" download>.ipynb</a></td></tr></tbody>
   </table></div>
+
+  <h2 class="sec">AI × 파이썬 실습 · 선택 · NEW</h2>
+  <p class="pyintro">파이썬에서 <b><code>AI("질문")</code> 한 줄로 생성형 AI를 직접 불러</b> 실험합니다. 같은 질문 3번 · 스미싱 판별 대결 · 프롬프트 조립기 · 기억하는 챗봇 · 문서 공장 · 예산 검산 · 환각 채점 · 요약 공장 · AI 비서 지침서 · 루틴 코치까지 단원마다 2개씩.
+  Colab 내장 AI → Gemini API 키 → <b>연습 모드</b> 순서로 자동 연결되어, 계정 사정과 관계없이 끝까지 실습할 수 있습니다.</p>
+  <div class="pytable ai"><table>
+    <thead><tr><th>단원</th><th>미션</th><th>노트북</th></tr></thead>
+    <tbody>
+      <tr><td>1단원</td><td><b>A1</b> AI에게 같은 질문 3번 — 답이 매번 다를까? <span class="mut">(6차시)</span><br><b>A2</b> AI 스미싱 판별관 vs 파이썬 경고등 — 누가 더 잘 잡을까? <span class="mut">(7차시)</span></td>
+        <td class="act"><a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit1_ai.ipynb" target="_blank" rel="noopener">Colab</a><a href="python/unit1_ai.ipynb" download>.ipynb</a></td></tr>
+      <tr><td>2단원</td><td><b>A3</b> 프롬프트 4요소 조립기 — 나쁜 질문 vs 좋은 질문 대결 <span class="mut">(2차시)</span><br><b>A4</b> 기억하는 나만의 챗봇 만들기 <span class="mut">(3차시)</span></td>
+        <td class="act"><a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit2_ai.ipynb" target="_blank" rel="noopener">Colab</a><a href="python/unit2_ai.ipynb" download>.ipynb</a></td></tr>
+      <tr><td>3단원</td><td><b>A5</b> AI 문서 공장 — 문자 3종을 한 번에 만들고 파일로 저장 <span class="mut">(1차시)</span><br><b>A6</b> AI 여행 예산 검산기 — AI의 계산을 믿지 말고 파이썬으로! <span class="mut">(3차시)</span></td>
+        <td class="act"><a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit3_ai.ipynb" target="_blank" rel="noopener">Colab</a><a href="python/unit3_ai.ipynb" download>.ipynb</a></td></tr>
+      <tr><td>4단원</td><td><b>A7</b> 환각 탐정 — AI 답안지를 파이썬이 채점한다 <span class="mut">(3차시)</span><br><b>A8</b> 세 줄 요약 공장 — 기사 3개를 한 번에 요약하고 비교 <span class="mut">(5차시)</span></td>
+        <td class="act"><a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit4_ai.ipynb" target="_blank" rel="noopener">Colab</a><a href="python/unit4_ai.ipynb" download>.ipynb</a></td></tr>
+      <tr><td>5단원</td><td><b>A9</b> 젬(Gem)처럼 만드는 나만의 AI 비서 — 지침서 조립하고 시험하기 <span class="mut">(4차시)</span><br><b>A10</b> AI 루틴 코치 — 내 일주일 기록을 분석하고 응원 보고서 받기 <span class="mut">(5차시)</span></td>
+        <td class="act"><a href="https://colab.research.google.com/github/bctcaiedu/bctcaiedu.github.io/blob/main/digital36/python/unit5_ai.ipynb" target="_blank" rel="noopener">Colab</a><a href="python/unit5_ai.ipynb" download>.ipynb</a></td></tr></tbody>
+  </table></div>
+
+  <h2 class="sec">AI 트렌드 영상관 · NEW</h2>
+  <a class="bonus vids" href="videos.html">
+    <span class="dn">VIDEOS · AI 최신 트렌드 13편 + 차시별 영상 44편</span>
+    <b>요즘 AI는 어디까지 왔을까? — 유튜브로 보는 AI 트렌드와 수업 복습 영상</b>
+    <span class="bd">AI 에이전트 · 구글 I/O 2026 · 영상 생성 AI · 휴머노이드 로봇 · 바이브 코딩 · AI와 일자리. 단원 · 차시별로 고른 쉬운 한국어 영상도 함께 모았습니다.</span>
+    <span class="chips"><i>AI 에이전트</i><i>구글 I/O 2026</i><i>소라 · 비오</i><i>CES 2026 로봇</i><i>차시별 복습</i></span>
+  </a>
 
   <h2 class="sec">보너스 실습 · 게임형</h2>
   <a class="bonus" href="bonus.html">

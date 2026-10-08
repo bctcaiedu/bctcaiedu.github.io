@@ -143,7 +143,7 @@
     else if (e.key === 'Home'){ go(-idx); }
     else if (e.key === 'End'){ go(slides.length-1-idx); }
   });
-  $('stage').addEventListener('click', e => { if (e.clientX > window.innerWidth/2) go(1); else go(-1); });
+  $('stage').addEventListener('click', e => { if (e.target.closest('a, button, iframe')) return; if (e.clientX > window.innerWidth/2) go(1); else go(-1); });
   window.addEventListener('beforeunload', () => { try{ synth.cancel(); }catch(e){} });
   window.deckGo = n => { const was = playing; stop(); show(n); if (was) setTimeout(startSpeaking, 150); };
 })();
