@@ -165,3 +165,22 @@
   .gptwrap .apps .card{padding:1.4cqh 1.2cqw}
   .gptwrap .apps .card .t{font-size:2.2cqh}
   .gptwrap .apps .card .d{font-size:1.8cqh}
+
+  /* 사진으로 묻기 — 스마트폰 ChatGPT 화면 목업 */
+  .phwrap{display:grid;grid-template-columns:1.25fr 1fr;gap:3cqw;align-items:center;margin-top:1.2cqh}
+  .phone{position:relative;justify-self:center;width:52cqh;background:#fff;border:1.1cqh solid #1d2125;border-radius:4cqh;box-shadow:0 1.6cqh 4cqh rgba(0,0,0,.18);display:flex;flex-direction:column;height:66cqh;font-size:1.7cqh;color:#1f2328}
+  .ph-top{display:flex;justify-content:space-between;align-items:center;padding:1.4cqh 2cqh 1cqh;border-bottom:1px solid #EEF0F2;font-size:2cqh;color:#555} .ph-top b{color:#111}
+  .ph-chat{flex:1;display:flex;flex-direction:column;gap:1.4cqh;padding:1.6cqh 1.8cqh;overflow:hidden}
+  .ph-me{align-self:flex-end;max-width:84%;display:flex;flex-direction:column;align-items:flex-end;gap:.6cqh}
+  .ph-pw{position:relative;width:64%;align-self:flex-end}
+  .ph-photo{width:100%;border-radius:1.4cqh;overflow:hidden;transform:rotate(-2deg);box-shadow:0 .6cqh 1.4cqh rgba(0,0,0,.2);outline:.35cqh solid #B85434;outline-offset:.3cqh}
+  .ph-svg{display:block;width:100%;height:auto}
+  .ph-txt{position:relative;background:#ECECF1;border-radius:2cqh;padding:1cqh 1.4cqh;line-height:1.45}
+  .ph-ai{display:flex;gap:.8cqh;line-height:1.5} .ph-ai>b{color:#10A37F}
+  .ph-warn{position:relative;display:inline-block;margin-top:.4cqh;color:#B85434;font-weight:700}
+  .ph-input{position:relative;display:flex;align-items:center;gap:1cqh;margin:0 1.4cqh 1.6cqh;border:1px solid #D5D9DE;border-radius:3cqh;padding:.9cqh 1.4cqh}
+  .ph-plus{font-size:2.2cqh;font-weight:700;color:#B85434}
+  .phone .gm-num{width:3.4cqh;height:3.4cqh;font-size:1.9cqh;z-index:2}
+  .phone .mk{left:-2.2cqh;top:50%;transform:translate(-50%,-50%)}
+  .ph-chat{gap:1.1cqh;padding:1.4cqh 1.8cqh 1cqh 3.4cqh}
+  .ph-input{margin-left:3.4cqh}

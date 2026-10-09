@@ -203,15 +203,28 @@ module.exports = {
       nar: `다섯 번째 차시입니다. 이제 글자만이 아니라 사진과 파일로도 질문해 보겠습니다. 깨알 같은 안내문, 외국어 설명서, 수십 쪽짜리 피디에프 문서를 찍거나 올려서 쉽게 풀어 달라고 할 수 있습니다.` },
 
     { eb: 'Photo', h: '스마트폰으로 찍어서 묻기',
-      body: `<div class="rowlist" style="margin-top:1.2cqh">
-        <div class="row"><span class="dot">1</span><span class="t">입력창 옆 + 버튼</span><span class="d">카메라로 바로 찍기 또는 앨범에서 사진 고르기</span></div>
-        <div class="row"><span class="dot">2</span><span class="t">잘 찍기</span><span class="d">밝은 곳에서, 글자가 화면을 꽉 채우게, 흔들리지 않게</span></div>
-        <div class="row"><span class="dot">3</span><span class="t">질문을 함께 쓰기</span><span class="d">사진만 올리지 말고 "무엇을 알고 싶은지" 함께 적습니다</span></div>
-      </div>
-      <pre style="margin-top:2cqh"><span class="p">나 ▶</span> (세탁기 오류 화면 사진) 이 표시가 무슨 뜻이야? 내가 직접 해 볼 수 있는
-     방법을 순서대로 알려 주고, 서비스센터에 연락해야 하는 경우도 알려 줘.</pre>`,
+      sub: '사진 한 장 + 알고 싶은 것 한 줄. 이렇게 보내면 됩니다.',
+      body: `<div class="phwrap">
+        <div class="rowlist">
+          <div class="row"><span class="dot">1</span><span class="t">입력창 옆 + 버튼</span><span class="d">카메라로 바로 찍기 또는 앨범에서 고르기</span></div>
+          <div class="row"><span class="dot">2</span><span class="t">잘 찍기</span><span class="d">밝은 곳에서, 글자가 화면을 꽉 채우게, 흔들리지 않게</span></div>
+          <div class="row"><span class="dot">3</span><span class="t">질문을 함께 쓰기</span><span class="d">사진만 올리지 말고 "무엇을 알고 싶은지" 적기</span></div>
+          <div class="row"><span class="dot">4</span><span class="t">답을 확인하기</span><span class="d">코드 뜻은 모델마다 다름 → 설명서·제조사 누리집과 대조</span></div>
+        </div>
+        <div class="phone">
+          <div class="ph-top"><span>☰</span><b>ChatGPT</b><span>✎</span></div>
+          <div class="ph-chat">
+            <div class="ph-me">
+              <div class="ph-pw"><em class="gm-num mk">2</em><div class="ph-photo"><svg viewBox="0 0 220 130" class="ph-svg" aria-hidden="true"><defs><linearGradient id="wm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E9ECEE"/><stop offset="1" stop-color="#C9CED2"/></linearGradient><radialGradient id="kn" cx=".4" cy=".35"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#A9B0B5"/></radialGradient></defs><rect width="220" height="130" fill="#7D858B"/><rect x="8" y="10" width="204" height="110" rx="10" fill="url(#wm)"/><circle cx="48" cy="65" r="30" fill="url(#kn)" stroke="#8E969B" stroke-width="2"/><line x1="48" y1="65" x2="48" y2="40" stroke="#5B6368" stroke-width="4" stroke-linecap="round"/><rect x="96" y="32" width="96" height="44" rx="5" fill="#141A1E"/><text x="144" y="66" text-anchor="middle" font-family="monospace" font-weight="700" font-size="34" fill="#FF6A3D" letter-spacing="3">dE</text><g fill="#7A8287"><rect x="98" y="88" width="20" height="10" rx="3"/><rect x="124" y="88" width="20" height="10" rx="3"/><rect x="150" y="88" width="20" height="10" rx="3"/><rect x="176" y="88" width="16" height="10" rx="3"/></g><circle cx="186" cy="24" r="4" fill="#FF6A3D"/></svg></div></div>
+              <div class="ph-txt"><em class="gm-num mk">3</em>이 표시가 무슨 뜻이야? 내가 직접 해 볼 방법을 순서대로 알려 주고, 서비스센터에 연락해야 하는 경우도 알려 줘.</div>
+            </div>
+            <div class="ph-ai"><b>◎</b><div>사진 속 <strong>dE</strong>는 보통 <strong>문이 제대로 닫히지 않았다</strong>는 뜻이에요.<br>① 전원을 끄고 문을 열었다 다시 꾹 닫기<br>② 문틈에 낀 빨래·고무패킹 확인<br>③ 다시 켜서 시작<br>계속 뜨면 서비스센터에 연락하세요. <span class="ph-warn"><em class="gm-num mk">4</em>모델마다 의미가 다를 수 있으니 설명서로 확인!</span></div></div>
+          </div>
+          <div class="ph-input"><em class="gm-num mk">1</em><span class="ph-plus">＋</span><span class="gm-ph">무엇이든 물어보세요</span><span class="gm-mic">🎙</span></div>
+        </div>
+      </div>`,
       foot: '사진 속 글자를 잘못 읽을 수도 있습니다. 숫자·날짜·금액은 원본과 꼭 대조하세요.',
-      nar: `스마트폰으로 찍어서 묻는 순서입니다. 입력창 옆의 더하기 버튼을 누르고 카메라로 바로 찍거나 앨범에서 사진을 고릅니다. 사진은 밝은 곳에서, 글자가 화면을 꽉 채우게, 흔들리지 않게 찍어야 잘 읽습니다. 그리고 사진만 올리지 말고 무엇을 알고 싶은지 함께 적어 주세요. 예를 들어 세탁기 오류 표시를 찍고, 무슨 뜻인지, 내가 해 볼 방법은 무엇인지, 언제 서비스센터에 연락해야 하는지 물어봅니다. 에이아이가 사진 속 글자를 잘못 읽을 때도 있으니 숫자와 날짜, 금액은 원본과 꼭 대조하세요.` },
+      nar: `스마트폰으로 찍어서 묻는 모습을 보겠습니다. 입력창 옆의 더하기 버튼을 누르고 카메라로 바로 찍거나 앨범에서 사진을 고릅니다. 화면처럼 세탁기 오류 표시를 찍어 올렸습니다. 사진은 밝은 곳에서, 글자가 화면을 꽉 채우게, 흔들리지 않게 찍어야 잘 읽습니다. 그리고 사진만 올리지 말고 무엇을 알고 싶은지 함께 적습니다. 이 표시가 무슨 뜻인지, 내가 해 볼 방법은 무엇인지, 언제 서비스센터에 연락해야 하는지 물었더니, 에이아이가 문이 제대로 닫히지 않았다는 뜻이라며 해 볼 순서를 알려 줍니다. 하지만 오류 코드의 뜻은 제조사와 모델마다 다를 수 있습니다. 그래서 마지막 단계로 설명서나 제조사 누리집에서 꼭 확인합니다. 에이아이가 사진 속 글자를 잘못 읽을 때도 있으니 숫자와 날짜, 금액은 원본과 대조하세요.` },
 
     { eb: 'PDF', h: '긴 문서는 요약하고, 질문하고, 확인합니다',
       body: `<pre style="margin-top:1.4cqh"><span class="c"># PC에서 + 버튼 → 파일 올리기 (예: 주민센터 프로그램 안내 PDF)</span>
