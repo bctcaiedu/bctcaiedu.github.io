@@ -194,12 +194,38 @@
   .ph-chat{gap:1.1cqh;padding:1.4cqh 1.8cqh 1cqh 3.4cqh}
   .ph-input{margin-left:3.4cqh}
 
+  /* NotebookLM(Gemini Notebook) 화면 재현 */
+  .nlm{position:relative;margin-top:1.6cqh;background:#fff;border:1px solid #CFD8D2;border-radius:1.4cqh;box-shadow:0 1.2cqh 3.6cqh rgba(0,0,0,.1);font-size:1.7cqh;color:#1f2328}
+  .nlm-top{display:flex;align-items:center;gap:1.2cqh;padding:1cqh 1.8cqh;border-bottom:1px solid #E6EAE8;font-size:1.9cqh}
+  .nlm-logo{color:#4C8DF6;font-weight:700} .nlm-r{margin-left:auto;color:#6C7A72;font-size:1.6cqh}
+  .nlm-body{display:grid;grid-template-columns:1fr 1.5fr 1fr;gap:1.2cqh;padding:1.6cqh;background:#F3F6F4;border-radius:0 0 1.4cqh 1.4cqh}
+  .nlm-col{position:relative;background:#fff;border:1px solid #E1E6E3;border-radius:1.2cqh;padding:1.2cqh 1.4cqh;display:flex;flex-direction:column;gap:.8cqh;min-height:27cqh}
+  .nlm-col .gm-num{transform:translate(-50%,0);width:3.4cqh;height:3.4cqh;font-size:1.9cqh}
+  .nlm-h{font-weight:700;font-size:1.8cqh;color:#3b3f45;border-bottom:1px solid #EEF0F2;padding-bottom:.6cqh}
+  .nlm-add{border:1px solid #D5D9DE;border-radius:2cqh;padding:.6cqh 1cqh;text-align:center;font-weight:700}
+  .nlm-search{background:#F3F6F4;border-radius:2cqh;padding:.6cqh 1cqh;color:#6C7A72;font-size:1.55cqh}
+  .nlm-src{display:flex;gap:.6cqh;align-items:center;font-size:1.55cqh;white-space:nowrap;overflow:hidden}
+  .nlm-src i{font-style:normal;color:#4C8DF6} .nlm-src span{overflow:hidden;text-overflow:ellipsis}
+  .nlm-sum{background:#F7F9FF;border-radius:1cqh;padding:1cqh 1.2cqh;line-height:1.5;flex:1}
+  .nlm-chips{display:flex;gap:.6cqh;flex-wrap:wrap} .nlm-chips span{border:1px solid #D5D9DE;border-radius:2cqh;padding:.3cqh 1cqh;font-size:1.5cqh;color:#3b3f45}
+  .nlm-input{display:flex;justify-content:space-between;border:1px solid #D5D9DE;border-radius:2.4cqh;padding:.8cqh 1.4cqh;color:#9AA0A6}
+  .nlm-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6cqh} .nlm-grid span{background:#F3F6F4;border-radius:.8cqh;padding:.6cqh .8cqh;font-size:1.5cqh;white-space:nowrap}
+  .nlm-note{margin-top:auto;text-align:center;border:1px dashed #C9D1CC;border-radius:1cqh;padding:.6cqh;color:#6C7A72;font-size:1.5cqh}
+  .nlmchat{display:grid;grid-template-columns:1.1fr 1fr;gap:3cqw;align-items:start;margin-top:1.4cqh}
+  .nlm-ans{position:relative;background:#fff;border:1px solid #CFD8D2;border-radius:1.4cqh;padding:1.8cqh 2cqh;box-shadow:0 1.2cqh 3.6cqh rgba(0,0,0,.1);font-size:2.1cqh;line-height:1.6}
+  .nlm-ans p{margin:1.2cqh 0}
+  .nlm-q{margin-left:auto;width:fit-content;background:#ECECF1;border-radius:2cqh;padding:.8cqh 1.6cqh}
+  .nlm-ans sup{display:inline-grid;place-items:center;width:2.4cqh;height:2.4cqh;margin-left:.3cqh;border-radius:50%;background:#E3E8E5;color:#3b3f45;font-size:1.4cqh;font-weight:700;vertical-align:.6cqh}
+  .nlm-ans sup.on{background:#B85434;color:#fff;box-shadow:0 0 0 .4cqh rgba(184,84,52,.25)}
+  .nlm-quote{background:#FBF1EC;border-left:.6cqh solid #B85434;border-radius:.8cqh;padding:1cqh 1.4cqh;font-size:1.8cqh;color:#5a3b2e}
+  .nlm-ans .gm-num{display:none}
+
 </style>
 
 <div class="bar">
   <span class="brand">UNIT 04 · 생성형 AI와 정보활용 능력 · 강의 슬라이드</span>
   <button id="prev" title="이전 (←)">◀</button>
-  <span class="count" id="count">1 / 36</span>
+  <span class="count" id="count">1 / 41</span>
   <button id="next" title="다음 (→)">▶</button>
   <button class="play" id="play" title="재생 / 정지 (Space)">▶ 재생</button>
   <button id="auto" class="on" title="나레이션이 끝나면 자동으로 다음 장">자동 진행</button>
@@ -499,7 +525,7 @@
       <h2>여러 자료 요약·정리(NotebookLM)</h2>
       <div class="sub">내가 고른 자료만 읽고 답하는 AI 연구 노트</div>
     </div>
-  <div class="nar">다섯 번째 차시입니다. 지금까지는 정보를 거르는 법을 배웠다면, 이제부터는 모은 정보를 정리하는 법을 배웁니다. 오늘 쓸 도구는 구글의 노트북엘엠입니다. 구글 계정만 있으면 무료로 쓸 수 있습니다.</div>
+  <div class="nar">다섯 번째 차시입니다. 지금까지는 정보를 거르는 법을 배웠다면, 이제부터는 모은 정보를 정리하는 법을 배웁니다. 오늘 쓸 도구는 구글의 노트북엘엠입니다. 이천이십육년 칠월부터는 제미나이 노트북이라는 새 이름으로 바뀌었지만, 쓰는 방법은 같습니다. 구글 계정만 있으면 무료로 쓸 수 있습니다.</div>
 </section>
 <section class="slide">
     <div class="eb">NotebookLM</div>
@@ -512,8 +538,117 @@
         <div class="card"><span class="n">③ 정리하기</span><span class="t">요약·마인드맵 등</span><span class="d">자료 전체를 한눈에 보는 마인드맵, 요약 노트, 음성 요약 같은 기능이 있습니다</span></div>
       </div>
       <div class="bannerG" style="margin-top:2.4cqh">일반 챗봇: 인터넷 전체에서 배운 지식으로 답함 · 노트북LM: 내가 넣은 자료를 중심으로 답함</div></div>
-    <div class="foot">기능 이름과 버튼 위치는 자주 바뀝니다. 화면 오른쪽이나 가운데에서 비슷한 이름을 찾으세요.</div>
+    <div class="foot">2026년 7월부터 이름이 "Gemini Notebook"으로 바뀌었습니다. 기능과 사용법은 그대로입니다.</div>
   <div class="nar">노트북엘엠은 내가 고른 자료를 중심으로 답하는 에이아이 연구 노트입니다. 쓰는 방법은 세 단계입니다. 먼저 소스라고 부르는 자료를 올립니다. 피디에프 파일, 구글 문서, 웹페이지 주소, 유튜브 주소, 복사한 글 등을 넣을 수 있습니다. 그다음 질문하면, 올린 자료를 바탕으로 답하고 문장 끝에 근거 번호를 붙여 줍니다. 번호를 누르면 자료의 어느 부분에서 가져왔는지 바로 보입니다. 마지막으로 마인드맵이나 요약 노트 같은 기능으로 전체 내용을 정리할 수 있습니다. 기능 이름과 버튼 위치는 자주 바뀌니, 비슷한 이름을 찾아보세요.</div>
+</section>
+<section class="slide">
+    <div class="eb">Start · Screen</div>
+    <h2>접속하고, 화면 세 칸을 익힙니다</h2>
+    <div class="sub">notebook.google.com 접속 → 구글 계정 로그인 → "새 노트북 만들기". 예전 주소 notebooklm.google.com도 자동으로 연결됩니다.</div>
+    
+    <div class="fill"><div class="nlm">
+        <div class="nlm-top"><span class="nlm-logo">◠</span><b>전기요금 절약 방법</b><span class="nlm-r">공유 · 설정</span></div>
+        <div class="nlm-body">
+          <div class="nlm-col"><div class="nlm-h">소스</div>
+            <div class="nlm-add">＋ 소스 추가</div>
+            <div class="nlm-search">🔍 웹에서 새 소스 검색</div>
+            <div class="nlm-src"><i>☑</i><span>📄 전기요금 절약 안내.pdf</span></div>
+            <div class="nlm-src"><i>☑</i><span>🌐 ○○신문 「겨울 전기요금…」</span></div>
+            <div class="nlm-src"><i>☑</i><span>▶ 공공기관 유튜브 영상</span></div>
+            <em class="gm-num" style="left:50%;top:-1.6cqh">1</em></div>
+          <div class="nlm-col nlm-mid"><div class="nlm-h">채팅</div>
+            <div class="nlm-sum"><b>전기요금 절약 방법</b><br>소스 3개 · 세 자료는 난방기 사용 시간, 대기전력, 요금제 확인을 공통으로 강조합니다…</div>
+            <div class="nlm-chips"><span>핵심 내용 5줄 요약</span><span>자료끼리 다른 점은?</span></div>
+            <div class="nlm-input">소스에 대해 질문하기…<span>➤</span></div>
+            <em class="gm-num" style="left:50%;top:-1.6cqh">2</em></div>
+          <div class="nlm-col"><div class="nlm-h">스튜디오</div>
+            <div class="nlm-grid"><span>🎧 오디오 오버뷰</span><span>🎬 동영상 오버뷰</span><span>🧠 마인드맵</span><span>📑 보고서</span><span>🃏 플래시카드</span><span>❓ 퀴즈</span><span>📊 인포그래픽</span><span>🖥 슬라이드</span></div>
+            <div class="nlm-note">＋ 메모 추가</div>
+            <em class="gm-num" style="left:50%;top:-1.6cqh">3</em></div>
+        </div>
+      </div>
+      <div class="grid g3" style="margin-top:1.4cqh">
+        <div class="card"><span class="n">① 왼쪽 · 소스</span><span class="t">자료를 넣는 곳</span><span class="d">체크를 끄면 그 자료는 답에서 빠집니다</span></div>
+        <div class="card"><span class="n">② 가운데 · 채팅</span><span class="t">자료에 질문하는 곳</span><span class="d">자동 요약과 추천 질문이 먼저 보입니다</span></div>
+        <div class="card"><span class="n">③ 오른쪽 · 스튜디오</span><span class="t">정리 결과물을 만드는 곳</span><span class="d">음성·영상 요약, 마인드맵, 퀴즈 등</span></div>
+      </div></div>
+    <div class="foot">수업 화면은 이해를 돕기 위한 재현 그림입니다. 실제 버튼 모양·위치는 업데이트로 조금씩 다를 수 있습니다. 스마트폰은 "Gemini Notebook" 앱.</div>
+  <div class="nar">이제 실제로 써 보겠습니다. 인터넷 주소창에 노트북 점 구글 점 컴을 입력하고 구글 계정으로 로그인합니다. 예전 주소인 노트북엘엠 점 구글 점 컴으로 들어가도 자동으로 연결됩니다. 새 노트북 만들기를 누르면 화면이 세 칸으로 나뉩니다. 왼쪽 일번은 소스 칸으로, 자료를 넣고 목록을 보는 곳입니다. 자료 옆의 체크를 끄면 그 자료는 답할 때 빠집니다. 가운데 이번은 채팅 칸입니다. 자료를 넣으면 자동 요약과 추천 질문이 먼저 나오고, 아래 입력창에 질문을 씁니다. 오른쪽 삼번은 스튜디오 칸으로, 오디오 요약, 마인드맵, 퀴즈 같은 정리 결과물을 버튼 하나로 만듭니다. 스마트폰에서는 제미나이 노트북 앱을 쓰면 됩니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Step 1 · Sources</div>
+    <h2>① 소스 넣기 — 자료를 골라 담습니다</h2>
+    
+    
+    <div class="fill"><div class="grid g3" style="margin-top:1.2cqh">
+        <div class="card"><span class="n">파일 올리기</span><span class="t">PDF · 워드 · 파워포인트</span><span class="d">이미지·음성 파일도 가능. 한글(hwp)은 PDF로 저장해서 올리기</span></div>
+        <div class="card"><span class="n">주소 붙여 넣기</span><span class="t">웹사이트 · YouTube</span><span class="d">공개된 기사·누리집 주소, 자막 있는 공개 유튜브 영상</span></div>
+        <div class="card"><span class="n">구글 드라이브 · 복사한 글</span><span class="t">문서·슬라이드·시트</span><span class="d">구글 문서를 바로 고르거나, 글을 복사해 붙여 넣기</span></div>
+      </div>
+      <div class="rowlist" style="margin-top:1.8cqh">
+        <div class="row"><span class="dot">1</span><span class="t">＋ 소스 추가</span><span class="d">자료 종류 고르기 → 파일 선택 또는 주소 붙여 넣기 → 삽입</span></div>
+        <div class="row"><span class="dot">2</span><span class="t">웹에서 새 소스 검색</span><span class="d">소스 칸 검색창에 주제를 쓰면 관련 자료를 찾아 줍니다. 출처를 보고 골라서 가져오기</span></div>
+        <div class="row"><span class="dot">!</span><span class="t">잘 안 들어가는 자료</span><span class="d">로그인·유료 기사, 자막 없는·비공개 유튜브. 이럴 땐 본문을 복사해 "복사한 텍스트"로</span></div>
+      </div></div>
+    <div class="foot">무료 계정은 노트북 하나에 소스 50개까지(2026년 10월 기준). 수업에서는 믿을 만한 자료 3개면 충분합니다.</div>
+  <div class="nar">첫 번째 단계는 소스 넣기입니다. 소스 추가 버튼을 누르면 자료 종류를 고를 수 있습니다. 피디에프나 워드, 파워포인트 같은 파일을 올리거나, 기사나 누리집 주소, 유튜브 주소를 붙여 넣거나, 구글 드라이브의 문서를 바로 고를 수도 있습니다. 넣을 자료가 없으면 소스 칸의 검색창에 주제를 쓰면 웹에서 관련 자료를 찾아 주는데, 이때도 출처를 보고 믿을 만한 것만 골라 가져옵니다. 로그인이 필요한 페이지나 유료 기사, 자막이 없는 유튜브 영상은 잘 안 들어갑니다. 그럴 때는 본문을 복사해서 복사한 텍스트로 넣으면 됩니다. 무료 계정은 노트북 하나에 소스를 오십 개까지 넣을 수 있지만, 수업에서는 믿을 만한 자료 세 개면 충분합니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Step 2 · Chat</div>
+    <h2>② 질문하고, 근거 번호를 눌러 확인합니다</h2>
+    
+    
+    <div class="fill"><div class="nlmchat">
+        <div>
+          <pre style="margin:0"><span class="c"># 이렇게 물어보세요</span>
+<span class="p">나 ▶</span> 세 자료의 핵심 내용을 5줄로 요약해 줘.
+<span class="p">나 ▶</span> 세 자료에서 서로 다르게 설명하는 부분이 있어?
+<span class="p">나 ▶</span> 내가 오늘 실천할 수 있는 것 3가지를
+     자료 근거와 함께 알려 줘.
+<span class="p">나 ▶</span> 중학생도 알게 쉬운 말로, 표로 정리해 줘.</pre>
+          <div class="bannerG" style="margin-top:1.4cqh">답이 마음에 들면 <b>메모에 저장</b> → 스튜디오 칸에 모아 둘 수 있습니다</div>
+        </div>
+        <div class="nlm-ans">
+          <div class="nlm-q">세 자료의 공통점을 알려 줘.</div>
+          <p>세 자료 모두 난방기 온도를 1~2도 낮추라고 권합니다<sup>1</sup>. 쓰지 않는 플러그를 뽑으면 대기전력을 줄일 수 있고<sup>2</sup>, 요금제 확인도 함께 안내합니다<sup class="on">3</sup>.</p>
+          <div class="nlm-quote"><b>3</b> ▶ 공공기관 유튜브 영상 · 02:14<br>"…사용 패턴에 맞는 요금제를 확인하면…"</div>
+        </div>
+      </div></div>
+    <div class="foot">근거 번호 위에 마우스를 올리거나 누르면, 그 문장을 가져온 원문 부분이 보입니다.</div>
+  <div class="nar">두 번째 단계는 질문하기입니다. 가운데 입력창에 화면의 예시처럼 물어보세요. 핵심 요약, 자료끼리 다른 점, 내가 실천할 것, 그리고 쉬운 말이나 표로 바꿔 달라는 요청도 좋습니다. 노트북엘엠의 답에는 문장마다 작은 숫자가 붙어 있습니다. 이것이 근거 번호입니다. 번호를 누르면 그 문장을 어느 자료의 어느 부분에서 가져왔는지 원문이 바로 보입니다. 유튜브 영상이면 몇 분 몇 초인지도 나옵니다. 요약이 원문의 뜻과 같은지 꼭 눌러서 확인하세요. 마음에 드는 답은 메모에 저장해 두면 오른쪽 스튜디오 칸에 모입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Step 3 · Studio</div>
+    <h2>③ 스튜디오 — 버튼 하나로 정리 결과물 만들기</h2>
+    
+    
+    <div class="fill"><div class="grid g4" style="margin-top:1.2cqh">
+        <div class="card"><span class="n">🎧 오디오 오버뷰</span><span class="t">라디오처럼 듣는 요약</span><span class="d">두 진행자가 대화하듯 설명. 산책하며 듣기 좋음</span></div>
+        <div class="card"><span class="n">🧠 마인드맵</span><span class="t">한눈에 보는 구조</span><span class="d">주제를 누르면 그 부분을 채팅으로 더 물어봄</span></div>
+        <div class="card"><span class="n">📑 보고서</span><span class="t">브리핑 · 학습 가이드</span><span class="d">7차시 1페이지 리포트의 초안으로 활용</span></div>
+        <div class="card"><span class="n">🃏 플래시카드 · 퀴즈</span><span class="t">외우고 점검하기</span><span class="d">자료 내용으로 문제를 만들어 스스로 확인</span></div>
+        <div class="card"><span class="n">🎬 동영상 오버뷰</span><span class="t">슬라이드 영상 요약</span><span class="d">그림과 함께 설명하는 짧은 영상</span></div>
+        <div class="card"><span class="n">📊 인포그래픽 · 슬라이드</span><span class="t">한 장 그림 · 발표 자료</span><span class="d">핵심을 그림·슬라이드로 정리</span></div>
+        <div class="card"><span class="n">📋 데이터 테이블</span><span class="t">자료 속 숫자를 표로</span><span class="d">구글 시트로 내보내기 → 6차시와 연결</span></div>
+        <div class="card warn"><span class="n">⚙ 맞춤 설정</span><span class="t">연필 아이콘</span><span class="d">언어(한국어) · 길이 · "초보자용으로" 같은 요청</span></div>
+      </div></div>
+    <div class="foot">무료 계정은 결과물 종류마다 하루 만들 수 있는 횟수가 정해져 있습니다(예: 오디오·동영상 오버뷰 하루 3개). 만드는 데 몇 분 걸릴 수 있습니다.</div>
+  <div class="nar">세 번째 단계는 오른쪽 스튜디오 칸입니다. 버튼 하나로 자료를 여러 모양으로 정리해 줍니다. 오디오 오버뷰는 두 진행자가 라디오처럼 대화하며 내용을 설명해 주는 음성 요약입니다. 마인드맵은 자료 전체 구조를 한눈에 보여 주고, 주제를 누르면 그 부분을 더 물어볼 수 있습니다. 보고서는 브리핑이나 학습 가이드 형태로 정리해 주는데, 칠차시 리포트의 초안으로 쓸 수 있습니다. 플래시카드와 퀴즈로는 배운 내용을 스스로 점검합니다. 이 밖에 동영상 오버뷰, 인포그래픽, 슬라이드, 데이터 테이블도 있습니다. 연필 모양 아이콘을 누르면 언어를 한국어로, 길이나 수준을 원하는 대로 바꿀 수 있습니다. 무료 계정은 하루에 만들 수 있는 개수가 정해져 있고, 만드는 데 몇 분이 걸릴 수 있으니 기다려 주세요.</div>
+</section>
+<section class="slide">
+    <div class="eb">Practice · 15 min</div>
+    <h2>따라 하기 — 내 주제로 노트북 한 권 만들기</h2>
+    
+    
+    <div class="fill"><div class="rowlist" style="margin-top:1.2cqh">
+        <div class="row"><span class="dot">1</span><span class="t">새 노트북 · 이름 짓기</span><span class="d">왼쪽 위 제목을 눌러 "전기요금 절약 방법"처럼 주제로 바꾸기 (2분)</span></div>
+        <div class="row"><span class="dot">2</span><span class="t">소스 3개 넣기</span><span class="d">실습지 미션 10에서 고른 누리집 · 기사 · 유튜브 주소 (3분)</span></div>
+        <div class="row"><span class="dot">3</span><span class="t">질문 3개 + 근거 2개 확인</span><span class="d">요약 · 다른 점 · 실천할 것. 번호를 눌러 원문과 대조 (5분)</span></div>
+        <div class="row"><span class="dot">4</span><span class="t">마인드맵 만들기</span><span class="d">스튜디오 → 마인드맵. 가지 하나를 눌러 더 물어보기 (3분)</span></div>
+        <div class="row"><span class="dot">5</span><span class="t">오디오 오버뷰 (선택 · 과제)</span><span class="d">한국어 · 짧게로 설정해 만들고, 집에서 들어 보기 (2분)</span></div>
+      </div></div>
+    <div class="foot">만든 노트북은 자동 저장됩니다. 첫 화면에서 다시 열어 7차시 리포트에 사용합니다.</div>
+  <div class="nar">이제 직접 따라 해 봅니다. 먼저 새 노트북을 만들고 왼쪽 위 제목을 눌러 주제 이름으로 바꿉니다. 다음으로 실습지 미션 십에서 고른 누리집, 기사, 유튜브 주소 세 개를 소스로 넣습니다. 그리고 질문 세 가지, 요약, 다른 점, 실천할 것을 묻고, 근거 번호를 두 개 이상 눌러 원문과 대조합니다. 그다음 스튜디오에서 마인드맵을 만들고, 가지 하나를 눌러 더 물어봅니다. 시간이 되면 오디오 오버뷰를 한국어, 짧게로 설정해 만들어 두고 집에서 들어 보세요. 만든 노트북은 자동으로 저장되니 칠차시 리포트를 쓸 때 다시 열면 됩니다.</div>
 </section>
 <section class="slide">
     <div class="eb">Caution</div>
