@@ -133,3 +133,35 @@
   .vcard .vt{font-size:2.5cqh;font-weight:700;line-height:1.35;padding:1.4cqh 1.6cqh .4cqh;color:var(--ink)}
   .vcard .vc{font-size:1.9cqh;color:#6C7A72;padding:0 1.6cqh}
   .vcard .vd{font-size:2.1cqh;color:#3A453E;padding:.6cqh 1.6cqh 1.6cqh}
+
+  /* ---------- ChatGPT 화면 구성 그림 (2단원) ---------- */
+  .gptwrap{display:grid;grid-template-columns:1fr 1fr;gap:2.2cqw;align-items:center;margin-top:1.4cqh}
+  .gptwrap .rowlist{margin:0}
+  .gptmock{background:#fff;border:1px solid #CFD8D2;border-radius:1.4cqh;overflow:hidden;box-shadow:0 1.2cqh 3.6cqh rgba(0,0,0,.12);font-size:1.9cqh;color:#1f2328}
+  .gm-bar{display:flex;align-items:center;gap:.7cqh;padding:1cqh 1.4cqh;background:#EEF1EF;border-bottom:1px solid #DDE3DF}
+  .gm-bar i{width:1.2cqh;height:1.2cqh;border-radius:50%;background:#C9D1CC}
+  .gm-bar span{margin-left:1.4cqh;background:#fff;border-radius:2cqh;padding:.3cqh 1.6cqh;font:1.6cqh var(--mono);color:#6C7A72}
+  .gm-body{display:grid;grid-template-columns:30% 1fr;height:36cqh}
+  .gm-side{position:relative;background:#F7F7F8;border-right:1px solid #E5E7EB;padding:1.6cqh 1.4cqh;display:flex;flex-direction:column;gap:1cqh;font-size:1.7cqh;color:#3b3f45}
+  .gm-side span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gm-new{font-weight:700;padding:.8cqh 1cqh;border-radius:1cqh;background:#fff;border:1px solid #E5E7EB}
+  .gm-lbl{font-size:1.45cqh;color:#8A9099;margin-top:.6cqh}
+  .gm-main{position:relative;display:flex;flex-direction:column;padding:1.8cqh 2.2cqh}
+  .gm-chat{position:relative;flex:1;display:flex;flex-direction:column;gap:1.6cqh}
+  .gm-me{align-self:flex-end;max-width:78%;background:#ECECF1;border-radius:2cqh;padding:1cqh 1.6cqh}
+  .gm-ai{max-width:92%;line-height:1.5} .gm-ai b{color:#10A37F;margin-right:.6cqh}
+  .gm-input{position:relative;display:flex;align-items:center;gap:1.2cqh;border:1px solid #D5D9DE;border-radius:3cqh;padding:1cqh 1.6cqh;box-shadow:0 .4cqh 1.2cqh rgba(0,0,0,.06)}
+  .gm-ph{flex:1;color:#9AA0A6}
+  .gm-plus,.gm-mic{font-size:2.1cqh;color:#555}
+  .gm-voice{width:3.4cqh;height:3.4cqh;border-radius:50%;background:#111;color:#fff;display:grid;place-items:center;font-size:1.7cqh}
+  .gm-num{position:absolute;font-style:normal;width:4.2cqh;height:4.2cqh;border-radius:50%;background:#B85434;color:#fff;font:700 2.4cqh var(--sans);display:grid;place-items:center;box-shadow:0 0 0 .5cqh rgba(184,84,52,.25)}
+  .gptshot{position:relative;border:1px solid #CFD8D2;border-radius:1.2cqh;overflow:hidden;box-shadow:0 1.2cqh 3.6cqh rgba(0,0,0,.12);background:#fff}
+  .gptshot img{display:block;width:100%;height:auto}
+  .gptshot .gm-num{transform:translate(-50%,-50%)}
+
+  .gptwrap>.rowlist{grid-column:2;grid-row:1}
+  .gptwrap>.gptshot{grid-row:1 / span 2}
+  .gptwrap .apps{grid-column:2;display:grid;grid-template-columns:repeat(3,1fr);gap:1cqw}
+  .gptwrap .apps .card{padding:1.4cqh 1.2cqw}
+  .gptwrap .apps .card .t{font-size:2.2cqh}
+  .gptwrap .apps .card .d{font-size:1.8cqh}

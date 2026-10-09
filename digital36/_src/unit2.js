@@ -33,28 +33,46 @@ module.exports = {
       sub: '화면을 익히고, 첫 질문을 글과 목소리로 던져 봅니다.',
       nar: `첫 번째 차시입니다. 오늘은 챗지피티 화면이 어떻게 생겼는지 익히고, 첫 대화를 나눠 봅니다. 컴퓨터에서 글로 한 번, 스마트폰에서 목소리로 한 번 질문하겠습니다. 어렵지 않습니다. 문자 보내듯이 쓰면 됩니다.` },
 
-    { eb: 'Screen', h: 'ChatGPT 화면은 네 부분입니다',
-      sub: '웹사이트 chatgpt.com 또는 스마트폰 앱. 구글 계정으로 로그인할 수 있습니다.',
-      body: `<div class="grid g2" style="margin-top:1.6cqh">
-        <div class="card"><span class="n">① 왼쪽 메뉴</span><span class="t">대화 목록</span><span class="d">지난 대화가 쌓입니다. 새 대화를 시작하는 버튼도 여기 있습니다</span></div>
-        <div class="card"><span class="n">② 가운데</span><span class="t">대화 창</span><span class="d">내 질문과 AI의 답이 채팅처럼 위에서 아래로 쌓입니다</span></div>
-        <div class="card"><span class="n">③ 아래쪽</span><span class="t">입력창</span><span class="d">질문을 쓰는 곳. 옆의 + 버튼으로 사진·파일을 붙입니다</span></div>
-        <div class="card"><span class="n">④ 입력창 오른쪽</span><span class="t">마이크 · 음성 버튼</span><span class="d">말로 받아쓰기, 또는 말로 주고받는 음성 대화</span></div>
+    { eb: 'Screen · Apps', h: 'ChatGPT 화면은 네 부분입니다',
+      sub: '웹사이트 chatgpt.com, PC 앱, 스마트폰 앱 — 어디서 열어도 화면 구성은 같습니다.',
+      body: `<div class="gptwrap">
+        <div class="gptshot">
+          <img src="../img/chatgpt_screen.jpg" alt="ChatGPT 웹 화면 — 왼쪽 메뉴, 가운데 대화 창, 아래 입력창과 마이크 버튼">
+          <em class="gm-num" style="left:31%;top:8.5%">①</em>
+          <em class="gm-num" style="left:66%;top:26%">②</em>
+          <em class="gm-num" style="left:40%;top:39%">③</em>
+          <em class="gm-num" style="left:89.5%;top:38%">④</em>
+        </div>
+        <div class="rowlist">
+          <div class="row"><span class="dot">1</span><span class="t">왼쪽 · 대화 목록</span><span class="d">지난 대화가 쌓입니다. 새 대화 버튼도 여기</span></div>
+          <div class="row"><span class="dot">2</span><span class="t">가운데 · 대화 창</span><span class="d">질문과 답이 채팅처럼 위에서 아래로</span></div>
+          <div class="row"><span class="dot">3</span><span class="t">아래 · 입력창</span><span class="d">질문을 쓰는 곳. ＋ 로 사진·파일 첨부</span></div>
+          <div class="row"><span class="dot">4</span><span class="t">입력창 오른쪽 · 마이크</span><span class="d">말로 받아쓰기, 또는 음성 대화</span></div>
+        </div>
+        <div class="apps">
+          <div class="card"><span class="n">웹</span><span class="t">chatgpt.com</span><span class="d">설치 없이 바로. 수업 기본</span></div>
+          <div class="card"><span class="n">PC 앱</span><span class="t">Windows · Mac</span><span class="d">chatgpt.com 에서 내려받기</span></div>
+          <div class="card"><span class="n">폰 앱</span><span class="t">Android · iPhone</span><span class="d">Play 스토어 · App Store</span></div>
+        </div>
       </div>
-      <div class="banner" style="margin-top:2cqh">메뉴 이름과 위치는 업데이트로 조금씩 달라질 수 있습니다. 모양이 달라도 네 부분은 그대로입니다.</div>`,
-      nar: `챗지피티 화면은 크게 네 부분입니다. 왼쪽에는 지난 대화 목록이 있고, 새 대화를 시작하는 버튼도 여기에 있습니다. 가운데는 대화 창으로, 카카오톡처럼 내 질문과 에이아이의 답이 차례로 쌓입니다. 아래쪽 입력창에 질문을 쓰고, 옆의 더하기 버튼으로 사진이나 파일을 붙입니다. 입력창 오른쪽에는 마이크와 음성 대화 버튼이 있습니다. 메뉴 이름이나 위치는 업데이트로 조금씩 바뀔 수 있지만, 이 네 부분은 거의 그대로이니 모양이 달라 보여도 당황하지 마세요.` },
+      <div class="banner" style="margin-top:1.4cqh">같은 계정으로 로그인하면 웹 · PC · 폰 어디서나 <b>대화 목록이 이어집니다</b>. 화면은 2026년 10월 무료 계정 기준이며 업데이트로 달라질 수 있습니다.</div>`,
+      nar: `챗지피티 화면은 크게 네 부분입니다. 왼쪽에는 지난 대화 목록이 있고, 새 대화를 시작하는 버튼도 여기에 있습니다. 가운데는 대화 창으로, 카카오톡처럼 내 질문과 에이아이의 답이 차례로 쌓입니다. 아래쪽 입력창에 질문을 쓰고, 옆의 더하기 버튼으로 사진이나 파일을 붙입니다. 입력창 오른쪽에는 마이크와 음성 대화 버튼이 있습니다. 챗지피티는 인터넷 창에서 챗지피티 닷컴으로 쓸 수도 있고, 컴퓨터에 설치하는 피시 앱, 그리고 스마트폰 앱도 있습니다. 피시 앱은 윈도우와 맥용이 있고, 스마트폰 앱은 플레이 스토어나 앱 스토어에서 받을 수 있습니다. 같은 계정으로 로그인하면 어디서 쓰든 대화 목록이 그대로 이어집니다. 메뉴 이름이나 위치는 업데이트로 조금씩 바뀔 수 있지만, 이 네 부분은 거의 그대로이니 당황하지 마세요.` },
 
-    { eb: 'Free vs Paid', h: '무료로 충분히 배울 수 있습니다',
-      body: `<div class="grid g2" style="margin-top:1.6cqh">
-        <div class="card"><span class="n">무료</span><span class="t">이 과정의 기본</span><span class="d">대화 · 사진과 파일 올리기 · 음성 대화 · 검색까지 체험 가능. 다만 사용량 제한이 있습니다</span></div>
-        <div class="card warn"><span class="n">유료</span><span class="t">필요할 때만 선택</span><span class="d">더 많이, 더 좋은 모델을 오래 사용. 매달 요금이 나가므로 신중하게</span></div>
+    { eb: 'Plans · Models', h: '요금제와 모델 — 무료로 충분히 배울 수 있습니다',
+      sub: '요금제는 네 가지. 돈을 더 내면 더 똑똑한 모델을 더 많이 쓸 수 있습니다.',
+      body: `<div class="grid g4" style="margin-top:1.4cqh">
+        <div class="card"><span class="n">Free · 0원</span><span class="t">이 과정의 기본</span><span class="d">GPT-6 대화. 사진·파일 올리기, 음성, 이미지 만들기는 횟수 제한</span></div>
+        <div class="card"><span class="n">Go · 약 1만 3천 원</span><span class="t">조금 더 많이</span><span class="d">무료 기능 + 업로드·이미지·음성 더 많이, 더 긴 기억. 광고가 나올 수 있음</span></div>
+        <div class="card warn"><span class="n">Plus · 약 2만 9천 원</span><span class="t">본격 활용</span><span class="d">고급 추론 모델, 넉넉한 한도, 프로젝트·예약 작업·맞춤형 GPT</span></div>
+        <div class="card warn"><span class="n">Pro · 약 15만 9천 원~</span><span class="t">전문가용</span><span class="d">최상위 모델(GPT-6 Astra), 이미지 무제한, 최대 심층 리서치</span></div>
       </div>
-      <div class="rowlist" style="margin-top:2cqh">
-        <div class="row"><span class="dot">!</span><span class="t">사용량을 넘으면</span><span class="d">잠시 기다리라는 안내가 뜨거나, 더 가벼운 모델로 바뀌어 답이 달라질 수 있습니다</span></div>
-        <div class="row"><span class="dot">!</span><span class="t">기능·요금은 자주 바뀝니다</span><span class="d">정확한 내용은 ChatGPT 안의 요금제 안내에서 직접 확인하세요</span></div>
+      <div class="rowlist" style="margin-top:1.8cqh">
+        <div class="row"><span class="dot">M</span><span class="t">모델이란?</span><span class="d">AI의 '두뇌' 버전. 지금은 GPT-6 계열 — 빠른 모델(Luna), 기본(Sol), 깊이 생각하는 모델(Astra)</span></div>
+        <div class="row"><span class="dot">!</span><span class="t">사용량을 넘으면</span><span class="d">잠시 기다리라는 안내가 뜨거나 더 가벼운 모델로 바뀌어 답이 달라질 수 있습니다</span></div>
+        <div class="row"><span class="dot">!</span><span class="t">요금·모델은 자주 바뀝니다</span><span class="d">월 요금(부가세 포함)은 2026년 10월 기준. 정확한 내용은 chatgpt.com/pricing 에서 확인</span></div>
       </div>`,
-      foot: '결제 안내 창이 뜨면 누르지 말고 닫으세요. 이 과정은 무료로만 진행합니다.',
-      nar: `무료와 유료의 차이를 보겠습니다. 이 과정의 모든 실습은 무료로 할 수 있습니다. 무료로도 대화, 사진과 파일 올리기, 음성 대화까지 체험할 수 있습니다. 다만 무료에는 사용량 제한이 있습니다. 많이 쓰면 잠시 기다리라는 안내가 나오거나, 더 가벼운 모델로 바뀌어서 답의 품질이 달라질 수 있습니다. 유료는 더 많이, 더 좋은 모델을 쓸 수 있지만 매달 요금이 나갑니다. 기능과 요금은 자주 바뀌니 필요할 때 직접 확인하시고, 수업 중에 결제 안내 창이 뜨면 누르지 말고 닫아 주세요.` },
+      foot: '결제 안내 창이 뜨면 누르지 말고 닫으세요. 이 과정은 무료(Free)로만 진행합니다.',
+      nar: `이번에는 챗지피티의 요금제와 모델을 알아보겠습니다. 요금제는 네 가지입니다. 무료인 프리는 지피티 식스 모델로 대화할 수 있고, 사진과 파일 올리기, 음성 대화, 이미지 만들기도 횟수 제한 안에서 쓸 수 있습니다. 이 과정은 이 무료 요금제로 진행합니다. 고는 한 달에 약 만 삼천 원으로, 무료 기능을 더 많이 쓸 수 있고 광고가 나올 수 있습니다. 플러스는 약 이만 구천 원으로, 깊이 생각하는 고급 모델과 넉넉한 사용량, 프로젝트나 예약 작업 같은 기능이 더해집니다. 프로는 약 십오만 구천 원부터로, 가장 뛰어난 모델을 거의 제한 없이 쓰는 전문가용입니다. 여기서 모델이란 에이아이의 두뇌 버전이라고 생각하시면 됩니다. 빠르게 답하는 모델, 기본 모델, 오래 깊이 생각하는 모델이 있고, 유료일수록 좋은 모델을 더 많이 쓸 수 있습니다. 무료에서 사용량을 넘으면 잠시 기다리라는 안내가 나오거나 가벼운 모델로 바뀔 수 있습니다. 요금과 모델 이름은 자주 바뀌니 필요할 때 직접 확인하시고, 수업 중에 결제 안내 창이 뜨면 누르지 말고 닫아 주세요.` },
 
     { eb: 'Mobile · Voice', h: '스마트폰에서는 말로 물어봅니다',
       sub: 'Play 스토어·App Store에서 "ChatGPT"를 검색. 개발사가 OpenAI인지 꼭 확인하세요.',
