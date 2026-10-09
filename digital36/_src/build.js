@@ -252,7 +252,7 @@ function pyRows(D, no) {
   const ms = part ? (part.missions || []).filter(m => m.py) : [];
   if (!ms.length) return '';
   const nbOf = m => (m.ai ? D.ai : D.py).notebook.file;
-  return `<tr><td class="stage">확장<br>(선택)</td><td><ul>${ms.map(m => `<li><strong>${m.ai ? 'AI × 파이썬' : '파이썬'} ${m.n}</strong> ${m.h} — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="${colabUrl(nbOf(m))}" target="_blank" rel="noopener">Colab</a> · <a href="../python/${nbOf(m)}" download>노트북</a> · <a href="../python/answers/${answerName(nbOf(m))}" download>답안</a></li>`).join('')}</ul></td><td class="min">선택</td></tr>`;
+  return `<tr><td class="stage">확장<br>(선택)</td><td><ul>${ms.map(m => `<li><strong>${m.ai ? 'AI × 파이썬' : '파이썬'} ${m.n}</strong> ${m.h} — 실습을 먼저 마친 교육생 또는 과제로 진행 · <a href="${colabUrl(nbOf(m))}" target="_blank" rel="noopener">Colab</a> · <a href="../python/${nbOf(m)}" download>노트북</a></li>`).join('')}</ul></td><td class="min">선택</td></tr>`;
 }
 
 /* =================================================================
@@ -1009,7 +1009,7 @@ function buildColabLesson() {
         <tr><th style="width:130px">학습목표</th><td>${li(CB.goals.map(g => g[0] + ' ' + g[1]))}</td></tr>
         <tr><th>교재 · 자료</th><td><ul>
           <li><a href="colab.html">Colab 사용 설명서</a> — 학생용 · 1~11장 · 실습 예제 C1~C10 · 인쇄 가능</li>
-          <li>실습 노트북 <a href="python/${file}" download>${file}</a> (<a href="${colabUrl(file)}" target="_blank" rel="noopener">Colab에서 열기</a>) · 교수자용 답안 <a href="python/answers/${ans}" download>${ans}</a></li>
+          <li>실습 노트북 <a href="python/${file}" download>${file}</a> (<a href="${colabUrl(file)}" target="_blank" rel="noopener">Colab에서 열기</a>) · 정답은 노트북에서 셀을 실행하면 바로 나옵니다</li>
         </ul></td></tr>
         <tr><th>연계</th><td>앞 교과 「파이썬 기초」 → <strong>이 준비 차시</strong> → 각 단원 실습지의 PYTHON 미션 P1~P9</td></tr>
       </tbody>
@@ -1078,7 +1078,7 @@ ${CSS.colab}
     <h1>파이썬 실습 준비 · <em>${CB.title}</em></h1>
     <p class="standfirst">${CB.theme} — 교과목 「${COURSE_INFO.name}」 · ${COURSE_INFO.kind} · 교수 ${COURSE_INFO.prof} · 훈련시설 ${COURSE_INFO.room}</p>
     <div class="lnk">
-      <a href="colab.html">Colab 사용 설명서</a><a href="python/${file}" download>실습 노트북</a><a href="python/answers/${ans}" download>답안 노트북</a><a href="plan.html">운영계획서</a>
+      <a href="colab.html">Colab 사용 설명서</a><a href="python/${file}" download>실습 노트북</a><a href="plan.html">운영계획서</a>
       <button class="printbtn" onclick="window.print()">🖨 인쇄 / PDF 저장</button>
     </div>
   </div>
@@ -1152,19 +1152,62 @@ function mergeOne(D, P, isAI) {
   });
 }
 
-function buildNotebook(P, answer) {
+/* 정답 표시 — 빈칸 셀 맨 아래에 한 줄을 붙여, 실행하면 결과 아래에 정답이 나오게 합니다.
+   정답은 base64로 넣어 실행 전에는 코드에서 보이지 않습니다. */
+function blankHunks(stu, ans) {
+  const a = stu.split('\n'), b = ans.split('\n'), n = a.length, m = b.length;
+  const L = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--)
+    L[i][j] = a[i].trim() === b[j].trim() ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  const hunks = []; let i = 0, j = 0, cur = null;
+  const flush = () => { if (cur) { hunks.push(cur); cur = null; } };
+  while (i < n || j < m) {
+    if (i < n && j < m && a[i].trim() === b[j].trim()) { flush(); i++; j++; }
+    else if (j < m && (i >= n || L[i][j + 1] >= L[i + 1][j])) { (cur = cur || { s: [], a: [] }).a.push(b[j]); j++; }
+    else { (cur = cur || { s: [], a: [] }).s.push(a[i]); i++; }
+  }
+  flush();
+  const blanks = hunks.filter(h => h.s.some(l => /✏️|^\s*pass\b|=\s*None\b/.test(l)) && h.a.some(l => l.trim()));
+  if (!blanks.length) return null;
+  const ind = Math.min(...blanks.flatMap(h => h.a).filter(l => l.trim()).map(l => l.match(/^ */)[0].length));
+  return blanks.map(h => h.a.filter(l => l.trim()).map(l => '    ' + l.slice(ind)).join('\n')).join('\n    ⋯\n');
+}
+
+function answerLine(stu, ans) {
+  const part = blankHunks(stu, ans);
+  const txt = part
+    ? `${'─'.repeat(40)}\n💡 정답 — 빈칸에 들어갈 코드\n${part}\n※ 다르게 써도 결과가 같으면 정답입니다`
+    : `${'─'.repeat(40)}\n💡 정답 예시 코드\n${ans.split('\n').map(l => '    ' + l).join('\n')}\n※ 여러 가지 답이 있을 수 있습니다`;
+  const b64 = Buffer.from(txt, 'utf8').toString('base64');
+  return `\n\n# 💡 직접 풀고 실행하세요 — 실행하면 결과 아래에 정답이 나옵니다\nprint("\\n" + __import__("base64").b64decode("${b64}").decode())`;
+}
+
+function answerCell(ans) {
+  const b64 = Buffer.from(`💡 정답 코드\n${ans.split('\n').map(l => '    ' + l).join('\n')}`, 'utf8').toString('base64');
+  return `#@title 💡 정답 보기 — 위 셀을 먼저 실행해 본 뒤 ▶ 를 누르세요 { display-mode: "form" }\nprint(__import__("base64").b64decode("${b64}").decode())`;
+}
+
+function buildNotebook(P) {
   const lines = t => t.split('\n').map((l, i, a) => i < a.length - 1 ? l + '\n' : l);
   const file = P.notebook.file;
-  const head = answer
-    ? `> 🔑 **교수자용 답안 노트북** — 학생용 파일: \`${file}\``
-    : `<a href="${colabUrl(file)}" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>`;
+  const head = `<a href="${colabUrl(file)}" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+
+> 💡 ✏️ 빈칸이 있는 셀은 **실행하면 결과 아래에 정답이 바로 나옵니다.** 먼저 직접 풀어 보고 비교하세요.`;
   const cells = [{ cell_type: 'markdown', metadata: {}, source: lines(head) }];
+  const code = (src, meta = {}) => cells.push({ cell_type: 'code', execution_count: null, metadata: meta, outputs: [], source: lines(src) });
   P.notebook.cells.forEach(c => {
     if (c.md !== undefined) {
       cells.push({ cell_type: 'markdown', metadata: {}, source: lines(c.md.replace(/^\n/, '').replace(/\s+$/, '')) });
+      return;
+    }
+    const stu = dedent(c.code);
+    if (!c.answer) { code(stu, c.error ? { tags: ['raises-exception'] } : {}); return; }
+    const ans = dedent(c.answer);
+    if (c.error) {            // 일부러 에러가 나는 셀은 정답 줄이 실행되지 않으므로 바로 아래 정답 셀을 둡니다
+      code(stu, { tags: ['raises-exception'] });
+      code(answerCell(ans), { cellView: 'form' });
     } else {
-      const src = dedent(answer && c.answer ? c.answer : c.code);
-      cells.push({ cell_type: 'code', execution_count: null, metadata: c.error ? { tags: ['raises-exception'] } : {}, outputs: [], source: lines(src) });
+      code(stu + answerLine(stu, ans));
     }
   });
   return JSON.stringify({
@@ -1180,14 +1223,10 @@ function buildNotebook(P, answer) {
 
 function writeNotebooks(all) {
   const dir = path.join(ROOT, 'python');
-  fs.mkdirSync(path.join(dir, 'answers'), { recursive: true });
   all.forEach(D => [D.py, D.ai].filter(Boolean).forEach(P => {
-    const file = P.notebook.file;
-    fs.writeFileSync(path.join(dir, file), buildNotebook(P, false));
-    fs.writeFileSync(path.join(dir, 'answers', answerName(file)), buildNotebook(P, true));
+    fs.writeFileSync(path.join(dir, P.notebook.file), buildNotebook(P));
   }));
-  fs.writeFileSync(path.join(dir, CB.notebook.file), buildNotebook(CB, false));
-  fs.writeFileSync(path.join(dir, 'answers', answerName(CB.notebook.file)), buildNotebook(CB, true));
+  fs.writeFileSync(path.join(dir, CB.notebook.file), buildNotebook(CB));
 }
 
 /* =================================================================
@@ -1242,7 +1281,7 @@ fs.writeFileSync(path.join(ROOT, 'videos.html'), buildVideos(all));
 fs.writeFileSync(path.join(ROOT, 'colab.html'), buildColabGuide());
 fs.writeFileSync(path.join(ROOT, 'colab_lesson.html'), buildColabLesson());
 writeNotebooks(all);
-console.log(`python/  노트북 ${all.filter(D => D.py).length}개 + ${CB.notebook.file} (+ answers/ 답안)`);
+console.log(`python/  노트북 ${all.filter(D => D.py).length}개 + ${CB.notebook.file} (정답은 셀 실행 후 표시)`);
 console.log(`colab.html · colab_lesson.html  (Colab 사용 설명서 · 준비 ${CB.hours}차시 교안)`);
 const total = all.reduce((s, u) => s + u.hours, 0);
 console.log(`index.html · plan.html · nav.js · bonus.html  (${all.length}개 단원 · ${total}시간)`);

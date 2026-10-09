@@ -67,9 +67,10 @@ digital36/
 | P8 | 5-2 | 내 루틴 값 넣고 `.ics` 제목 줄 추가 → 구글 캘린더 | 여러 일정 함수 완성 | `python/unit5_python.ipynb` |
 | P9 | 5-6 | 습관 달성률 (`count("O")`) · 주간 비교 · 보고서 | CSV 읽기 · 최장 연속일 · 그래프 | 〃 |
 
-- 원본: `_src/python/unitN.js` (실습지 미션 + 노트북 셀). `code`는 학생용, `answer`는 답안용 셀입니다.
-- 빌드하면 `python/*.ipynb`(학생용)와 `python/answers/*_answers.ipynb`(교수자용 답안)가 함께 만들어집니다.
-  **답안을 학생에게 공개하지 않으려면 `python/answers/` 폴더는 저장소에 올리지 마세요.**
+- 원본: `_src/python/unitN.js` (실습지 미션 + 노트북 셀). `code`는 문제 셀, `answer`는 정답 코드입니다.
+- 빌드하면 `python/*.ipynb` 하나만 만들어집니다. 교사용 답안 파일은 따로 두지 않습니다.
+  ✏️ 빈칸 셀 맨 아래에 정답 표시 줄이 붙어 있어, **셀을 실행하면 결과 아래에 정답(빈칸에 들어갈 코드)이 바로 나옵니다.**
+  정답은 base64로 들어 있어 실행 전에는 코드에서 보이지 않습니다. 일부러 에러를 내는 셀은 바로 아래 「💡 정답 보기」 셀(코드 숨김)을 실행합니다.
 - "Colab에서 열기" 링크는 `_src/build.js`의 `GITHUB`(저장소 `bctcaiedu/bctcaiedu.github.io`, 브랜치 `main`) 기준입니다. 브랜치 이름이 다르면 고치고 다시 빌드하세요.
 - 그래프 셀은 선택입니다. Colab에서 한글 글꼴(나눔고딕)을 자동 설치합니다. 기본 결과는 글자 막대(■)라 글꼴 없이도 보입니다.
 
@@ -94,7 +95,7 @@ digital36/
 - **연결 순서(자동)**: ① Colab 내장 AI(`google.colab.ai`, 로그인만) → ② Gemini API 키(🔑 보안 비밀 `GOOGLE_API_KEY`) → ③ **연습 모드**(미리 준비한 답). 계정 사정과 관계없이 파이썬 부분은 끝까지 실습됩니다.
 - Colab 내장 AI는 계정 종류 · 지역에 따라 열려 있지 않거나 사용량 제한이 있을 수 있습니다. 수업 전에 노트북 맨 위 셀을 한 번 실행해 연결 방식을 확인하세요.
 - ② 방식의 모델 이름은 노트북의 `제미나이_모델` 변수(기본 `gemini-2.5-flash`)입니다. 서비스가 바뀌면 이 줄만 고칩니다.
-- 원본: `_src/python/unitN_ai.js` (공통 도우미 셀은 `_src/python/ai_common.js`). 답안은 `python/answers/unitN_ai_answers.ipynb`.
+- 원본: `_src/python/unitN_ai.js` (공통 도우미 셀은 `_src/python/ai_common.js`). 정답은 각 셀을 실행하면 바로 나옵니다.
 
 ### AI 트렌드 영상관 · 차시별 영상
 - `videos.html` — AI 트렌드(에이전트 · 구글 I/O 2026 · 영상 생성 AI · CES 2026 로봇 · 바이브 코딩 · AI와 일자리) + 단원 · 차시별 복습 영상. 누르면 화면 안에서 재생, 안 되면 유튜브에서 열기.
@@ -109,7 +110,7 @@ digital36/
 |---|---|---|
 | 사용 설명서 (학생용) | `colab.html` | 1 코랩이란 · 2 시작하기 · 3 화면 구성(그림) · 4 셀 · 5 런타임 · 6 파일/드라이브 · 7 편리한 기능(폼·`!pip`·Gemini) · 8 저장/공유/제출 · 9 실습 예제 C1~C10 · 10 문제 해결표 · 11 단축키/안전 수칙/자가 점검 |
 | 차시별 교안 (교수자용) | `colab_lesson.html` | 준비 1차시(접속·화면·셀·저장) · 2차시(폼·파일·드라이브·QR·그래프·오류·AI 코드 검증·공유) · 수업 전 점검표 · 평가 기준(상/중/하) |
-| 실습 노트북 | `python/colab_basics.ipynb` | 예제 1~10 + 도전(평↔㎡ 변환기). 답안은 `python/answers/colab_basics_answers.ipynb` |
+| 실습 노트북 | `python/colab_basics.ipynb` | 예제 1~10 + 도전(평↔㎡ 변환기). 정답은 셀 실행 후 바로 표시 |
 
 - 교안·문제 해결표·노트북은 `_src/colab.js`, 설명서 본문은 `_src/colab_guide.html`, 전용 스타일은 `_src/css/colab.css`를 고치고 다시 빌드합니다.
 - 표지(index.html)의 "파이썬 실습 준비 · Google Colab" 카드와 목차 사이드바에서 들어갈 수 있습니다.
