@@ -853,6 +853,8 @@ ${FONTS}
   .c{font-size:12px;color:var(--muted);padding:0 12px}
   .d{font-size:13px;padding:4px 12px 12px}
   .note{font-size:13px;color:var(--muted);margin:6px 0 0}
+  .filenote{background:#FFF4E5;color:#7A4B00;border:1px solid #F5C77E;border-radius:8px;padding:10px 14px;font-size:14px;margin:0 0 8px}
+  .filenote[hidden]{display:none}
   .modal{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
   .modal.on{display:flex}
   .mbox{width:min(960px,100%);background:#000;border-radius:10px;overflow:hidden}
@@ -873,6 +875,7 @@ ${FONTS}
 </div></header>
 
 <div class="wrap">
+  <p class="filenote" id="filenote" hidden>💡 지금은 내 PC의 파일로 열려 있어서, 영상을 누르면 <b>유튜브 새 창</b>에서 재생됩니다. (유튜브는 파일로 연 페이지 안에서의 재생을 막습니다. GitHub Pages 주소로 열면 이 화면 안에서 바로 재생됩니다.)</p>
   <h2 class="sec" id="trend">AI TRENDS · 2026</h2>
   <p class="note">수업 시작 5분 "이번 주 AI 소식"이나 쉬는 시간에 함께 보기 좋은 영상입니다. 영상 속 서비스 · 가격 · 기능은 빠르게 바뀌니 최신 정보는 공식 사이트에서 확인하세요.</p>
   ${trends}
@@ -885,18 +888,21 @@ ${FONTS}
 </div>
 
 <div class="modal" id="modal" role="dialog" aria-modal="true"><div class="mbox">
-  <iframe id="frame" title="유튜브 영상" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+  <iframe id="frame" title="유튜브 영상" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
   <div class="mbar"><span id="mtitle"></span><a id="mopen" target="_blank" rel="noopener">유튜브에서 열기</a><button id="mclose">닫기 ✕</button></div>
 </div></div>
 
 <footer><div class="wrap"><p>영상은 각 채널의 저작물입니다. 수업에서는 링크로 연결해 시청하며, 내려받거나 다시 올리지 않습니다. 영상이 사라졌다면 <code>_src/videos.js</code>에서 바꾸고 다시 빌드하세요.</p></div></footer>
 <script>
   var M = document.getElementById('modal'), F = document.getElementById('frame');
+  if (location.protocol === 'file:') document.getElementById('filenote').hidden = false;
   document.addEventListener('click', function (e) {
     var c = e.target.closest('.vc');
     if (c) {
       var id = c.dataset.id;
-      F.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0';
+      // 내 PC에서 파일(file://)로 열면 유튜브가 "오류 153"으로 재생을 막으므로 유튜브 새 창으로 엽니다
+      if (location.protocol === 'file:') { window.open('https://www.youtube.com/watch?v=' + id, '_blank', 'noopener'); return; }
+      F.src = 'https://www.youtube.com/embed/' + id + '?autoplay=1&rel=0&playsinline=1&origin=' + encodeURIComponent(location.origin);
       document.getElementById('mtitle').textContent = c.querySelector('.t').textContent;
       document.getElementById('mopen').href = 'https://www.youtube.com/watch?v=' + id;
       M.classList.add('on');
