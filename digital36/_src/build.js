@@ -352,8 +352,8 @@ function buildLab(D) {
       <div class="sbody">${s.body}</div>
     </div>`).join('\n')}
     ${(p.missions || []).map(m => `
-    <div class="mission${m.py ? ' py' : ''}${m.ai ? ' ai' : ''}">
-      <div class="mhead"><span class="mn">${m.ai ? `AI × PYTHON ${m.n} · 선택` : m.py ? `PYTHON ${m.n} · 선택` : `MISSION ${pad(m.n)}`}</span><h3>${m.h}</h3></div>
+    <div class="mission${m.py ? ' py' : ''}${m.ai ? ' ai' : ''}${m.work ? ' work' : ''}">
+      <div class="mhead"><span class="mn">${m.ai ? `AI × PYTHON ${m.n} · 선택` : m.py ? `PYTHON ${m.n} · 선택` : m.work ? `CHATGPT WORK ${m.n}` : `MISSION ${pad(m.n)}`}</span><h3>${m.h}</h3></div>
       ${m.body}
     </div>`).join('\n')}
     ${(() => { const ids = vidsOf(D.unit, +String(p.pn).replace(/\D/g, '')); return ids.length ? `<div class="vbox"><span class="lbl">📺 함께 보면 좋은 영상 — 미션을 마치고 남는 시간에</span><div class="vlist">${ids.map(vidCard).join('')}</div></div>` : ''; })()}
@@ -425,6 +425,8 @@ ${FONTS}
 ${CSS.lab}
   pre{white-space:pre-wrap;word-break:keep-all;font-family:var(--sans);font-size:13.5px}
   .mission.py{border-left-color:var(--ask)}
+  .mission.work{border-left-color:#10A37F}
+  .mission.work .mn{color:#0E8A6B}
   .mission.py .mn{color:var(--ask)}
   .nb{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0 4px;padding:10px 12px;background:var(--ask-soft);border-radius:4px}
   .nb b{font-size:13px;color:var(--ink-2);margin-right:4px}
@@ -930,6 +932,8 @@ ${FONTS}
 ${CSS.lab}
   pre{white-space:pre-wrap;word-break:keep-all;font-family:var(--sans);font-size:13.5px}
   .mission.py{border-left-color:var(--ask)}
+  .mission.work{border-left-color:#10A37F}
+  .mission.work .mn{color:#0E8A6B}
   .mission.py .mn{color:var(--ask)}
 ${CSS.bonus}
   @media print{ .l70nav{display:none} pre{background:#F2F2F2;color:#000} pre .p,pre .o,pre .c{color:#000} }
