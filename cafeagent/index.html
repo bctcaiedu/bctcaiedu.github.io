@@ -1,0 +1,1098 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 카페 비서 만들기</title>
+<meta name="description" content="Antigravity · Ollama(Qwen) · Hermes Agent · 텔레그램으로 비용 0원 카페 사장님 AI 비서를 만드는 AI응용소프트웨어과 실습 교안">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
+<script>try{var t=localStorage.getItem('cafeagent-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<style>
+  :root{
+    --bg:#f4f6f9;--card:#fff;--card2:#f7f9fc;--line:#e1e6ee;--line2:#b9c2d0;--fg:#1d2433;--muted:#6b7587;
+    --accent:#e95420;--accent-soft:#fdece6;--accent2:#77216f;--accent2-soft:#f5e8f3;
+    --ok:#1f9d55;--ok-soft:#e3f6ec;--warn:#c98a00;--warn-soft:#fff6d9;--danger:#d64541;--danger-soft:#fdeaea;
+    --more:#7b4fd1;--more-soft:#f1ebfd;--code-bg:#f6f8fb;--code-fg:#24292f;--tk-def:#953800;
+    --term-bg:#0f1419;--term-fg:#d7dde8;--kakao:#FEE500;--kakao-ink:#3A1D1D;
+    --shadow:0 1px 2px rgba(20,30,50,.06),0 4px 16px rgba(20,30,50,.06);--radius:10px;
+    --mono:'JetBrains Mono','D2Coding',Consolas,'Courier New',monospace;
+    --sans:'Pretendard Variable',Pretendard,-apple-system,'Segoe UI','Malgun Gothic',sans-serif;
+    color-scheme:light}
+  :root[data-theme="dark"]{
+    --bg:#0e1116;--card:#1a2029;--card2:#1f2631;--line:#2a323e;--line2:#4a5566;--fg:#e3e8f0;--muted:#8d97a8;
+    --accent:#ff7f50;--accent-soft:#3b1f14;--accent2:#d58bcb;--accent2-soft:#2f1a2d;
+    --ok:#4cc983;--ok-soft:#132e20;--warn:#f2c14e;--warn-soft:#33290f;--danger:#ff6b61;--danger-soft:#3a1a18;
+    --more:#b695ff;--more-soft:#271d3d;--code-bg:#11161d;--code-fg:#d6deeb;--tk-def:#ffa657;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25);color-scheme:dark}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:20px}
+  html,code,kbd,pre{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0,"clig" 0,"dlig" 0}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15.5px;line-height:1.7;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent2)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+  .topbar{display:flex;align-items:center;gap:10px;padding:14px 0}
+  .topbar .logo{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:19px;background:linear-gradient(135deg,#e95420,#77216f)}
+  .topbar b{font-size:16px;letter-spacing:-.01em;display:block;line-height:1.2}
+  .topbar small{font-size:12px;color:var(--muted)}
+  .topbar .sp{flex:1}
+  .btn{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;padding:6px 12px;cursor:pointer;font:600 13.5px var(--sans);text-decoration:none}
+  .btn:hover{border-color:var(--accent)}
+
+  .hero{border-radius:16px;padding:34px 34px 30px;margin:6px 0 0;color:#fff;position:relative;overflow:hidden;
+    background:radial-gradient(circle at 85% 20%,rgba(255,255,255,.18),transparent 40%),linear-gradient(135deg,#e95420 0%,#a33a4c 45%,#4a0f3d 100%)}
+  .hero .eyebrow{font:600 12px var(--mono);letter-spacing:.06em;opacity:.9}
+  .hero h1{margin:10px 0 8px;font-size:clamp(28px,4.4vw,38px);line-height:1.25;letter-spacing:-.02em;font-weight:800}
+  .hero p{margin:4px 0;opacity:.95;max-width:62ch;font-size:16px}
+  .hero .meta{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px;position:relative;z-index:1}
+  .hero .meta span{font-size:13px;font-weight:600;background:rgba(255,255,255,.95);color:#1d2433;border-radius:8px;padding:5px 11px}
+  .hero .meta span.k{background:var(--kakao);color:var(--kakao-ink)}
+  .hero .cup{position:absolute;right:26px;bottom:-18px;font-size:120px;opacity:.25;pointer-events:none}
+
+  .layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:32px;margin-top:28px}
+  nav.toc{position:sticky;top:16px;align-self:start;font-size:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;box-shadow:var(--shadow)}
+  nav.toc b{display:block;font:700 11px var(--mono);letter-spacing:.1em;color:var(--muted);margin:2px 6px 8px}
+  nav.toc a{display:block;padding:7px 10px;border-radius:8px;color:var(--fg);text-decoration:none;line-height:1.35}
+  nav.toc a:hover{background:var(--card2)}
+  nav.toc a.on{background:var(--accent-soft);color:var(--accent);font-weight:700}
+  nav.toc a small{font:700 10.5px var(--mono);color:var(--accent);display:block}
+
+  main{min-width:0}
+  section{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:28px 34px 30px;margin-bottom:24px}
+  .sec{font:700 12px var(--mono);color:var(--accent);margin:0 0 4px}
+  h2{font-size:24px;line-height:1.35;margin:0 0 14px;padding-bottom:8px;border-bottom:2px solid var(--line);letter-spacing:-.01em}
+  h3{font-size:18.5px;margin:30px 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  h3::before{content:'';width:5px;height:18px;border-radius:3px;background:var(--accent)}
+  h3 .n{font:600 12px var(--mono);color:var(--accent2);background:var(--accent2-soft);border-radius:5px;padding:1px 7px}
+  .lead{font-size:16px;margin:0 0 8px}
+  p{margin:8px 0}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:3px 0}
+  li::marker{color:var(--accent)}
+  :not(pre)>code{font-family:var(--mono);background:var(--card2);border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:.88em;color:var(--tk-def);word-break:break-word}
+
+  .tbl{overflow-x:auto;margin:12px 0}
+  table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px;background:var(--card);border-radius:8px;overflow:hidden;box-shadow:var(--shadow)}
+  th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+  th{background:var(--card2);font-weight:700}
+
+  .code{position:relative;margin:14px 0 16px;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--code-bg);box-shadow:var(--shadow)}
+  .code .lang{display:block;padding:7px 90px 7px 14px;background:var(--card);border-bottom:1px solid var(--line);font:600 11.5px var(--mono);color:var(--accent2)}
+  pre{margin:0;padding:12px 16px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.6;color:var(--code-fg);white-space:pre;tab-size:4}
+  pre code{background:none;border:0;padding:0;color:inherit;font-size:inherit}
+  .code.term pre{background:var(--term-bg);color:var(--term-fg)}
+  .copy{position:absolute;top:4px;right:6px;font:600 12px var(--sans);background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:7px;padding:3px 9px;cursor:pointer}
+  .copy:hover{border-color:var(--accent);color:var(--accent)}
+  .code.prompt{border-left:5px solid var(--more)}
+  .code.prompt .lang{color:var(--more);background:var(--more-soft)}
+  .code.prompt pre{font-family:var(--sans);font-size:14.5px;white-space:pre-wrap;background:var(--card)}
+  details.full{margin:12px 0}
+  details.full summary{cursor:pointer;font-weight:700;padding:10px 16px;background:var(--accent2-soft);color:var(--accent2);border:1px solid var(--line);border-radius:var(--radius)}
+  details.full[open] summary{border-radius:var(--radius) var(--radius) 0 0}
+  details.full .code{margin-top:0;border-radius:0 0 var(--radius) var(--radius)}
+
+  .ok,.warn,.tip{border-radius:var(--radius);padding:12px 16px;margin:16px 0;border:1px solid var(--line);border-left-width:5px;font-size:15px}
+  .ok::before,.warn::before,.tip::before{display:block;font-weight:800;margin-bottom:2px}
+  .ok{border-left-color:var(--ok);background:var(--ok-soft)}
+  .ok::before{content:"✅ 확인 포인트";color:var(--ok)}
+  .warn{border-left-color:var(--danger);background:var(--danger-soft)}
+  .warn::before{content:"⚠️ 주의";color:var(--danger)}
+  .tip{border-left-color:var(--accent2);background:var(--accent2-soft)}
+  .tip::before{content:"💡 강사 메모";color:var(--accent2)}
+  .ok p,.warn p,.tip p{margin:4px 0}
+
+  .checks{list-style:none;padding:0}
+  .checks li{position:relative;padding:9px 12px 9px 42px;background:var(--card2);border:1px solid var(--line);border-radius:8px;margin:8px 0}
+  .checks input{position:absolute;left:14px;top:13px;width:17px;height:17px;accent-color:var(--ok)}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:16px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);transition:transform .12s,border-color .12s}
+  .card:hover{transform:translateY(-2px);border-color:var(--accent)}
+  .card .dn{font:700 12px var(--mono);color:var(--accent)}
+  .card b{display:block;font-size:16px;margin:4px 0 2px}
+  .card span{font-size:13.5px;color:var(--muted);line-height:1.55;display:block}
+
+  figure{margin:20px 0 8px}
+  .diagram{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;overflow-x:auto}
+  .diagram svg{display:block;width:100%;min-width:620px;height:auto}
+  figcaption{font-size:13.5px;color:var(--muted);margin-top:8px}
+  svg .bx{fill:var(--card);stroke:var(--line2);stroke-width:1.25}
+  svg .bx.main{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2}
+  svg .bx.dash{fill:none;stroke-dasharray:4 4}
+  svg .pc{fill:var(--bg);stroke:var(--line2);stroke-width:1}
+  svg .ln{fill:none;stroke:var(--line2);stroke-width:1.4}
+  svg .ln.dash{stroke-dasharray:4 4}
+  svg .t{fill:var(--fg);font-weight:700;font-size:13px;text-anchor:middle;font-family:var(--sans)}
+  svg .s{fill:var(--muted);font-size:11.5px;text-anchor:middle;font-family:var(--sans)}
+  svg .h{fill:var(--accent2);font-weight:700;font-size:13px;font-family:var(--sans)}
+  svg .ah{fill:var(--line2)}
+
+  /* 도구 용어: 누르면 설명 창 */
+  .term{font:inherit;color:inherit;background:none;border:0;padding:0 1px;margin:0;cursor:pointer;
+        border-bottom:2px dotted var(--accent);border-radius:2px;line-height:inherit}
+  .term:hover,.term:focus-visible{background:var(--accent-soft);color:var(--accent);outline:none}
+  .toolgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:12px 0 4px}
+  .toolcard{display:flex;gap:10px;align-items:flex-start;text-align:left;font:inherit;color:var(--fg);background:var(--card);
+        border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);cursor:pointer;transition:transform .12s,border-color .12s}
+  .toolcard:hover,.toolcard:focus-visible{transform:translateY(-2px);border-color:var(--accent);outline:none}
+  .toolcard .ic{font-size:22px;line-height:1.2}
+  .toolcard b{display:block;font-size:15px}
+  .toolcard small{display:block;color:var(--muted);font-size:12.5px;line-height:1.45;margin-top:2px}
+  .toolcard .role{font:700 10.5px var(--mono);color:var(--accent2)}
+
+  dialog.tooltip-modal{border:1px solid var(--line);border-radius:16px;padding:0;max-width:640px;width:calc(100% - 32px);
+        background:var(--card);color:var(--fg);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  dialog.tooltip-modal::backdrop{background:rgba(14,17,22,.55)}
+  .tm-head{display:flex;gap:12px;align-items:center;padding:18px 20px 14px;color:#fff;
+        background:linear-gradient(135deg,#e95420 0%,#a33a4c 55%,#4a0f3d 100%)}
+  .tm-head .ic{font-size:30px}
+  .tm-head h4{margin:0;font-size:20px;line-height:1.3}
+  .tm-head p{margin:2px 0 0;font-size:13.5px;opacity:.92}
+  .tm-head .x{margin-left:auto;align-self:flex-start;background:rgba(255,255,255,.2);color:#fff;border:0;border-radius:8px;
+        width:32px;height:32px;font-size:18px;cursor:pointer}
+  .tm-head .x:hover{background:rgba(255,255,255,.35)}
+  .tm-body{padding:16px 20px 20px;font-size:15px;max-height:65vh;overflow-y:auto}
+  .tm-body h5{font-size:13px;color:var(--accent);margin:14px 0 4px;font-weight:800}
+  .tm-body h5:first-child{margin-top:0}
+  .tm-body p{margin:4px 0}
+  .tm-body ul{margin:4px 0;padding-left:20px}
+  .tm-body .facts{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px;background:var(--card2);
+        border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:4px 0}
+  .tm-body .facts dt{color:var(--muted);font-weight:600}
+  .tm-body .facts dd{margin:0}
+  .tm-body .go{display:inline-block;margin-top:14px;font-weight:700;text-decoration:none;color:var(--accent2);
+        border:1px solid var(--line);border-radius:8px;padding:6px 12px}
+  .tm-body .go:hover{border-color:var(--accent2)}
+
+  footer{padding:20px 0 50px;font-size:13px;color:var(--muted)}
+  footer a{color:var(--muted)}
+
+  @media (max-width:900px){.layout{grid-template-columns:1fr;gap:0} nav.toc{display:none}}
+  @media (max-width:760px){.wrap{padding:0 16px} section{padding:22px 18px} .hero{padding:26px 22px} .hero .cup{font-size:80px}}
+  @media print{nav.toc,.copy,.topbar .btn{display:none} .layout{display:block} section{box-shadow:none} pre{white-space:pre-wrap}}
+</style>
+
+<header class="wrap">
+  <div class="topbar">
+    <div class="logo">☕</div>
+    <div><b>AI 카페 비서 만들기</b><small>AI응용소프트웨어과 · 실습 교안</small></div>
+    <span class="sp"></span>
+    <button class="btn" id="theme" type="button">🌙 다크</button>
+  </div>
+  <div class="hero">
+    <div class="eyebrow">한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과</div>
+    <h1>텔레그램으로 대화하는<br>AI 카페 비서 만들기</h1>
+    <p>코드는 Antigravity에 한국어로 부탁해서 만들고, 두뇌는 내 PC의 Qwen, 비서는 Hermes, 창구는 텔레그램. 모든 도구가 무료이고, 카카오톡 연결은 보충으로 다룹니다.</p>
+    <div class="meta"><span>6차시 · 차시당 3시간</span><span>비용 0원</span><span>코딩 경험 없어도 OK</span><span>Windows PC</span><span class="k">텔레그램 연동</span></div>
+    <div class="cup">☕</div>
+  </div>
+</header>
+
+<div class="wrap layout">
+  <nav class="toc" aria-label="목차">
+    <b>CONTENTS</b>
+    <a href="#overview"><small>OVERVIEW</small>과정 개요</a>
+    <a href="#tools"><small>TOOLS</small>도구 사전</a>
+    <a href="#step0"><small>STEP 0</small>사전 준비</a>
+    <a href="#step1"><small>STEP 1</small>Ollama + Qwen</a>
+    <a href="#step2"><small>STEP 2</small>카페 도구(MCP)</a>
+    <a href="#step3"><small>STEP 3</small>Hermes 연결</a>
+    <a href="#step4"><small>STEP 4</small>텔레그램 봇</a>
+    <a href="#step5"><small>STEP 5</small>Hermes ↔ 텔레그램</a>
+    <a href="#step6"><small>STEP 6</small>통합 테스트</a>
+    <a href="#faq"><small>FAQ</small>문제 해결 · 보안</a>
+    <a href="#kakao"><small>SUPPLEMENT</small>보충: 카카오톡 연결</a>
+  </nav>
+
+  <main>
+    <!-- ───────── 개요 ───────── -->
+    <section id="overview">
+      <div class="sec">Overview</div>
+      <h2>과정 개요</h2>
+      <p class="lead">이 과정이 끝나면 텔레그램으로 “오늘 매출 알려줘”라고 보내면 AI가 답하는 <b>카페 사장님 비서</b>를 직접 만들어 보게 됩니다.</p>
+      <div class="cards">
+        <div class="card"><div class="dn">WHO</div><b>AI응용소프트웨어과 수강생</b><span>코딩 경험이 없어도 되고, 마우스·키보드와 메신저만 쓸 줄 알면 됩니다.</span></div>
+        <div class="card"><div class="dn">GOAL</div><b>에이전트의 구조 이해</b><span>“생각하는 두뇌(LLM)”, “손발(도구)”, “대화 창구(메신저)”를 직접 조립합니다.</span></div>
+        <div class="card"><div class="dn">RESULT</div><b>텔레그램 카페 비서</b><span>매출 조회, 품절 처리, 지출 등록, 신메뉴 등록을 대화로 처리합니다.</span></div>
+      </div>
+
+      <h3 id="tools">사용하는 도구 한눈에 보기 <span class="n">클릭하면 자세히</span></h3>
+      <p>본문에서 <button type="button" class="term" data-term="mcp">밑줄 친 도구 이름</button>을 누르면 그 도구가 무엇이고 이 과정에서 어떤 역할을 하는지 설명 창이 열립니다.</p>
+      <div class="toolgrid" id="toolgrid"></div>
+
+      <figure>
+        <div class="diagram">
+          <svg viewBox="0 0 760 380" role="img" aria-label="텔레그램 질문은 내 PC의 Hermes가 Qwen과 카페 도구로 답합니다">
+            <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="ah" d="M0 0L10 5L0 10z"/></marker></defs>
+            <rect class="pc" x="24" y="124" width="712" height="240" rx="8"/>
+            <text class="h" x="40" y="148">내 PC · 모두 무료, 인터넷 요금 없음</text>
+            <g>
+              <path class="ln" d="M220 68H290" marker-start="url(#ah)" marker-end="url(#ah)"/>
+              <path class="ln" d="M380 168V96" marker-start="url(#ah)" marker-end="url(#ah)"/>
+              <path class="ln" d="M290 196H220" marker-start="url(#ah)" marker-end="url(#ah)"/>
+              <path class="ln" d="M380 224V268" marker-end="url(#ah)"/>
+              <path class="ln" d="M290 296H220" marker-start="url(#ah)" marker-end="url(#ah)"/>
+              <path class="ln dash" d="M630 268V224" marker-end="url(#ah)"/>
+              <path class="ln dash" d="M540 296H470" marker-end="url(#ah)"/>
+              <path class="ln dash" d="M540 196H470" marker-end="url(#ah)"/>
+            </g>
+            <text class="s" x="392" y="136" style="text-anchor:start">PC가 먼저 새 메시지를 가져옴</text>
+            <rect class="bx" x="40" y="40" width="180" height="56" rx="8"/><text class="t" x="130" y="64">텔레그램 앱</text><text class="s" x="130" y="83">사장님 휴대폰</text>
+            <rect class="bx" x="290" y="40" width="180" height="56" rx="8"/><text class="t" x="380" y="64">텔레그램 서버</text><text class="s" x="380" y="83">내 봇의 메시지 보관</text>
+            <rect class="bx dash" x="540" y="40" width="180" height="56" rx="8"/><text class="t" x="630" y="64">터널·중계 서버 불필요</text><text class="s" x="630" y="83">카카오톡은 보충에서</text>
+            <rect class="bx main" x="290" y="168" width="180" height="56" rx="8"/><text class="t" x="380" y="192">Hermes 에이전트</text><text class="s" x="380" y="211">hermes gateway</text>
+            <rect class="bx" x="40" y="168" width="180" height="56" rx="8"/><text class="t" x="130" y="192">Ollama + Qwen3</text><text class="s" x="130" y="211">두뇌 · 11434</text>
+            <rect class="bx" x="540" y="168" width="180" height="56" rx="8"/><text class="t" x="630" y="192">SOUL.md</text><text class="s" x="630" y="211">비서의 성격과 말투</text>
+            <rect class="bx" x="290" y="268" width="180" height="56" rx="8"/><text class="t" x="380" y="292">카페 MCP 도구</text><text class="s" x="380" y="311">cafe_mcp.py · 손발</text>
+            <rect class="bx" x="40" y="268" width="180" height="56" rx="8"/><text class="t" x="130" y="292">cafe.db</text><text class="s" x="130" y="311">카페 장부</text>
+            <rect class="bx dash" x="540" y="268" width="180" height="56" rx="8"/><text class="t" x="630" y="292">Antigravity</text><text class="s" x="630" y="311">코드를 만들어 줌</text>
+            <text class="s" x="40" y="350" style="text-anchor:start">점선: Antigravity로 만들거나 직접 쓰는 파일 · 실선: 질문과 답이 오가는 길</text>
+          </svg>
+        </div>
+        <figcaption>텔레그램에 보낸 질문은 텔레그램 서버에 보관되고, 내 PC의 Hermes가 그 메시지를 직접 가져옵니다. 그래서 인터넷 주소(터널)나 중계 서버가 필요 없습니다. Hermes는 Qwen에게 물어 알맞은 카페 도구를 실행하고, 답을 텔레그램으로 보냅니다.</figcaption>
+      </figure>
+
+      <h3>비용 0원 구성</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>역할</th><th>사용 도구</th><th>비용</th><th>비고</th></tr></thead>
+        <tbody>
+          <tr><td>코드 작성</td><td>Google Antigravity</td><td>무료</td><td>개인 Gmail 계정, 사용량 한도 있음</td></tr>
+          <tr><td>두뇌(LLM)</td><td>Ollama + Qwen3</td><td>무료</td><td>내 PC에서 실행, 인터넷 요금 없음</td></tr>
+          <tr><td>에이전트</td><td>Hermes Agent</td><td>무료</td><td>오픈소스(MIT 라이선스)</td></tr>
+          <tr><td>도구 연결</td><td>MCP(파이썬)</td><td>무료</td><td>Antigravity로 생성</td></tr>
+          <tr><td>대화 창구</td><td>텔레그램 봇 (@BotFather)</td><td>무료</td><td>텔레그램 계정만 있으면 바로 생성, 심사 없음</td></tr>
+          <tr><td>보충: 카카오톡</td><td>카카오톡 채널 + 오픈빌더 + Cloudflare 터널</td><td>무료</td><td>카카오 비즈니스 계정, 콜백 신청 필요</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>차시 구성 <span class="n">권장 6차시 · 차시당 3시간</span></h3>
+      <div class="tbl"><table>
+        <thead><tr><th>차시</th><th>단계</th><th>주요 활동</th><th>확인 포인트</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>0~1단계</td><td>설치, Ollama로 Qwen과 대화</td><td>터미널에서 Qwen이 한국어로 답함</td></tr>
+          <tr><td>2</td><td>2단계</td><td>Antigravity로 카페 데이터와 MCP 서버 만들기</td><td>매출 조회 함수 실행 성공</td></tr>
+          <tr><td>3</td><td>3단계</td><td>Hermes 설치, Qwen과 카페 MCP 연결</td><td><code>hermes</code>에서 “오늘 매출” 답변</td></tr>
+          <tr><td>4</td><td>4~5단계</td><td>텔레그램 봇 만들기, Hermes에 연결</td><td>휴대폰 텔레그램에서 매출 답변</td></tr>
+          <tr><td>5</td><td>6단계</td><td>통합 테스트, 시연, 응용 과제</td><td>시나리오 6개 통과</td></tr>
+          <tr><td>6</td><td>보충</td><td>카카오톡 채널 연결 (선택)</td><td>카카오톡에서 답변</td></tr>
+        </tbody>
+      </table></div>
+      <div class="tip"><p>본 과정은 <b>텔레그램</b>으로 진행합니다. 봇을 만드는 데 1분이면 되고, 심사도 없고, Hermes가 직접 지원해서 터널이나 중계 서버가 필요 없습니다. 카카오톡으로 연결하려면 <a href="#kakao">보충</a>을 따라 합니다. 이때는 카카오 콜백 승인에 며칠이 걸릴 수 있으니 미리 신청해 두세요.</p></div>
+    </section>
+
+    <!-- ───────── 0단계 ───────── -->
+    <section id="step0">
+      <div class="sec">Step 0</div>
+      <h2>사전 준비</h2>
+      <p class="lead">수업 전에 PC 사양 점검, 프로그램 설치, 계정 생성까지 끝내 두면 수업 시간을 실습에만 쓸 수 있습니다. 가장 중요한 것은 <b>PC 메모리(RAM)</b>입니다.</p>
+
+      <h3>PC 사양</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>항목</th><th>최소</th><th>권장</th><th>사용 모델</th></tr></thead>
+        <tbody>
+          <tr><td>운영체제</td><td>Windows 10 64비트</td><td>Windows 11</td><td>-</td></tr>
+          <tr><td>메모리(RAM)</td><td>16GB</td><td>32GB</td><td>16GB: <code>qwen3:4b</code>, 32GB: <code>qwen3:8b</code></td></tr>
+          <tr><td>그래픽카드</td><td>없어도 됨</td><td>NVIDIA 8GB 이상</td><td>있으면 답변이 5~10배 빨라짐</td></tr>
+          <tr><td>저장 공간</td><td>여유 20GB</td><td>여유 40GB</td><td>모델 파일이 3~5GB</td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li>Hermes는 모델의 대화 기억 길이(컨텍스트)를 <b>최소 64,000토큰</b> 요구합니다. 이 길이를 맞추려면 모델 크기보다 메모리가 더 많이 필요해서 8GB PC는 권하지 않습니다.</li>
+        <li>그래픽카드가 없는 PC는 첫 답변에 1~3분이 걸릴 수 있습니다. 실습실 PC가 느리면 강사 PC 한 대를 Ollama 서버로 쓰고 학생들이 여기에 접속하는 방식도 있습니다(<a href="#faq">FAQ</a> 참고).</li>
+      </ul>
+
+      <h3>설치할 프로그램</h3>
+      <ol>
+        <li><b>Python 3.12</b>: <a href="https://www.python.org/downloads/" target="_blank" rel="noopener">python.org/downloads</a>에서 받습니다. 설치 첫 화면에서 <b>“Add python.exe to PATH”에 꼭 체크</b>하세요.</li>
+        <li><b>Git for Windows</b>: <a href="https://git-scm.com/download/win" target="_blank" rel="noopener">git-scm.com</a>에서 받아 기본값으로 설치합니다. Hermes 설치에 필요합니다.</li>
+        <li><b>Ollama</b>: <a href="https://ollama.com/download" target="_blank" rel="noopener">ollama.com/download</a>에서 Windows용을 받습니다(1단계에서 자세히).</li>
+        <li><b>Google Antigravity</b>: <a href="https://antigravity.google" target="_blank" rel="noopener">antigravity.google</a>에서 Windows용을 받고, 처음 실행할 때 Google 계정으로 로그인합니다.</li>
+        <li><b>텔레그램</b>: 휴대폰에 텔레그램 앱을 설치합니다. PC에서도 쓰려면 <a href="https://desktop.telegram.org" target="_blank" rel="noopener">Telegram Desktop</a>을 설치합니다(선택).</li>
+      </ol>
+      <p>카카오톡 보충 실습을 할 때만 터널 프로그램 <code>cloudflared</code>를 추가로 설치합니다(<a href="#kakao">보충</a> 참고).</p>
+
+      <h3>만들 계정</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>계정</th><th>용도</th><th>만드는 곳</th></tr></thead>
+        <tbody>
+          <tr><td>Google(Gmail)</td><td>Antigravity 로그인</td><td><a href="https://accounts.google.com" target="_blank" rel="noopener">accounts.google.com</a></td></tr>
+          <tr><td>텔레그램</td><td>봇 만들기, 비서와 대화</td><td>텔레그램 앱에서 휴대폰 번호로 가입</td></tr>
+          <tr><td>카카오 비즈니스 (보충)</td><td>카카오톡 채널·챗봇 만들기</td><td><a href="https://business.kakao.com" target="_blank" rel="noopener">business.kakao.com</a> (카카오계정으로 가입)</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>강사가 미리 할 일</h3>
+      <ul class="checks">
+        <li><input type="checkbox" aria-label="완료">학생 모두 텔레그램에 가입되어 있는지 확인합니다. 가입할 때 휴대폰 문자 인증이 필요합니다.</li>
+        <li><input type="checkbox" aria-label="완료">강사가 4~5단계를 미리 해 보고 봇 하나를 시연용으로 준비해 둡니다.</li>
+        <li><input type="checkbox" aria-label="완료">카카오톡 보충까지 할 계획이면 1차시 1주 전에 카카오 채널을 만들고 <b>AI 챗봇 콜백을 신청</b>합니다(보충 K-2).</li>
+        <li><input type="checkbox" aria-label="완료">실습실 PC에 Qwen 모델을 미리 내려받아 둡니다. 한 반이 동시에 받으면 네트워크가 느려집니다.</li>
+      </ul>
+    </section>
+
+    <!-- ───────── 1단계 ───────── -->
+    <section id="step1">
+      <div class="sec">Step 1 · 1차시</div>
+      <h2>Ollama에 Qwen 두뇌 설치하기</h2>
+      <p class="lead">이 단계가 끝나면 인터넷 요금 없이 내 PC에서 돌아가는 AI(Qwen)와 한국어로 대화할 수 있습니다. Ollama는 AI 모델을 내려받아 실행해 주는 프로그램이고, Qwen은 알리바바가 무료로 공개한 AI 모델입니다.</p>
+
+      <h3><span class="n">1-1</span>Ollama 설치</h3>
+      <ol>
+        <li><a href="https://ollama.com/download" target="_blank" rel="noopener">ollama.com/download</a>에서 <b>Download for Windows</b>를 눌러 설치합니다.</li>
+        <li>설치가 끝나면 화면 오른쪽 아래 작업표시줄에 라마 아이콘이 생깁니다.</li>
+        <li>PowerShell을 열고 설치를 확인합니다.</li>
+      </ol>
+      <div class="code term"><span class="lang">PowerShell</span><pre><code>ollama --version</code></pre></div>
+
+      <h3><span class="n">1-2</span>Qwen 모델 내려받기</h3>
+      <p>PC 메모리에 맞는 모델을 고릅니다. 두 모델 모두 도구 호출(tools)을 지원해서 에이전트에 쓸 수 있습니다.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>PC 메모리</th><th>모델</th><th>내려받는 크기</th></tr></thead>
+        <tbody>
+          <tr><td>16GB</td><td><code>qwen3:4b</code></td><td>약 2.5GB</td></tr>
+          <tr><td>32GB 이상</td><td><code>qwen3:8b</code></td><td>약 5GB</td></tr>
+        </tbody>
+      </table></div>
+      <div class="code term"><span class="lang">PowerShell</span><pre><code>ollama pull qwen3:4b</code></pre></div>
+      <p>내려받은 뒤 바로 대화해 봅니다. 끝낼 때는 <code>/bye</code>를 입력합니다.</p>
+      <div class="code term"><span class="lang">PowerShell</span><pre><code>ollama run qwen3:4b "카페 사장님께 아침 인사를 한 줄로 해 줘"</code></pre></div>
+
+      <h3><span class="n">1-3</span>대화 기억 길이 늘리기 (필수)</h3>
+      <p>Ollama는 기본으로 짧은 대화만 기억하도록 설정돼 있어서, Hermes가 요구하는 64,000토큰으로 늘린 모델을 따로 만듭니다. 이 설정을 빼면 Hermes가 시작할 때 모델을 거부합니다.</p>
+      <ol>
+        <li>메모장을 열고 아래 두 줄을 적습니다. <code>qwen3:8b</code>를 쓰면 첫 줄을 바꿉니다.</li>
+      </ol>
+      <div class="code"><span class="lang">Modelfile</span><pre><code>FROM qwen3:4b
+PARAMETER num_ctx 65536</code></pre></div>
+      <ol start="2">
+        <li><code>C:\cafe-ai</code> 폴더를 만들고 파일 이름을 <code>Modelfile</code>로 저장합니다. 파일 형식을 “모든 파일”로 바꿔야 <code>.txt</code>가 붙지 않습니다.</li>
+        <li>PowerShell에서 새 모델을 만듭니다.</li>
+      </ol>
+      <div class="code term"><span class="lang">PowerShell</span><pre><code>cd C:\cafe-ai
+ollama create qwen3-cafe -f Modelfile</code></pre></div>
+      <ol start="4">
+        <li><code>ollama list</code>에 <code>qwen3-cafe</code>가 보이면 성공입니다. 이후 단계에서는 이 이름만 씁니다.</li>
+      </ol>
+
+      <h3><span class="n">1-4</span>메모리 아끼기 <span class="n">16GB PC 권장</span></h3>
+      <p>대화 기억을 길게 하면 메모리를 많이 씁니다. 아래 설정을 하면 품질 손실은 거의 없이 메모리 사용이 절반 가까이 줄어듭니다.</p>
+      <div class="code term"><span class="lang">PowerShell</span><pre><code>setx OLLAMA_FLASH_ATTENTION 1
+setx OLLAMA_KV_CACHE_TYPE q8_0
+setx OLLAMA_KEEP_ALIVE 24h</code></pre></div>
+      <p>설정 후 작업표시줄의 Ollama 아이콘을 오른쪽 클릭해 <b>Quit</b>하고 다시 실행합니다. <code>OLLAMA_KEEP_ALIVE</code>는 모델을 메모리에 계속 올려 두는 설정이라, 텔레그램 질문마다 모델을 다시 불러오는 시간을 없앱니다.</p>
+      <div class="ok"><p><code>ollama run qwen3-cafe "안녕"</code>에 한국어로 답하고, 다른 창에서 <code>ollama ps</code>를 쳤을 때 CONTEXT가 65536으로 보이면 됩니다.</p></div>
+    </section>
+
+    <!-- ───────── 2단계 ───────── -->
+    <section id="step2">
+      <div class="sec">Step 2 · 2차시</div>
+      <h2>Antigravity로 카페 도구(MCP 서버) 만들기</h2>
+      <p class="lead">AI 비서의 “손발”을 만듭니다. 카페 장부(데이터베이스)와, 그 장부를 읽고 쓰는 도구 5개를 Antigravity에 한국어로 부탁해서 만듭니다. MCP는 AI가 도구를 쓸 수 있게 해 주는 표준 연결 규격으로, “AI용 USB 단자”라고 설명하면 쉽습니다.</p>
+
+      <h3><span class="n">2-1</span>프로젝트 폴더 열기</h3>
+      <ol>
+        <li>Antigravity를 실행하고 <b>Open Folder</b>로 <code>C:\cafe-ai</code> 폴더를 엽니다.</li>
+        <li>에이전트 대화창을 엽니다. 모드는 처음에 <b>Planning</b>을 고르면 무엇을 만들지 계획을 먼저 보여 주어 설명하기 좋습니다.</li>
+        <li>에이전트가 명령어 실행이나 파일 생성을 물으면 내용을 읽어 보고 <b>승인(Accept)</b>합니다.</li>
+      </ol>
+
+      <h3><span class="n">2-2</span>프롬프트 ① 카페 장부 만들기</h3>
+      <p>아래 내용을 그대로 복사해 에이전트 대화창에 붙여넣습니다.</p>
+      <div class="code prompt"><span class="lang">PROMPT ①</span><pre><code>파이썬으로 작은 카페 관리 프로그램을 만들어줘. 초보자가 읽을 수 있게 주석은 한국어로 자세히 달아줘.
+
+1. 이 폴더에 파이썬 가상환경(.venv)을 만들어줘.
+2. cafe_db.py 파일을 만들고 sqlite3로 cafe.db 데이터베이스를 만들어줘.
+   - menu 테이블: id, 이름, 카테고리(커피/음료/디저트), 가격, 품절여부
+   - sales 테이블: id, 날짜, 메뉴이름, 수량, 금액
+   - expense 테이블: id, 날짜, 항목, 금액, 메모
+3. 처음 실행할 때 샘플 데이터를 넣어줘.
+   - 메뉴 10개(아메리카노 4500원, 카페라떼 5000원 등 한국 카페 메뉴)
+   - 오늘과 지난 6일치 판매 기록을 하루 15~30건씩
+   - 지출 3건(원두, 우유, 컵)
+4. 함수 5개를 만들어줘: 메뉴 목록 보기, 품절 처리/해제, 날짜별 매출 요약(총매출, 건수, 지출, 순이익, 많이 팔린 메뉴 3개), 지출 등록, 신메뉴 등록.
+5. 끝나면 함수를 직접 실행해서 오늘 매출 요약이 제대로 나오는지 보여줘.</code></pre></div>
+      <div class="ok"><p>폴더에 <code>cafe_db.py</code>와 <code>cafe.db</code>가 생기고, “오늘 총매출 OOO원” 같은 결과가 나오면 성공입니다.</p></div>
+
+      <h3><span class="n">2-3</span>프롬프트 ② MCP 서버로 만들기</h3>
+      <div class="code prompt"><span class="lang">PROMPT ②</span><pre><code>cafe_db.py의 함수 5개를 AI 에이전트가 쓸 수 있도록 MCP 서버로 만들어줘.
+
+- 파일 이름: cafe_mcp.py
+- .venv에 mcp 패키지를 설치해줘. (pip install mcp)
+- mcp 2.x 버전이면 "from mcp.server.mcpserver import MCPServer"를 쓰고,
+  1.x 버전이면 "from mcp.server.fastmcp import FastMCP"를 써줘. 설치된 버전을 먼저 확인해.
+- 서버 이름은 "cafe", 실행 방식은 stdio.
+- 도구 이름은 영어(get_menu, set_soldout, get_sales_report, add_expense, add_menu)로,
+  도구 설명(docstring)은 한국어로 자세히 써줘. AI는 이 설명을 보고 도구를 고른다.
+- 날짜를 생략하면 오늘로 처리해줘.
+- 어느 폴더에서 실행해도 cafe.db를 찾도록 파일 위치 기준 절대경로를 써줘.
+- 마지막으로 도구 목록을 출력하는 간단한 테스트 스크립트 test_mcp.py도 만들고 실행해줘.</code></pre></div>
+      <div class="ok"><p><code>test_mcp.py</code> 실행 결과에 도구 5개 이름이 보이면 성공입니다.</p></div>
+      <div class="tip">
+        <p>도구 설명을 얼마나 자세히 쓰느냐에 따라 작은 모델(Qwen 4B)의 정확도가 크게 달라집니다. “품절 처리는 메뉴 이름을 정확히 넣어야 하며, 모르면 먼저 get_menu로 확인하라”처럼 쓰는 것이 좋습니다.</p>
+        <p>만들어진 코드는 학생마다 조금씩 다릅니다. 수업을 맞추려면 강사가 미리 만든 완성본을 나눠 주고, 안 되는 학생은 그 파일로 바꿔 진행합니다.</p>
+        <p><code>mcp</code> 패키지는 2.x에서 <code>FastMCP</code>가 <code>MCPServer</code>로 이름이 바뀌었습니다. <code>No module named 'mcp.server.fastmcp'</code> 오류가 나면 오류 문구를 그대로 에이전트에게 보여 주면 고칩니다.</p>
+      </div>
+    </section>
+
+    <!-- ───────── 3단계 ───────── -->
+    <section id="step3">
+      <div class="sec">Step 3 · 3차시</div>
+      <h2>Hermes 에이전트에 두뇌와 손발 연결하기</h2>
+      <p class="lead">이 단계가 끝나면 PowerShell에서 <code>hermes</code>에게 “오늘 매출 알려줘”라고 하면, Qwen이 카페 도구를 골라 실행하고 답합니다. Hermes는 Nous Research가 만든 무료 오픈소스 에이전트입니다.</p>
+
+      <h3><span class="n">3-1</span>Hermes 설치</h3>
+      <p>PowerShell에서 아래 한 줄을 실행합니다. 설치가 끝나면 <b>PowerShell 창을 닫고 새로 열어야</b> <code>hermes</code> 명령을 쓸 수 있습니다.</p>
+      <div class="code term"><span class="lang">PowerShell</span><pre><code>iex (irm https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.ps1)</code></pre></div>
+
+      <h3><span class="n">3-2</span>Qwen(Ollama)을 두뇌로 지정</h3>
+      <div class="code term"><span class="lang">PowerShell</span><pre><code>hermes setup</code></pre></div>
+      <p>설정 마법사가 물어보면 아래처럼 답합니다.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>질문</th><th>입력값</th></tr></thead>
+        <tbody>
+          <tr><td>Provider(제공자)</td><td><b>Custom Endpoint</b></td></tr>
+          <tr><td>Base URL</td><td><code>http://localhost:11434/v1</code></td></tr>
+          <tr><td>API Key</td><td>비워 두거나 <code>no-key</code></td></tr>
+          <tr><td>Model</td><td><code>qwen3-cafe</code> (1단계에서 만든 이름)</td></tr>
+        </tbody>
+      </table></div>
+      <p>로컬 모델은 답이 느리므로 기다리는 시간을 늘려 둡니다. 메모장으로 <code>%LOCALAPPDATA%\hermes\.env</code> 파일을 열고 맨 아래에 한 줄을 추가합니다.</p>
+      <div class="code"><span class="lang">.env</span><pre><code>HERMES_API_TIMEOUT=1800</code></pre></div>
+
+      <h3><span class="n">3-3</span>카페 도구(MCP) 연결</h3>
+      <p>메모장으로 <code>%LOCALAPPDATA%\hermes\config.yaml</code>을 열고 파일 맨 아래에 다음을 붙여넣습니다. 띄어쓰기(들여쓰기)가 틀리면 읽지 못하니 그대로 복사하세요.</p>
+      <div class="code"><span class="lang">config.yaml</span><pre><code>mcp_servers:
+  cafe:
+    command: "C:\\cafe-ai\\.venv\\Scripts\\python.exe"
+    args: ["C:\\cafe-ai\\cafe_mcp.py"]
+    cwd: "C:\\cafe-ai"
+    env:
+      PYTHONUTF8: "1"
+
+# 작은 모델이 헷갈리지 않도록 카페 도구만 켭니다
+platform_toolsets:
+  cli: [cafe]
+  telegram: [cafe]</code></pre></div>
+      <p><code>platform_toolsets</code>는 에이전트가 쓸 수 있는 도구를 카페 도구로만 제한하는 설정입니다. 두 가지 이유로 꼭 넣습니다.</p>
+      <ul>
+        <li><b>속도와 정확도</b>: Hermes는 기본으로 터미널, 파일, 웹 검색 등 도구를 수십 개 켭니다. 작은 모델은 도구가 많을수록 느려지고 잘못 고릅니다.</li>
+        <li><b>보안</b>: 5단계에서 연결하는 텔레그램에 터미널 도구가 켜져 있으면, 메시지로 PC에 명령을 내릴 수 있게 됩니다.</li>
+      </ul>
+      <p>연결을 확인합니다. 도구 5개가 보이면 성공입니다.</p>
+      <div class="code term"><span class="lang">PowerShell</span><pre><code>hermes mcp test cafe</code></pre></div>
+
+      <h3><span class="n">3-4</span>사장님 비서 성격 입히기 (SOUL.md)</h3>
+      <p><code>%LOCALAPPDATA%\hermes\SOUL.md</code> 파일은 에이전트의 성격과 말투를 정합니다. 원래 파일은 <code>SOUL.md.bak</code>으로 복사해 두고, 내용을 아래처럼 바꿉니다. 학생마다 자기 카페 이름으로 바꿔 보게 하면 좋습니다.</p>
+      <div class="code"><span class="lang">SOUL.md</span><pre><code>당신은 '햇살카페' 사장님의 다정한 경영 비서입니다.
+- 항상 존댓말로, 3~4문장 이내로 짧게 답합니다.
+- 매출·메뉴·지출은 반드시 cafe 도구로 확인한 값만 말합니다. 추측하지 않습니다.
+- 금액은 "12,500원"처럼 쉼표를 넣어 말합니다.
+- 품절 처리나 지출 등록처럼 장부를 바꾸는 일은 한 뒤 무엇을 바꿨는지 알려 드립니다.</code></pre></div>
+
+      <h3><span class="n">3-5</span>첫 대화</h3>
+      <div class="code term"><span class="lang">PowerShell</span><pre><code>hermes</code></pre></div>
+      <p>아래 세 문장을 차례로 입력해 봅니다.</p>
+      <ol>
+        <li>오늘 매출 요약해 줘</li>
+        <li>카페라떼 품절 처리해 줘</li>
+        <li>우유 32,000원 지출 등록해 줘</li>
+      </ol>
+      <div class="ok"><p>답변 위에 <code>get_sales_report</code>처럼 도구 이름이 보이고, 금액이 2단계에서 확인한 값과 같으면 성공입니다. 도구 이름 없이 숫자를 말하면 AI가 지어낸 것이니, “도구로 확인해서 다시 알려줘”라고 해 봅니다. 이 차이를 학생들에게 직접 보여 주면 “AI가 도구를 쓴다”는 개념이 분명해집니다.</p></div>
+    </section>
+
+    <!-- ───────── 4단계 ───────── -->
+    <section id="step4">
+      <div class="sec">Step 4 · 4차시</div>
+      <h2>텔레그램 봇 만들기</h2>
+      <p class="lead">텔레그램에서는 누구나 1분 만에 무료로 봇을 만들 수 있습니다. 텔레그램 공식 봇인 <b>@BotFather</b>에게 말을 걸어 봇을 만들고, 봇을 조종하는 열쇠인 <b>봇 토큰</b>을 받습니다.</p>
+
+      <h3><span class="n">4-1</span>BotFather로 봇 만들기</h3>
+      <ol>
+        <li>텔레그램에서 <code>@BotFather</code>를 검색하거나 <a href="https://t.me/BotFather" target="_blank" rel="noopener">t.me/BotFather</a>를 엽니다. 이름 옆에 파란 공식 인증 표시가 있는지 확인합니다.</li>
+        <li><b>시작(Start)</b>을 누르고 <code>/newbot</code>을 보냅니다.</li>
+        <li>봇의 표시 이름을 정합니다. 예: <code>햇살카페 비서</code></li>
+        <li>봇의 아이디를 정합니다. 영어로 쓰고 <b>반드시 bot으로 끝나야</b> 합니다. 예: <code>sunny_cafe_kim_bot</code>. 이미 있는 이름이면 다른 이름을 고릅니다.</li>
+        <li>BotFather가 보내 준 긴 문자열(<code>1234567890:AAH...</code> 모양)이 <b>봇 토큰</b>입니다. 복사해서 메모장에 붙여 둡니다.</li>
+      </ol>
+      <div class="warn"><p>봇 토큰을 가진 사람은 누구나 내 봇을 조종할 수 있습니다. 화면 공유나 단체방에 올리지 않습니다. 실수로 공개했으면 BotFather에 <code>/revoke</code>를 보내 새 토큰을 받습니다.</p></div>
+
+      <h3><span class="n">4-2</span>봇 꾸미기 <span class="n">선택</span></h3>
+      <p>BotFather에게 아래 명령을 보내면 봇 소개와 메뉴를 바꿀 수 있습니다.</p>
+      <ul>
+        <li><code>/setdescription</code> 봇을 처음 열었을 때 보이는 소개 글. 예: “햇살카페 매출·메뉴·지출을 관리하는 AI 비서입니다.”</li>
+        <li><code>/setuserpic</code> 봇 프로필 사진</li>
+        <li><code>/setcommands</code> 입력창의 메뉴 버튼. 아래 내용을 붙여넣습니다.</li>
+      </ul>
+      <div class="code"><span class="lang">BotFather /setcommands</span><pre><code>new - 새 대화 시작
+status - 현재 대화 정보 보기
+stop - 진행 중인 작업 멈추기
+help - 도움말</code></pre></div>
+
+      <h3><span class="n">4-3</span>내 텔레그램 사용자 ID 알아내기</h3>
+      <p>내 봇을 나만 쓰게 하려면 숫자로 된 <b>사용자 ID</b>가 필요합니다. <code>@username</code>과는 다른 값입니다.</p>
+      <ol>
+        <li>텔레그램에서 <code>@userinfobot</code>을 검색하거나 <a href="https://t.me/userinfobot" target="_blank" rel="noopener">t.me/userinfobot</a>을 엽니다.</li>
+        <li>아무 메시지나 보내면 <code>Id: 123456789</code> 같은 숫자를 알려 줍니다. 이 숫자를 메모장에 적어 둡니다.</li>
+      </ol>
+      <div class="ok"><p>메모장에 <b>봇 토큰</b>과 <b>내 사용자 ID</b> 두 가지가 적혀 있고, 텔레그램에서 내 봇을 검색해 대화방을 열 수 있으면 됩니다. 아직은 봇이 답하지 않습니다.</p></div>
+    </section>
+
+
+    <!-- ───────── 5단계 ───────── -->
+    <section id="step5">
+      <div class="sec">Step 5 · 4차시</div>
+      <h2>Hermes와 텔레그램 연결하기</h2>
+      <p class="lead">Hermes에는 텔레그램 연결 기능이 들어 있어서 <b>설정 두 줄과 명령 한 줄</b>이면 연결됩니다. Hermes가 텔레그램 서버에서 새 메시지를 직접 가져오는 방식이라, 카카오톡처럼 인터넷 주소(터널)나 중계 서버를 만들 필요가 없습니다.</p>
+
+      <h3><span class="n">5-1</span>봇 토큰과 사용자 ID 등록</h3>
+      <p>방법은 두 가지입니다. 처음에는 마법사(방법 A)가 쉽습니다.</p>
+      <p><b>방법 A. 설정 마법사</b>: 아래 명령을 실행하고 화살표 키로 <b>Telegram</b>을 고른 뒤, 4단계에서 적어 둔 봇 토큰과 사용자 ID를 붙여넣습니다.</p>
+      <div class="code term"><span class="lang">PowerShell</span><pre><code>hermes gateway setup</code></pre></div>
+      <p><b>방법 B. 직접 입력</b>: 메모장으로 <code>%LOCALAPPDATA%\hermes\.env</code>를 열고 맨 아래에 두 줄을 추가합니다.</p>
+      <div class="code"><span class="lang">.env</span><pre><code>TELEGRAM_BOT_TOKEN=1234567890:AAH여기에봇토큰
+TELEGRAM_ALLOWED_USERS=123456789</code></pre></div>
+      <p><code>TELEGRAM_ALLOWED_USERS</code>는 이 봇과 대화할 수 있는 사람 목록입니다. 직원도 쓰게 하려면 <code>123456789,987654321</code>처럼 쉼표로 이어 적습니다.</p>
+
+      <h3><span class="n">5-2</span>텔레그램에서도 카페 도구만 쓰게 하기</h3>
+      <p>3-3에서 <code>config.yaml</code>에 넣은 <code>platform_toolsets</code>에 <code>telegram: [cafe]</code>가 있는지 다시 확인합니다. 이 줄이 빠지면 텔레그램 메시지로 터미널, 파일, 웹 검색 같은 기본 도구까지 쓸 수 있게 됩니다.</p>
+      <div class="code"><span class="lang">config.yaml</span><pre><code>platform_toolsets:
+  cli: [cafe]
+  telegram: [cafe]</code></pre></div>
+
+      <h3><span class="n">5-3</span>게이트웨이 실행</h3>
+      <p>Hermes가 텔레그램을 지켜보며 답하는 상태를 <b>게이트웨이</b>라고 합니다. 이 창은 수업 내내 켜 둡니다.</p>
+      <div class="code term"><span class="lang">PowerShell</span><pre><code>hermes gateway</code></pre></div>
+      <p>화면에 <code>Telegram adapter connected</code>가 보이면 연결된 것입니다.</p>
+
+      <h3><span class="n">5-4</span>휴대폰으로 첫 대화</h3>
+      <ol>
+        <li>텔레그램에서 내 봇 대화방을 열고 <b>시작(Start)</b>을 누릅니다.</li>
+        <li>“오늘 매출 요약해 줘”를 보냅니다. 로컬 모델이라 답이 오기까지 10초~2분이 걸릴 수 있습니다. 상단에 “입력 중…”이 보이면 생각하고 있는 것입니다.</li>
+        <li>대화를 처음부터 다시 하고 싶으면 <code>/new</code>를 보냅니다.</li>
+      </ol>
+      <div class="ok"><p>휴대폰 텔레그램에서 매출 답변이 오고, PowerShell 창에 <code>get_sales_report</code> 도구를 쓴 기록이 보이면 성공입니다. 허용 목록에 없는 다른 학생이 내 봇에 말을 걸면 답하지 않는지도 확인합니다.</p></div>
+      <div class="tip"><p><b>여러 명이 쓰게 하려면</b>: 허용 목록을 매번 고치는 대신 <b>페어링</b>을 쓸 수 있습니다. 목록에 없는 사람이 봇에게 말을 걸면 일회용 코드가 오고, 사장님 PC에서 <code>hermes pairing approve telegram 코드</code>를 실행하면 바로 등록됩니다. 등록된 사람은 <code>hermes pairing list</code>로 확인합니다.</p></div>
+      <div class="tip"><p><b>PC를 끄면 봇도 멈춥니다.</b> Hermes와 <code>cafe.db</code>가 모두 이 PC에 있기 때문입니다. 실제 매장에서 쓰려면 항상 켜 두는 PC나 서버가 필요하다는 점을 설명해 줍니다.</p></div>
+    </section>
+
+
+    <!-- ───────── 6단계 ───────── -->
+    <section id="step6">
+      <div class="sec">Step 6 · 6차시</div>
+      <h2>통합 테스트와 시연</h2>
+      <p class="lead">휴대폰 텔레그램으로 아래 시나리오를 순서대로 진행하고, 장부가 실제로 바뀌었는지 확인합니다. 시작 전에 Ollama와 Hermes 게이트웨이가 켜져 있는지부터 점검합니다.</p>
+
+      <h3>시작 전 점검</h3>
+      <ul class="checks">
+        <li><input type="checkbox" aria-label="완료">Ollama 아이콘이 작업표시줄에 있다</li>
+        <li><input type="checkbox" aria-label="완료"><code>hermes gateway</code> 창에 Telegram adapter connected가 보인다</li>
+        <li><input type="checkbox" aria-label="완료"><code>config.yaml</code>의 <code>platform_toolsets</code>에 <code>telegram: [cafe]</code>가 있다</li>
+        <li><input type="checkbox" aria-label="완료">휴대폰 텔레그램에서 내 봇 대화방이 열린다</li>
+      </ul>
+
+      <h3>시연 시나리오</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>순서</th><th>텔레그램에 보낼 말</th><th>AI가 쓸 도구</th><th>제대로 됐는지 확인하는 법</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>오늘 매출 요약해 줘</td><td><code>get_sales_report</code></td><td>금액이 2단계 테스트 결과와 같다</td></tr>
+          <tr><td>2</td><td>메뉴 중에 제일 비싼 게 뭐야?</td><td><code>get_menu</code></td><td>실제 메뉴판과 같다</td></tr>
+          <tr><td>3</td><td>카페라떼 품절 처리해 줘</td><td><code>set_soldout</code></td><td>2번을 다시 물어보면 품절로 나온다</td></tr>
+          <tr><td>4</td><td>우유 32,000원 지출 등록해 줘</td><td><code>add_expense</code></td><td>1번을 다시 물어보면 지출이 32,000원 늘었다</td></tr>
+          <tr><td>5</td><td>딸기라떼 6,000원으로 신메뉴 등록해 줘</td><td><code>add_menu</code></td><td>2번을 다시 물어보면 딸기라떼가 있다</td></tr>
+          <tr><td>6</td><td>아까 품절시킨 메뉴 다시 팔아 줘</td><td><code>set_soldout</code></td><td>앞의 대화를 기억해서 카페라떼를 해제한다</td></tr>
+        </tbody>
+      </table></div>
+      <p>6번은 사용자별 대화 기억(<code>conversation</code>)이 동작하는지 보는 문제입니다. 다른 학생의 휴대폰으로 내 봇에 말을 걸어 <b>답하지 않는지</b>도 확인하면 보안 설명으로 이어집니다.</p>
+
+      <h3>응용 과제 <span class="n">여유가 있을 때</span></h3>
+      <ul>
+        <li>Antigravity에 “어제와 오늘 매출을 비교하는 도구를 추가해 줘”라고 요청하고, <code>hermes gateway</code>를 다시 켜서 텔레그램으로 시험합니다.</li>
+        <li>SOUL.md의 말투를 “사투리를 쓰는 정감 있는 비서”로 바꿔 보고 차이를 비교합니다.</li>
+        <li>같은 질문을 <code>qwen3:4b</code>와 <code>qwen3:8b</code>에 해 보고 속도와 정확도를 비교합니다.</li>
+        <li>텔레그램에 영수증 사진을 보내고 “이 지출 등록해 줘”라고 해 봅니다. 사진을 이해하는 모델이 필요해서 Qwen3로는 잘 안 되는데, 왜 그런지 토론해 봅니다.</li>
+      </ul>
+    </section>
+
+    <!-- ───────── FAQ ───────── -->
+    <section id="faq">
+      <div class="sec">FAQ</div>
+      <h2>문제 해결, 강사 팁, 보안</h2>
+      <p class="lead">수업에서 가장 자주 막히는 곳은 메모리 부족, 컨텍스트 설정 누락, 봇 토큰·사용자 ID 입력 실수 세 가지입니다. 카카오톡 관련 문제는 <a href="#kakao">보충</a> 끝에 따로 정리했습니다.</p>
+
+      <h3>자주 생기는 문제</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>증상</th><th>원인</th><th>해결</th></tr></thead>
+        <tbody>
+          <tr><td><code>hermes</code> 명령을 찾을 수 없음</td><td>설치 직후 창을 안 닫음</td><td>PowerShell을 닫고 새로 엽니다</td></tr>
+          <tr><td>Hermes가 컨텍스트가 작다며 거부</td><td>1-3을 건너뜀</td><td><code>qwen3-cafe</code> 모델을 만들고 그 이름으로 설정합니다</td></tr>
+          <tr><td>답이 아주 느리거나 PC가 멈춤</td><td>메모리 부족</td><td>1-4 설정을 하고, 그래도 느리면 <code>qwen3:4b</code>로 바꿉니다</td></tr>
+          <tr><td>AI가 도구를 안 쓰고 숫자를 지어냄</td><td>도구가 너무 많거나 설명이 부족</td><td>3-3의 <code>platform_toolsets</code>를 확인하고, 도구 설명을 자세히 고칩니다</td></tr>
+          <tr><td><code>config.yaml</code>을 고친 뒤 Hermes가 안 켜짐</td><td>들여쓰기 오류, 또는 <code>platform_toolsets</code>가 두 번 있음</td><td>파일에서 <code>platform_toolsets:</code>를 검색해 하나로 합칩니다</td></tr>
+          <tr><td>텔레그램 봇이 아무 답도 안 함</td><td><code>hermes gateway</code>가 꺼졌거나, 내 ID가 허용 목록에 없음</td><td>게이트웨이 창을 확인하고, <code>TELEGRAM_ALLOWED_USERS</code>의 숫자가 @userinfobot이 알려 준 값과 같은지 봅니다</td></tr>
+          <tr><td>게이트웨이가 토큰 오류로 시작 안 됨</td><td>봇 토큰 복사 실수(앞뒤 공백, 일부만 복사)</td><td>BotFather에서 <code>/mybots</code> → 내 봇 → API Token으로 다시 복사합니다</td></tr>
+          <tr><td>“입력 중…”만 뜨고 답이 늦음</td><td>로컬 모델이 생각하는 중</td><td>정상입니다. 2분 넘게 안 오면 게이트웨이 창의 오류를 확인하고 더 작은 모델을 씁니다</td></tr>
+          <tr><td><code>hermes mcp test cafe</code>가 실패</td><td>경로 오타</td><td><code>C:\cafe-ai\.venv\Scripts\python.exe</code>가 실제로 있는지 확인합니다</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>강사 팁</h3>
+      <ul>
+        <li><b>강사 PC를 공용 두뇌로</b>: 실습실 PC가 약하면, 그래픽카드가 있는 강사 PC에서 <code>setx OLLAMA_HOST 0.0.0.0</code>을 설정하고 Ollama를 다시 켭니다. 학생은 3-2의 Base URL을 <code>http://강사PC의IP:11434/v1</code>로 넣습니다. 실습실 내부망에서만 쓰고 수업이 끝나면 설정을 지웁니다.</li>
+        <li><b>진도를 맞추는 법</b>: 단계마다 완성본 폴더(<code>step2</code>, <code>step5</code> 등)를 USB나 공유 폴더로 나눠 주면 뒤처진 학생도 다음 단계에 합류할 수 있습니다.</li>
+        <li><b>비유로 설명하기</b>: LLM은 “두뇌”, MCP 도구는 “손발”, Hermes는 “두뇌와 손발을 잇는 비서실장”, 텔레그램은 “전화기”, 봇 토큰은 “전화기 열쇠”입니다.</li>
+        <li><b>Antigravity 사용량 한도</b>: 무료 계정은 사용량에 한도가 있어서, 한 학생이 같은 요청을 여러 번 반복하면 잠시 막힐 수 있습니다. 막히면 완성본 파일로 진행합니다. 개강 전에 <a href="https://antigravity.google" target="_blank" rel="noopener">공식 사이트</a>에서 무료 조건을 다시 확인하세요.</li>
+      </ul>
+
+      <h3>보안 주의 <span class="n">수업에서 꼭 강조</span></h3>
+      <ul>
+        <li><b>허용 목록(TELEGRAM_ALLOWED_USERS)을 꼭 쓴다</b>: 텔레그램 봇은 아이디만 알면 누구나 검색해서 말을 걸 수 있어서, 목록이 없으면 모르는 사람이 장부를 바꿀 수 있습니다.</li>
+        <li><b>도구는 카페 도구만 켠다</b>: <code>platform_toolsets</code>의 <code>telegram: [cafe]</code>를 빼면 텔레그램 메시지로 PC에 명령을 내릴 수 있게 됩니다.</li>
+        <li><b>봇 토큰은 비밀번호처럼</b>: 화면 공유나 단체방에 올리지 않고, 새어 나가면 BotFather의 <code>/revoke</code>로 바로 바꿉니다.</li>
+        <li><b>수업이 끝나면 게이트웨이를 끈다</b>: <code>hermes gateway</code> 창에서 <code>Ctrl+C</code>를 누릅니다.</li>
+        <li><b>실습 데이터는 가짜로</b>: 실제 매장 매출이나 개인정보는 넣지 않습니다.</li>
+      </ul>
+
+      <h3>참고 자료</h3>
+      <ul>
+        <li><a href="https://core.telegram.org/bots/tutorial" target="_blank" rel="noopener">텔레그램 봇 만들기 공식 안내</a></li>
+        <li><a href="https://kakaobusiness.gitbook.io/main/tool/chatbot/skill_guide/ai_chatbot_callback_guide" target="_blank" rel="noopener">카카오 AI 챗봇 콜백 가이드</a> (보충)</li>
+        <li><a href="https://hermes-agent.nousresearch.com/" target="_blank" rel="noopener">Hermes Agent 공식 문서</a> (로컬 Ollama 설정, API 서버)</li>
+        <li><a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a> · <a href="https://antigravity.google" target="_blank" rel="noopener">Google Antigravity</a></li>
+      </ul>
+    </section>
+    <!-- ───────── 보충: 카카오톡 ───────── -->
+    <section id="kakao">
+      <div class="sec">Supplement · 선택</div>
+      <h2>보충. 카카오톡으로 연결하기</h2>
+      <p class="lead">본 과정의 텔레그램 대신 카카오톡으로 비서와 대화하고 싶을 때 따라 하는 보충 실습입니다. Hermes는 카카오톡을 직접 지원하지 않아서, 카카오 i 오픈빌더와 우리가 만든 <b>중계 서버</b>, 내 PC를 인터넷에 여는 <b>Cloudflare 터널</b>이 추가로 필요합니다.</p>
+
+      <div class="tbl"><table>
+        <thead><tr><th>비교</th><th>텔레그램 (본 과정)</th><th>카카오톡 (보충)</th></tr></thead>
+        <tbody>
+          <tr><td>봇 만들기</td><td>BotFather에서 1분, 심사 없음</td><td>카카오 채널 + 오픈빌더, 콜백 심사 필요</td></tr>
+          <tr><td>Hermes 지원</td><td>기본 지원 (<code>hermes gateway</code>)</td><td>지원 안 함 → 중계 서버 직접 제작</td></tr>
+          <tr><td>인터넷 주소</td><td>필요 없음 (PC가 메시지를 가져옴)</td><td>필요 (카카오가 PC로 보냄) → 터널</td></tr>
+          <tr><td>응답 시간 제한</td><td>제한 없음</td><td>5초, 콜백 사용 시 5분</td></tr>
+          <tr><td>켜 둘 창</td><td>1개 (게이트웨이)</td><td>3개 (게이트웨이, 중계 서버, 터널)</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>추가로 준비할 것</h3>
+      <ul class="checks">
+        <li><input type="checkbox" aria-label="완료">카카오 비즈니스 계정: <a href="https://business.kakao.com" target="_blank" rel="noopener">business.kakao.com</a>에 카카오계정으로 가입</li>
+        <li><input type="checkbox" aria-label="완료">터널 프로그램 설치: PowerShell에서 <code>winget install --id Cloudflare.cloudflared</code></li>
+        <li><input type="checkbox" aria-label="완료">1주 전: K-2의 <b>AI 챗봇 콜백 신청</b>. 승인이 늦어지면 K-5의 “결과” 물어보기 방식으로 진행합니다(승인 불필요).</li>
+      </ul>
+      <div class="warn"><p>카카오 화면 구성은 자주 바뀌므로 수업 전에 강사가 한 번 따라 해 보고 메뉴 이름을 맞춰 두세요.</p></div>
+
+      <h3><span class="n">K-1</span>카카오톡 채널 만들기</h3>
+      <ol>
+        <li><a href="https://business.kakao.com" target="_blank" rel="noopener">business.kakao.com</a>에 카카오계정으로 로그인합니다.</li>
+        <li><b>카카오톡 채널 만들기</b>에서 채널 이름(예: 햇살카페 비서)과 검색용 아이디를 정합니다.</li>
+        <li>채널 관리자센터에서 채널을 <b>공개</b>로 두고 <b>채팅 기능을 켭니다</b>.</li>
+      </ol>
+
+      <h3><span class="n">K-2</span>오픈빌더에서 챗봇 만들기</h3>
+      <ol>
+        <li><a href="https://chatbot.kakao.com" target="_blank" rel="noopener">chatbot.kakao.com</a>에 접속해 <b>봇 만들기 → 카카오톡 챗봇</b>을 고릅니다.</li>
+        <li>봇 <b>설정</b>에서 K-1의 카카오톡 채널을 연결합니다.</li>
+        <li>같은 설정 화면에서 <b>AI 챗봇 전환(콜백 기능) 신청</b>을 합니다. 사용 목적에는 “로컬 LLM 기반 카페 경영 비서 교육 실습”처럼 적습니다.</li>
+      </ol>
+      <div class="tip"><p><b>콜백이 필요한 이유</b>: 오픈빌더는 스킬 서버가 <b>5초 안에</b> 답하지 않으면 오류로 처리합니다. 내 PC의 Qwen은 보통 10초~2분이 걸리므로, 먼저 “잠시만요”로 답하고 나중에 결과를 보내는 콜백 기능을 씁니다. 콜백 주소는 <b>5분간 유효하고 한 번만</b> 쓸 수 있습니다(<a href="https://kakaobusiness.gitbook.io/main/tool/chatbot/skill_guide/ai_chatbot_callback_guide" target="_blank" rel="noopener">카카오 콜백 가이드</a>).</p></div>
+
+      <h3><span class="n">K-3</span>스킬 등록과 폴백 블록 연결</h3>
+      <p>아래 작업은 K-7에서 터널 주소를 받은 뒤에 합니다.</p>
+      <ol>
+        <li><b>스킬 → 생성</b>에서 이름을 <code>카페비서</code>로, URL을 <code>https://(터널주소)/kakao/skill</code>로 넣고 저장합니다.</li>
+        <li><b>시나리오 → 폴백 블록</b>을 엽니다. 폴백 블록은 다른 블록에 해당하지 않는 모든 말을 받습니다.</li>
+        <li>파라미터 설정에서 스킬을 <code>카페비서</code>로 고르고, 봇 응답을 <b>스킬데이터 사용</b>으로 바꿉니다.</li>
+        <li>콜백이 승인되었다면 블록 오른쪽 위 <b>더보기(…) → Callback API 설정</b>을 켜고 기본 응답에 “장부를 확인하고 있어요. 잠시만 기다려 주세요”를 적습니다.</li>
+        <li><b>배포</b> 메뉴에서 배포합니다. 배포하지 않으면 오픈빌더 테스트 창에서만 동작하고 실제 채널에서는 반영되지 않습니다.</li>
+      </ol>
+      <div class="ok"><p>휴대폰 카카오톡에서 채널을 찾아 채팅방을 열 수 있으면 됩니다. 답장은 K-8까지 끝나야 옵니다.</p></div>
+
+      <h3><span class="n">K-4</span>Hermes를 API 서버로 켜기</h3>
+      <p><code>%LOCALAPPDATA%\hermes\.env</code> 맨 아래에 두 줄을 추가합니다. 비밀번호는 아무 긴 문자열로 직접 정하고, 남에게 보여주지 않습니다.</p>
+      <div class="code"><span class="lang">.env</span><pre><code>API_SERVER_ENABLED=true
+API_SERVER_KEY=내가정한긴비밀번호</code></pre></div>
+      <p><b>창 ①</b>에서 Hermes를 실행합니다. <code>API server listening on http://127.0.0.1:8642</code>가 보이면 성공이고, 이 창은 수업 내내 켜 둡니다.</p>
+      <div class="code term"><span class="lang">창 ① PowerShell</span><pre><code>hermes gateway</code></pre></div>
+      <p>API 서버로 들어온 질문도 카페 도구만 쓰도록 <code>config.yaml</code>의 <code>platform_toolsets</code>에 <code>api_server: [cafe]</code> 한 줄을 추가하고 게이트웨이를 다시 켭니다. 이 줄이 없으면 카카오톡 메시지로 PC에 명령을 내릴 수 있게 됩니다.</p>
+      <div class="code"><span class="lang">config.yaml</span><pre><code>platform_toolsets:
+  cli: [cafe]
+  telegram: [cafe]
+  api_server: [cafe]</code></pre></div>
+
+      <h3><span class="n">K-5</span>프롬프트 ③ 중계 서버 만들기</h3>
+      <p>Antigravity 에이전트 대화창에 붙여넣습니다.</p>
+      <div class="code prompt"><span class="lang">PROMPT ③</span><pre><code>카카오 i 오픈빌더 스킬 서버를 FastAPI로 만들어줘. 파일 이름은 kakao_bridge.py.
+
+- .venv에 fastapi, uvicorn, httpx를 설치해줘.
+- POST /kakao/skill 로 요청을 받는다. 사용자 ID는 userRequest.user.id,
+  질문은 userRequest.utterance, 콜백 주소는 userRequest.callbackUrl 에 있다.
+- 질문은 Hermes API 서버(http://127.0.0.1:8642/v1/responses)에 보낸다.
+  헤더 Authorization: Bearer (환경변수 HERMES_KEY),
+  본문 {"model":"hermes-agent","input":질문,"conversation":"kakao-"+사용자ID,"store":true}.
+  답은 응답의 output 목록에서 type이 message인 항목의 output_text 글자다.
+- 환경변수 ALLOWED_USERS(쉼표 구분)에 없는 사용자에게는 "등록된 사장님만 사용할 수 있어요"와
+  그 사람의 ID를 알려주고, Hermes에는 보내지 마.
+- callbackUrl이 있으면: 즉시 {"version":"2.0","useCallback":true,"data":{"text":"잠시만 기다려 주세요"}}
+  를 돌려주고, 백그라운드에서 Hermes 답을 받아 callbackUrl로 POST 한다.
+- callbackUrl이 없으면: "30초쯤 뒤에 '결과'라고 보내 주세요"라고 답하고 백그라운드에서
+  답을 저장해 두었다가, 사용자가 "결과"라고 보내면 꺼내 준다.
+- 카카오 답장은 simpleText 형식, 1000자를 넘으면 자른다.
+- Hermes가 꺼져 있으면 오류 대신 "비서가 응답하지 못했어요"라고 답한다.
+- 요청이 올 때마다 사용자 ID와 질문을 화면에 출력해줘.
+- 마지막으로 가짜 카카오 요청을 보내는 테스트를 만들어 실행해줘.</code></pre></div>
+      <p>에이전트가 만든 코드가 동작하지 않으면 아래 <b>강사용 완성본</b>을 <code>C:\cafe-ai\kakao_bridge.py</code>로 저장해 씁니다. 이 코드는 가짜 Hermes로 네 가지 경우(미등록 사용자 거부, 콜백 응답, “결과” 물어보기, Hermes 꺼짐)를 테스트했습니다.</p>
+      <details class="full">
+        <summary>강사용 완성본 kakao_bridge.py 펼치기</summary>
+        <div class="code"><span class="lang">Python</span><pre><code>"""카카오톡 ↔ Hermes 중계 서버
+실행: .venv\Scripts\python -m uvicorn kakao_bridge:app --port 8000
+"""
+import os
+
+import httpx
+from fastapi import BackgroundTasks, FastAPI, Request
+
+HERMES_URL = os.getenv("HERMES_URL", "http://127.0.0.1:8642")
+HERMES_KEY = os.getenv("HERMES_KEY", "")
+# 쉼표로 구분한 카카오 사용자 ID 목록. 여기 없는 사람에게는 "내 ID"만 알려줍니다.
+ALLOWED_USERS = [u.strip() for u in os.getenv("ALLOWED_USERS", "").split(",") if u.strip()]
+
+app = FastAPI()
+results = {}  # 콜백 미승인 시 사용자별 답변 보관 ("결과" 물어보기 방식)
+
+
+def kakao_text(text: str) -&gt; dict:
+    """카카오 말풍선(simpleText) 응답. 말풍선은 1000자까지만 보입니다."""
+    return {"version": "2.0", "template": {"outputs": [{"simpleText": {"text": text[:1000]}}]}}
+
+
+def ask_hermes(user_id: str, question: str) -&gt; str:
+    """Hermes에게 질문하고 최종 답변 글자만 꺼냅니다."""
+    try:
+        r = httpx.post(
+            f"{HERMES_URL}/v1/responses",
+            headers={"Authorization": f"Bearer {HERMES_KEY}"},
+            json={"model": "hermes-agent", "input": question,
+                  "conversation": f"kakao-{user_id}",  # 사용자별로 대화를 이어감
+                  "store": True},
+            timeout=280,  # 콜백 주소는 5분간 유효하므로 그 안에 끝냅니다
+        )
+        r.raise_for_status()
+    except Exception as e:
+        return f"비서가 응답하지 못했어요. Hermes가 켜져 있는지 확인해 주세요. ({type(e).__name__})"
+
+    answer = ""
+    for item in r.json().get("output", []):
+        if item.get("type") == "message" and item.get("phase") != "commentary":
+            for part in item.get("content", []):
+                if part.get("type") == "output_text":
+                    answer = part.get("text", "")
+    return answer or "답변이 비어 있어요. 다시 한 번 물어봐 주세요."
+
+
+def answer_by_callback(callback_url: str, user_id: str, question: str):
+    """콜백 방식: 다 생각한 뒤 카카오가 준 콜백 주소로 답을 보냅니다."""
+    httpx.post(callback_url, json=kakao_text(ask_hermes(user_id, question)), timeout=10)
+
+
+def answer_later(user_id: str, question: str):
+    """'결과' 물어보기 방식: 답을 보관해 두었다가 물어보면 꺼내 줍니다."""
+    results[user_id] = ask_hermes(user_id, question)
+
+
+@app.post("/kakao/skill")
+async def kakao_skill(request: Request, background: BackgroundTasks):
+    body = await request.json()
+    user_req = body.get("userRequest", {})
+    user_id = user_req.get("user", {}).get("id", "")
+    question = user_req.get("utterance", "").strip()
+    callback_url = user_req.get("callbackUrl")
+    print(f"[카카오] 사용자={user_id} 질문={question!r} 콜백={'있음' if callback_url else '없음'}")
+
+    # 1. 허용된 사장님만 사용
+    if user_id not in ALLOWED_USERS:
+        return kakao_text(f"등록된 사장님만 사용할 수 있어요.\n내 ID: {user_id}")
+
+    # 2. 콜백 승인된 경우: "잠시만요" 먼저, 답은 나중에 콜백으로
+    if callback_url:
+        background.add_task(answer_by_callback, callback_url, user_id, question)
+        return {"version": "2.0", "useCallback": True,
+                "data": {"text": "장부를 확인하고 있어요. 잠시만 기다려 주세요."}}
+
+    # 3. 콜백이 없는 경우: "결과"라고 물어보면 보관해 둔 답을 보여줌
+    if question == "결과":
+        if user_id not in results:
+            return kakao_text("먼저 궁금한 것을 물어봐 주세요.")
+        if results[user_id] is None:
+            return kakao_text("아직 생각하고 있어요. 조금 뒤에 다시 '결과'라고 보내 주세요.")
+        return kakao_text(results.pop(user_id))
+
+    results[user_id] = None  # 생각 중 표시
+    background.add_task(answer_later, user_id, question)
+    return kakao_text("질문을 받았어요. 30초쯤 뒤에 '결과'라고 보내 주세요.")</code></pre></div>
+      </details>
+
+      <h3><span class="n">K-6</span>중계 서버 실행</h3>
+      <p><b>창 ②</b>에서 실행합니다. <code>HERMES_KEY</code>에는 K-4에서 정한 비밀번호를 넣습니다. <code>ALLOWED_USERS</code>는 처음에는 비워 둡니다.</p>
+      <div class="code term"><span class="lang">창 ② PowerShell</span><pre><code>cd C:\cafe-ai
+$env:HERMES_KEY = "내가정한긴비밀번호"
+$env:ALLOWED_USERS = ""
+.venv\Scripts\python -m uvicorn kakao_bridge:app --port 8000</code></pre></div>
+
+      <h3><span class="n">K-7</span>터널로 인터넷에 연결</h3>
+      <p>카카오 서버는 인터넷에 있고 중계 서버는 내 PC 안에 있어서, 터널로 “임시 인터넷 주소”를 만듭니다. <b>창 ③</b>에서 실행합니다.</p>
+      <div class="code term"><span class="lang">창 ③ PowerShell</span><pre><code>cloudflared tunnel --url http://localhost:8000</code></pre></div>
+      <p>화면에 나오는 <code>https://임의의단어들.trycloudflare.com</code> 주소를 복사해, <a href="#kakao">K-3</a> 스킬 URL에 <code>https://임의의단어들.trycloudflare.com/kakao/skill</code>로 넣고 배포합니다.</p>
+      <div class="warn"><p>이 주소는 터널을 다시 켤 때마다 바뀝니다. 그때마다 스킬 URL을 고치고 다시 배포해야 합니다.</p></div>
+
+      <h3><span class="n">K-8</span>내 카카오 ID 등록하기</h3>
+      <ol>
+        <li>휴대폰 카카오톡에서 내 채널에 “안녕”을 보냅니다.</li>
+        <li>“등록된 사장님만 사용할 수 있어요. 내 ID: …”라는 답이 오면 ID를 복사합니다. 창 ②에도 같은 ID가 찍힙니다.</li>
+        <li>창 ②에서 <code>Ctrl+C</code>로 중계 서버를 멈추고, <code>$env:ALLOWED_USERS = "복사한 ID"</code>를 넣은 뒤 다시 실행합니다.</li>
+      </ol>
+      <p>오픈빌더 테스트 창과 실제 카카오톡은 사용자 ID가 다릅니다. 둘 다 쓰려면 두 ID를 쉼표로 이어 적습니다.</p>
+      <div class="ok"><p>카카오톡에 “오늘 매출 알려줘”를 보내면 “잠시만 기다려 주세요” 뒤에 매출 답변이 옵니다. 콜백 승인 전이라면 안내대로 “결과”를 보내면 답이 옵니다.</p></div>
+
+      <h3>카카오톡에서 자주 생기는 문제</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>증상</th><th>원인</th><th>해결</th></tr></thead>
+        <tbody>
+          <tr><td>카카오 테스트 창에 “스킬 서버 오류”</td><td>터널 주소가 바뀌었거나 창 ②·③이 꺼짐</td><td>새 터널 주소로 스킬 URL을 고치고 다시 배포합니다</td></tr>
+          <tr><td>테스트 창은 되는데 휴대폰은 안 됨</td><td>배포를 안 함</td><td>오픈빌더 <b>배포</b> 메뉴에서 배포합니다</td></tr>
+          <tr><td>“잠시만요” 뒤에 답이 안 옴</td><td>5분 안에 답을 못 만듦</td><td>창 ①에서 오류를 확인하고, 더 작은 모델을 씁니다</td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li><b>허용 목록(ALLOWED_USERS)</b>: 카카오톡 채널은 누구나 친구 추가할 수 있으니 중계 서버의 허용 목록을 꼭 씁니다.</li>
+        <li><b>API_SERVER_KEY</b>는 화면 공유나 카카오톡으로 보내지 않습니다.</li>
+        <li>수업이 끝나면 창 세 개(게이트웨이, 중계 서버, 터널)를 모두 닫습니다. 터널이 열려 있는 동안에는 중계 서버가 인터넷에 노출됩니다.</li>
+      </ul>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과 · <a href="../">전체 과정 보기</a> · 2026년 10월 작성</div>
+</footer>
+
+<dialog class="tooltip-modal" id="termDialog" aria-labelledby="tmTitle">
+  <div class="tm-head">
+    <span class="ic" id="tmIcon"></span>
+    <div><h4 id="tmTitle"></h4><p id="tmTag"></p></div>
+    <button class="x" type="button" aria-label="닫기" id="tmClose">×</button>
+  </div>
+  <div class="tm-body" id="tmBody"></div>
+</dialog>
+
+<script>
+  // ───────── 도구 사전: 본문의 도구 이름을 누르면 이 내용이 열립니다 ─────────
+  var TERMS = {
+    antigravity: {
+      icon: '🚀', name: 'Google Antigravity', tag: 'AI 에이전트가 코드를 대신 써 주는 개발 도구',
+      match: /Google Antigravity|Antigravity/, role: '코드 작성',
+      body: '<h5>무엇인가요?</h5><p>Google이 만든 “에이전트 중심” 코드 편집기입니다. VS Code와 비슷한 화면에, 할 일을 말로 맡기면 AI 에이전트가 계획을 세우고 파일을 만들고 명령어를 실행해 결과까지 확인해 줍니다. 기본 AI는 Google의 Gemini입니다.</p>' +
+            '<h5>이 과정에서 하는 일</h5><p>카페 장부(<code>cafe_db.py</code>), 카페 도구(<code>cafe_mcp.py</code>), 카카오 중계 서버(<code>kakao_bridge.py</code>)를 학생이 직접 타이핑하지 않고 <b>한국어 프롬프트</b>로 만들게 합니다.</p>' +
+            '<h5>알아 두면 좋은 점</h5><ul><li><b>Planning 모드</b>는 작업 계획을 먼저 보여 주고, <b>Fast 모드</b>는 바로 실행합니다. 수업에는 Planning이 설명하기 좋습니다.</li><li>에이전트가 명령 실행이나 파일 생성을 물으면 내용을 읽고 승인합니다. AI가 만든 코드도 반드시 실행해서 확인합니다.</li><li>개인 Google 계정은 무료지만 사용량 한도가 있습니다. 개강 전에 무료 조건을 다시 확인하세요.</li></ul>' +
+            '<dl class="facts"><dt>만든 곳</dt><dd>Google</dd><dt>비용</dt><dd>개인 계정 무료(사용량 한도 있음)</dd><dt>설치</dt><dd>Windows · macOS · Linux 데스크톱 앱</dd></dl>',
+      link: 'https://antigravity.google'
+    },
+    ollama: {
+      icon: '🦙', name: 'Ollama', tag: '내 PC에서 AI 모델을 실행해 주는 프로그램',
+      match: /Ollama/, role: '두뇌 실행기',
+      body: '<h5>무엇인가요?</h5><p>공개된 AI 모델(LLM)을 내려받아 <b>내 PC에서 직접</b> 실행해 주는 무료 오픈소스 프로그램입니다. 인터넷 AI 서비스와 달리 요금이 없고, 대화 내용이 PC 밖으로 나가지 않습니다.</p>' +
+            '<h5>이 과정에서 하는 일</h5><p>Qwen 모델을 실행하고, Hermes가 질문을 보낼 수 있도록 <code>http://localhost:11434/v1</code> 주소로 AI를 열어 둡니다. 이 주소는 OpenAI와 같은 형식이라 Hermes가 “Custom Endpoint”로 바로 연결합니다.</p>' +
+            '<h5>자주 쓰는 명령</h5><ul><li><code>ollama pull qwen3:4b</code> 모델 내려받기</li><li><code>ollama run qwen3:4b</code> 바로 대화하기</li><li><code>ollama list</code> 내려받은 모델 보기</li><li><code>ollama ps</code> 지금 메모리에 올라간 모델과 컨텍스트 길이 보기</li><li><code>ollama create 이름 -f Modelfile</code> 설정을 바꾼 새 모델 만들기</li></ul>' +
+            '<dl class="facts"><dt>비용</dt><dd>무료 · 오픈소스</dd><dt>기본 주소</dt><dd>localhost:11434</dd><dt>필요 사양</dt><dd>모델 크기에 따라 RAM 8~32GB, 그래픽카드는 선택</dd></dl>',
+      link: 'https://ollama.com'
+    },
+    qwen: {
+      icon: '🧠', name: 'Qwen3', tag: '알리바바가 무료로 공개한 AI 언어 모델',
+      match: /Qwen3?/, role: '두뇌(LLM)',
+      body: '<h5>무엇인가요?</h5><p>알리바바 클라우드의 Qwen 팀이 만든 대형 언어 모델(LLM)입니다. 모델 파일이 공개되어 있고(Apache 2.0 라이선스) 누구나 내려받아 쓸 수 있습니다. 한국어를 이해하고, <b>도구 호출(tool calling)</b>을 지원해서 에이전트의 두뇌로 쓸 수 있습니다.</p>' +
+            '<h5>이 과정에서 하는 일</h5><p>사장님의 말을 이해하고, 어떤 카페 도구를 쓸지 고르고, 도구 결과를 보고 답을 만듭니다. 실제 계산과 장부 수정은 도구가 하고 Qwen은 “판단”을 맡습니다.</p>' +
+            '<h5>모델 고르기</h5><ul><li><code>qwen3:4b</code> 약 2.5GB · RAM 16GB PC</li><li><code>qwen3:8b</code> 약 5GB · RAM 32GB PC, 더 정확함</li><li>뒤의 4b, 8b는 매개변수 수(40억, 80억 개)입니다. 클수록 똑똑하지만 느리고 메모리를 더 씁니다.</li><li>Qwen3는 답하기 전에 속으로 생각하는 “생각 모드”가 있어서, 작은 PC에서는 답이 늦게 나올 수 있습니다.</li></ul>' +
+            '<dl class="facts"><dt>만든 곳</dt><dd>Alibaba Cloud Qwen 팀</dd><dt>비용</dt><dd>무료 · 공개 모델</dd><dt>받는 곳</dt><dd>Ollama 모델 목록 (ollama.com/library/qwen3)</dd></dl>',
+      link: 'https://ollama.com/library/qwen3'
+    },
+    hermes: {
+      icon: '🤖', name: 'Hermes Agent', tag: '두뇌와 도구를 연결해 일을 처리하는 AI 비서 프로그램',
+      match: /Hermes(?: Agent| 에이전트)?/, role: '에이전트',
+      body: '<h5>무엇인가요?</h5><p>Nous Research가 만든 무료 오픈소스 AI 에이전트입니다. LLM(두뇌)에게 질문을 전달하고, LLM이 “이 도구를 써야겠다”고 하면 실제로 도구를 실행한 뒤 결과를 다시 LLM에게 돌려주는 과정을 반복해 일을 끝냅니다.</p>' +
+            '<h5>이 과정에서 하는 일</h5><ul><li>Ollama의 Qwen을 두뇌로, 카페 MCP 서버를 손발로 연결합니다.</li><li><code>SOUL.md</code>로 “다정한 카페 경영 비서”라는 성격과 말투를 정합니다.</li><li><code>hermes gateway</code>로 텔레그램 봇과 연결합니다. 보충에서는 같은 명령으로 API 서버(<code>127.0.0.1:8642</code>)도 엽니다.</li></ul>' +
+            '<h5>알아 두면 좋은 점</h5><ul><li>설정 파일은 <code>%LOCALAPPDATA%\\hermes</code> 폴더의 <code>config.yaml</code>과 <code>.env</code>입니다.</li><li>텔레그램, 디스코드, 슬랙 같은 메신저를 <b>직접 연결</b>할 수 있습니다. 이 과정은 텔레그램을 씁니다. 카카오톡은 지원하지 않아서 보충에서 중계 서버를 따로 만듭니다.</li><li>모델의 대화 기억 길이(컨텍스트)가 64,000토큰 이상이어야 시작합니다.</li></ul>' +
+            '<dl class="facts"><dt>만든 곳</dt><dd>Nous Research</dd><dt>비용</dt><dd>무료 · MIT 라이선스</dd><dt>주요 명령</dt><dd>hermes · hermes setup · hermes gateway · hermes mcp test</dd></dl>',
+      link: 'https://hermes-agent.nousresearch.com/'
+    },
+    mcp: {
+      icon: '🔌', name: 'MCP (Model Context Protocol)', tag: 'AI가 도구를 쓸 수 있게 해 주는 표준 연결 규격',
+      match: /MCP/, role: '손발 연결',
+      body: '<h5>무엇인가요?</h5><p>AI 프로그램과 외부 도구·데이터를 연결하는 공개 표준입니다. 2024년 11월 Anthropic이 공개했고 지금은 여러 AI 도구가 함께 씁니다. 전자기기의 USB-C처럼 <b>한 번 만들어 두면 여러 AI에 꽂아 쓸 수 있는 단자</b>라고 생각하면 됩니다.</p>' +
+            '<h5>이 과정에서 하는 일</h5><p><code>cafe_mcp.py</code>가 MCP 서버입니다. 메뉴 보기, 품절 처리, 매출 요약, 지출 등록, 신메뉴 등록 도구 5개를 Hermes에게 알려 주고, Hermes가 요청하면 실제로 <code>cafe.db</code>를 읽고 씁니다.</p>' +
+            '<h5>알아 두면 좋은 점</h5><ul><li>AI는 도구의 <b>이름과 설명(docstring)</b>만 보고 언제 쓸지 고릅니다. 설명을 자세히 쓸수록 정확해집니다.</li><li>이 과정은 <b>stdio 방식</b>입니다. Hermes가 MCP 서버 프로그램을 직접 실행하고, 표준 입출력으로 대화합니다.</li><li>파이썬 <code>mcp</code> 패키지 2.x에서는 <code>FastMCP</code>가 <code>MCPServer</code>로 이름이 바뀌었습니다.</li></ul>' +
+            '<dl class="facts"><dt>만든 곳</dt><dd>Anthropic이 공개한 오픈 표준</dd><dt>비용</dt><dd>무료</dd><dt>파이썬</dt><dd>pip install mcp</dd></dl>',
+      link: 'https://modelcontextprotocol.io'
+    },
+    cloudflare: {
+      icon: '🌐', name: 'Cloudflare 터널 (cloudflared)', tag: '내 PC 프로그램에 임시 인터넷 주소를 붙여 주는 도구',
+      match: /Cloudflare(?: 퀵)? 터널|cloudflared|Cloudflare/, role: '보충 · 외부 연결',
+      body: '<h5>무엇인가요?</h5><p>집이나 실습실 PC는 보통 인터넷에서 직접 찾아올 수 없습니다. <code>cloudflared</code>는 Cloudflare 서버와 내 PC 사이에 통로(터널)를 만들어, 바깥에서 <code>https://….trycloudflare.com</code> 주소로 내 PC의 프로그램에 접속할 수 있게 해 줍니다.</p>' +
+            '<h5>이 과정에서 하는 일</h5><p>카카오 서버가 내 PC의 중계 서버(<code>localhost:8000</code>)로 질문을 보낼 수 있도록 임시 주소를 만듭니다. 이 주소를 오픈빌더 스킬 URL에 넣습니다.</p>' +
+            '<h5>알아 두면 좋은 점</h5><ul><li><code>cloudflared tunnel --url http://localhost:8000</code> 한 줄이면 회원가입 없이 바로 쓸 수 있습니다(“퀵 터널”).</li><li>퀵 터널 주소는 <b>켤 때마다 바뀌고</b> 테스트용입니다. 바뀌면 스킬 URL도 고쳐야 합니다.</li><li>터널이 켜져 있는 동안은 중계 서버가 인터넷에 열려 있습니다. 수업이 끝나면 꼭 닫습니다.</li></ul>' +
+            '<dl class="facts"><dt>만든 곳</dt><dd>Cloudflare</dd><dt>비용</dt><dd>퀵 터널 무료 · 계정 불필요</dd><dt>설치</dt><dd>winget install --id Cloudflare.cloudflared</dd></dl>',
+      link: 'https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/do-more-with-tunnels/trycloudflare/'
+    },
+    telegram: {
+      icon: '✈️', name: '텔레그램 봇', tag: '프로그램이 대신 답하는 텔레그램 계정',
+      match: /텔레그램 봇|텔레그램/, role: '대화 창구',
+      body: '<h5>무엇인가요?</h5><p>텔레그램은 무료 메신저이고, <b>봇</b>은 사람이 아니라 프로그램이 답하는 텔레그램 계정입니다. 누구나 무료로, 심사 없이 몇 분 만에 만들 수 있습니다.</p>' +
+            '<h5>이 과정에서 하는 일</h5><p>사장님이 휴대폰 텔레그램에서 봇에게 말을 걸면, 내 PC의 Hermes가 그 메시지를 받아 답합니다. Hermes가 텔레그램 서버에 “새 메시지 있어?”라고 계속 물어보는 방식(롱 폴링)이라 PC에 인터넷 주소가 필요 없습니다.</p>' +
+            '<h5>알아 두면 좋은 점</h5><ul><li>봇 아이디는 반드시 <code>bot</code>으로 끝나야 합니다.</li><li>봇은 아이디만 알면 누구나 검색해서 말을 걸 수 있으므로 <code>TELEGRAM_ALLOWED_USERS</code>로 허용할 사람을 정합니다.</li><li>허용 목록에는 <code>@username</code>이 아니라 숫자로 된 사용자 ID를 씁니다. <code>@userinfobot</code>에게 물어보면 알려 줍니다.</li><li><code>/new</code>를 보내면 대화를 새로 시작합니다.</li></ul>' +
+            '<dl class="facts"><dt>만든 곳</dt><dd>Telegram</dd><dt>비용</dt><dd>무료</dd><dt>필요한 것</dt><dd>휴대폰 번호로 가입한 텔레그램 계정</dd></dl>',
+      link: 'https://core.telegram.org/bots'
+    },
+    botfather: {
+      icon: '🧔', name: 'BotFather', tag: '텔레그램 봇을 만들고 관리하는 공식 봇',
+      match: /BotFather/, role: '봇 만들기',
+      body: '<h5>무엇인가요?</h5><p>텔레그램이 직접 운영하는 공식 봇입니다. 대화로 명령을 보내 새 봇을 만들고, 이름과 사진, 메뉴를 바꾸고, 봇 토큰을 관리합니다.</p>' +
+            '<h5>자주 쓰는 명령</h5><ul><li><code>/newbot</code> 새 봇 만들기 → 봇 토큰 발급</li><li><code>/mybots</code> 내 봇 목록, 토큰 다시 보기</li><li><code>/setdescription</code> 소개 글 · <code>/setuserpic</code> 프로필 사진 · <code>/setcommands</code> 메뉴</li><li><code>/revoke</code> 토큰이 새어 나갔을 때 새 토큰으로 바꾸기</li></ul>' +
+            '<h5>주의</h5><p>이름이 비슷한 가짜 계정이 있을 수 있습니다. 아이디가 정확히 <code>@BotFather</code>이고 공식 인증 표시가 있는지 확인합니다.</p>',
+      link: 'https://t.me/BotFather'
+    },
+    openbuilder: {
+      icon: '💬', name: '카카오 i 오픈빌더', tag: '카카오톡 챗봇을 만드는 카카오의 무료 도구',
+      match: /카카오 i 오픈빌더|오픈빌더/, role: '보충 · 챗봇 창구',
+      body: '<h5>무엇인가요?</h5><p>카카오톡 채널에 챗봇을 붙이는 카카오의 웹 도구입니다. 사용자의 말을 <b>블록</b>으로 나눠 답하게 하고, 복잡한 답은 외부 프로그램인 <b>스킬 서버</b>에 물어볼 수 있습니다.</p>' +
+            '<h5>이 과정에서 하는 일</h5><p><b>폴백 블록</b>(다른 블록에 맞지 않는 모든 말)을 스킬 <code>카페비서</code>에 연결해, 사장님의 모든 메시지를 중계 서버로 보냅니다.</p>' +
+            '<h5>꼭 알아 둘 규칙</h5><ul><li>스킬 서버는 <b>5초 안에</b> 답해야 합니다. 넘으면 오류가 납니다.</li><li>그래서 <b>콜백</b>을 씁니다. 먼저 “잠시만요”로 답하고, 카카오가 준 콜백 주소로 나중에 진짜 답을 보냅니다. 콜백 주소는 5분 동안 한 번만 쓸 수 있습니다.</li><li>콜백은 AI 챗봇 전환 신청(심사)이 필요할 수 있으니 미리 신청합니다.</li><li>수정한 내용은 <b>배포</b>해야 실제 카카오톡에 반영됩니다.</li></ul>' +
+            '<dl class="facts"><dt>만든 곳</dt><dd>카카오</dd><dt>비용</dt><dd>무료</dd><dt>주소</dt><dd>chatbot.kakao.com</dd></dl>',
+      link: 'https://kakaobusiness.gitbook.io/main/tool/chatbot/skill_guide/ai_chatbot_callback_guide'
+    },
+    kakaochannel: {
+      icon: '📱', name: '카카오톡 채널', tag: '가게·기관이 카카오톡에서 손님과 대화하는 공식 계정',
+      match: /카카오톡 채널/, role: '보충 · 대화 상대',
+      body: '<h5>무엇인가요?</h5><p>사업자나 기관이 만드는 카카오톡 공식 계정입니다. 사용자가 채널을 친구로 추가하고 1:1 채팅을 보내면, 연결된 챗봇이 대신 답할 수 있습니다.</p>' +
+            '<h5>이 과정에서 하는 일</h5><p>“햇살카페 비서” 같은 채널을 만들고 오픈빌더 챗봇과 연결합니다. 사장님은 휴대폰 카카오톡에서 이 채널에 말을 겁니다.</p>' +
+            '<h5>알아 두면 좋은 점</h5><ul><li>카카오 비즈니스(business.kakao.com)에서 카카오계정으로 무료로 만듭니다.</li><li>채널은 누구나 친구 추가할 수 있으므로, 중계 서버의 <code>ALLOWED_USERS</code>로 사장님만 쓰게 막습니다.</li></ul>' +
+            '<dl class="facts"><dt>만든 곳</dt><dd>카카오</dd><dt>비용</dt><dd>무료(기본 채팅)</dd></dl>',
+      link: 'https://business.kakao.com'
+    },
+    fastapi: {
+      icon: '⚡', name: 'FastAPI', tag: '파이썬으로 웹 서버를 쉽게 만드는 도구',
+      match: /FastAPI/, role: '보충 · 중계 서버',
+      body: '<h5>무엇인가요?</h5><p>파이썬으로 웹 API 서버를 짧은 코드로 만들 수 있는 무료 오픈소스 프레임워크입니다. <code>uvicorn</code>이라는 프로그램으로 실행합니다.</p>' +
+            '<h5>이 과정에서 하는 일</h5><p><code>kakao_bridge.py</code>가 FastAPI로 만든 중계 서버입니다. 카카오가 보낸 질문(<code>POST /kakao/skill</code>)을 받아 Hermes에 묻고, 답을 카카오 말풍선 형식으로 돌려줍니다.</p>' +
+            '<dl class="facts"><dt>비용</dt><dd>무료 · 오픈소스</dd><dt>설치</dt><dd>pip install fastapi uvicorn httpx</dd><dt>실행</dt><dd>python -m uvicorn kakao_bridge:app --port 8000</dd></dl>',
+      link: 'https://fastapi.tiangolo.com/ko/'
+    },
+    context: {
+      icon: '📏', name: '컨텍스트 (토큰)', tag: 'AI가 한 번에 기억하며 읽을 수 있는 글의 길이',
+      match: /컨텍스트/, role: '개념',
+      body: '<h5>무엇인가요?</h5><p>LLM은 글을 <b>토큰</b>이라는 작은 조각으로 나눠 읽습니다. 컨텍스트는 AI가 한 번에 붙잡고 있을 수 있는 토큰의 양으로, 사람으로 치면 “단기 기억의 크기”입니다.</p>' +
+            '<h5>왜 중요할까요?</h5><ul><li>에이전트는 성격 설명(SOUL.md), 도구 설명서, 대화 내용, 도구 결과를 모두 컨텍스트에 넣고 생각합니다. 그래서 Hermes는 <b>최소 64,000토큰</b>을 요구합니다.</li><li>Ollama의 기본값은 이보다 훨씬 작아서 1단계에서 <code>num_ctx 65536</code>으로 늘린 <code>qwen3-cafe</code>를 만듭니다.</li><li>컨텍스트를 늘리면 메모리를 더 씁니다. 그래서 <code>OLLAMA_KV_CACHE_TYPE=q8_0</code>으로 아낍니다.</li></ul>',
+      link: ''
+    }
+  };
+
+  // 사전 카드 그리기
+  var grid = document.getElementById('toolgrid');
+  Object.keys(TERMS).forEach(function (k) {
+    var t = TERMS[k];
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'toolcard'; b.dataset.term = k;
+    b.innerHTML = '<span class="ic">' + t.icon + '</span><span><span class="role">' + t.role + '</span><b>' + t.name + '</b><small>' + t.tag + '</small></span>';
+    grid.appendChild(b);
+  });
+
+  // 본문에서 각 도구 이름을 단계(section)마다 처음 한 번 클릭할 수 있게 감싸기
+  var SKIP = /^(PRE|CODE|A|BUTTON|H1|H2|H3|H4|SUMMARY|SVG|TEXT|SCRIPT|STYLE|DIALOG)$/;
+  function wrapFirst(root, key, re) {
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        for (var p = n.parentNode; p && p !== root; p = p.parentNode) {
+          if (SKIP.test(p.nodeName.toUpperCase()) || (p.classList && (p.classList.contains('term') || p.classList.contains('toolgrid') || p.classList.contains('code')))) return NodeFilter.FILTER_REJECT;
+        }
+        return re.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+      }
+    });
+    var node = walker.nextNode();
+    if (!node) return;
+    var m = node.nodeValue.match(re);
+    var after = node.splitText(m.index);
+    after.splitText(m[0].length);
+    var btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'term'; btn.dataset.term = key; btn.textContent = m[0];
+    btn.title = TERMS[key].name + ' 설명 보기';
+    after.parentNode.replaceChild(btn, after);
+  }
+  document.querySelectorAll('main section').forEach(function (sec) {
+    Object.keys(TERMS).forEach(function (k) { wrapFirst(sec, k, TERMS[k].match); });
+  });
+
+  // 설명 창 열기 / 닫기
+  var dlg = document.getElementById('termDialog');
+  function openTerm(key) {
+    var t = TERMS[key]; if (!t) return;
+    document.getElementById('tmIcon').textContent = t.icon;
+    document.getElementById('tmTitle').textContent = t.name;
+    document.getElementById('tmTag').textContent = t.tag;
+    document.getElementById('tmBody').innerHTML = t.body +
+      (t.link ? '<a class="go" href="' + t.link + '" target="_blank" rel="noopener">공식 사이트 열기 ↗</a>' : '');
+    if (dlg.showModal) { dlg.showModal(); } else { dlg.setAttribute('open', ''); }
+  }
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest && e.target.closest('[data-term]');
+    if (el) { openTerm(el.dataset.term); }
+  });
+  document.getElementById('tmClose').addEventListener('click', function () { dlg.close ? dlg.close() : dlg.removeAttribute('open'); });
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });  // 바깥(어두운 곳) 클릭 시 닫기
+
+  // 라이트 / 다크 전환
+  var tb = document.getElementById('theme');
+  var setLabel = function () { tb.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️ 라이트' : '🌙 다크'; };
+  setLabel();
+  tb.addEventListener('click', function () {
+    var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('cafeagent-theme', next); } catch (e) {}
+    setLabel();
+  });
+
+  // 코드 블록 복사 버튼
+  document.querySelectorAll('.code').forEach(function (box) {
+    var btn = document.createElement('button');
+    btn.className = 'copy'; btn.type = 'button'; btn.textContent = '복사';
+    btn.addEventListener('click', function () {
+      var text = box.querySelector('code').textContent;
+      var done = function () { btn.textContent = '복사됨'; setTimeout(function () { btn.textContent = '복사'; }, 1500); };
+      if (navigator.clipboard) { navigator.clipboard.writeText(text).then(done, function () {}); }
+    });
+    box.appendChild(btn);
+  });
+
+  // 체크리스트 상태를 이 브라우저에 기억
+  document.querySelectorAll('.checks input').forEach(function (cb, i) {
+    var key = 'cafeagent-check-' + i;
+    try { cb.checked = localStorage.getItem(key) === '1'; } catch (e) {}
+    cb.addEventListener('change', function () { try { localStorage.setItem(key, cb.checked ? '1' : '0'); } catch (e) {} });
+  });
+
+  // 현재 보고 있는 단계를 목차에 표시
+  var links = document.querySelectorAll('nav.toc a');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          links.forEach(function (a) { a.classList.toggle('on', a.getAttribute('href') === '#' + en.target.id); });
+        }
+      });
+    }, { rootMargin: '-30% 0px -60% 0px' });
+    document.querySelectorAll('main section').forEach(function (s) { io.observe(s); });
+  }
+</script>
+</html>
