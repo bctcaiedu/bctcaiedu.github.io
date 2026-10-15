@@ -1381,7 +1381,7 @@
       if (c.cred.uid !== 0) { c.err('dpkg: error: requested operation requires superuser privilege\n'); return 2; }
       const f = rest[0];
       if (!f || !c.fs.lookup(c.resolve(f))) { c.err(`dpkg: error: cannot access archive '${f}': No such file or directory\n`); return 1; }
-      const n = ((/^(?:.*\/)?([a-z0-9.+-]+?)_/.exec(f) || [])[1]);
+      const n = ((/^(?:.*\/)?([a-z0-9.+-]+?)_/.exec(f) || [])[1]) || ((/^(?:.*\/)?([a-z0-9]+)(?:-linux-[a-z0-9]+)?\.deb$/.exec(f) || [])[1]);
       if (!n || !LX.PKGS[n]) { c.err(`dpkg-deb: error: '${f}' is not a Debian format archive\n`); return 1; }
       c.out(`Selecting previously unselected package ${n}.\n(Reading database ... 84210 files and directories currently installed.)\nPreparing to unpack ${f} ...\nUnpacking ${n} (${LX.PKGS[n].ver}) ...\nSetting up ${n} (${LX.PKGS[n].ver}) ...\nProcessing triggers for man-db (2.12.0-4build2) ...\n`);
       LX.pkgFiles(m, n);

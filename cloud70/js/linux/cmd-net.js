@@ -18,6 +18,7 @@
   function internetDown(m) {
     const e = m.state.net.ifaces.enp0s3;
     if (!e || e.state !== 'UP') return 'Network is unreachable';
+    if (m.state.c70role === 'school') return m.state.net.gw === '172.16.10.1' && e.addr.some((a) => a.startsWith('172.16.10.')) ? null : 'Network is unreachable';
     if (!e.addr.some((a) => a.startsWith('10.0.2.'))) return 'Network is unreachable';
     if (m.state.net.gw !== '10.0.2.2') return 'Network is unreachable';
     return null;

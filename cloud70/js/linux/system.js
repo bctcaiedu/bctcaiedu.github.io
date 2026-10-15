@@ -456,6 +456,7 @@
     Object.entries((m.runtime && m.runtime.servers) || {}).forEach(([port, srv]) => {
       list.push({ proto: 'tcp', addr: srv.addr || '0.0.0.0', port: +port, proc: srv.proc || 'python3', pid: srv.pid, runtime: srv });
     });
+    if (LX.extraPorts) { try { LX.extraPorts(m).forEach((p) => list.push(p)); } catch (e) { /* 무시 */ } }
     return list;
   };
 
@@ -732,7 +733,7 @@
     if (!r.local) {
       // 외부: 가상 인터넷
       const ext = r.ext || {};
-      if (ext.route) { const rr = ext.route(m, path, host, method); if (rr) return Object.assign({ status: 200, headers: { 'Content-Type': 'text/html; charset=UTF-8', Server: rr.server || 'cloud', Date: httpDate(m.now()) }, ip: r.ip, port }, rr); }
+      if (ext.route) { const rr = await ext.route(m, path, host, method, o, port); if (rr) return Object.assign({ status: 200, headers: { 'Content-Type': 'text/html; charset=UTF-8', Server: rr.server || 'cloud', Date: httpDate(m.now()) }, ip: r.ip, port }, rr); }
       if (ext.redirect && path === '/') return { status: 301, headers: { Location: ext.redirect, 'Content-Type': 'text/html; charset=UTF-8', Server: 'gws' }, body: `<HTML><HEAD><meta http-equiv="content-type" content="text/html;charset=utf-8">\n<TITLE>301 Moved</TITLE></HEAD><BODY>\n<H1>301 Moved</H1>\nThe document has moved\n<A HREF="${ext.redirect}">here</A>.\r\n</BODY></HTML>\r\n`, ip: r.ip, port };
       if (ext.json) return { status: 200, headers: { 'Content-Type': 'application/json; charset=utf-8', Server: 'nginx' }, body: JSON.stringify(ext.json, null, 2) + '\n', ip: r.ip, port };
       const body = ext.body || `<!DOCTYPE html>\n<html>\n<head><title>${host}</title></head>\n<body>\n<h1>${host}</h1>\n<p>(가상 인터넷 응답) 실제 사이트의 내용은 실제 리눅스에서 확인하세요.</p>\n</body>\n</html>\n`;
@@ -757,7 +758,8 @@
     const req = { method, path, host: host.replace(/^\[|\]$/g, ''), port, headers: o.headers || {}, body: o.data || '', scheme, depth: (o.depth || 0) + 1 };
     if (req.depth > 5) return { status: 508, headers: {}, body: 'Loop Detected\n' };
     let res;
-    if (l.svc === 'nginx') res = await serveNginx(m, req);
+    if (l.c70tun) { const tr = await LX.c70tunServe(l.c70tun, req); if (tr.error) return tr; res = tr; }
+    else if (l.svc === 'nginx') res = await serveNginx(m, req);
     else if (l.svc === 'apache2') res = await serveApache(m, req);
     else if (l.container) res = await LX.dockerServe(m, l, req);
     else if (l.runtime) res = await l.runtime.handle(req);

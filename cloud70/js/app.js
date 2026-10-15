@@ -493,10 +493,10 @@
       $('crumb').innerHTML = '<b>강좌 소개</b>';
       renderHome();
     } else if (r.type === 'chapter') {
-      $('crumb').innerHTML = `${esc(r.ch.no)}일차 · <b>${esc(r.ch.title)}</b>`;
+      $('crumb').innerHTML = `${esc(r.ch.extra ? "심화" : r.ch.no + "일차")} · <b>${esc(r.ch.title)}</b>`;
       renderChapter(r.ch);
     } else {
-      $('crumb').innerHTML = `${esc(r.ch.no)}일차 ${esc(r.ch.title)} › <b>${esc(r.sec.title)}</b>`;
+      $('crumb').innerHTML = `${esc(r.ch.extra ? "심화" : r.ch.no + "일차")} ${esc(r.ch.title)} › <b>${esc(r.sec.title)}</b>`;
       if (slides) {
         const idx = app.pendingSlide != null ? app.pendingSlide : (r.slide != null ? r.slide : savedSlide(r.sec.id));
         app.pendingSlide = null;
@@ -529,9 +529,9 @@
     C.order.forEach((o) => {
       if (partAt[o.id]) cards += `${cards ? '</div>' : ''}<h3 class="part-title">${esc(partAt[o.id])}</h3><div class="cards">`;
       const ch = C.chapters[o.id];
-      if (!ch) { cards += `<div class="card disabled"><span class="ci">${o.icon}</span><span class="cn">${esc(o.no)}일차</span><span class="ct">${esc(o.title)}</span><span class="cs">준비 중</span></div>`; return; }
+      if (!ch) { cards += `<div class="card disabled"><span class="ci">${o.icon}</span><span class="cn">${esc(o.extra ? "심화" : o.no + "일차")}</span><span class="ct">${esc(o.title)}</span><span class="cs">준비 중</span></div>`; return; }
       const d = ch.sections.filter((s) => app.done.has(s.id)).length;
-      cards += `<a class="card" href="#${ch.id}"><span class="ci">${o.icon}</span><span class="cn">${esc(ch.no)}일차</span><span class="ct">${esc(ch.title)}</span>
+      cards += `<a class="card" href="#${ch.id}"><span class="ci">${o.icon}</span><span class="cn">${esc(ch.extra ? "심화" : ch.no + "일차")}</span><span class="ct">${esc(ch.title)}</span>
         <span class="cs">${ch.sections.length}교시 · ${esc(stripTags(ch.summary).slice(0, 56))}${stripTags(ch.summary).length > 56 ? '…' : ''}</span>
         <span class="cp"><i style="width:${ch.sections.length ? d / ch.sections.length * 100 : 0}%"></i></span></a>`;
     });
@@ -541,7 +541,7 @@
         <h1>☁️ 클라우드 기초 — 비용 0원으로 내 서버 만들기</h1>
         <p>AWS · Azure · Google Cloud 를 직접 써 보며 비교하고, 무료 클라우드 서버 한 대를 도메인과 https 를 갖춘 서비스로 완성하는 <b>70시간 · 10일</b> 실습 과정입니다.
         오른쪽 <b>가상 클라우드 서버 터미널</b>에서 모든 명령을 먼저 연습한 뒤 실제 클라우드에서 그대로 따라 합니다.</p>
-        <p>${chs.length}일 · ${all.length}교시 · 실습 블록 ${nCmd}개 · 과제 ${nPractice}개 · 퀴즈 ${nQuiz}문항 · 슬라이드 ${nSlides}장</p>
+        <p>${chs.filter((c) => !c.extra).length}일${chs.some((c) => c.extra) ? ' + 심화' : ''} · ${all.length}교시 · 실습 블록 ${nCmd}개 · 과제 ${nPractice}개 · 퀴즈 ${nQuiz}문항 · 슬라이드 ${nSlides}장</p>
         <div class="hero-actions">
           ${lastF ? `<a class="btn" href="#${lastF.sec.id}">⏯ 이어서 학습: ${esc(lastF.sec.title)}</a>` : ''}
           ${first ? `<a class="btn${lastF ? ' outline' : ''}" href="#${first.sec.id}">▶ 1일차부터 시작</a>` : ''}
@@ -622,7 +622,7 @@
       return `${s.minutes || 50}분 · 실습 블록 ${nc} · 과제 ${(s.practice || []).length} · 슬라이드 ${(s.slides || []).length}`;
     };
     $('content').innerHTML = `<div class="doc">
-      <span class="chapter-badge">${esc(ch.icon || '')} ${esc(ch.no)}일차</span>
+      <span class="chapter-badge">${esc(ch.icon || '')} ${esc(ch.extra ? "심화" : ch.no + "일차")}</span>
       <h1>${esc(ch.title)} ${ch.subtitle ? `<span class="muted" style="font-size:.6em;font-weight:600">${esc(ch.subtitle)}</span>` : ''}</h1>
       <p class="lead">${ch.summary || ''}</p>
       ${(ch.goals || []).length ? `<div class="goals"><b>🎯 오늘의 학습 목표</b><ul>${ch.goals.map((g) => `<li>${g}</li>`).join('')}</ul></div>` : ''}
@@ -723,7 +723,7 @@
     const nVm = (sec.content || []).filter((b) => (b.type === 'cmd' && b.vm) || (b.type === 'callout' && b.kind === 'vm')).length;
 
     $('content').innerHTML = `<div class="doc">
-      <span class="chapter-badge">${esc(ch.icon || '')} ${esc(ch.no)}일차 · ${esc(ch.title)} · ${idx + 1}/${ch.sections.length}교시</span>
+      <span class="chapter-badge">${esc(ch.icon || '')} ${esc(ch.extra ? "심화" : ch.no + "일차")} · ${esc(ch.title)} · ${idx + 1}/${ch.sections.length}교시</span>
       <h1>${esc(sec.title)}</h1>
       <div class="meta-row"><span class="chip">⏱ ${sec.minutes || 50}분</span><span class="chip">💻 터미널 실습 ${nCmd}</span>${nVm ? `<span class="chip vm-chip">🖥 실제 클라우드 ${nVm}</span>` : ''}
         <span class="chip">🛠️ 과제 ${(sec.practice || []).length}</span><span class="chip">❓ 퀴즈 ${(sec.quiz || []).length}</span>

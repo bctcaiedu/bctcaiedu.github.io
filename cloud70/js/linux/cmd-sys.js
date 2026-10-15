@@ -1493,6 +1493,7 @@ NUMA:
       Object.entries(c.m.runtime.servers).forEach(([port, s]) => { if (s.pid === pid) { if (s.stop) s.stop(); delete c.m.runtime.servers[port]; } });
       return null;
     }
+    { const raw = c.m.procs.find((x) => x.pid === p.pid); if (raw && raw.onSignal && [2, 3, 9, 15].includes(sig)) { c.m.exitProc(raw); try { raw.onSignal(sig); } catch (e) { /* 무시 */ } return null; } }
     if (p.pid === 1 && c.cred.uid === 0) return null;
     if (p.sys && c.cred.uid !== 0) return 'Operation not permitted';
     if (STOP_SIGS.includes(sig)) p.stopped = true;

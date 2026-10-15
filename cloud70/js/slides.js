@@ -425,7 +425,7 @@
       const teacher = this.app.role === 'teacher';
       this.editor = null;
       const key = this.key;
-      const top = `<div class="s-top"><span class="s-ch">Day ${esc(this.ch.no)}</span><span>${esc(this.ch.title)}</span><span class="spacer"></span><span>${esc(this.sec.title)}</span></div>`;
+      const top = `<div class="s-top"><span class="s-ch">${this.ch.extra ? "심화" : "Day " + esc(this.ch.no)}</span><span>${esc(this.ch.title)}</span><span class="spacer"></span><span>${esc(this.sec.title)}</span></div>`;
       const foot = `<div class="s-foot"><span>☁️ 클라우드 기초 70시간</span><span class="spacer"></span><span class="pg">${this.index + 1} / ${this.slides.length}</span></div>`;
       const title = `<h2 class="s-title">${s.title || ''}</h2>`;
       const lead = s.lead ? `<p class="s-lead">${s.lead}</p>` : '';
@@ -435,7 +435,7 @@
       switch (s.layout) {
         case 'title':
           cls += ' title-slide';
-          html = `<div class="badge">${esc(s.badge || `Day ${this.ch.no} · ${this.ch.title}`)}</div>
+          html = `<div class="badge">${esc(s.badge || `${this.ch.extra ? "심화" : "Day " + this.ch.no} · ${this.ch.title}`)}</div>
             <h1>${s.title}</h1>
             ${s.subtitle ? `<div class="sub">${s.subtitle}</div>` : ''}
             <div class="meta"><span>⏱ ${this.sec.minutes || 50}분</span><span>🖼️ 슬라이드 ${this.slides.length}장</span></div>
@@ -833,7 +833,7 @@
       let notes = s.notes || '';
       if (s.layout === 'quiz' && typeof s.answer === 'number') notes += `<p><b>정답: ${s.answer + 1}번</b> ${(s.options || [])[s.answer] || ''}</p>`;
       this.channel.postMessage({
-        type: 'state', lesson: `Day ${this.ch.no} ${this.ch.title} · ${this.sec.title}`, index: this.index, total: this.slides.length,
+        type: 'state', lesson: `${this.ch.extra ? "심화" : "Day " + this.ch.no} ${this.ch.title} · ${this.sec.title}`, index: this.index, total: this.slides.length,
         title: s.title, notes, next: n ? n.title : '', schedule: this.sec.flow || [], minutes: this.sec.minutes || 50
       });
     }
