@@ -792,10 +792,10 @@ ${FONTS}
 
   <h2 class="sec">NotebookLM 실습 · 4단원 · NEW</h2>
   <a class="bonus nlm" href="unit4/notebooklm.html">
-    <span class="dn">PRACTICE · 왕초보 사용법 + 일기장 미션 15개 · 4단원 5차시 보충</span>
+    <span class="dn">PRACTICE · 왕초보 사용법 + 일기장 미션 15개 + 실전 문서 16개 · 4단원 5차시 보충</span>
     <b>일기장으로 연습하기 — 내 PDF와 대화하는 NotebookLM(Gemini Notebook)</b>
-    <span class="bd">연습용 일기장(3~6월 48편)을 올리고 숫자 찾기 · 흩어진 내용 모으기 · 숨은 규칙 찾기 · 없는 걸 묻는 함정 문제까지. 근거 번호로 원본을 확인하는 습관을 만듭니다. PDF 3종 내려받기 · 정답 포함.</span>
-    <span class="chips"><i>근거 번호</i><i>숨은 규칙 찾기</i><i>함정 문제</i><i>채팅 설정</i><i>오디오 요약 · 마인드맵</i></span>
+    <span class="bd">연습용 일기장(3~6월 48편)을 올리고 숫자 찾기 · 흩어진 내용 모으기 · 숨은 규칙 찾기 · 없는 걸 묻는 함정 문제까지. 근거 번호로 원본을 확인하는 습관을 만든 뒤, 보험 약관 · 가전 설명서 같은 실전 문서로 넘어갑니다.</span>
+    <span class="chips"><i>근거 번호</i><i>숨은 규칙 찾기</i><i>함정 문제</i><i>보험 약관</i><i>가전 설명서</i></span>
   </a>
 
   <h2 class="sec">보너스 실습 · 게임형</h2>
@@ -1160,7 +1160,7 @@ function buildNav(all) {
       { f: 'lesson.html', label: '차시별 교안', tag: U.hours + '차시' },
       { f: 'lab.html',    label: '실습지' },
       { f: 'quiz.html',   label: '퀴즈', tag: U.quiz.length + '문항' }
-    ].concat(U.unit === 4 ? [{ f: 'notebooklm.html', label: 'NotebookLM 실습', tag: '미션 15' }] : [])
+    ].concat(U.unit === 4 ? [{ f: 'notebooklm.html', label: 'NotebookLM 실습', tag: '미션 31' }] : [])
   }));
   return JS.nav
     .replace('__COURSE__', JSON.stringify(COURSE))
@@ -1333,7 +1333,7 @@ fs.writeFileSync(path.join(ROOT, 'colab_lesson.html'), buildColabLesson());
 fs.writeFileSync(path.join(ROOT, 'unit4', 'notebooklm.html'), buildNotebookLM());
 writeNotebooks(all);
 console.log(`python/  노트북 ${all.filter(D => D.py).length}개 + ${CB.notebook.file} (정답은 셀 실행 후 표시)`);
-console.log('unit4/notebooklm.html  (NotebookLM 일기장 미션 15개)');
+console.log('unit4/notebooklm.html  (NotebookLM 일기장 미션 15개 + 실전 문서 16개)');
 console.log(`colab.html · colab_lesson.html  (Colab 사용 설명서 · 준비 ${CB.hours}차시 교안)`);
 const total = all.reduce((s, u) => s + u.hours, 0);
 console.log(`index.html · plan.html · nav.js · bonus.html  (${all.length}개 단원 · ${total}시간)`);

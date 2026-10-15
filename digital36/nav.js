@@ -115,7 +115,7 @@
         {
           "f": "notebooklm.html",
           "label": "NotebookLM 실습",
-          "tag": "미션 15"
+          "tag": "미션 31"
         }
       ]
     },
