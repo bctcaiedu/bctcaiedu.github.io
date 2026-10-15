@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>클라우드 기초 70시간 과정</title>
+  <meta name="description" content="AWS · Azure · Google Cloud 를 소개하고 무료 클라우드 서버를 직접 만들어 https 서비스까지 배포하는 70시간 과정. 브라우저 안의 가상 클라우드 서버로 실습합니다.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☁️</text></svg>">
+
+  <!-- 글꼴 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
+
+  <!-- 코드 강조 · 편집기 (CodeMirror 5) -->
+  <link rel="stylesheet" href="vendor/codemirror/codemirror.min.css">
+  <script src="vendor/codemirror/codemirror.min.js"></script>
+  <script src="vendor/codemirror/addon-runmode.min.js"></script>
+  <script src="vendor/codemirror/addon-simple.min.js"></script>
+  <script src="vendor/codemirror/addon-matchbrackets.min.js"></script>
+  <script src="vendor/codemirror/addon-comment.min.js"></script>
+  <script src="vendor/codemirror/addon-active-line.min.js"></script>
+  <script src="vendor/codemirror/shell.min.js"></script>
+  <script src="vendor/codemirror/nginx.min.js"></script>
+  <script src="vendor/codemirror/yaml.min.js"></script>
+  <script src="vendor/codemirror/properties.min.js"></script>
+  <script src="vendor/codemirror/javascript.min.js"></script>
+  <script src="vendor/codemirror/python.min.js"></script>
+  <script src="vendor/codemirror/sql.min.js"></script>
+  <script src="vendor/codemirror/xml.min.js"></script>
+  <script src="vendor/codemirror/css.min.js"></script>
+  <script src="vendor/codemirror/htmlmixed.min.js"></script>
+  <script src="vendor/codemirror/clike.min.js"></script>
+  <script src="vendor/codemirror/php.min.js"></script>
+  <script src="vendor/codemirror/dockerfile.min.js"></script>
+  <script src="vendor/codemirror/diff.min.js"></script>
+
+  <link rel="stylesheet" href="css/style.css?v=c70-1">
+  <link rel="stylesheet" href="css/slides.css?v=c70-1">
+  <link rel="stylesheet" href="css/terminal.css?v=c70-1">
+<script src="js/presenter.js?v=c70-1"></script>
+</head>
+<body>
+  <div id="app" class="layout">
+    <!-- ========== 왼쪽: 네비게이션 ========== -->
+    <aside id="nav" class="pane nav">
+      <div class="brand">
+        <a class="brand-logo" href="#home" title="처음 화면">☁️</a>
+        <div class="brand-text">
+          <div class="brand-title">클라우드 기초</div>
+          <div class="brand-sub" id="brandSub">70시간 · 10일 실습</div>
+        </div>
+        <button id="themeBtn" class="icon-btn" title="라이트/다크 전환" aria-label="테마 전환">◐</button>
+        <button id="navCloseBtn" class="icon-btn nav-close" title="메뉴 접기" aria-label="메뉴 접기">⟨</button>
+      </div>
+      <div class="role-switch" role="group" aria-label="보기 대상">
+        <button data-role="student" title="학생용: 문서 형태의 강좌 + 실습">🎓 학생용</button>
+        <button data-role="teacher" title="교사용: PPT 슬라이드 + 교사 노트 + 정답 · 타이머">🧑‍🏫 교사용</button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>학습 진도</span><span id="progressText">0 / 0</span></div>
+        <div class="progress"><div id="progressBar" class="progress-fill"></div></div>
+      </div>
+      <input id="navSearch" class="nav-search" type="search" placeholder="검색 (예: ssh, docker, aws, 방화벽)">
+      <nav id="navTree" class="nav-tree" aria-label="강좌 목차"></nav>
+      <div class="nav-foot">
+        <button id="serverBtn" class="server-badge ok" title="가상 머신 정보 / 초기화">
+          <span class="dot"></span><span id="serverText">가상 클라우드 서버 · Ubuntu 24.04</span>
+        </button>
+      </div>
+    </aside>
+    <div class="gutter" data-resize="nav" title="드래그하여 너비 조절"></div>
+
+    <!-- ========== 가운데: 강좌 내용 (문서 / 슬라이드) + 편집기 ========== -->
+    <main id="center" class="pane center">
+      <div class="topbar">
+        <button id="navOpenBtn" class="icon-btn nav-open" title="메뉴 펼치기" aria-label="메뉴 펼치기">☰</button>
+        <div id="crumb" class="crumb"></div>
+        <span class="spacer"></span>
+        <div class="view-switch" role="group" aria-label="보기 방식">
+          <button data-view="doc" title="문서 보기">📄 문서</button>
+          <button data-view="slides" title="슬라이드 보기 (PPT)">🖼️ 슬라이드</button>
+        </div>
+        <button id="prevBtn" class="btn ghost small" title="이전 교시">◀</button>
+        <button id="nextBtn" class="btn ghost small" title="다음 교시">▶</button>
+      </div>
+
+      <!-- 문서 보기 -->
+      <div id="docView" class="doc-view">
+        <div id="content" class="content" tabindex="-1"></div>
+        <div class="hgutter" data-resize="editor" title="드래그하여 높이 조절"></div>
+        <section id="editorPane" class="editor-pane folded">
+          <div class="editor-bar">
+            <span class="editor-title">📝 편집기 <span id="editorLabel" class="muted">— 터미널에서 <code>nano 파일</code> 을 입력하면 여기에서 열립니다</span></span>
+            <span class="spacer"></span>
+            <span id="editorBadge" class="chip ed-badge hidden"></span>
+            <button id="edOpenBtn" class="btn ghost small" title="가상 머신의 파일 열기">📂 열기</button>
+            <button id="edSaveBtn" class="btn primary small" title="저장 (Ctrl+S)" disabled>💾 저장</button>
+            <button id="edRunBtn" class="btn ghost small hidden" title="bash 로 실행 (Ctrl+Enter)">▶ 실행</button>
+            <button id="edCloseBtn" class="btn ghost small" title="편집 끝내기 (Ctrl+X)" disabled>✕ 닫기</button>
+            <button id="fontDownBtn" class="btn ghost small" title="글자 작게">A−</button>
+            <button id="fontUpBtn" class="btn ghost small" title="글자 크게">A+</button>
+            <button id="foldBtn" class="btn ghost small" title="편집기 접기/펼치기">▴ 펼치기</button>
+          </div>
+          <div id="editorHost" class="editor-host"></div>
+        </section>
+      </div>
+
+      <!-- 슬라이드 보기 -->
+      <div id="slideView" class="slide-view hidden">
+        <div id="deckBars" class="deck-bars">
+          <div class="deck-bar">
+            <button id="sFirst" class="btn ghost small" title="첫 슬라이드 (Home)">⏮ <span class="bl">처음</span></button>
+            <button id="sPrev" class="btn ghost small" title="이전 슬라이드 (← , PageUp)">◀</button>
+            <span id="sCount" class="s-count">1 / 1</span>
+            <button id="sNext" class="btn ghost small" title="다음 슬라이드 (→ , Space)">▶</button>
+            <input id="sSlider" class="deck-slider" type="range" min="1" max="1" value="1" title="끌어서 슬라이드 이동" aria-label="슬라이드 이동">
+            <span id="sTitle" class="deck-title"></span>
+            <span class="spacer"></span>
+            <button id="timerBox" class="timer teacher-only" title="수업 타이머 — 클릭하면 시작/일시정지 (T)">⏱ <span id="timerText">00:00</span></button>
+            <button id="timerReset" class="icon-btn small teacher-only" title="타이머 초기화">↺</button>
+            <button id="sPresenter" class="btn ghost small teacher-only" title="발표자 창 열기 (노트 · 다음 슬라이드 · 타이머)">🗒 <span class="bl">발표자 창</span></button>
+            <button id="sGrid" class="btn ghost small" title="슬라이드 목록 (G)">▦ <span class="bl">목록</span></button>
+            <button id="sDoc" class="btn ghost small" title="문서 보기로 전환">📄 <span class="bl">문서</span></button>
+            <button id="sFull" class="btn primary small" title="전체 화면 발표 (F)">⛶ <span class="bl">전체 화면</span></button>
+            <div class="deck-progress"><i id="deckProgress"></i></div>
+          </div>
+          <div class="deck-bar draw-bar teacher-only">
+            <span class="draw-label">✏️ <span class="bl">판서</span></span>
+            <div class="draw-group" role="group" aria-label="판서 도구">
+              <button class="tool-btn" data-tool="pen" title="펜 (P)">🖊 <span class="bl">펜</span></button>
+              <button class="tool-btn" data-tool="marker" title="형광펜 (H) — 반투명 · 굵게">🖍 <span class="bl">형광펜</span></button>
+              <button class="tool-btn" data-tool="line" title="직선 (-) — Shift: 수평 · 수직 · 45°">╱ <span class="bl">직선</span></button>
+              <button class="tool-btn" data-tool="arrow" title="화살표 (A) — Shift: 수평 · 수직 · 45°">➚ <span class="bl">화살표</span></button>
+              <button class="tool-btn" data-tool="rect" title="사각형 (S) — Shift: 정사각형">▭ <span class="bl">사각형</span></button>
+              <button class="tool-btn" data-tool="ellipse" title="타원 (O) — Shift: 정원">◯ <span class="bl">타원</span></button>
+              <button class="tool-btn" data-tool="text" title="글자 (I) — 클릭한 자리에 글자 넣기">T <span class="bl">글자</span></button>
+              <button class="tool-btn" data-tool="eraser" title="지우개 (E) — 스친 획을 통째로 삭제">🧽 <span class="bl">지우개</span></button>
+              <button class="tool-btn" data-tool="pointer" title="레이저 포인터 (L) — 그리지 않고 가리키기">🔴 <span class="bl">레이저</span></button>
+            </div>
+            <div class="draw-group draw-colors" role="group" aria-label="판서 색">
+              <button class="color-btn" data-color="#e53935" style="--c:#e53935" title="빨강"></button>
+              <button class="color-btn" data-color="#1e63e9" style="--c:#1e63e9" title="파랑"></button>
+              <button class="color-btn" data-color="#1b9e4b" style="--c:#1b9e4b" title="초록"></button>
+              <button class="color-btn" data-color="#ffc400" style="--c:#ffc400" title="노랑"></button>
+              <button class="color-btn" data-color="#111111" style="--c:#111111" title="검정"></button>
+              <button class="color-btn" data-color="#ffffff" style="--c:#ffffff" title="흰색"></button>
+            </div>
+            <div class="draw-group draw-widths" role="group" aria-label="선 굵기">
+              <button class="width-btn" data-width="3" title="가늘게"><i style="width:4px;height:4px"></i></button>
+              <button class="width-btn" data-width="6" title="보통"><i style="width:8px;height:8px"></i></button>
+              <button class="width-btn" data-width="12" title="굵게"><i style="width:13px;height:13px"></i></button>
+            </div>
+            <div class="draw-group">
+              <button id="inkUndo" class="btn ghost small" title="되돌리기 (Ctrl+Z)">↶ <span class="bl">되돌리기</span></button>
+              <button id="inkRedo" class="btn ghost small" title="다시 실행 (Ctrl+Y · Ctrl+Shift+Z)">↷ <span class="bl">다시</span></button>
+              <button id="inkClear" class="btn ghost small" title="이 슬라이드의 판서 지우기 (Delete)">🗑 <span class="bl">이 장 지우기</span></button>
+              <button id="inkClearAll" class="btn ghost small" title="이 강의의 판서 모두 지우기">🗑 <span class="bl">모두</span></button>
+            </div>
+            <div class="draw-group">
+              <button id="boardWhite" class="tool-btn board-btn" data-board="white" title="빈 칠판 — 흰 배경 (W). 다시 누르면 슬라이드로">⬜ <span class="bl">흰 칠판</span></button>
+              <button id="boardBlack" class="tool-btn board-btn" data-board="black" title="빈 칠판 — 검은 배경 (D). 다시 누르면 슬라이드로">⬛ <span class="bl">검은 칠판</span></button>
+              <button id="inkSave" class="btn ghost small" title="이 슬라이드의 판서를 PNG 로 저장">💾 <span class="bl">PNG</span></button>
+              <span class="draw-hint bl" title="P 펜 · H 형광펜 · - 직선 · A 화살표 · S 사각형 · O 타원 · I 글자 · E 지우개 · L 레이저 · 1~6 색 · [ ] 굵기 · W/D 칠판 · Ctrl+Z 되돌리기 · Delete 지우기">⌨ 단축키</span>
+            </div>
+          </div>
+        </div>
+        <div id="deckWrap" class="deck-wrap">
+          <div id="stageHost" class="stage-host">
+            <div id="stage" class="stage">
+              <div id="slideHost" class="slide-host"></div>
+              <div id="inkBoard" class="ink-board hidden" aria-hidden="true"></div>
+              <canvas id="inkCanvas" class="ink-canvas" width="2560" height="1440"></canvas>
+              <div class="edge edge-left" aria-hidden="true"><span>‹</span></div>
+              <div class="edge edge-right" aria-hidden="true"><span>›</span></div>
+            </div>
+            <div id="blackout" class="blackout hidden"></div>
+          </div>
+          <div id="fsConsoleSlot" class="fs-console-slot"></div>
+          <div class="fs-controls">
+            <button data-fs="prev" title="이전 (←)">◀</button>
+            <span id="fsCount">1 / 1</span>
+            <button data-fs="next" title="다음 (→)">▶</button>
+            <button data-fs="grid" title="목록 (G)">▦</button>
+            <button data-fs="console" title="터미널 패널 (R)">▣ 터미널</button>
+            <button data-fs="black" title="화면 가리기 (B)">◼</button>
+            <button data-fs="exit" title="전체 화면 종료 (Esc)">✕</button>
+          </div>
+          <div id="gridOverlay" class="grid-overlay hidden"></div>
+        </div>
+        <div id="notesPane" class="notes-pane teacher-only">
+          <div id="notesHead" class="notes-head" title="눌러서 접기/펼치기 (N)">
+            <b>🗒 교사용 노트</b>
+            <span id="notesMeta" class="muted"></span>
+            <span class="spacer"></span>
+            <span id="notesNext" class="notes-next"></span>
+            <button id="notesToggle" class="btn ghost small">▾ 접기</button>
+          </div>
+          <div id="notesBody" class="notes-body"></div>
+        </div>
+      </div>
+    </main>
+    <div class="gutter" data-resize="out" title="드래그하여 너비 조절"></div>
+
+    <!-- ========== 오른쪽: 가상 Ubuntu 터미널 ========== -->
+    <aside id="output" class="pane output">
+      <div id="consolePanel" class="console-panel">
+        <div class="console-head">
+          <span class="console-dots"><i></i><i></i><i></i></span>
+          <span class="console-title">☁️ 가상 클라우드 서버 <span class="muted">Ubuntu 24.04 LTS</span></span>
+          <span class="spacer"></span>
+          <span id="runState" class="run-state idle">대기</span>
+        </div>
+        <div class="console-tools">
+          <button id="stopBtn" class="btn small danger" title="실행 중인 명령 중단 (Ctrl+C)">■ Ctrl+C</button>
+          <button id="clearBtn" class="btn small ghost" title="화면 지우기 (Ctrl+L)">⌫ 지우기</button>
+          <button id="resetVmBtn" class="btn small ghost" title="가상 머신을 처음 설치한 상태로 되돌리기">⟲ 초기화</button>
+          <span class="spacer"></span>
+          <button id="cFontDown" class="btn small ghost" title="글자 작게">A−</button>
+          <button id="cFontUp" class="btn small ghost" title="글자 크게">A+</button>
+          <button id="consoleHideBtn" class="btn small ghost fs-only" title="터미널 패널 닫기 (R)">✕</button>
+        </div>
+        <div id="term" class="term" tabindex="-1"></div>
+        <div class="console-status"><span id="statusLeft">준비</span><span class="spacer"></span><span id="statusRight">Tab · ↑↓ · Ctrl+C</span></div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- 모달 -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-head"><b id="modalTitle"></b><span class="spacer"></span><button id="modalClose" class="icon-btn" aria-label="닫기">✕</button></div>
+      <div id="modalBody" class="modal-body"></div>
+    </div>
+  </div>
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- 가상 리눅스 엔진 -->
+  <script src="js/linux/vfs.js?v=c70-1"></script>
+  <script src="js/linux/shell.js?v=c70-1"></script>
+  <script src="js/linux/machine.js?v=c70-1"></script>
+  <script src="js/linux/packages.js?v=c70-1"></script>
+  <script src="js/linux/image.js?v=c70-1"></script>
+  <script src="js/linux/system.js?v=c70-1"></script>
+  <script src="js/linux/builtins.js?v=c70-1"></script>
+  <script src="js/linux/cmd-files.js?v=c70-1"></script>
+  <script src="js/linux/cmd-text.js?v=c70-1"></script>
+  <script src="js/linux/cmd-sys.js?v=c70-1"></script>
+  <script src="js/linux/cmd-admin.js?v=c70-1"></script>
+  <script src="js/linux/cmd-net.js?v=c70-1"></script>
+  <script src="js/linux/cmd-db.js?v=c70-1"></script>
+  <script src="js/linux/cmd-docker.js?v=c70-1"></script>
+  <script src="js/linux/cmd-apps.js?v=c70-1"></script>
+  <script src="js/linux/cmd-extra.js?v=c70-1"></script>
+  <script src="js/linux/man.js?v=c70-1"></script>
+  <script src="js/cloud70-bin.js?v=c70-1"></script>
+  <script src="js/cloud70-ext.js?v=c70-1"></script>
+
+  <!-- 강좌 -->
+  <script src="js/course.js?v=c70-1"></script>
+<script src="lessons/day01.js?v=c70-1"></script>
+<script src="lessons/day02.js?v=c70-1"></script>
+<script src="lessons/day03.js?v=c70-1"></script>
+<script src="lessons/day04.js?v=c70-1"></script>
+<script src="lessons/day05.js?v=c70-1"></script>
+<script src="lessons/day06.js?v=c70-1"></script>
+<script src="lessons/day07.js?v=c70-1"></script>
+<script src="lessons/day08.js?v=c70-1"></script>
+<script src="lessons/day09.js?v=c70-1"></script>
+<script src="lessons/day10.js?v=c70-1"></script>  <script src="js/highlight.js?v=c70-1"></script>
+  <script src="js/terminal.js?v=c70-1"></script>
+  <script src="js/slides.js?v=c70-1"></script>
+  <script src="js/app.js?v=c70-1"></script>
+
+<!-- 나레이션 (브라우저 음성 합성) -->
+
+
+
+</body>
+</html>

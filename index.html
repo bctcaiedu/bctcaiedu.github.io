@@ -89,6 +89,7 @@
   .c-phys{--c1:#2563eb;--c2:#0f766e;--c1d:#7aa7ff}
   .c-digi{--c1:#10684a;--c2:#3e9c74;--c1d:#57c294}
   .c-ubuntu{--c1:#772953;--c2:#e95420;--c1d:#ff9566}
+  .c-cloud{--c1:#0369a1;--c2:#4338ca;--c1d:#5cc4ff}
 
   /* ── 하단 ── */
   .about{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:44px 0 0}
@@ -117,7 +118,7 @@
       <span class="kicker"><i></i>AI응용소프트웨어과 실습 강의실</span>
       <h1>직접 만들며 배우는<br><span>AI 소프트웨어</span></h1>
       <p>리눅스 서버부터 피지컬 AI, 생성형 AI 활용, AI 에이전트까지. 모든 과정은 브라우저에서 바로 열리는 슬라이드와 실습 가이드로 진행됩니다.</p>
-      <div class="stack"><span>Linux</span><span>LLM Serving</span><span>Computer Vision</span><span>Robotics · RL</span><span>Generative AI</span><span>AI Agent</span></div>
+      <div class="stack"><span>Linux</span><span>LLM Serving</span><span>Computer Vision</span><span>Robotics · RL</span><span>Generative AI</span><span>AI Agent</span><span>Cloud</span></div>
     </div>
   </div>
 </header>
@@ -125,6 +126,23 @@
 <main class="wrap">
   <div class="head"><h2>COURSES</h2></div>
   <div class="grid">
+
+    <a class="course c-cloud" href="cloud70/">
+      <div class="art">
+        <span class="new">NEW</span>
+        <span class="emo">☁️</span>
+        <span class="code">$ ssh ubuntu@my-free-vm
+$ docker compose up -d
+https://내서버.duckdns.org</span>
+      </div>
+      <div class="body">
+        <div class="field">CLOUD FUNDAMENTALS</div>
+        <h3>클라우드 기초 — 비용 0원으로 내 서버 만들기</h3>
+        <p>AWS · Azure · Google Cloud를 직접 써 보며 비교하고, 무료 클라우드 서버 한 대를 도메인과 https를 갖춘 서비스로 완성합니다.</p>
+        <div class="topics"><span>AWS · Azure · GCP</span><span>무료 티어</span><span>Oracle Always Free</span><span>Docker</span><span>HTTPS</span></div>
+        <div class="go"><b>강의실 입장</b><span class="arrow">→</span></div>
+      </div>
+    </a>
 
     <a class="course c-cafe" href="cafeagent/">
       <div class="art">

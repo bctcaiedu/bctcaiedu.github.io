@@ -1,0 +1,117 @@
+
+/* ===================================================================
+   Ubuntu 강좌 — 가상 터미널 · 명령 블록 · 파일 블록 · 편집기
+   =================================================================== */
+
+/* 다크 테마: 밝은 강조색 위에는 어두운 글자 (디자인 시스템 on-accent) */
+:root[data-theme="dark"] .btn.primary,
+:root[data-theme="dark"] .btn.blue { color: #0e1116; }
+
+/* ---------------------------------------------------------------- 터미널 */
+.term {
+  flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; position: relative;
+  padding: 10px 12px 18px; cursor: text; outline: none;
+  font: var(--c-font)/1.45 var(--mono); color: var(--term-fg); background: var(--term-bg);
+  white-space: pre-wrap; word-break: break-all; tab-size: 8;
+}
+.term-log, .term-line { white-space: pre-wrap; word-break: break-all; }
+.term-line { min-height: 1.45em; }
+.term-input {
+  position: absolute; left: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; border: 0; padding: 0; resize: none;
+  font-size: 16px; /* 모바일 확대 방지 */
+}
+.term-cursor { background: #d7dde8; color: var(--term-bg); animation: term-blink 1.1s steps(1) infinite; }
+.term-cursor.blur { background: transparent; color: inherit; outline: 1px solid #7d8799; animation: none; }
+.term-line.busy .term-cursor { background: #7d8799; }
+.term-ahead { color: #7d8799; }
+.term-comp { text-decoration: underline; }
+@keyframes term-blink { 50% { background: transparent; color: inherit; } }
+.term::selection, .term *::selection { background: #264f78; color: #fff; }
+.run-state.idle { background: #262c36; color: var(--term-muted); }
+.run-state.input { background: #3b2e0e; color: #f2c14e; }
+
+/* ANSI 색 (어두운 바탕 기준, 대비 4.5:1 이상) */
+.term .a-b { font-weight: 700; }
+.term .a-d { opacity: .72; }
+.term .a-u { text-decoration: underline; }
+.term .f-k { color: #6e7681; }  .term .f-K { color: #8b949e; }
+.term .f-r { color: #ff7b72; }  .term .f-R { color: #ffa198; }
+.term .f-g { color: #7ee787; }  .term .f-G { color: #56d364; }
+.term .f-y { color: #e3b341; }  .term .f-Y { color: #f8e3a1; }
+.term .f-b { color: #79c0ff; }  .term .f-B { color: #a5d6ff; }
+.term .f-m { color: #d2a8ff; }  .term .f-M { color: #e2c5ff; }
+.term .f-c { color: #56d4dd; }  .term .f-C { color: #b3f0ff; }
+.term .f-w { color: #d7dde8; }  .term .f-W { color: #ffffff; }
+.term .f-bgc { color: var(--term-bg); }
+.term .bg-fgc { background: var(--term-fg); }
+.term .bg-k { background: #30363d; } .term .bg-r { background: #da3633; color: #fff; } .term .bg-g { background: #2ea043; color: #0f1419; }
+.term .bg-y { background: #d29922; color: #0f1419; } .term .bg-b { background: #1f6feb; color: #fff; } .term .bg-m { background: #8957e5; color: #fff; }
+.term .bg-c { background: #1b7c83; color: #fff; } .term .bg-w { background: #d7dde8; color: #0f1419; }
+.term .a-b.f-b { color: #6cb6ff; }
+.term .f-x28, .term .f-x34 { color: #7ee787; } .term .f-x208 { color: #ffa657; }
+
+/* 전원 · 재부팅 화면 */
+.term-power { position: absolute; inset: 0; background: rgba(8, 10, 14, .94); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; font-family: var(--sans); color: #d7dde8; z-index: 3; }
+.term-power .spin { width: 36px; height: 36px; border-radius: 50%; border: 4px solid #30363d; border-top-color: var(--accent); animation: spin .9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------------------------------------------------------------- 명령 블록 */
+.code-block pre.cmd { padding: 10px 0; }
+.code-block pre.cmd .ln { padding: 0 16px 0 14px; }
+.code-block pre.cmd .ln::before { content: none; }
+.code-block pre.cmd .ln.cmd::before { content: '$ '; width: auto; padding: 0; margin: 0; color: var(--ok); opacity: 1; font-weight: 700; }
+.code-block pre.cmd .ln.cmd.root::before { content: '# '; color: var(--danger); }
+.code-block pre.cmd .ln.cont::before { content: '> '; width: auto; padding: 0; margin: 0; color: var(--muted); opacity: .8; }
+.code-block pre.cmd .ln.cmt { color: var(--tk-comment); font-style: normal; }
+.code-block pre.cmd .ln.blank { height: .6em; }
+.code-head .t .tag.vm { color: var(--more); background: var(--more-soft); }
+.code-head .t .tag.file { color: var(--accent); background: var(--accent-soft); }
+.code-head .fpath { font: 700 12.5px var(--mono); color: var(--fg); background: transparent; padding: 0; }
+.code-head .ftitle { color: var(--muted); font-weight: 600; font-size: 12.5px; }
+.cmd-block.vm { border-style: dashed; border-color: var(--more); }
+.cmd-block.vm pre.cmd .ln.cmd::before { color: var(--more); }
+.chip.vm-chip { color: var(--more); border-color: var(--more); background: var(--more-soft); font-weight: 700; }
+.out-block pre.term { margin: 0; padding: 10px 16px; background: var(--term-bg); color: var(--term-fg); font-size: 13px; white-space: pre-wrap; }
+pre.term.mini { margin: 8px 0 0; padding: 8px 12px; border-radius: 8px; background: var(--term-bg); color: var(--term-fg); font-size: 12.5px; white-space: pre-wrap; max-height: 180px; overflow: auto; }
+
+/* 실제 VM 콜아웃 */
+.callout.vm { border-left-color: var(--more); background: var(--more-soft); border-style: dashed; border-left-style: solid; }
+.callout.vm .ct { color: var(--more); }
+
+/* 실습 과제 확인 결과 */
+.check-result { margin-top: 10px; padding: 10px 12px; border-radius: 8px; font-size: 14px; }
+.check-result.ok { background: var(--ok-soft); border: 1px solid var(--ok); }
+.check-result.bad { background: var(--danger-soft); border: 1px solid var(--danger); }
+
+/* 네비게이션 · 홈 부(part) 제목 */
+.nav-part { font-size: 11.5px; font-weight: 800; letter-spacing: .04em; color: var(--muted); padding: 12px 10px 4px; text-transform: none; }
+.part-title { margin: 22px 0 8px; font-size: 16px; color: var(--accent2); }
+.part-title + .cards { margin-top: 0; }
+
+/* ---------------------------------------------------------------- 편집기 */
+.editor-pane.editing .editor-bar { background: var(--accent-soft); }
+.editor-pane .ed-badge { color: var(--danger); border-color: var(--danger); background: var(--danger-soft); }
+.editor-pane .ed-dirty { color: var(--accent); font-size: 12.5px; }
+.editor-title code { font-size: 12.5px; }
+.editor-host .CodeMirror { font-size: var(--ed-font, 14px); }
+
+/* ---------------------------------------------------------------- 슬라이드: 터미널 상자 */
+.s-term-box .s-pre { margin: 0; flex: 1; overflow: auto; padding: 1cqw 1.4cqw; font: var(--s-code-font, 1.45cqw)/1.55 var(--mono); color: var(--code-fg); background: var(--code-bg); white-space: pre; }
+.s-term-box .s-pre .ln { display: block; }
+.s-term-box .s-pre.cmd .ln.cmd::before { content: '$ '; color: var(--ok); font-weight: 700; }
+.s-term-box .s-pre.cmd .ln.cmd.root::before { content: '# '; color: var(--danger); }
+.s-term-box .s-pre.cmd .ln.cont::before { content: '> '; color: var(--muted); }
+.s-term-box .s-pre.cmd .ln.cmt { color: var(--tk-comment); }
+.s-term-box .s-pre:not(.cmd) .ln::before { content: attr(data-n); display: inline-block; width: 2.4em; margin-right: .8em; text-align: right; color: var(--muted); opacity: .6; }
+.s-term-box.vm { border: .15cqw dashed var(--more); }
+.s-try { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: .8cqw; font-size: 1.7cqw; color: var(--s-muted, var(--muted)); padding: 2cqw; }
+.s-try .s-hint { font-size: 1.35cqw; color: var(--s-fg, var(--fg)); background: var(--s-card, var(--card)); border-radius: 1cqw; padding: .8cqw 1.2cqw; }
+.s-static.cmd .ln { display: block; }
+.s-static.cmd .ln.cmd::before { content: '$ '; color: var(--ok); font-weight: 700; }
+.s-static.cmd .ln.cont::before { content: '> '; color: var(--muted); }
+
+/* 좁은 화면 */
+@media (max-width: 860px) {
+  .term { min-height: 55vh; }
+}
+
