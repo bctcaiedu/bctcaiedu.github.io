@@ -202,6 +202,7 @@
       const ahead = this.running && !this.req;
       this.lineEl.innerHTML = `${p}<span class="${ahead ? 'term-ahead' : ''}">${esc(before)}${comp}<span class="term-cursor${this.focused ? '' : ' blur'}">${at ? esc(at) : ' '}</span>${esc(after)}</span>`;
       this.lineEl.classList.toggle('busy', this.running && !this.req);
+      this.ta.style.top = this.lineEl.offsetTop + 'px'; this.ta.style.bottom = 'auto';
       if (this.state) {
         const busy = this.running && !this.req;
         this.state.textContent = this.req ? '입력 대기' : busy ? '실행 중' : '대기';
