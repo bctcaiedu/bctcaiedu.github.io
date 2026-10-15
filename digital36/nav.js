@@ -111,6 +111,11 @@
           "f": "quiz.html",
           "label": "퀴즈",
           "tag": "15문항"
+        },
+        {
+          "f": "notebooklm.html",
+          "label": "NotebookLM 실습",
+          "tag": "미션 15"
         }
       ]
     },

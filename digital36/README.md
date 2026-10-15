@@ -20,6 +20,7 @@ digital36/
 ├── bonus.html          ← 게임형 보너스 실습지 · 미션 15개 + 파이썬 2개 (자동 생성)
 ├── colab.html          ← Google Colab 사용 설명서 (학생용 · 11장 · 실습 예제 10개, 자동 생성)
 ├── colab_lesson.html   ← Colab 준비 2차시 교안 (교수자용 · 점검표 · 문제 해결표 · 평가 기준, 자동 생성)
+├── unit4/notebooklm.html ← NotebookLM 실습 · 일기장 미션 15개 (4단원 5차시 보충, 자동 생성) · PDF 3종은 unit4/notebooklm/
 ├── unit1 ~ unit5/
 │   ├── index.html      ← 강의 슬라이드 (TTS 나레이션 · 자막 · 자동진행)
 │   ├── lesson.html     ← 차시별 교안 (학습목표 · 도입/전개/정리 · 교수방법 · 준비물 · 평가) — 인쇄 가능
@@ -32,7 +33,8 @@ digital36/
     ├── bonus.html      ← 보너스 실습지 본문 (HTML 그대로 작성)
     ├── colab.js        ← Colab 교안(lesson) · 점검표 · 문제 해결표 · 평가 기준 · 실습 노트북 셀
     ├── colab_guide.html← Colab 사용 설명서 본문 (HTML 그대로 작성)
-    ├── css/  deck.css · lab.css · quiz.css · bonus.css
+    ├── notebooklm_guide.html ← NotebookLM 실습 본문 (HTML 그대로 작성)
+    ├── css/  deck.css · lab.css · quiz.css · bonus.css · colab.css · notebooklm.css
     └── js/   deck.js · quiz.js · nav.tpl.js
 ```
 
