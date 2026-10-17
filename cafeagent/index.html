@@ -216,7 +216,7 @@
       <div class="cards">
         <div class="card"><div class="dn">WHO</div><b>AI응용소프트웨어과 수강생</b><span>코딩 경험이 없어도 되고, 마우스·키보드와 메신저만 쓸 줄 알면 됩니다.</span></div>
         <div class="card"><div class="dn">GOAL</div><b>에이전트의 구조 이해</b><span>“생각하는 두뇌(LLM)”, “손발(도구)”, “대화 창구(메신저)”를 직접 조립합니다.</span></div>
-        <div class="card"><div class="dn">RESULT</div><b>텔레그램 카페 비서 + 웹 대시보드</b><span>매출 조회, 품절 처리, 지출 등록, 신메뉴 등록을 대화로 처리하고, 바뀐 장부를 브라우저 화면에서 바로 확인합니다.</span></div>
+        <div class="card"><div class="dn">RESULT</div><b>텔레그램 카페 비서 + 웹 대시보드·키오스크</b><span>손님은 키오스크로 주문하고, 사장님은 매출 조회·품절 처리·지출 등록·신메뉴 등록을 대화로 처리하며, 바뀐 장부를 브라우저 화면에서 바로 확인합니다.</span></div>
       </div>
 
       <h3 id="tools">사용하는 도구 한눈에 보기 <span class="n">클릭하면 자세히</span></h3>
@@ -263,7 +263,7 @@
           <tr><td>두뇌(LLM)</td><td>Ollama + Qwen3</td><td>무료</td><td>내 PC에서 실행, 인터넷 요금 없음</td></tr>
           <tr><td>에이전트</td><td>Hermes Agent</td><td>무료</td><td>오픈소스(MIT 라이선스)</td></tr>
           <tr><td>도구 연결</td><td>MCP(파이썬)</td><td>무료</td><td>Antigravity로 생성</td></tr>
-          <tr><td>웹 대시보드</td><td>파이썬 표준 라이브러리</td><td>무료</td><td>Antigravity로 생성, 추가 설치 없음, 내 PC에서만 열림</td></tr>
+          <tr><td>웹 화면 (대시보드 · 키오스크)</td><td>파이썬 표준 라이브러리</td><td>무료</td><td>Antigravity로 생성, 추가 설치 없음, 내 PC에서만 열림</td></tr>
           <tr><td>대화 창구</td><td>텔레그램 봇 (@BotFather)</td><td>무료</td><td>텔레그램 계정만 있으면 바로 생성, 심사 없음</td></tr>
           <tr><td>보충: 카카오톡</td><td>카카오톡 채널 + 오픈빌더 + Cloudflare 터널</td><td>무료</td><td>카카오 비즈니스 계정, 콜백 신청 필요</td></tr>
         </tbody>
@@ -274,7 +274,7 @@
         <thead><tr><th>차시</th><th>단계</th><th>주요 활동</th><th>확인 포인트</th></tr></thead>
         <tbody>
           <tr><td>1</td><td>0~1단계</td><td>설치, Ollama로 Qwen과 대화</td><td>터미널에서 Qwen이 한국어로 답함</td></tr>
-          <tr><td>2</td><td>2단계</td><td>Antigravity로 카페 데이터, MCP 서버, 웹 대시보드 만들기</td><td>브라우저에서 메뉴판과 오늘 매출이 보임</td></tr>
+          <tr><td>2</td><td>2단계</td><td>Antigravity로 카페 데이터, MCP 서버, 대시보드·키오스크 만들기</td><td>키오스크 주문이 대시보드 매출에 반영됨</td></tr>
           <tr><td>3</td><td>3단계</td><td>Hermes 설치, Qwen과 카페 MCP 연결</td><td><code>hermes</code>에서 “오늘 매출” 답변, 품절 처리가 대시보드에 반영</td></tr>
           <tr><td>4</td><td>4~5단계</td><td>텔레그램 봇 만들기, Hermes에 연결</td><td>휴대폰 텔레그램에서 매출 답변</td></tr>
           <tr><td>5</td><td>6단계</td><td>통합 테스트, 시연, 응용 과제</td><td>시나리오 6개 통과</td></tr>
@@ -390,8 +390,8 @@ setx OLLAMA_KEEP_ALIVE 24h</code></pre></div>
     <!-- ───────── 2단계 ───────── -->
     <section id="step2">
       <div class="sec">Step 2 · 2차시</div>
-      <h2>Antigravity로 카페 도구(MCP 서버)와 웹 대시보드 만들기</h2>
-      <p class="lead">AI 비서의 “손발”과 “눈으로 보는 화면”을 만듭니다. 카페 장부(데이터베이스), 그 장부를 읽고 쓰는 도구 5개, 장부를 브라우저로 보여 주는 웹 대시보드를 Antigravity에 한국어로 부탁해서 만듭니다. MCP는 AI가 도구를 쓸 수 있게 해 주는 표준 연결 규격으로, “AI용 USB 단자”라고 설명하면 쉽습니다.</p>
+      <h2>Antigravity로 카페 도구(MCP 서버)와 웹 화면 만들기</h2>
+      <p class="lead">AI 비서의 “손발”과 “눈으로 보는 화면”을 만듭니다. 카페 장부(데이터베이스), 그 장부를 읽고 쓰는 도구 5개, 장부를 브라우저로 보여 주는 사장님 대시보드, 손님이 주문하는 키오스크를 Antigravity에 한국어로 부탁해서 만듭니다. MCP는 AI가 도구를 쓸 수 있게 해 주는 표준 연결 규격으로, “AI용 USB 단자”라고 설명하면 쉽습니다.</p>
 
       <h3><span class="n">2-1</span>프로젝트 폴더 열기</h3>
       <ol>
@@ -460,6 +460,32 @@ setx OLLAMA_KEEP_ALIVE 24h</code></pre></div>
       <div class="tip">
         <p>대시보드는 <b>읽기만</b> 하게 만드는 것이 핵심입니다. 장부를 고치는 일은 AI 비서가 MCP 도구로만 하게 해야 “누가 무엇을 바꿨는지”가 분명해집니다. 학생에게 “대시보드에 품절 버튼도 달아 볼까요?”라고 물어보고, 왜 일부러 안 다는지 토론하면 좋습니다.</p>
         <p>포트 8000을 다른 프로그램이 쓰고 있으면 실행할 때 오류가 납니다. 그때는 에이전트에게 “포트를 8080으로 바꿔줘”라고 하면 됩니다.</p>
+      </div>
+
+      <h3><span class="n">2-5</span>프롬프트 ④ 손님 키오스크 만들기</h3>
+      <p>손님이 메뉴를 골라 주문하는 화면을 같은 서버에 붙입니다. 이제 장부가 세 방향으로 이어집니다. <b>손님은 키오스크로 주문</b>하고, <b>사장님은 텔레그램으로 묻고 고치고</b>, <b>대시보드는 그 결과를 보여 줍니다</b>.</p>
+      <div class="code prompt"><span class="lang">PROMPT ④</span><pre><code>cafe_web.py에 손님이 직접 주문하는 키오스크 화면을 추가해줘. 초보자가 읽을 수 있게 주석은 한국어로 달아줘.
+
+- 주소: http://localhost:8000/kiosk (대시보드와 같은 서버, 추가 설치 없이 표준 라이브러리만)
+- 화면: 위에 카테고리 탭, 가운데 메뉴 버튼(이름·가격), 오른쪽에 장바구니(수량 +/−, 합계)와 '주문하기' 버튼
+- 품절 메뉴는 회색에 '품절' 표시를 하고 누를 수 없게 해줘.
+- 메뉴는 /api/menu에서 JSON으로 받고, 5초마다 다시 받아서 사장님이 품절 처리하면 바로 반영되게 해줘.
+  장바구니에 담아 둔 메뉴가 그사이 품절되면 장바구니에서 빼고 안내해줘.
+- '주문하기'를 누르면 POST /api/order로 보내고, 서버는 sales 테이블에 메뉴별로 한 줄씩
+  (오늘 날짜, 메뉴 이름, 수량, 금액) 기록해줘.
+  - 가격은 손님 화면이 보낸 값을 믿지 말고 menu 테이블에서 다시 읽어서 계산해.
+  - 품절이거나 없는 메뉴가 하나라도 있으면 아무것도 기록하지 말고 이유를 돌려줘.
+  - 수량은 1~20잔만 받아.
+- 결제는 하지 않아. 주문 번호와 주문 내용이 크게 보이는 '주문 완료' 화면만 보여줘.
+- 사장님 대시보드(/)는 지금처럼 읽기만 하게 그대로 두고, 대시보드 위쪽에 키오스크로 가는 링크만 달아줘.
+- 끝나면 서버를 다시 켜서 키오스크에서 주문해 보고, 대시보드의 오늘 매출이 늘어나는지 확인해줘.</code></pre></div>
+      <p>코드가 바뀌었으니 대시보드를 켜 둔 창에서 <kbd>Ctrl</kbd>+<kbd>C</kbd>로 끄고 다시 실행합니다.</p>
+      <div class="code term"><span class="lang">PowerShell</span><pre><code>.\.venv\Scripts\python.exe cafe_web.py</code></pre></div>
+      <div class="ok"><p>브라우저 탭 두 개를 나란히 엽니다. 키오스크(<code>http://localhost:8000/kiosk</code>)에서 아메리카노 2잔을 주문하면 ‘주문 완료’ 화면에 주문 번호가 나오고, 5초 안에 대시보드(<code>http://localhost:8000</code>)의 오늘 매출이 9,000원 늘어나면 성공입니다.</p></div>
+      <div class="warn"><p>코드를 고쳤는데 화면이 그대로라면, <b>예전 서버가 아직 켜져 있는 것</b>입니다. 윈도우에서는 파이썬 웹 서버 두 개가 같은 포트(8000)를 함께 잡을 수 있어서, 새 서버를 켜도 예전 서버가 답할 수 있습니다. 서버를 켠 PowerShell 창을 모두 닫고 하나만 다시 켜세요.</p></div>
+      <div class="tip">
+        <p>“가격은 손님 화면이 보낸 값을 믿지 말라”는 줄이 이 프롬프트의 핵심입니다. 브라우저 개발자 도구(<kbd>F12</kbd>)로 주문 요청의 금액을 바꿔 보내는 시연을 하고, 서버가 장부의 가격으로 다시 계산해서 막는 것을 보여 주면 웹 보안 수업으로 이어집니다.</p>
+        <p>품절 메뉴를 화면에서 막는 것과 서버에서 한 번 더 막는 것이 왜 둘 다 필요한지 물어보세요. 손님이 5초 사이에 주문하면 화면은 아직 품절을 모를 수 있습니다.</p>
       </div>
     </section>
 
@@ -545,6 +571,7 @@ tools:
       <p><code>%LOCALAPPDATA%\hermes\SOUL.md</code> 파일은 에이전트의 성격과 말투를 정합니다. 원래 파일은 <code>SOUL.md.bak</code>으로 복사해 두고, 내용을 아래처럼 바꿉니다. 학생마다 자기 카페 이름으로 바꿔 보게 하면 좋습니다.</p>
       <div class="code"><span class="lang">SOUL.md</span><pre><code>당신은 '햇살카페' 사장님의 다정한 경영 비서입니다.
 - 항상 존댓말로, 3~4문장 이내로 짧게 답합니다.
+- 한국어로만 답하고, 한자나 중국어 단어를 섞지 않습니다.
 - 매출·메뉴·지출은 반드시 cafe 도구로 확인한 값만 말합니다. 추측하지 않습니다.
 - 금액은 "12,500원"처럼 쉼표를 넣어 말합니다.
 - 품절 처리나 지출 등록처럼 장부를 바꾸는 일은 한 뒤 무엇을 바꿨는지 알려 드립니다.</code></pre></div>
@@ -559,7 +586,7 @@ tools:
       </ol>
       <div class="warn"><p><b>한글을 입력하고 Enter를 두 번</b> 누르세요. 첫 Enter는 마지막 글자(예: '줘')의 조합을 끝내는 데만 쓰이고 전송되지 않을 때가 많습니다. 입력창에 문장이 그대로 남아 있으면 아직 전송되지 않은 것입니다.</p></div>
       <p>전송되면 <code>Initializing agent...</code>가 뜨고, 첫 답은 모델을 불러오느라 20초~1분 걸립니다. 그다음부터는 몇 초 안에 답합니다.</p>
-      <p><b>2-4의 웹 대시보드(<code>http://localhost:8000</code>)를 옆에 띄워 두고</b> 2번과 3번 문장을 보내 보세요. 5초 안에 카페라떼에 ‘품절’ 표시가 붙고, 오늘 지출이 32,000원 늘어난 칸이 노랗게 깜빡입니다.</p>
+      <p><b>2-4의 웹 대시보드(<code>http://localhost:8000</code>)를 옆에 띄워 두고</b> 2번과 3번 문장을 보내 보세요. 5초 안에 카페라떼에 ‘품절’ 표시가 붙고, 오늘 지출이 32,000원 늘어난 칸이 노랗게 깜빡입니다. 키오스크(<code>/kiosk</code>)에서는 카페라떼를 누를 수 없게 됩니다. 반대로 키오스크에서 주문한 뒤 “오늘 매출 다시 알려 줘”라고 하면 방금 주문까지 포함해 답합니다.</p>
       <div class="ok"><p>답변 위에 <code>get_sales_report</code>처럼 도구 이름이 보이고, 금액이 2단계에서 확인한 값과 같으면 성공입니다. 도구 이름 없이 숫자를 말하면 AI가 지어낸 것이니, “도구로 확인해서 다시 알려줘”라고 해 봅니다. 이 차이를 학생들에게 직접 보여 주면 “AI가 도구를 쓴다”는 개념이 분명해집니다.</p></div>
     </section>
 
@@ -651,16 +678,17 @@ TELEGRAM_ALLOWED_USERS=123456789</code></pre></div>
         <li><input type="checkbox" aria-label="완료"><code>hermes gateway</code> 창에 Telegram adapter connected가 보인다</li>
         <li><input type="checkbox" aria-label="완료"><code>config.yaml</code>의 <code>platform_toolsets</code>에 <code>telegram: [cafe]</code>가 있다</li>
         <li><input type="checkbox" aria-label="완료">휴대폰 텔레그램에서 내 봇 대화방이 열린다</li>
-        <li><input type="checkbox" aria-label="완료"><code>cafe_web.py</code>가 켜져 있고, PC 브라우저에서 <code>http://localhost:8000</code> 대시보드가 보인다</li>
+        <li><input type="checkbox" aria-label="완료"><code>cafe_web.py</code>가 켜져 있고, PC 브라우저에서 대시보드(<code>http://localhost:8000</code>)와 키오스크(<code>/kiosk</code>)가 열린다</li>
       </ul>
 
       <h3>시연 시나리오</h3>
       <div class="tbl"><table>
         <thead><tr><th>순서</th><th>텔레그램에 보낼 말</th><th>AI가 쓸 도구</th><th>제대로 됐는지 확인하는 법</th></tr></thead>
         <tbody>
-          <tr><td>1</td><td>오늘 매출 요약해 줘</td><td><code>get_sales_report</code></td><td>금액이 2단계 테스트 결과와 같다</td></tr>
+          <tr><td>1</td><td>오늘 매출 요약해 줘</td><td><code>get_sales_report</code></td><td>금액이 대시보드의 오늘 매출과 같다</td></tr>
+          <tr><td>1-1</td><td>(키오스크에서 손님 역할로 아메리카노 2잔 주문) → 오늘 매출 다시 알려 줘</td><td><code>get_sales_report</code></td><td>1번보다 9,000원 늘어난 금액으로 답하고, 대시보드도 같다</td></tr>
           <tr><td>2</td><td>메뉴 중에 제일 비싼 게 뭐야?</td><td><code>get_menu</code></td><td>실제 메뉴판과 같다</td></tr>
-          <tr><td>3</td><td>카페라떼 품절 처리해 줘</td><td><code>set_soldout</code></td><td>대시보드 메뉴판의 카페라떼에 ‘품절’ 표시가 붙는다</td></tr>
+          <tr><td>3</td><td>카페라떼 품절 처리해 줘</td><td><code>set_soldout</code></td><td>대시보드 메뉴판의 카페라떼에 ‘품절’ 표시가 붙고, 키오스크에서 카페라떼를 누를 수 없다</td></tr>
           <tr><td>4</td><td>우유 32,000원 지출 등록해 줘</td><td><code>add_expense</code></td><td>대시보드의 오늘 지출이 32,000원 늘고, 최근 지출 맨 위에 우유가 보인다</td></tr>
           <tr><td>5</td><td>딸기라떼 6,000원으로 신메뉴 등록해 줘</td><td><code>add_menu</code></td><td>대시보드 메뉴판에 딸기라떼가 새로 보인다</td></tr>
           <tr><td>6</td><td>아까 품절시킨 메뉴 다시 팔아 줘</td><td><code>set_soldout</code></td><td>앞의 대화를 기억해서 카페라떼를 해제한다. 대시보드에서 ‘품절’ 표시가 사라진다</td></tr>
@@ -701,6 +729,9 @@ TELEGRAM_ALLOWED_USERS=123456789</code></pre></div>
           <tr><td>로그에 <code>platform 'cli' has no valid toolsets configured (unknown name(s): cafe)</code></td><td>MCP 서버 이름은 기본 도구 목록에 없어서 나오는 경고</td><td>무시해도 됩니다. 같은 로그에 <code>MCP server 'cafe' … registered</code>가 있으면 카페 도구는 정상입니다</td></tr>
           <tr><td>대시보드 실행 시 <code>address already in use</code> / <code>WinError 10048</code></td><td>포트 8000을 다른 프로그램이 쓰는 중</td><td>Antigravity에 “포트를 8080으로 바꿔줘”라고 하고 <code>http://localhost:8080</code>으로 엽니다</td></tr>
           <tr><td>AI는 “품절 처리했다”는데 대시보드가 안 바뀜</td><td>대시보드와 MCP 서버가 서로 다른 <code>cafe.db</code>를 읽음, 또는 대시보드가 꺼짐</td><td><code>config.yaml</code>의 <code>cwd</code>와 <code>cafe_web.py</code>가 같은 폴더(<code>C:\cafe-ai</code>)인지, 대시보드 위쪽의 마지막 확인 시각이 계속 바뀌는지 봅니다</td></tr>
+          <tr><td><code>cafe_web.py</code>를 고쳤는데 화면이 그대로임 (예: <code>/kiosk</code>가 “없는 주소입니다”)</td><td>예전 서버가 아직 켜져 있음. 윈도우에서는 두 서버가 같은 포트를 함께 잡을 수 있음</td><td>서버를 켠 PowerShell 창을 모두 닫고 하나만 다시 켭니다. 그래도 같으면 PC를 다시 시작합니다</td></tr>
+          <tr><td>키오스크에서 주문하면 “방금 품절되었습니다”</td><td>그사이 사장님이 품절 처리함</td><td>정상입니다. 키오스크는 5초마다 메뉴를 새로 받아 품절 메뉴를 막습니다</td></tr>
+          <tr><td>답에 <code>卖出</code> 같은 중국어·한자가 섞임</td><td>작은 Qwen 모델의 버릇</td><td>3-4의 SOUL.md에 “한국어로만 답한다” 줄이 있는지 확인합니다</td></tr>
           <tr><td>마법사에서 Nous Portal 로그인 창이 뜸</td><td>기본값이 Nous 항목인 질문에서 Enter만 누름</td><td>창을 닫고 <code>hermes setup</code>을 다시 실행해 3-2 표의 번호를 직접 입력합니다</td></tr>
         </tbody>
       </table></div>
