@@ -102,6 +102,7 @@
   .tip{border-left-color:var(--accent2);background:var(--accent2-soft)}
   .tip::before{content:"💡 강사 메모";color:var(--accent2)}
   .ok p,.warn p,.tip p{margin:4px 0}
+  .muted{color:var(--muted);font-size:13px}
 
   .checks{list-style:none;padding:0}
   .checks li{position:relative;padding:9px 12px 9px 42px;background:var(--card2);border:1px solid var(--line);border-radius:8px;margin:8px 0}
@@ -447,23 +448,53 @@ setx OLLAMA_KEEP_ALIVE 24h</code></pre></div>
       <div class="code term"><span class="lang">PowerShell</span><pre><code>iex (irm https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.ps1)</code></pre></div>
 
       <h3><span class="n">3-2</span>Qwen(Ollama)을 두뇌로 지정</h3>
-      <div class="code term"><span class="lang">PowerShell</span><pre><code>hermes setup</code></pre></div>
-      <p>설정 마법사가 물어보면 아래처럼 답합니다.</p>
+      <p>마법사를 시작하기 전에 Ollama가 켜져 있고 <code>qwen3-cafe</code> 모델이 목록에 있는지 확인합니다.</p>
+      <div class="code term"><span class="lang">PowerShell</span><pre><code>ollama list
+hermes setup</code></pre></div>
+      <p>설정 마법사는 질문을 20개 가까이 이어서 합니다. 화면에 나오는 순서대로 아래처럼 답합니다. <b>번호는 Hermes 버전에 따라 바뀔 수 있으니, 번호보다 항목 이름을 보고 고르세요.</b></p>
+      <div class="warn"><p>기본값(●)이 Nous Portal 로그인이나 유료 서비스인 질문이 많습니다. <b>Enter만 누르지 말고</b> 표의 번호를 직접 입력하세요.</p></div>
       <div class="tbl"><table>
-        <thead><tr><th>질문</th><th>입력값</th></tr></thead>
+        <thead><tr><th>#</th><th>화면의 질문</th><th>고를 것</th><th>이유</th></tr></thead>
         <tbody>
-          <tr><td>Provider(제공자)</td><td><b>Custom Endpoint</b></td></tr>
-          <tr><td>Base URL</td><td><code>http://localhost:11434/v1</code></td></tr>
-          <tr><td>API Key</td><td>비워 두거나 <code>no-key</code></td></tr>
-          <tr><td>Model</td><td><code>qwen3-cafe</code> (1단계에서 만든 이름)</td></tr>
+          <tr><td>1</td><td>How would you like to set up Hermes?</td><td><b>2. Full setup</b></td><td>1번 Quick Setup은 Nous Portal 클라우드 모델을 씁니다. 우리는 내 PC의 Qwen을 씁니다</td></tr>
+          <tr><td>2</td><td>Select provider</td><td><b>Custom endpoint (enter URL manually)</b><br><span class="muted">예: 41번</span></td><td><b>Ollama Cloud는 고르지 않습니다</b>(ollama.com의 클라우드 모델). Local models 항목도 안내와 다르게 진행됩니다</td></tr>
+          <tr><td>3</td><td>API base URL</td><td><code>http://localhost:11434/v1</code></td><td>끝의 <code>/v1</code>까지 넣습니다. 맞으면 <code>Verified endpoint … model(s) visible</code>이 나옵니다</td></tr>
+          <tr><td>4</td><td>API key [optional]</td><td>비워 두고 Enter</td><td>내 PC의 Ollama는 키가 필요 없습니다</td></tr>
+          <tr><td>5</td><td>Select API compatibility mode</td><td><b>2. Chat Completions</b></td><td>Ollama가 가장 확실하게 지원하는 방식입니다</td></tr>
+          <tr><td>6</td><td>Select model</td><td><b><code>qwen3-cafe:latest</code></b>의 번호</td><td>1단계에서 만든 모델입니다. <code>qwen3:8b</code>가 아닙니다</td></tr>
+          <tr><td>7</td><td>Context length in tokens</td><td>비워 두고 Enter</td><td>자동으로 알아냅니다. <code>65.5K</code>처럼 나오면 1-3이 잘 된 것입니다</td></tr>
+          <tr><td>8</td><td>Display name</td><td>Enter</td><td>기본 이름 <code>Local (localhost:11434)</code>을 씁니다</td></tr>
+          <tr><td>9</td><td>Select reasoning effort</td><td><b>Disable reasoning</b><br><span class="muted">예: 8번</span></td><td>생각하는 단계를 끄면 답이 10~20초에서 몇 초로 줄어듭니다. 매출 조회에는 깊은 추론이 필요 없습니다</td></tr>
+          <tr><td>10</td><td>Select terminal backend</td><td>Enter (Local / Keep current)</td><td>이 과정은 터미널 도구를 쓰지 않습니다(3-3에서 끔)</td></tr>
+          <tr><td>11</td><td>메신저 목록 (Telegram, Discord …)</td><td><b>아무것도 고르지 않고</b> Enter</td><td>텔레그램은 5단계에서 연결합니다. 도구를 제한하기 전에 연결하면 메시지로 PC를 조종할 수 있게 됩니다</td></tr>
+          <tr><td>12</td><td>Start the gateway now after install?</td><td><b>2. No</b></td><td>아직 연결한 메신저가 없습니다</td></tr>
+          <tr><td>13</td><td>Start the gateway automatically on Windows login …?</td><td><b>2. No</b></td><td>실습실 PC에 자동 실행 작업을 남기지 않습니다. 필요하면 5단계에서 직접 켭니다</td></tr>
+          <tr><td>14</td><td>도구 목록 체크 (Computer Use, Cron Jobs …)</td><td><b>Computer Use</b>만 번호를 입력해 끄고 Enter</td><td>화면을 직접 조종하는 기능이라 끕니다. 나머지는 3-3의 설정이 막아 줍니다</td></tr>
+          <tr><td>15</td><td>Browser · Choose a provider</td><td><b>Skip</b><br><span class="muted">예: 8번</span></td><td>브라우저 도구는 쓰지 않습니다</td></tr>
+          <tr><td>16</td><td>Image Generation · Choose a provider</td><td><b>Skip</b><br><span class="muted">예: 10번</span></td><td>기본값이 Nous 로그인이라 Enter를 누르면 안 됩니다</td></tr>
+          <tr><td>17</td><td>Text-to-Speech · Choose a provider</td><td>Enter (Microsoft Edge TTS)</td><td>무료이고 키가 필요 없습니다. Skip을 골라도 됩니다</td></tr>
+          <tr><td>18</td><td>Configure vision backend</td><td><b>Skip</b><br><span class="muted">예: 4번</span></td><td><code>qwen3-cafe</code>는 이미지를 볼 수 없는 모델입니다</td></tr>
+          <tr><td>19</td><td>Web search · Choose a provider</td><td><b>Skip</b><br><span class="muted">예: 17번</span></td><td>켜 두면 작은 모델이 매출을 카페 도구 대신 웹에서 찾으려 합니다</td></tr>
+          <tr><td>20</td><td>Start the gateway now after install? [Y/n]<br>… Scheduled Task? [Y/n]</td><td><code>n</code>, <code>n</code></td><td>12·13번과 같은 이유입니다</td></tr>
         </tbody>
       </table></div>
+      <div class="ok"><p>마법사가 끝나면 <code>Default model set to: qwen3-cafe:latest (via http://localhost:11434/v1)</code>가 보였는지 확인합니다.</p></div>
       <p>로컬 모델은 답이 느리므로 기다리는 시간을 늘려 둡니다. 메모장으로 <code>%LOCALAPPDATA%\hermes\.env</code> 파일을 열고 맨 아래에 한 줄을 추가합니다.</p>
       <div class="code"><span class="lang">.env</span><pre><code>HERMES_API_TIMEOUT=1800</code></pre></div>
 
       <h3><span class="n">3-3</span>카페 도구(MCP) 연결</h3>
-      <p>메모장으로 <code>%LOCALAPPDATA%\hermes\config.yaml</code>을 열고 파일 맨 아래에 다음을 붙여넣습니다. 띄어쓰기(들여쓰기)가 틀리면 읽지 못하니 그대로 복사하세요.</p>
-      <div class="code"><span class="lang">config.yaml</span><pre><code>mcp_servers:
+      <p>메모장으로 <code>%LOCALAPPDATA%\hermes\config.yaml</code>을 엽니다. 이 파일은 2,000줄이 넘고, 마법사가 이미 <code>platform_toolsets:</code>를 만들어 두었습니다. 그래서 <b>세 군데를 나눠서</b> 고칩니다. 띄어쓰기(들여쓰기)가 틀리면 읽지 못하니 그대로 복사하세요. 고치기 전에 <code>config.yaml</code>을 복사해 백업해 둡니다.</p>
+      <p><b>① 이미 있는 <code>platform_toolsets:</code> 고치기</b> — <kbd>Ctrl</kbd>+<kbd>F</kbd>로 맨 앞에 <code>#</code>이 없는 <code>platform_toolsets:</code> 줄을 찾습니다. 그 아래 <code>cli:</code> 줄과 <code>telegram:</code> 줄만 바꿉니다. 나머지 줄(discord, slack …)은 그대로 둡니다.</p>
+      <div class="code"><span class="lang">config.yaml · 바꾸기 전</span><pre><code>platform_toolsets:
+  cli: [browser, clarify, code_execution, … , web]
+  telegram: [hermes-telegram]</code></pre></div>
+      <div class="code"><span class="lang">config.yaml · 바꾼 뒤</span><pre><code>platform_toolsets:
+  # 작은 모델이 헷갈리지 않도록 카페 도구만 켭니다
+  cli: [cafe]
+  telegram: [cafe]</code></pre></div>
+      <div class="warn"><p>파일 맨 아래에 <code>platform_toolsets:</code>를 새로 붙여넣으면 같은 항목이 두 번 생겨 Hermes가 한쪽만 읽거나 켜지지 않습니다.</p></div>
+      <p><b>② 파일 맨 아래에 카페 도구와 도구 검색 끄기 붙여넣기</b> — 파일 안에 맨 앞에 <code>#</code>이 없는 <code>mcp_servers:</code>나 <code>tools:</code>가 이미 있으면, 새로 붙이지 말고 그 아래에 내용을 넣습니다.</p>
+      <div class="code"><span class="lang">config.yaml · 맨 아래</span><pre><code>mcp_servers:
   cafe:
     command: "C:\\cafe-ai\\.venv\\Scripts\\python.exe"
     args: ["C:\\cafe-ai\\cafe_mcp.py"]
@@ -471,15 +502,16 @@ setx OLLAMA_KEEP_ALIVE 24h</code></pre></div>
     env:
       PYTHONUTF8: "1"
 
-# 작은 모델이 헷갈리지 않도록 카페 도구만 켭니다
-platform_toolsets:
-  cli: [cafe]
-  telegram: [cafe]</code></pre></div>
+# 작은 로컬 모델은 숨겨진 도구를 찾아 부르지 못하므로 카페 도구를 바로 보여 줍니다
+tools:
+  tool_search:
+    enabled: off</code></pre></div>
       <p><code>platform_toolsets</code>는 에이전트가 쓸 수 있는 도구를 카페 도구로만 제한하는 설정입니다. 두 가지 이유로 꼭 넣습니다.</p>
       <ul>
         <li><b>속도와 정확도</b>: Hermes는 기본으로 터미널, 파일, 웹 검색 등 도구를 수십 개 켭니다. 작은 모델은 도구가 많을수록 느려지고 잘못 고릅니다.</li>
         <li><b>보안</b>: 5단계에서 연결하는 텔레그램에 터미널 도구가 켜져 있으면, 메시지로 PC에 명령을 내릴 수 있게 됩니다.</li>
       </ul>
+      <p><code>tool_search</code>를 끄는 줄도 꼭 넣습니다. 최신 Hermes는 도구를 모델에게 바로 보여 주지 않고 숨겨 두었다가 <code>tool_call</code>이라는 중간 도구로 부르게 합니다. 큰 클라우드 모델은 괜찮지만 <code>qwen3-cafe</code> 같은 작은 모델은 이 형식을 맞추지 못해 <code>tool_call requires 'calls'</code> 오류를 반복하고 “확인할 수 없습니다”라고 답합니다. 카페 도구는 5개뿐이라 숨길 이유가 없습니다.</p>
       <p>연결을 확인합니다. 도구 5개가 보이면 성공입니다.</p>
       <div class="code term"><span class="lang">PowerShell</span><pre><code>hermes mcp test cafe</code></pre></div>
 
@@ -499,6 +531,8 @@ platform_toolsets:
         <li>카페라떼 품절 처리해 줘</li>
         <li>우유 32,000원 지출 등록해 줘</li>
       </ol>
+      <div class="warn"><p><b>한글을 입력하고 Enter를 두 번</b> 누르세요. 첫 Enter는 마지막 글자(예: '줘')의 조합을 끝내는 데만 쓰이고 전송되지 않을 때가 많습니다. 입력창에 문장이 그대로 남아 있으면 아직 전송되지 않은 것입니다.</p></div>
+      <p>전송되면 <code>Initializing agent...</code>가 뜨고, 첫 답은 모델을 불러오느라 20초~1분 걸립니다. 그다음부터는 몇 초 안에 답합니다.</p>
       <div class="ok"><p>답변 위에 <code>get_sales_report</code>처럼 도구 이름이 보이고, 금액이 2단계에서 확인한 값과 같으면 성공입니다. 도구 이름 없이 숫자를 말하면 AI가 지어낸 것이니, “도구로 확인해서 다시 알려줘”라고 해 봅니다. 이 차이를 학생들에게 직접 보여 주면 “AI가 도구를 쓴다”는 개념이 분명해집니다.</p></div>
     </section>
 
@@ -628,12 +662,16 @@ TELEGRAM_ALLOWED_USERS=123456789</code></pre></div>
           <tr><td><code>hermes</code> 명령을 찾을 수 없음</td><td>설치 직후 창을 안 닫음</td><td>PowerShell을 닫고 새로 엽니다</td></tr>
           <tr><td>Hermes가 컨텍스트가 작다며 거부</td><td>1-3을 건너뜀</td><td><code>qwen3-cafe</code> 모델을 만들고 그 이름으로 설정합니다</td></tr>
           <tr><td>답이 아주 느리거나 PC가 멈춤</td><td>메모리 부족</td><td>1-4 설정을 하고, 그래도 느리면 <code>qwen3:4b</code>로 바꿉니다</td></tr>
-          <tr><td>AI가 도구를 안 쓰고 숫자를 지어냄</td><td>도구가 너무 많거나 설명이 부족</td><td>3-3의 <code>platform_toolsets</code>를 확인하고, 도구 설명을 자세히 고칩니다</td></tr>
+          <tr><td>AI가 도구를 안 쓰고 숫자를 지어냄</td><td>도구가 너무 많거나 설명이 부족, 또는 <code>SOUL.md</code>에 없는 도구 이름이 적혀 있음</td><td>3-3의 <code>platform_toolsets</code>를 확인하고, <code>SOUL.md</code>는 3-4 예시처럼 도구 이름 없이 짧게 씁니다</td></tr>
           <tr><td><code>config.yaml</code>을 고친 뒤 Hermes가 안 켜짐</td><td>들여쓰기 오류, 또는 <code>platform_toolsets</code>가 두 번 있음</td><td>파일에서 <code>platform_toolsets:</code>를 검색해 하나로 합칩니다</td></tr>
           <tr><td>텔레그램 봇이 아무 답도 안 함</td><td><code>hermes gateway</code>가 꺼졌거나, 내 ID가 허용 목록에 없음</td><td>게이트웨이 창을 확인하고, <code>TELEGRAM_ALLOWED_USERS</code>의 숫자가 @userinfobot이 알려 준 값과 같은지 봅니다</td></tr>
           <tr><td>게이트웨이가 토큰 오류로 시작 안 됨</td><td>봇 토큰 복사 실수(앞뒤 공백, 일부만 복사)</td><td>BotFather에서 <code>/mybots</code> → 내 봇 → API Token으로 다시 복사합니다</td></tr>
           <tr><td>“입력 중…”만 뜨고 답이 늦음</td><td>로컬 모델이 생각하는 중</td><td>정상입니다. 2분 넘게 안 오면 게이트웨이 창의 오류를 확인하고 더 작은 모델을 씁니다</td></tr>
           <tr><td><code>hermes mcp test cafe</code>가 실패</td><td>경로 오타</td><td><code>C:\cafe-ai\.venv\Scripts\python.exe</code>가 실제로 있는지 확인합니다</td></tr>
+          <tr><td><code>⚡ Unnamed call … [tool_call requires 'calls' …]</code>가 여러 번 반복되고 “확인할 수 없습니다”라고 답함</td><td>도구 검색(<code>tool_search</code>)이 켜져 있어 작은 모델이 숨겨진 도구를 부르지 못함</td><td>3-3 ②의 <code>tools: tool_search: enabled: off</code>를 넣고 <code>hermes</code>를 다시 시작합니다</td></tr>
+          <tr><td>질문을 입력했는데 아무 반응이 없음</td><td>한글 입력기 때문에 첫 Enter가 전송되지 않음</td><td>Hermes 창을 클릭하고 Enter를 한 번 더 누릅니다</td></tr>
+          <tr><td>로그에 <code>platform 'cli' has no valid toolsets configured (unknown name(s): cafe)</code></td><td>MCP 서버 이름은 기본 도구 목록에 없어서 나오는 경고</td><td>무시해도 됩니다. 같은 로그에 <code>MCP server 'cafe' … registered</code>가 있으면 카페 도구는 정상입니다</td></tr>
+          <tr><td>마법사에서 Nous Portal 로그인 창이 뜸</td><td>기본값이 Nous 항목인 질문에서 Enter만 누름</td><td>창을 닫고 <code>hermes setup</code>을 다시 실행해 3-2 표의 번호를 직접 입력합니다</td></tr>
         </tbody>
       </table></div>
 
