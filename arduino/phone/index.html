@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>스마트폰 IoT 노드 · AI로 배우는 아두이노와 사물인터넷</title>
+  <meta name="description" content="스마트폰을 IoT 노드로: 기울기와 LED 명령을 ThingSpeak로 보내고 ESP32의 온습도를 받아 봅니다.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <script>try{var t=localStorage.getItem('bctc-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+  <style>
+  :root { --bg:#f4f6f9; --card:#fff; --card2:#f7f9fc; --line:#e1e6ee; --fg:#1d2433; --muted:#6b7587; --accent:#00878f; --accent-soft:#e2f4f4; --accent2:#6a3fd0;
+    --ok:#1f9d55; --ok-soft:#e3f6ec; --danger:#d64541; --danger-soft:#fdeaea; --warn:#c98a00; --shadow:0 1px 2px rgba(20,30,50,.06),0 4px 16px rgba(20,30,50,.06);
+    --sans:'Pretendard Variable',Pretendard,-apple-system,'Segoe UI','Malgun Gothic',sans-serif; --mono:Consolas,monospace; color-scheme:light; }
+  :root[data-theme="dark"] { --bg:#0e1116; --card:#1a2029; --card2:#1f2631; --line:#2a323e; --fg:#e3e8f0; --muted:#8d97a8; --accent:#3cc6cc; --accent-soft:#0f2e31; --accent2:#b69cff;
+    --ok:#4cc983; --ok-soft:#132e20; --danger:#ff6b61; --danger-soft:#3a1a18; --warn:#f2c14e; --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+  button, input { font: inherit; color: inherit; }
+  .top { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: var(--card); border-bottom: 1px solid var(--line); }
+  .top a { color: var(--fg); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+  .logo { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-size: 19px; background: linear-gradient(135deg, #00979d, #6a3fd0); }
+  .top b { display: block; font-size: 15px; line-height: 1.2; } .top small { font-size: 12px; color: var(--muted); }
+  main { max-width: 560px; margin: 0 auto; padding: 14px 16px 60px; display: flex; flex-direction: column; gap: 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); padding: 14px 16px; }
+  .card h2 { margin: 0 0 8px; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+  .muted { color: var(--muted); font-size: 13px; margin: 4px 0; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .big { background: var(--card2); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+  .big .k { font-size: 12px; color: var(--muted); font-weight: 700; }
+  .big .v { font: 800 28px/1.2 var(--sans); }
+  .big .v small { font-size: 13px; color: var(--muted); font-weight: 600; }
+  label.f { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin: 8px 0 3px; }
+  input[type=text], input[type=password] { width: 100%; border: 1px solid var(--line); background: var(--card2); border-radius: 9px; padding: 9px 11px; font-size: 15px; outline: none; }
+  input:focus { border-color: var(--accent); }
+  .btn { border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 10px 14px; font-weight: 700; cursor: pointer; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .switch { width: 100%; padding: 18px; border-radius: 14px; border: 2px solid var(--line); background: var(--card2); font-size: 18px; font-weight: 800; cursor: pointer; }
+  .switch.on { background: #f5c542; border-color: #c99a06; color: #1d2433; box-shadow: 0 0 24px rgba(245,197,66,.6); }
+  .tilt { height: 12px; background: var(--card2); border: 1px solid var(--line); border-radius: 6px; position: relative; overflow: hidden; margin-top: 6px; }
+  .tilt i { position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: var(--accent); transition: left .15s; }
+  .log { font: 12.5px/1.5 var(--mono); background: var(--card2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; max-height: 180px; overflow-y: auto; white-space: pre-wrap; }
+  .ok { color: var(--ok); } .err { color: var(--danger); }
+  details summary { cursor: pointer; font-weight: 800; }
+  .note { font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 8px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+<header class="top">
+  <a href="../index.html#l34"><span class="logo">📱</span><span><b>스마트폰 IoT 노드</b><small>← 34차시 ThingSpeak</small></span></a>
+</header>
+<main>
+  <section class="card">
+    <h2>📟 ESP32가 보낸 값 <span class="muted" id="aTime" style="margin-left:auto"></span></h2>
+    <div class="grid2">
+      <div class="big"><div class="k">온도 (채널 A · field1)</div><div class="v" id="aTemp">-<small> °C</small></div></div>
+      <div class="big"><div class="k">습도 (채널 A · field2)</div><div class="v" id="aHum">-<small> %</small></div></div>
+    </div>
+    <p class="muted">20초마다 채널 A의 마지막 값을 읽어 옵니다.</p>
+  </section>
+
+  <section class="card">
+    <h2>📱 이 스마트폰이 보내는 값 (채널 B)</h2>
+    <button class="switch" id="ledBtn">💡 ESP32 LED 끄기 상태 · 눌러서 켜기</button>
+    <div class="big" style="margin-top:10px">
+      <div class="k">스마트폰 기울기 (field1) — 앞뒤로 기울여 보세요</div>
+      <div class="v" id="tilt">-<small> °</small></div>
+      <div class="tilt"><i id="tiltBar"></i></div>
+      <button class="btn" id="sensorBtn" style="margin-top:8px">📐 기울기 센서 켜기</button>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn primary" id="sendBtn">📤 지금 보내기</button>
+      <label class="row" style="gap:6px;font-weight:700"><input type="checkbox" id="auto"> 20초마다 자동 전송</label>
+    </div>
+    <p class="note">ThingSpeak 무료 계정은 한 채널에 <b>15초보다 자주</b> 쓸 수 없습니다. 그래서 ESP32는 채널 A, 스마트폰은 채널 B에 각자 쓰고, 서로 상대 채널을 읽습니다.</p>
+  </section>
+
+  <section class="card">
+    <details id="setBox">
+      <summary>⚙️ 채널 설정 (처음 한 번)</summary>
+      <label class="f" for="chA">채널 A 번호 (ESP32가 쓰는 채널)</label><input type="text" id="chA" inputmode="numeric" placeholder="예: 2345678">
+      <label class="f" for="readA">채널 A Read API Key (공개 채널이면 비워 두기)</label><input type="password" id="readA" autocomplete="off">
+      <label class="f" for="writeB">채널 B Write API Key (스마트폰이 쓰는 채널)</label><input type="password" id="writeB" autocomplete="off">
+      <div class="row" style="margin-top:10px"><button class="btn primary" id="saveBtn">저장</button><button class="btn" id="clearBtn">지우기</button></div>
+      <p class="note">키는 이 휴대폰 브라우저에만 저장되고, ThingSpeak 서버로만 전송됩니다. 수업용 채널의 키만 쓰세요.</p>
+    </details>
+  </section>
+
+  <section class="card">
+    <h2>📝 기록</h2>
+    <div class="log" id="log"></div>
+  </section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const st = {
+  get(k) { try { return localStorage.getItem('ard-phone-' + k) || ''; } catch (e) { return ''; } },
+  set(k, v) { try { localStorage.setItem('ard-phone-' + k, v); } catch (e) {} }
+};
+let led = 0, tilt = null, lastSend = 0, timer = null;
+function log(t, cls) {
+  const d = new Date().toLocaleTimeString('en-GB');
+  const el = $('log'); el.innerHTML = `<span class="${cls || ''}">${d}  ${t.replace(/</g, '&lt;')}</span>\n` + el.innerHTML;
+}
+function cfg() { return { chA: $('chA').value.trim(), readA: $('readA').value.trim(), writeB: $('writeB').value.trim() }; }
+function load() { ['chA', 'readA', 'writeB'].forEach((k) => $(k).value = st.get(k)); led = +(st.get('led') || 0); renderLed(); if (!st.get('chA') || !st.get('writeB')) $('setBox').open = true; }
+$('saveBtn').onclick = () => { const c = cfg(); Object.entries(c).forEach(([k, v]) => st.set(k, v)); log('설정을 저장했습니다', 'ok'); readA(); };
+$('clearBtn').onclick = () => { ['chA', 'readA', 'writeB'].forEach((k) => { $(k).value = ''; st.set(k, ''); }); log('설정을 지웠습니다'); };
+
+function renderLed() {
+  $('ledBtn').classList.toggle('on', !!led);
+  $('ledBtn').textContent = led ? '💡 ESP32 LED 켜기 상태 · 눌러서 끄기' : '💡 ESP32 LED 끄기 상태 · 눌러서 켜기';
+}
+$('ledBtn').onclick = () => { led = led ? 0 : 1; st.set('led', String(led)); renderLed(); send(); };
+
+/* 기울기 센서 */
+function onOrient(e) {
+  if (e.beta == null) return;
+  tilt = Math.round(e.beta);
+  $('tilt').innerHTML = tilt + '<small> °</small>';
+  $('tiltBar').style.left = Math.max(0, Math.min(100, (tilt + 90) / 180 * 100)) + '%';
+}
+$('sensorBtn').onclick = async () => {
+  try {
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+      const r = await DeviceOrientationEvent.requestPermission();
+      if (r !== 'granted') return log('기울기 센서 권한이 거부되었습니다', 'err');
+    }
+    window.addEventListener('deviceorientation', onOrient);
+    $('sensorBtn').textContent = '📐 기울기 센서 켜짐';
+    log('기울기 센서를 켰습니다 (PC에서는 값이 나오지 않을 수 있음)', 'ok');
+  } catch (e) { log('센서를 켤 수 없습니다: ' + e.message, 'err'); }
+};
+
+/* 채널 B로 보내기 */
+async function send() {
+  const c = cfg();
+  if (!c.writeB) { $('setBox').open = true; return log('채널 B Write API Key를 먼저 설정하세요', 'err'); }
+  const wait = 15500 - (Date.now() - lastSend);
+  if (wait > 0) return log(`ThingSpeak 제한: ${Math.ceil(wait / 1000)}초 뒤에 다시 보내세요`, 'err');
+  lastSend = Date.now();
+  const q = new URLSearchParams({ api_key: c.writeB, field2: String(led) });
+  if (tilt != null) q.set('field1', String(tilt));
+  try {
+    const r = await fetch('https://api.thingspeak.com/update?' + q.toString());
+    const t = (await r.text()).trim();
+    if (t === '0') log('전송 거절 (키 · 간격 확인)', 'err');
+    else log(`보냄 → 기록 번호 ${t} · LED ${led ? 'ON' : 'OFF'}${tilt != null ? ' · 기울기 ' + tilt + '°' : ''}`, 'ok');
+  } catch (e) {
+    try { await fetch('https://api.thingspeak.com/update?' + q.toString(), { mode: 'no-cors' }); log('보냄 (브라우저 보안 때문에 응답은 확인할 수 없음)', 'ok'); }
+    catch (e2) { log('전송 실패: 인터넷 연결을 확인하세요', 'err'); }
+  }
+}
+$('sendBtn').onclick = send;
+$('auto').onchange = () => {
+  clearInterval(timer);
+  if ($('auto').checked) { send(); timer = setInterval(send, 20000); log('20초마다 자동 전송을 시작합니다', 'ok'); }
+};
+
+/* 채널 A 읽기 */
+async function readA() {
+  const c = cfg();
+  if (!c.chA) return;
+  const url = `https://api.thingspeak.com/channels/${encodeURIComponent(c.chA)}/feeds/last.json` + (c.readA ? `?api_key=${encodeURIComponent(c.readA)}` : '');
+  try {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    if (j === -1 || !j) throw new Error('채널 번호나 Read 키를 확인하세요');
+    const f = (v) => v == null || v === '' ? '-' : (+v).toFixed(1);
+    $('aTemp').innerHTML = f(j.field1) + '<small> °C</small>';
+    $('aHum').innerHTML = f(j.field2) + '<small> %</small>';
+    $('aTime').textContent = j.created_at ? new Date(j.created_at).toLocaleTimeString('en-GB') : '';
+  } catch (e) { log('채널 A 읽기 실패: ' + e.message, 'err'); }
+}
+load();
+readA();
+setInterval(readA, 20000);
+</script>
+</body>
+</html>

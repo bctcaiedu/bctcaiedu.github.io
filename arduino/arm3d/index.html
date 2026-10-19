@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D 로봇팔 실습실 · AI로 배우는 아두이노와 사물인터넷</title>
+  <meta name="description" content="서보 4개로 움직이는 로봇팔을 3D로 보고, 가변저항 · 버튼 · Arduino 코드(ESP32Servo)로 티칭과 재생을 시험합니다.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦾</text></svg>">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
+  <script>try{var t=localStorage.getItem('bctc-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <style>
+  :root { --bg:#f4f6f9; --pane:#fff; --card:#fff; --card2:#f7f9fc; --line:#e1e6ee; --fg:#1d2433; --muted:#6b7587; --accent:#00878f; --accent2:#6a3fd0;
+    --shadow:0 1px 2px rgba(20,30,50,.06),0 4px 16px rgba(20,30,50,.06);
+    --mono:'JetBrains Mono',Consolas,monospace; --sans:'Pretendard Variable',Pretendard,-apple-system,'Segoe UI','Malgun Gothic',sans-serif;
+    --term-bg:#0f1419; --term-card:#161d26; --term-line:#273141; --term-fg:#d7dde8; --term-muted:#7d8799; color-scheme:light; }
+  :root[data-theme="dark"] { --bg:#0e1116; --pane:#151a21; --card:#1a2029; --card2:#1f2631; --line:#2a323e; --fg:#e3e8f0; --muted:#8d97a8; --accent:#3cc6cc; --accent2:#b69cff; color-scheme:dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  html, textarea, code, pre { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+  body { background: var(--bg); color: var(--fg); font: 14.5px/1.55 var(--sans); }
+  button, select, textarea, input { font: inherit; color: inherit; }
+  .app { display: grid; grid-template-rows: auto 1fr; height: 100vh; height: 100dvh; }
+  .top { display: flex; align-items: center; gap: 10px; padding: 8px 14px; background: var(--pane); border-bottom: 1px solid var(--line); }
+  .top a { color: var(--fg); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+  .logo { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; font-size: 18px; background: linear-gradient(135deg, #00979d, #6a3fd0); }
+  .top b { display: block; font-size: 15px; line-height: 1.2; } .top small { font-size: 12px; color: var(--muted); }
+  body.embed .top { display: none; } body.embed .app { grid-template-rows: 1fr; }
+  .main { display: grid; grid-template-columns: minmax(0, 1fr) 430px; min-height: 0; }
+  .stage { position: relative; min-height: 0; background: #dfe7ef; }
+  #view { position: absolute; inset: 0; }
+  .hud { position: absolute; left: 10px; top: 10px; right: 140px; display: flex; flex-wrap: wrap; gap: 6px; pointer-events: none; }
+  .pill { background: rgba(255,255,255,.92); color: #1d2433; border: 1px solid #d0d7e2; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 700; font-family: var(--mono); }
+  .pill.run { background: #efe9fc; border-color: #6a3fd0; color: #4b2aa8; }
+  .pill.ok { background: #e3f6ec; border-color: #1f9d55; color: #16743f; }
+  .pill.bad { background: #fdeaea; border-color: #d64541; color: #b3322e; }
+  .tools { position: absolute; right: 10px; top: 10px; display: flex; flex-direction: column; gap: 6px; }
+  .tools button { border: 1px solid #d0d7e2; background: rgba(255,255,255,.95); color: #1d2433; border-radius: 9px; padding: 5px 10px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+  .tools button.on { background: #00878f; color: #fff; border-color: #00878f; }
+  .side { background: var(--term-bg); color: var(--term-fg); display: flex; flex-direction: column; min-height: 0; border-left: 1px solid var(--line); }
+  .side-body { flex: 1; overflow-y: auto; padding: 10px 12px 14px; display: flex; flex-direction: column; gap: 9px; min-height: 0; }
+  .row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .btn { border: 1px solid var(--term-line); background: var(--term-card); color: var(--term-fg); border-radius: 8px; padding: 5px 11px; font-weight: 700; font-size: 13px; cursor: pointer; user-select: none; touch-action: none; }
+  .btn.primary { background: #00979d; border-color: #00979d; color: #fff; }
+  .btn.danger { color: #ff7b72; border-color: #ff7b72; }
+  .btn.press { background: #f5c542; border-color: #f5c542; color: #1d2433; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  select { background: var(--term-card); border: 1px solid var(--term-line); color: var(--term-fg); border-radius: 8px; padding: 5px 8px; font-size: 13px; }
+  textarea.editor { width: 100%; min-height: 260px; flex: 1; resize: vertical; background: #0a0e13; color: #e6edf3; border: 1px solid var(--term-line); border-radius: 8px; padding: 8px 10px; font: 12.5px/1.55 var(--mono); tab-size: 2; white-space: pre; outline: none; }
+  textarea.editor:focus { border-color: #c9a7ff; }
+  .box { background: var(--term-card); border: 1px solid var(--term-line); border-radius: 9px; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; }
+  .cap { font-size: 11.5px; font-weight: 700; color: var(--term-muted); letter-spacing: .02em; display: flex; justify-content: space-between; gap: 8px; }
+  .cap em { font-style: normal; color: #7ee787; }
+  .pot { display: grid; grid-template-columns: 118px 1fr 74px; gap: 8px; align-items: center; font-size: 12.5px; }
+  .pot b { color: #79c0ff; font: 600 11px var(--mono); display: block; }
+  .pot input { width: 100%; accent-color: #00979d; }
+  .pot span { font: 11.5px var(--mono); text-align: right; color: var(--term-muted); }
+  .servos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; font: 11px var(--mono); }
+  .servos div { background: #0a0e13; border: 1px solid var(--term-line); border-radius: 6px; padding: 4px; text-align: center; }
+  .servos div b { display: block; color: #c9a7ff; font-size: 10.5px; }
+  .servos div strong { font-size: 15px; color: #e6edf3; }
+  .log { background: #0a0e13; border: 1px solid var(--term-line); border-radius: 8px; padding: 6px 9px; font: 11.5px/1.5 var(--mono); height: 110px; overflow-y: auto; white-space: pre-wrap; flex: none; }
+  .log .e { color: #ff7b72; } .log .s { color: #79c0ff; } .log .i { color: #7ee787; } .log .w { color: #f2c14e; }
+  @media (max-width: 900px) {
+    .app { height: auto; } .main { grid-template-columns: 1fr; } .stage { height: 60vh; min-height: 360px; }
+    .side { border-left: none; }
+  }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <a href="../index.html#l41"><span class="logo">🦾</span><span><b>3D 로봇팔 실습실</b><small>← 41차시 로봇팔 ① 서보 4축과 티칭</small></span></a>
+  </header>
+  <div class="main">
+    <section class="stage">
+      <div id="view"></div>
+      <div class="hud" id="hud"></div>
+      <div class="tools">
+        <button id="labelBtn" class="on" title="부품 이름 보이기/숨기기">🏷 부품 이름</button>
+        <button id="sideBtn" title="옆에서 보기">👁 옆에서</button>
+        <button id="topBtn" title="위에서 보기">⬇ 위에서</button>
+        <button id="resetCam" title="처음 시점">⟲ 시점</button>
+        <button id="resetBlock" title="블록을 처음 자리로">📦 블록 리셋</button>
+      </div>
+    </section>
+    <aside class="side">
+      <div class="side-body">
+        <div class="row">
+          <select id="exSel" style="flex:1" aria-label="예제"></select>
+          <button class="btn primary" id="runBtn">▶ 업로드 · 실행</button>
+          <button class="btn danger" id="stopBtn" disabled>■</button>
+        </div>
+        <textarea class="editor" id="editor" spellcheck="false" aria-label="Arduino 코드"></textarea>
+        <div class="box">
+          <div class="cap"><span>🎛 보드 입력 (Wokwi 회로와 같은 핀)</span><em id="modeTxt"></em></div>
+          <div id="pots"></div>
+          <div class="row">
+            <button class="btn" id="btnRec" title="누르고 있는 동안 LOW (INPUT_PULLUP)">⏺ 기록 버튼 · GPIO25</button>
+            <button class="btn" id="btnPlay" title="누르고 있는 동안 LOW (INPUT_PULLUP)">▶ 재생 버튼 · GPIO4</button>
+          </div>
+        </div>
+        <div class="cap"><span>⚙ 서보 각도 (신호선 핀)</span><span id="poseCnt"></span></div>
+        <div class="servos" id="servos"></div>
+        <div class="cap">시리얼 모니터</div>
+        <div class="log" id="log"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+<script>
+/* ===================================================================
+   설정 (단위: cm, 각도: 도)
+   =================================================================== */
+const H0 = 9, L1 = 12, L2 = 11, GL = 5, BLOCK = 3, SPEED = 300;   // SPEED: 서보 속도 (°/s)
+const JOINTS = [
+  { key: 'base', name: '베이스', pin: 13, pot: 32, init: 90 },
+  { key: 'shoulder', name: '어깨', pin: 14, pot: 33, init: 90 },
+  { key: 'elbow', name: '팔꿈치', pin: 27, pot: 34, init: 90 },
+  { key: 'grip', name: '그리퍼', pin: 26, pot: 35, init: 90 }
+];
+const BTN = { rec: 25, play: 4 };
+const BLOCK_HOME = { base: 45, r: 16 }, ZONE = { base: 135, r: 16 };
+const $ = (id) => document.getElementById(id);
+if (new URLSearchParams(location.search).get('embed')) document.body.classList.add('embed');
+
+const S = { t: 0, ang: JOINTS.map((j) => j.init), tgt: JOINTS.map((j) => j.init), held: false, done: false, hit: false,
+            block: null, potRaw: JOINTS.map((j) => Math.round(j.init / 180 * 4095)), press: { 25: 0, 4: 0 }, hold: { 25: false, 4: false } };
+
+/* ===================================================================
+   3D 장면
+   =================================================================== */
+const view = $('view');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1)); renderer.shadowMap.enabled = true;
+view.appendChild(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0xdfe7ef);
+const camera = new THREE.PerspectiveCamera(42, 1, 0.5, 1000);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.49; controls.minDistance = 20; controls.maxDistance = 250;
+function homeCam() { camera.position.set(52, 38, 46); controls.target.set(4, 8, 0); controls.update(); }
+homeCam();
+scene.add(new THREE.HemisphereLight(0xffffff, 0x9aa5b1, 0.9));
+const sun = new THREE.DirectionalLight(0xffffff, 0.75); sun.position.set(40, 90, 30); sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048); Object.assign(sun.shadow.camera, { left: -50, right: 50, top: 50, bottom: -50 }); scene.add(sun);
+
+const M = (color, o = {}) => new THREE.MeshStandardMaterial(Object.assign({ color, roughness: 0.6, metalness: 0.05 }, o));
+const add = (geo, mat, x, y, z, parent) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; parent.add(m); return m; };
+// 책상
+add(new THREE.BoxGeometry(80, 2, 60), M(0xd9c29a, { roughness: 0.8 }), 0, -1, 0, scene);
+const grid = new THREE.GridHelper(60, 12, 0xb9a57f, 0xc8b48e); grid.position.y = 0.02; scene.add(grid);
+const polar = (deg, r) => { const p = (deg - 90) * Math.PI / 180; return [Math.cos(p) * r, -Math.sin(p) * r]; };
+// 목표 구역
+const [zx, zz] = polar(ZONE.base, ZONE.r);
+const zone = add(new THREE.CylinderGeometry(4, 4, 0.2, 40), M(0x1f9d55, { transparent: true, opacity: 0.35 }), zx, 0.1, zz, scene);
+add(new THREE.TorusGeometry(4, 0.18, 8, 48), M(0x1f9d55), zx, 0.15, zz, scene).rotation.x = Math.PI / 2;
+
+// 받침 + ESP32
+add(new THREE.CylinderGeometry(5.5, 6.5, 3, 40), M(0x2a2f3a), 0, 1.5, 0, scene);
+add(new THREE.BoxGeometry(5.2, 0.3, 2.8), M(0x1d1d1d), -11, 0.15, 8, scene);
+add(new THREE.BoxGeometry(1.8, 0.4, 1.6), M(0xc7cbd1, { metalness: 0.6 }), -11, 0.5, 8, scene);
+// 서보 모양 (SG90)
+function servoBox(parent, x, y, z, rot) {
+  const g = new THREE.Group(); g.position.set(x, y, z); if (rot) g.rotation.set(...rot); parent.add(g);
+  add(new THREE.BoxGeometry(2.3, 2.3, 1.2), M(0x2f6db5), 0, 0, 0, g);
+  add(new THREE.BoxGeometry(3.3, 0.25, 1.2), M(0x2f6db5), 0, 0.6, 0, g);
+  add(new THREE.CylinderGeometry(0.45, 0.45, 0.6, 16), M(0xffffff), 0.5, 1.4, 0, g);
+  return g;
+}
+// 관절 계층
+const yaw = new THREE.Group(); yaw.position.set(0, 3, 0); scene.add(yaw);
+add(new THREE.CylinderGeometry(5, 5, 1, 40), M(0x00979d), 0, 0.5, 0, yaw);
+servoBox(yaw, 0, -0.6, 0);
+add(new THREE.BoxGeometry(3, H0 - 3, 0.8), M(0x3a4354), 0, (H0 - 3) / 2 + 0.5, -2.2, yaw);
+add(new THREE.BoxGeometry(3, H0 - 3, 0.8), M(0x3a4354), 0, (H0 - 3) / 2 + 0.5, 2.2, yaw);
+const shoulder = new THREE.Group(); shoulder.position.set(0, H0 - 3, 0); yaw.add(shoulder);
+servoBox(yaw, 0, H0 - 3, -3.2, [Math.PI / 2, 0, 0]);
+const upper = add(new THREE.BoxGeometry(L1, 1.6, 3), M(0x00979d), L1 / 2, 0, 0, shoulder);
+add(new THREE.CylinderGeometry(1.6, 1.6, 3.6, 24), M(0xe6e9ee, { metalness: .4 }), 0, 0, 0, shoulder).rotation.x = Math.PI / 2;
+const elbow = new THREE.Group(); elbow.position.set(L1, 0, 0); shoulder.add(elbow);
+servoBox(elbow, 0, 0, -2.6, [Math.PI / 2, 0, 0]);
+const fore = add(new THREE.BoxGeometry(L2, 1.3, 2.4), M(0x6a3fd0), L2 / 2, 0, 0, elbow);
+add(new THREE.CylinderGeometry(1.4, 1.4, 3.2, 24), M(0xe6e9ee, { metalness: .4 }), 0, 0, 0, elbow).rotation.x = Math.PI / 2;
+const wrist = new THREE.Group(); wrist.position.set(L2, 0, 0); elbow.add(wrist);
+add(new THREE.BoxGeometry(1.6, 2.4, 3.4), M(0x3a4354), 0.4, 0, 0, wrist);
+servoBox(wrist, 0.6, 1.8, 0, [0, 0, 0]);
+const fingers = [-1, 1].map((s) => add(new THREE.BoxGeometry(GL, 0.9, 0.5), M(0x2a2f3a), GL / 2 + 1, 0, s * 2, wrist));
+const gripPoint = new THREE.Object3D(); gripPoint.position.set(GL - 0.8, 0, 0); wrist.add(gripPoint);
+// 블록
+const block = add(new THREE.BoxGeometry(BLOCK, BLOCK, BLOCK), M(0xf08c00), 0, 0, 0, scene);
+function resetBlock() { const [x, z] = polar(BLOCK_HOME.base, BLOCK_HOME.r); S.block = { x, y: BLOCK / 2, z, vy: 0 }; S.held = false; S.done = false; block.rotation.set(0, 0, 0); }
+resetBlock();
+
+// 이름표
+const labels = [];
+function label(text, parent, x, y, z) {
+  const c = document.createElement('canvas'); const ctx = c.getContext('2d');
+  ctx.font = '700 40px Pretendard, sans-serif'; const w = Math.ceil(ctx.measureText(text).width) + 36;
+  c.width = w; c.height = 64; ctx.font = '700 40px Pretendard, sans-serif';
+  ctx.fillStyle = 'rgba(29,36,51,.88)'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(0, 0, w, 64, 18) : ctx.rect(0, 0, w, 64); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.textBaseline = 'middle'; ctx.fillText(text, 18, 34);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false }));
+  sp.scale.set(w / 64 * 1.9, 1.9, 1); sp.position.set(x, y, z); sp.renderOrder = 10; parent.add(sp); labels.push(sp);
+}
+label('① 베이스 서보 · GPIO13', scene, -2, 0.5, 9.5);
+label('② 어깨 서보 · GPIO14', yaw, -3, H0 - 1, -6);
+label('③ 팔꿈치 서보 · GPIO27', elbow, 0, 3, -5);
+label('④ 그리퍼 서보 · GPIO26', wrist, 1, 4.2, 0);
+label('블록', block, 0, 3, 0);
+label('목표 구역', scene, zx, 3.5, zz);
+label('ESP32', scene, -11, 2.5, 8);
+
+/* ===================================================================
+   물리: 서보는 정해진 속도로 목표 각도를 따라간다
+   =================================================================== */
+const _v = new THREE.Vector3(), _q = new THREE.Quaternion();
+function gripGap() { return 0.6 + S.ang[3] / 180 * 6.4; }
+function applyPose() {
+  yaw.rotation.y = (S.ang[0] - 90) * Math.PI / 180;
+  shoulder.rotation.z = S.ang[1] * Math.PI / 180;
+  elbow.rotation.z = (S.ang[2] - 180) * Math.PI / 180;   // 180 = 일자로 폄, 90 = 직각
+  const gap = S.held ? Math.max(gripGap(), BLOCK) : gripGap();
+  fingers[0].position.z = -(gap / 2 + 0.25); fingers[1].position.z = gap / 2 + 0.25;
+  scene.updateMatrixWorld(true);
+}
+function step(dt) {
+  S.t += dt;
+  for (let i = 0; i < 4; i++) { const d = S.tgt[i] - S.ang[i], mv = SPEED * dt; S.ang[i] += Math.max(-mv, Math.min(mv, d)); }
+  applyPose();
+  // 책상 충돌 검사
+  const tip = gripPoint.getWorldPosition(_v).clone(); const el = elbow.getWorldPosition(new THREE.Vector3());
+  const low = Math.min(tip.y, el.y);
+  if (low < 0.4) { if (!S.hit) { S.hit = true; log('⚠ 로봇팔이 책상에 닿습니다. 실제 서보라면 무리한 힘이 걸려 고장 날 수 있습니다.', 'w'); } } else S.hit = false;
+  // 잡기 · 놓기
+  const B = S.block;
+  if (!S.held) {
+    const d = Math.hypot(tip.x - B.x, tip.y - B.y, tip.z - B.z);
+    if (d < 1.9 && gripGap() < BLOCK + 0.2) { S.held = true; log('✊ 블록을 잡았습니다', 'i'); }
+  } else if (gripGap() > BLOCK + 0.6) { S.held = false; log('🖐 블록을 놓았습니다', 'i'); }
+  if (S.held) {
+    B.x = tip.x; B.y = tip.y; B.z = tip.z; B.vy = 0;
+    wrist.getWorldQuaternion(_q); block.quaternion.copy(_q);
+  } else if (B.y > BLOCK / 2) {
+    B.vy -= 980 * dt; B.y = Math.max(BLOCK / 2, B.y + B.vy * dt);
+    if (B.y <= BLOCK / 2) {
+      B.vy = 0; block.rotation.set(0, block.rotation.y, 0);
+      if (!S.done && Math.hypot(B.x - zx, B.z - zz) < 4) { S.done = true; log(`🎉 목표 구역에 옮기기 성공! (${(S.t - (prog ? prog.t0 : 0)).toFixed(1)}초)`, 'i'); }
+    }
+  }
+  block.position.set(B.x, B.y, B.z);
+  // 버튼 (짧게 클릭해도 0.15초는 눌린 상태로)
+  for (const p of [25, 4]) if (S.press[p] > 0) S.press[p] -= dt;
+  directMode(dt);
+  wakeWaiters();
+}
+
+/* ===================================================================
+   직접 조종 모드 (코드 실행 전): 가변저항 = 각도, 버튼 = 기본 티칭
+   =================================================================== */
+const D = { poses: [], play: null, last: { 25: false, 4: false } };
+function pressed(p) { return S.hold[p] || S.press[p] > 0; }
+function directMode(dt) {
+  if (prog) return;
+  for (const p of [25, 4]) {
+    const now = pressed(p);
+    if (now && !D.last[p]) {
+      if (p === 25) { if (D.poses.length < 10) { D.poses.push(S.potRaw.map((v) => Math.round(v / 4095 * 180))); log(`⏺ 자세 ${D.poses.length} 기록: [${D.poses[D.poses.length - 1].join(', ')}]`, 's'); } else log('기록은 최대 10개입니다', 'w'); }
+      else if (D.poses.length) { D.play = { i: 0, loops: 0 }; log('▶ 재생 시작 (3번 반복)', 's'); } else log('먼저 ⏺ 기록 버튼으로 자세를 저장하세요', 'w');
+    }
+    D.last[p] = now;
+  }
+  if (D.play) {
+    const P = D.poses[D.play.i];
+    S.tgt = P.slice();
+    if (S.ang.every((a, i) => Math.abs(a - P[i]) < 0.5)) {
+      D.play.i++;
+      if (D.play.i >= D.poses.length) { D.play.i = 0; D.play.loops++; if (D.play.loops >= 3) { D.play = null; log('■ 재생 끝', 's'); } }
+    }
+  } else S.tgt = S.potRaw.map((v) => Math.round(v / 4095 * 180));
+}
+
+/* ===================================================================
+   Arduino 코드 → JavaScript 실행기 (ESP32Servo 흉내)
+   =================================================================== */
+const STOP = { stop: true };
+let prog = null, waiters = [];
+function waitSim(ms) { return new Promise((res, rej) => { if (!prog) return rej(STOP); waiters.push({ until: S.t + Math.max(0, ms) / 1000, res, rej }); }); }
+function wakeWaiters() { if (!waiters.length) return; const keep = []; for (const w of waiters) (S.t >= w.until ? w.res() : keep.push(w)); waiters = keep; }
+const TYPES = '(?:unsigned\\s+long|unsigned\\s+int|long|int|float|double|bool|boolean|byte|char|String|uint8_t|int16_t|size_t)';
+function convertInitializers(c) {
+  const re = new RegExp('\\b(const\\s+)?(?:static\\s+)?' + TYPES + '\\s+(\\w+)\\s*(?:\\[[^\\]]*\\])+\\s*=\\s*\\{', 'g');
+  let out = '', last = 0, m;
+  while ((m = re.exec(c))) {
+    let i = re.lastIndex, depth = 1;
+    while (i < c.length && depth) { if (c[i] === '{') depth++; else if (c[i] === '}') depth--; i++; }
+    const body = c.slice(re.lastIndex - 1, i).replace(/\{/g, '[').replace(/\}/g, ']');
+    out += c.slice(last, m.index) + (m[1] ? 'const ' : 'let ') + m[2] + ' = ' + body;
+    last = i; re.lastIndex = i;
+  }
+  return out + c.slice(last);
+}
+function cppToJs(src) {
+  let c = src.replace(/^\s*#include.*$/gm, '').replace(/^.*::.*;\s*$/gm, '');
+  c = c.replace(/^\s*#define\s+(\w+)\s+(.+)$/gm, 'const $1 = $2;');
+  c = c.replace(/\bServo\s+(\w+)\s*\[\s*([^\]]+)\]\s*;/g, 'let $1 = Array.from({ length: $2 }, () => new Servo());');
+  c = c.replace(/\bServo\s+([\w\s,]+);/g, (m, names) => 'let ' + names.split(',').map((n) => n.trim() + ' = new Servo()').join(', ') + ';');
+  c = convertInitializers(c);
+  c = c.replace(new RegExp('\\b(?:static\\s+)?' + TYPES + '\\s+(\\w+)\\s*\\[([^\\]]+)\\]\\s*\\[([^\\]]+)\\]\\s*;', 'g'), 'let $1 = __arr($2, $3);');
+  c = c.replace(new RegExp('\\b(?:static\\s+)?' + TYPES + '\\s+(\\w+)\\s*\\[([^\\]]+)\\]\\s*;', 'g'), 'let $1 = __arr($2);');
+  c = c.replace(new RegExp('\\b(?:void|' + TYPES + ')\\s+(\\w+)\\s*\\(([^)]*)\\)\\s*\\{', 'g'), (m, name, params) => {
+    const ps = params.trim() && params.trim() !== 'void' ? params.split(',').map((p) => p.replace(/\[[^\]]*\]/g, '').replace(/[&*]/g, ' ').trim().split(/\s+/).pop()).join(', ') : '';
+    return `function ${name}(${ps}) {`;
+  });
+  c = c.replace(new RegExp('\\bconst\\s+' + TYPES + '\\s+', 'g'), 'const ');
+  c = c.replace(new RegExp('\\b(?:static\\s+)?' + TYPES + '\\s+(?=[A-Za-z_]\\w*\\s*(?:=|;|,))', 'g'), 'let ');
+  c = c.replace(/\((?:int|long|float|byte)\)\s*/g, '');
+  return c;
+}
+function asyncify(code) {
+  const names = [...code.matchAll(/\bfunction\s+([A-Za-z_$][\w$]*)\s*\(/g)].map((m) => m[1]);
+  code = code.replace(/\bfunction\s+([A-Za-z_$][\w$]*)\s*\(/g, 'async function $1(');
+  for (const n of [...new Set(names), 'delay']) code = code.replace(new RegExp('(?<!function\\s+)(?<![\\w$.])(?<!await\\s+)' + n + '\\s*\\(', 'g'), 'await ' + n + '(');
+  code = code.replace(/\b(while|for)\s*(\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))\s*\{/g, '$1 $2 { await __guard();');
+  return code;
+}
+const warned = new Set();
+function warn(key, msg) { if (!warned.has(key)) { warned.add(key); log(msg, 'w'); } }
+function makeApi(ctl) {
+  let buf = '', guardN = 0;
+  const num = (v) => Number(v) || 0;
+  class Servo {
+    constructor() { this.j = -1; this.angle = 90; }
+    attach(pin) { this.j = JOINTS.findIndex((j) => j.pin === pin); if (this.j < 0) warn('pin' + pin, `⚠ GPIO${pin}에는 서보가 연결되어 있지 않습니다 (서보 핀: 13 · 14 · 27 · 26)`); return 1; }
+    write(a) {
+      a = Math.max(0, Math.min(180, Math.round(num(a)))); this.angle = a;
+      if (this.j < 0) { warn('noattach', '⚠ attach()하지 않은 서보에 write()를 했습니다 — 움직이지 않습니다'); return; }
+      S.tgt[this.j] = a;
+    }
+    read() { return this.angle; }
+    attached() { return this.j >= 0; }
+    detach() { this.j = -1; }
+    setPeriodHertz() {}
+    writeMicroseconds(us) { this.write((num(us) - 500) / 2000 * 180); }
+  }
+  return {
+    HIGH: 1, LOW: 0, OUTPUT: 'OUTPUT', INPUT: 'INPUT', INPUT_PULLUP: 'INPUT_PULLUP', true: true, false: false, Servo,
+    pinMode() {},
+    digitalRead(p) { if (p === BTN.rec || p === BTN.play) return pressed(p) ? 0 : 1; return 1; },
+    digitalWrite() {},
+    analogRead(p) { const i = JOINTS.findIndex((j) => j.pot === p); if (i < 0) { warn('adc' + p, `⚠ GPIO${p}에는 가변저항이 없습니다 (가변저항 핀: 32 · 33 · 34 · 35)`); return 0; } return Math.round(S.potRaw[i]); },
+    delay: (ms) => waitSim(num(ms)), millis: () => Math.floor((S.t - ctl.t0) * 1000),
+    abs: Math.abs, min: Math.min, max: Math.max, constrain: (x, a, b) => Math.max(a, Math.min(b, x)),
+    map: (x, a, b, c, d) => Math.trunc((x - a) * (d - c) / (b - a) + c),
+    __arr: (n, m) => Array.from({ length: n }, () => (m ? new Array(m).fill(0) : 0)),
+    Serial: { begin() {}, print(v) { buf += String(v); }, println(v = '') { log(buf + String(v), 's'); buf = ''; } },
+    async __guard() { if (ctl.stopped) throw STOP; if (++guardN % 500 === 0) await new Promise((r) => setTimeout(r, 0)); }
+  };
+}
+const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+async function runCode() {
+  stopCode(true); warned.clear(); D.play = null;
+  const src = $('editor').value; try { localStorage.setItem('ard-arm3d-code', src); } catch (e) {}
+  const ctl = { stopped: false, t0: S.t }; prog = ctl;
+  $('runBtn').disabled = true; $('stopBtn').disabled = false;
+  logArr.length = 0; log('▶ 업로드 완료 · 실행 시작', 'i');
+  const A = makeApi(ctl), keys = Object.keys(A).filter((k) => k !== 'true' && k !== 'false');
+  try {
+    const js = asyncify(cppToJs(src));
+    const fn = new AsyncFunction(...keys, js + '\n;return { setup: typeof setup === "function" ? setup : null, loop: typeof loop === "function" ? loop : null };');
+    const { setup, loop } = await fn(...keys.map((k) => A[k]));
+    if (setup) await setup();
+    while (loop && !ctl.stopped) { await loop(); await waitSim(2); }
+  } catch (e) {
+    if (e !== STOP) { log('✖ 오류: ' + (e && e.message || e), 'e'); log('  지원: void · int 함수, int · float 변수, 1 · 2차원 배열, if · for · while, Servo(attach · write · read). 클래스 · 포인터는 지원하지 않습니다.', 'e'); }
+  }
+  if (prog === ctl) stopCode();
+}
+function stopCode(silent) {
+  if (prog) { prog.stopped = true; if (!silent) log('■ 정지 — 가변저항으로 직접 조종합니다', 'w'); }
+  prog = null; for (const w of waiters) w.rej(STOP); waiters = [];
+  $('runBtn').disabled = false; $('stopBtn').disabled = true;
+}
+
+/* ===================================================================
+   예제
+   =================================================================== */
+const EXAMPLES = {
+  teach: ['1. 가변저항 조종 + 티칭 (기록 · 재생)', `#include <ESP32Servo.h>
+
+// 서보 신호선 핀: 베이스, 어깨, 팔꿈치, 그리퍼
+const int SERVO_PIN[4] = {13, 14, 27, 26};
+// 가변저항 핀 (ADC1): 같은 순서
+const int POT_PIN[4] = {32, 33, 34, 35};
+const int BTN_REC = 25;    // 기록 버튼
+const int BTN_PLAY = 4;    // 재생 버튼
+
+Servo servo[4];
+int poses[10][4];          // 자세를 최대 10개 저장
+int count = 0;             // 저장한 자세 수
+int now[4];                // 지금 각도
+
+void setup() {
+  Serial.begin(115200);
+  for (int i = 0; i < 4; i++) {
+    servo[i].attach(SERVO_PIN[i]);
+  }
+  pinMode(BTN_REC, INPUT_PULLUP);
+  pinMode(BTN_PLAY, INPUT_PULLUP);
+  Serial.println("가변저항으로 자세를 만들고 기록 버튼을 누르세요");
+}
+
+// 저장한 자세 p로 1도씩 부드럽게 이동
+void moveTo(int p) {
+  bool moving = true;
+  while (moving) {
+    moving = false;
+    for (int i = 0; i < 4; i++) {
+      if (now[i] < poses[p][i]) { now[i]++; moving = true; }
+      else if (now[i] > poses[p][i]) { now[i]--; moving = true; }
+      servo[i].write(now[i]);
+    }
+    delay(10);
+  }
+}
+
+void loop() {
+  // 1) 가변저항 값(0~4095)을 각도(0~180)로 바꿔 서보에 쓰기
+  for (int i = 0; i < 4; i++) {
+    now[i] = map(analogRead(POT_PIN[i]), 0, 4095, 0, 180);
+    servo[i].write(now[i]);
+  }
+  // 2) 기록 버튼: 지금 자세 저장 (INPUT_PULLUP이라 누르면 LOW)
+  if (digitalRead(BTN_REC) == LOW && count < 10) {
+    for (int i = 0; i < 4; i++) {
+      poses[count][i] = now[i];
+    }
+    count++;
+    Serial.print("기록 "); Serial.println(count);
+    delay(300);            // 버튼 떨림 방지
+  }
+  // 3) 재생 버튼: 저장한 자세를 차례로 3번 반복
+  if (digitalRead(BTN_PLAY) == LOW && count > 0) {
+    Serial.println("재생 시작");
+    for (int r = 0; r < 3; r++) {
+      for (int p = 0; p < count; p++) {
+        moveTo(p);
+        delay(200);
+      }
+    }
+    Serial.println("재생 끝");
+  }
+  delay(20);
+}`],
+  sweep: ['2. 관절 하나씩 움직여 보기', `#include <ESP32Servo.h>
+
+Servo base;
+Servo shoulder;
+Servo elbow;
+Servo gripper;
+
+void setup() {
+  Serial.begin(115200);
+  base.attach(13);
+  shoulder.attach(14);
+  elbow.attach(27);
+  gripper.attach(26);
+}
+
+void loop() {
+  Serial.println("베이스: 좌우로 돌기");
+  base.write(30);  delay(1000);
+  base.write(150); delay(1000);
+  base.write(90);  delay(800);
+
+  Serial.println("어깨: 앞으로 숙였다 들기");
+  shoulder.write(40);  delay(1000);
+  shoulder.write(120); delay(1000);
+  shoulder.write(90);  delay(800);
+
+  Serial.println("팔꿈치: 굽혔다 펴기 (180 = 일자, 90 = 직각)");
+  elbow.write(40);  delay(1000);
+  elbow.write(170); delay(1000);
+  elbow.write(90);  delay(800);
+
+  Serial.println("그리퍼: 오므렸다 벌리기");
+  gripper.write(0);   delay(800);
+  gripper.write(180); delay(800);
+  gripper.write(90);  delay(1500);
+}`],
+  pick: ['3. 자동으로 집어 옮기기 (자세 배열)', `#include <ESP32Servo.h>
+
+const int SERVO_PIN[4] = {13, 14, 27, 26};
+Servo servo[4];
+int now[4] = {90, 90, 90, 90};
+
+// 자세 = {베이스, 어깨, 팔꿈치, 그리퍼}  (그리퍼: 0 오므림 ~ 180 벌림)
+int seq[][4] = {
+  {45, 90, 90, 150},   // 블록 쪽으로 돌기, 그리퍼 벌리기
+  {45, 33, 80, 150},   // 블록까지 내려가기
+  {45, 33, 80, 0},     // 잡기
+  {45, 70, 80, 0},     // 들어 올리기
+  {135, 70, 80, 0},    // 목표 쪽으로 돌기
+  {135, 36, 80, 0},    // 내려놓을 위치
+  {135, 36, 80, 150},  // 놓기
+  {135, 90, 90, 150},  // 위로 빠지기
+  {90, 90, 90, 90}     // 처음 자세
+};
+int steps = 9;
+
+void moveSmooth(int p) {
+  bool moving = true;
+  while (moving) {
+    moving = false;
+    for (int i = 0; i < 4; i++) {
+      if (now[i] < seq[p][i]) { now[i]++; moving = true; }
+      else if (now[i] > seq[p][i]) { now[i]--; moving = true; }
+      servo[i].write(now[i]);
+    }
+    delay(12);
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  for (int i = 0; i < 4; i++) {
+    servo[i].attach(SERVO_PIN[i]);
+    servo[i].write(now[i]);
+  }
+  delay(500);
+  for (int p = 0; p < steps; p++) {
+    Serial.print("단계 "); Serial.println(p + 1);
+    moveSmooth(p);
+    delay(300);
+  }
+  Serial.println("완료!");
+}
+
+void loop() {}`]
+};
+
+/* ===================================================================
+   화면
+   =================================================================== */
+const logEl = $('log'); const logArr = [];
+function log(t, cls) { logArr.push(`<span class="${cls || ''}">${String(t).replace(/</g, '&lt;')}</span>`); if (logArr.length > 150) logArr.shift(); logEl.innerHTML = logArr.join('\n'); logEl.scrollTop = logEl.scrollHeight; }
+$('pots').innerHTML = JOINTS.map((j, i) => `<div class="pot"><label for="pot${i}">${j.name} 가변저항<b>GPIO${j.pot}</b></label><input type="range" id="pot${i}" min="0" max="4095" value="${S.potRaw[i]}"><span id="potv${i}"></span></div>`).join('');
+JOINTS.forEach((j, i) => { $('pot' + i).oninput = (e) => { S.potRaw[i] = +e.target.value; }; });
+function holdBtn(el, pin) {
+  const on = (e) => { e.preventDefault(); S.hold[pin] = true; S.press[pin] = 0.15; el.classList.add('press'); };
+  const off = () => { S.hold[pin] = false; el.classList.remove('press'); };
+  el.addEventListener('pointerdown', on); el.addEventListener('pointerup', off); el.addEventListener('pointerleave', off); el.addEventListener('pointercancel', off);
+}
+holdBtn($('btnRec'), BTN.rec); holdBtn($('btnPlay'), BTN.play);
+function renderPanel() {
+  JOINTS.forEach((j, i) => { $('potv' + i).textContent = `${Math.round(S.potRaw[i])} → ${Math.round(S.potRaw[i] / 4095 * 180)}°`; });
+  $('servos').innerHTML = JOINTS.map((j, i) => `<div><b>${j.name} · ${j.pin}</b><strong>${Math.round(S.ang[i])}°</strong></div>`).join('');
+  $('modeTxt').textContent = prog ? '코드가 읽는 중' : (D.play ? '기본 티칭 재생 중' : '직접 조종 (코드 없이)');
+  $('poseCnt').textContent = prog ? '' : `기본 티칭: 기록 ${D.poses.length}/10`;
+  const tip = gripPoint.getWorldPosition(new THREE.Vector3());
+  $('hud').innerHTML = `${prog ? '<span class="pill run">▶ 코드 실행 중</span>' : ''}${S.done ? '<span class="pill ok">🎉 옮기기 성공</span>' : ''}${S.hit ? '<span class="pill bad">⚠ 책상 충돌</span>' : ''}${S.held ? '<span class="pill ok">✊ 잡는 중</span>' : ''}<span class="pill">손끝 x ${tip.x.toFixed(1)} · y ${(-tip.z).toFixed(1)} · 높이 ${tip.y.toFixed(1)} cm</span>`;
+}
+function resize() { const w = view.clientWidth, h = view.clientHeight; if (!w || !h) return; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+window.addEventListener('resize', resize); if (window.ResizeObserver) new ResizeObserver(resize).observe(view);
+let last = performance.now(), acc = 0, panelT = 0;
+function frame(now) {
+  const dt = Math.min(0.1, (now - last) / 1000); last = now; acc += dt;
+  while (acc >= 1 / 120) { step(1 / 120); acc -= 1 / 120; }
+  upper.material.color.set(S.hit ? 0xd64541 : 0x00979d);
+  controls.update(); renderer.render(scene, camera);
+  if (now - panelT > 100) { renderPanel(); panelT = now; }
+  requestAnimationFrame(frame);
+}
+
+$('exSel').innerHTML = Object.entries(EXAMPLES).map(([k, [n]]) => `<option value="${k}">${n}</option>`).join('');
+$('exSel').onchange = () => { $('editor').value = EXAMPLES[$('exSel').value][1]; };
+$('runBtn').onclick = runCode; $('stopBtn').onclick = () => stopCode();
+$('labelBtn').onclick = () => { const on = !$('labelBtn').classList.contains('on'); $('labelBtn').classList.toggle('on', on); labels.forEach((l) => l.visible = on); };
+$('sideBtn').onclick = () => { camera.position.set(0, 14, 70); controls.target.set(0, 9, 0); controls.update(); };
+$('topBtn').onclick = () => { camera.position.set(0, 90, 0.01); controls.target.set(0, 0, 0); controls.update(); };
+$('resetCam').onclick = homeCam;
+$('resetBlock').onclick = () => { resetBlock(); log('📦 블록을 처음 자리로 옮겼습니다', 'i'); };
+$('editor').addEventListener('keydown', (e) => {
+  if (e.key === 'Tab') { e.preventDefault(); const el = e.target, s = el.selectionStart; el.value = el.value.slice(0, s) + '  ' + el.value.slice(el.selectionEnd); el.selectionStart = el.selectionEnd = s + 2; }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); runCode(); }
+});
+const qex = new URLSearchParams(location.search).get('ex');
+let saved = ''; try { saved = localStorage.getItem('ard-arm3d-code') || ''; } catch (e) {}
+if (qex && EXAMPLES[qex]) { $('exSel').value = qex; $('editor').value = EXAMPLES[qex][1]; } else $('editor').value = saved || EXAMPLES.teach[1];
+log('지금은 직접 조종 모드입니다. 가변저항 슬라이더로 팔을 움직이고 ⏺ 기록 · ▶ 재생 버튼을 눌러 보세요. 코드를 ▶ 업로드하면 코드가 팔을 제어합니다.', 'i');
+applyPose(); resize(); requestAnimationFrame(frame);
+</script>
+</body>
+</html>

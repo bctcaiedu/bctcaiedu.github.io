@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D 로봇개 실습실 · AI로 배우는 아두이노와 사물인터넷</title>
+  <meta name="description" content="3D 공원의 로봇개를 스마트폰 리모컨(MQTT)으로 조종합니다.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐕</text></svg>">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
+  <script>try{var t=localStorage.getItem('bctc-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+  :root { --bg:#f4f6f9; --pane:#fff; --line:#e1e6ee; --fg:#1d2433; --muted:#6b7587;
+    --mono:'JetBrains Mono',Consolas,monospace; --sans:'Pretendard Variable',Pretendard,-apple-system,'Segoe UI','Malgun Gothic',sans-serif;
+    --term-bg:#0f1419; --term-card:#161d26; --term-line:#273141; --term-fg:#d7dde8; --term-muted:#7d8799; color-scheme:light; }
+  :root[data-theme="dark"] { --bg:#0e1116; --pane:#151a21; --line:#2a323e; --fg:#e3e8f0; --muted:#8d97a8; color-scheme:dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bg); color: var(--fg); font: 14.5px/1.55 var(--sans); }
+  button, input { font: inherit; color: inherit; }
+  .app { display: grid; grid-template-rows: auto 1fr; height: 100vh; height: 100dvh; }
+  .top { display: flex; align-items: center; gap: 10px; padding: 8px 14px; background: var(--pane); border-bottom: 1px solid var(--line); }
+  .top a { color: var(--fg); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+  .logo { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; font-size: 18px; background: linear-gradient(135deg, #00979d, #6a3fd0); }
+  .top b { display: block; font-size: 15px; line-height: 1.2; } .top small { font-size: 12px; color: var(--muted); }
+  body.embed .top { display: none; } body.embed .app { grid-template-rows: 1fr; }
+  .main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; min-height: 0; }
+  .stage { position: relative; min-height: 0; background: #cfe6f5; }
+  #view { position: absolute; inset: 0; }
+  .hud { position: absolute; left: 10px; top: 10px; right: 130px; display: flex; flex-wrap: wrap; gap: 6px; pointer-events: none; }
+  .pill { background: rgba(255,255,255,.92); color: #1d2433; border: 1px solid #d0d7e2; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 700; font-family: var(--mono); }
+  .pill.ok { background: #e3f6ec; border-color: #1f9d55; color: #16743f; }
+  .pill.bad { background: #fdeaea; border-color: #d64541; color: #b3322e; }
+  .pill.net { background: #efe9fc; border-color: #6a3fd0; color: #4b2aa8; }
+  .tools { position: absolute; right: 10px; top: 10px; display: flex; flex-direction: column; gap: 6px; }
+  .tools button, .pad button { border: 1px solid #d0d7e2; background: rgba(255,255,255,.95); color: #1d2433; border-radius: 9px; padding: 5px 10px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+  .tools button.on { background: #00878f; color: #fff; border-color: #00878f; }
+  .pad { position: absolute; left: 10px; bottom: 10px; display: grid; grid-template-columns: repeat(3, 44px); gap: 4px; }
+  .pad button { padding: 7px 0; font-size: 15px; touch-action: none; user-select: none; }
+  .pad button.on { background: #00878f; color: #fff; }
+  .acts { position: absolute; right: 10px; bottom: 10px; display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; max-width: 330px; }
+  .acts button { border: 1px solid #d0d7e2; background: rgba(255,255,255,.95); color: #1d2433; border-radius: 9px; padding: 5px 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+  .side { background: var(--term-bg); color: var(--term-fg); display: flex; flex-direction: column; min-height: 0; border-left: 1px solid var(--line); }
+  .side-body { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+  .card { background: var(--term-card); border: 1px solid var(--term-line); border-radius: 10px; padding: 10px 12px; }
+  .cap { font-size: 11.5px; font-weight: 700; color: var(--term-muted); margin-bottom: 6px; display: flex; justify-content: space-between; gap: 6px; align-items: center; }
+  .code { font: 800 30px var(--mono); letter-spacing: .12em; color: #7ee787; text-align: center; }
+  #qr { display: grid; place-items: center; background: #fff; border-radius: 8px; padding: 8px; width: 156px; height: 156px; margin: 8px auto 4px; }
+  #qr img, #qr canvas { width: 140px !important; height: 140px !important; }
+  .url { font: 11px var(--mono); color: #79c0ff; word-break: break-all; text-align: center; }
+  .row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .btn { border: 1px solid var(--term-line); background: #0a0e13; color: var(--term-fg); border-radius: 8px; padding: 4px 10px; font-weight: 700; font-size: 12.5px; cursor: pointer; text-decoration: none; }
+  .btn.primary { background: #00979d; border-color: #00979d; color: #fff; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #7d8799; flex: none; display: inline-block; }
+  .dot.on { background: #28c840; box-shadow: 0 0 0 3px rgba(40,200,64,.2); } .dot.bad { background: #ff5f57; }
+  .api { font: 11.5px/1.6 var(--mono); white-space: pre-wrap; color: var(--term-fg); }
+  .api b { color: #ffa657; font-weight: 600; }
+  .log { background: #0a0e13; border: 1px solid var(--term-line); border-radius: 8px; padding: 6px 9px; font: 11.5px/1.5 var(--mono); height: 150px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
+  .log .e { color: #ff7b72; } .log .s { color: #79c0ff; } .log .i { color: #7ee787; } .log .m { color: #c9a7ff; } .log .w { color: #f2c14e; }
+  @media (max-width: 900px) { .app { height: auto; } .main { grid-template-columns: 1fr; } .stage { height: 62vh; min-height: 380px; } }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <a href="../index.html#l43"><span class="logo">🐕</span><span><b>3D 로봇개 실습실</b><small>← 43차시 스마트폰으로 로봇개 제어하기</small></span></a>
+  </header>
+  <div class="main">
+    <section class="stage">
+      <div id="view"></div>
+      <div class="hud" id="hud"></div>
+      <div class="tools">
+        <button data-cam="follow" class="on">🎥 따라가기</button>
+        <button data-cam="orbit">🧭 자유 시점</button>
+        <button data-cam="top">⬇ 위에서</button>
+        <button id="resetBtn">↺ 처음부터</button>
+      </div>
+      <div class="pad" title="PC에서 바로 조종 (W A S D / 방향키)">
+        <span></span><button data-k="up">▲</button><span></span>
+        <button data-k="left">⟲</button><button data-k="stop">■</button><button data-k="right">⟳</button>
+        <span></span><button data-k="down">▼</button><span></span>
+      </div>
+      <div class="acts" id="acts"></div>
+    </section>
+    <aside class="side">
+      <div class="side-body">
+        <div class="card">
+          <div class="cap"><span>📱 스마트폰으로 QR을 찍어 리모컨 열기</span><span><span class="dot" id="mqDot"></span> <span id="mqText">연결 안 됨</span></span></div>
+          <div class="code" id="code"></div>
+          <div id="qr"></div>
+          <div class="url" id="url"></div>
+          <div class="row" style="justify-content:center;margin-top:8px">
+            <a class="btn" id="openRemote" target="_blank" rel="noopener">🖥 이 PC에서 리모컨 열기</a>
+            <button class="btn" id="newCode">🔄 코드 바꾸기</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="cap"><span>📡 MQTT 약속 (API 명세)</span></div>
+          <div class="api" id="api"></div>
+        </div>
+        <div>
+          <div class="cap"><span>📨 받은 명령 · 보낸 상태</span><label style="font-weight:600"><input type="checkbox" id="showState"> 상태도 보기</label></div>
+          <div class="log" id="log"></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+<script>
+/* ===================================================================
+   설정 (단위: cm)
+   =================================================================== */
+const VMAX = 70, WMAX = 1.8, AREA = 250, DOG_R = 22, WATCHDOG = 0.7;
+const $ = (id) => document.getElementById(id);
+if (new URLSearchParams(location.search).get('embed')) document.body.classList.add('embed');
+function store(k, v) { try { if (v === undefined) return localStorage.getItem('ard-dog-' + k); localStorage.setItem('ard-dog-' + k, v); } catch (e) { return null; } }
+let CODE = store('code') || String(Math.floor(1000 + Math.random() * 9000)); store('code', CODE);
+const topicBase = () => 'bctc/dog/' + CODE;
+
+const D = { x: 0, z: 0, th: 0, v: 0, w: 0, cmdV: 0, cmdW: 0, lastMove: -1, mode: 'stand', action: null, actT: 0,
+            phase: 0, y: 0, jumpT: -1, t: 0, battery: 100, dist: 0, balls: 0, bump: 0, inWall: false, done: false, start: null, ack: 0, src: '' };
+
+/* ===================================================================
+   3D 장면: 공원
+   =================================================================== */
+const view = $('view');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1)); renderer.shadowMap.enabled = true;
+view.appendChild(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0xcfe6f5); scene.fog = new THREE.Fog(0xcfe6f5, 500, 1100);
+const camera = new THREE.PerspectiveCamera(50, 1, 1, 3000);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.48; controls.minDistance = 60; controls.maxDistance = 900;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x6f8f5a, 0.85));
+const sun = new THREE.DirectionalLight(0xffffff, 0.8); sun.position.set(-200, 400, 150); sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048); Object.assign(sun.shadow.camera, { left: -300, right: 300, top: 300, bottom: -300, far: 1200 }); scene.add(sun);
+const M = (color, o = {}) => new THREE.MeshStandardMaterial(Object.assign({ color, roughness: 0.7, metalness: 0.05 }, o));
+const add = (geo, mat, x, y, z, parent = scene) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; parent.add(m); return m; };
+
+const ground = add(new THREE.PlaneGeometry(1400, 1400), M(0x8cc56a, { roughness: 1 }), 0, 0, 0); ground.rotation.x = -Math.PI / 2;
+const lawn = add(new THREE.PlaneGeometry(AREA * 2, AREA * 2), M(0x9fd27a, { roughness: 1 }), 0, 0.2, 0); lawn.rotation.x = -Math.PI / 2;
+// 산책로
+const path = add(new THREE.RingGeometry(120, 150, 64), M(0xe2cfa3, { roughness: 1 }), 0, 0.4, 0); path.rotation.x = -Math.PI / 2;
+// 울타리
+for (let i = -AREA; i <= AREA; i += 25) {
+  [[i, -AREA], [i, AREA], [-AREA, i], [AREA, i]].forEach(([x, z]) => add(new THREE.BoxGeometry(3, 22, 3), M(0xf3efe6), x, 11, z));
+}
+[[0, -AREA, AREA * 2, 0], [0, AREA, AREA * 2, 0], [-AREA, 0, AREA * 2, 1], [AREA, 0, AREA * 2, 1]].forEach(([x, z, l, r]) => {
+  [8, 17].forEach((y) => { const b = add(new THREE.BoxGeometry(l, 2.5, 1.5), M(0xf3efe6), x, y, z); if (r) b.rotation.y = Math.PI / 2; });
+});
+// 장애물: 나무 · 벤치 · 상자
+const OBST = [];
+function tree(x, z, s = 1) {
+  add(new THREE.CylinderGeometry(4 * s, 5 * s, 30 * s, 10), M(0x8a5a33), x, 15 * s, z);
+  add(new THREE.ConeGeometry(22 * s, 46 * s, 12), M(0x3f8f4a), x, 50 * s, z);
+  add(new THREE.ConeGeometry(16 * s, 34 * s, 12), M(0x4ea35a), x, 72 * s, z);
+  OBST.push({ type: 'c', x, z, r: 8 * s });
+}
+function boxObs(x, z, w, d, h, color, rot = 0) {
+  const m = add(new THREE.BoxGeometry(w, h, d), M(color), x, h / 2, z); m.rotation.y = rot;
+  OBST.push({ type: 'b', x, z, w: rot ? d : w, d: rot ? w : d });
+}
+[[-170, -60], [-90, -180], [60, -200], [190, -120], [200, 90], [80, 200], [-60, 190], [-200, 160]].forEach(([x, z], i) => tree(x, z, i % 2 ? 0.9 : 1.15));
+boxObs(0, 0, 60, 20, 14, 0x9b6b43);   // 가운데 벤치
+add(new THREE.BoxGeometry(60, 18, 3), M(0x9b6b43), 0, 22, -9);
+boxObs(-120, 80, 30, 30, 30, 0xd99a3c); boxObs(110, 40, 30, 30, 30, 0x5c8fd6);
+// 개집
+const HOUSE = { x: -195, z: -195 };
+add(new THREE.BoxGeometry(50, 36, 46), M(0xc0563f), HOUSE.x, 18, HOUSE.z);
+const roofL = add(new THREE.BoxGeometry(56, 3, 34), M(0x4b3a2f), HOUSE.x, 44, HOUSE.z - 11); roofL.rotation.x = 0.7;
+const roofR = add(new THREE.BoxGeometry(56, 3, 34), M(0x4b3a2f), HOUSE.x, 44, HOUSE.z + 11); roofR.rotation.x = -0.7;
+add(new THREE.BoxGeometry(2, 22, 20), M(0x2a1f1a), HOUSE.x + 25.5, 12, HOUSE.z);
+OBST.push({ type: 'b', x: HOUSE.x, z: HOUSE.z, w: 50, d: 46 });
+const homeRing = add(new THREE.RingGeometry(26, 32, 40), M(0xf5c542, { transparent: true, opacity: .8 }), HOUSE.x + 55, 0.6, HOUSE.z); homeRing.rotation.x = -Math.PI / 2;
+const HOME = { x: HOUSE.x + 55, z: HOUSE.z, r: 32 };
+// 공 3개
+const BALL_POS = [[150, -150], [-180, 60], [160, 180]];
+let balls = [];
+function makeBalls() {
+  balls.forEach((b) => scene.remove(b.m));
+  balls = BALL_POS.map(([x, z], i) => ({ x, z, got: false, m: add(new THREE.SphereGeometry(6, 20, 14), M([0xf05252, 0xf5c542, 0x3a6fd8][i], { roughness: .4 }), x, 6, z) }));
+}
+makeBalls();
+
+/* 로봇개 모델 (앞 = +X) */
+const dog = new THREE.Group(); scene.add(dog);
+const body = new THREE.Group(); dog.add(body);
+const gray = M(0xd9dde3, { metalness: .3, roughness: .45 }), dark = M(0x2a2f3a, { metalness: .4 }), teal = M(0x00979d);
+add(new THREE.BoxGeometry(46, 13, 20), gray, 0, 0, 0, body);
+add(new THREE.BoxGeometry(46.4, 3, 20.4), teal, 0, 2, 0, body);
+add(new THREE.BoxGeometry(18, 2, 14), dark, -4, 7.5, 0, body);          // 등의 배터리 덮개
+const head = new THREE.Group(); head.position.set(25, 6, 0); body.add(head);
+add(new THREE.BoxGeometry(14, 11, 13), gray, 4, 2, 0, head);
+add(new THREE.BoxGeometry(2, 7, 11), dark, 11.2, 2, 0, head);           // 얼굴 화면
+const eyes = [-3, 3].map((z) => add(new THREE.BoxGeometry(0.6, 2.4, 2.2), new THREE.MeshBasicMaterial({ color: 0x3cf0ff }), 12.4, 3, z, head));
+[-4.5, 4.5].forEach((z) => { const e = add(new THREE.BoxGeometry(5, 7, 1.2), dark, 0, 10, z, head); e.rotation.x = z > 0 ? -0.35 : 0.35; });
+const tail = new THREE.Group(); tail.position.set(-23, 4, 0); body.add(tail);
+add(new THREE.CylinderGeometry(1, 1.4, 12, 8), dark, 0, 6, 0, tail).rotation.z = 0;
+tail.rotation.z = 0.7;
+// 다리 4개: [앞/뒤, 왼/오른]
+const LEG1 = 14, LEG2 = 14;
+const legs = [[1, -1], [1, 1], [-1, -1], [-1, 1]].map(([fx, sz]) => {
+  const hip = new THREE.Group(); hip.position.set(fx * 17, -5, sz * 11); body.add(hip);
+  add(new THREE.SphereGeometry(3.6, 14, 10), dark, 0, 0, 0, hip);
+  add(new THREE.BoxGeometry(4.4, LEG1, 4.4), gray, 0, -LEG1 / 2, 0, hip);
+  const knee = new THREE.Group(); knee.position.set(0, -LEG1, 0); hip.add(knee);
+  add(new THREE.SphereGeometry(2.8, 12, 8), dark, 0, 0, 0, knee);
+  add(new THREE.BoxGeometry(3.2, LEG2, 3.2), dark, 0, -LEG2 / 2, 0, knee);
+  add(new THREE.SphereGeometry(2.6, 12, 8), M(0x111111), 0, -LEG2, 0, knee);
+  return { hip, knee, front: fx > 0, left: sz < 0 };
+});
+// 말풍선
+function bubble(text) {
+  const c = document.createElement('canvas'); c.width = 256; c.height = 128; const x = c.getContext('2d');
+  x.fillStyle = '#fff'; x.beginPath(); x.roundRect ? x.roundRect(8, 8, 240, 92, 30) : x.rect(8, 8, 240, 92); x.fill();
+  x.beginPath(); x.moveTo(110, 98); x.lineTo(128, 124); x.lineTo(146, 98); x.fill();
+  x.fillStyle = '#1d2433'; x.font = '800 54px Pretendard, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(text, 128, 56);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false })); s.scale.set(30, 15, 1); s.renderOrder = 10; s.visible = false; scene.add(s); return s;
+}
+const bark = bubble('멍! 멍!'), heart = bubble('❤ 반가워'), ballTxt = bubble('🎾 찾았다!');
+let bubbleT = 0, bubbleNow = null;
+function say(sp) { [bark, heart, ballTxt].forEach((b) => b.visible = false); bubbleNow = sp; sp.visible = true; bubbleT = 1.6; }
+// 흔적
+const trailPos = new Float32Array(3000 * 3); let trailN = 0;
+const trailGeo = new THREE.BufferGeometry(); trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPos, 3)); trailGeo.setDrawRange(0, 0);
+scene.add(new THREE.Line(trailGeo, new THREE.LineBasicMaterial({ color: 0x6a3fd0 })));
+
+/* ===================================================================
+   로봇개 동작
+   =================================================================== */
+const POSES = {   // [몸 높이, 몸 기울기(앞 들림 +), 앞다리 엉덩이, 앞 무릎, 뒷다리 엉덩이, 뒷 무릎] — 엉덩이 각도는 땅 기준 (+ = 발이 앞으로)
+  stand: [27, 0, 0.25, -0.5, -0.25, 0.5],
+  sit:   [24, 0.5, 0.12, -0.1, 1.3, -2.4],
+  lie:   [12, 0, 1.45, 0, 1.4, -2.8]
+};
+const P = { y: 27, pitch: 0, fh: 0.25, fk: -0.5, rh: -0.25, rk: 0.5 };
+function setMode(m, src) {
+  if (D.mode === m && !D.action) return;
+  D.mode = m; D.action = null; D.cmdV = D.cmdW = 0;
+  log(`🐕 ${{ stand: '일어서', sit: '앉아', lie: '엎드려' }[m]}`, 'i');
+}
+function doAction(a) {
+  if (a === 'jump') { if (D.mode !== 'stand') setMode('stand'); if (D.jumpT < 0) { D.jumpT = 0; } return; }
+  if (a === 'bark') { say(bark); beep(); return; }
+  if (a === 'paw') { D.mode = 'sit'; D.action = 'paw'; D.actT = 0; D.cmdV = D.cmdW = 0; say(heart); return; }
+}
+let actx = null;
+function beep() {
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.22].forEach((d) => { const o = actx.createOscillator(), g = actx.createGain(); o.type = 'square'; o.frequency.setValueAtTime(520, actx.currentTime + d); o.frequency.exponentialRampToValueAtTime(260, actx.currentTime + d + 0.14);
+      g.gain.setValueAtTime(0.06, actx.currentTime + d); g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + d + 0.15); o.connect(g).connect(actx.destination); o.start(actx.currentTime + d); o.stop(actx.currentTime + d + 0.16); });
+  } catch (e) {}
+}
+function collides(x, z) {
+  if (Math.abs(x) > AREA - DOG_R || Math.abs(z) > AREA - DOG_R) return true;
+  for (const o of OBST) {
+    if (o.type === 'c') { if (Math.hypot(x - o.x, z - o.z) < o.r + DOG_R) return true; }
+    else { const dx = Math.max(Math.abs(x - o.x) - o.w / 2, 0), dz = Math.max(Math.abs(z - o.z) - o.d / 2, 0); if (Math.hypot(dx, dz) < DOG_R) return true; }
+  }
+  return false;
+}
+function step(dt) {
+  D.t += dt;
+  // 워치독: 이동 명령이 끊기면 멈춤
+  if (D.lastMove >= 0 && D.t - D.lastMove > WATCHDOG && (D.cmdV || D.cmdW)) {
+    D.cmdV = D.cmdW = 0; if (D.src === 'mqtt') log('⚠ 0.7초 동안 이동 명령이 없어 멈췄습니다 (워치독)', 'w');
+  }
+  const canWalk = D.mode === 'stand' && D.jumpT < 0;
+  const tv = canWalk ? D.cmdV * VMAX : 0, tw = canWalk ? D.cmdW * WMAX : 0;
+  const k = 1 - Math.exp(-dt / 0.18);
+  D.v += (tv - D.v) * k; D.w += (tw - D.w) * k;
+  D.th += D.w * dt;
+  const nx = D.x + Math.cos(D.th) * D.v * dt, nz = D.z - Math.sin(D.th) * D.v * dt;
+  if (Math.abs(D.v) > 0.5) {
+    if (collides(nx, nz)) { if (D.t - (D.lastBump ?? -9) > 0.6) { D.bump++; log('💥 부딪혔습니다', 'e'); } D.lastBump = D.t; D.inWall = true; D.v *= 0.2; }
+    else { D.inWall = false; D.dist += Math.hypot(nx - D.x, nz - D.z); D.x = nx; D.z = nz; }
+  }
+  if ((D.cmdV || D.cmdW) && D.start == null) D.start = D.t;
+  // 걸음 위상 (빠를수록 빨리)
+  const gait = Math.min(1, (Math.abs(D.v) / VMAX) + Math.abs(D.w) / WMAX * 0.7);
+  D.phase += dt * (4 + 8 * gait) * (gait > 0.03 ? 1 : 0) * (D.v < -1 ? -1 : 1);
+  D.gait = gait;
+  // 자세 보간
+  const T = POSES[D.mode]; const kp = 1 - Math.exp(-dt / 0.15);
+  P.y += (T[0] - P.y) * kp; P.pitch += (T[1] - P.pitch) * kp; P.fh += (T[2] - P.fh) * kp; P.fk += (T[3] - P.fk) * kp; P.rh += (T[4] - P.rh) * kp; P.rk += (T[5] - P.rk) * kp;
+  if (D.action === 'paw') { D.actT += dt; if (D.actT > 2.6) { D.action = null; } }
+  // 점프
+  D.y = 0;
+  if (D.jumpT >= 0) { D.jumpT += dt; const j = D.jumpT; if (j < 0.25) D.y = -5 * Math.sin(j / 0.25 * Math.PI / 2); else if (j < 0.85) { const u = (j - 0.25) / 0.6; D.y = 32 * 4 * u * (1 - u); } else if (j < 1.05) D.y = -3 * Math.sin((j - 0.85) / 0.2 * Math.PI); else D.jumpT = -1; }
+  // 공 · 집
+  balls.forEach((b, i) => { if (!b.got && Math.hypot(D.x - b.x, D.z - b.z) < DOG_R + 8) { b.got = true; D.balls++; say(ballTxt); log(`🎾 공 ${D.balls}/3 찾음`, 'i'); } });
+  if (!D.done && D.balls === 3 && Math.hypot(D.x - HOME.x, D.z - HOME.z) < HOME.r) { D.done = true; say(heart); log(`🏁 미션 성공! 공 3개를 찾아 집에 왔습니다 · ${(D.t - (D.start ?? D.t)).toFixed(1)}초 · 충돌 ${D.bump}회`, 'i'); }
+  D.battery = Math.max(0, 100 - D.dist / 100 * 0.8 - D.t * 0.01);
+  if (bubbleT > 0) { bubbleT -= dt; if (bubbleT <= 0 && bubbleNow) bubbleNow.visible = false; }
+}
+function pose3D() {
+  dog.position.set(D.x, 0, D.z); dog.rotation.y = D.th;
+  const bob = D.gait > 0.03 ? Math.abs(Math.sin(D.phase)) * 1.2 : 0;
+  body.position.y = P.y + D.y + bob; body.rotation.z = P.pitch + (D.jumpT > 0.25 && D.jumpT < 0.85 ? 0.12 : 0);
+  legs.forEach((L, i) => {
+    const diag = (i === 0 || i === 3) ? 0 : Math.PI;   // 대각선 다리끼리 같은 박자 (트롯)
+    const s = Math.sin(D.phase + diag), lift = Math.max(0, Math.cos(D.phase + diag));
+    const swing = D.gait * 0.45 * s, kneeLift = D.gait * 0.55 * lift;
+    let h = (L.front ? P.fh : P.rh) - P.pitch + swing, kn = (L.front ? P.fk : P.rk) + (L.front ? -kneeLift : kneeLift);
+    if (D.action === 'paw' && L.front && !L.left) { const t = D.actT; h = 1.2 + 0.25 * Math.sin(t * 9); kn = -0.6 + 0.25 * Math.sin(t * 9 + 1); }
+    if (D.jumpT > 0.25 && D.jumpT < 0.85) { h = L.front ? 0.6 : -0.6; kn = L.front ? -0.4 : 0.4; }
+    L.hip.rotation.z = h; L.knee.rotation.z = kn;
+  });
+  tail.rotation.z = 0.7 + Math.sin(D.t * (D.action === 'paw' || D.done ? 16 : 5)) * (D.action === 'paw' || D.done ? 0.35 : 0.12);
+  head.rotation.z = D.mode === 'lie' ? -0.15 : 0.05 * Math.sin(D.t * 2);
+  [bark, heart, ballTxt].forEach((b) => b.position.set(D.x, P.y + D.y + 34, D.z));
+  balls.forEach((b) => { b.m.visible = !b.got; b.m.position.y = 6 + Math.abs(Math.sin(D.t * 3 + b.x)) * 3; });
+  homeRing.material.opacity = D.balls === 3 && !D.done ? 0.5 + 0.4 * Math.sin(D.t * 6) : 0.8;
+  if (trailN < 3000) { const j = trailN - 1; if (trailN === 0 || Math.hypot(trailPos[j * 3] - D.x, trailPos[j * 3 + 2] - D.z) > 4) { trailPos.set([D.x, 0.8, D.z], trailN * 3); trailN++; trailGeo.setDrawRange(0, trailN); trailGeo.attributes.position.needsUpdate = true; } }
+}
+
+/* ===================================================================
+   명령 처리 (MQTT · 키보드 · 화면 버튼 공통)
+   =================================================================== */
+const TEXT_CMD = { forward: { c: 'move', v: 0.7, w: 0 }, back: { c: 'move', v: -0.5, w: 0 }, left: { c: 'move', v: 0, w: 0.8 }, right: { c: 'move', v: 0, w: -0.8 } };
+function handleCmd(obj, src) {
+  if (typeof obj === 'string') {
+    const s = obj.trim().toLowerCase();
+    try { obj = JSON.parse(obj); } catch (e) { obj = TEXT_CMD[s] || { c: s }; }
+  }
+  if (!obj || typeof obj !== 'object') return false;
+  D.src = src;
+  if (obj.seq != null) D.ack = obj.seq;
+  const c = String(obj.c || obj.cmd || '').toLowerCase();
+  const num = (v, d = 0) => (Number.isFinite(+v) ? Math.max(-1, Math.min(1, +v)) : d);
+  switch (c) {
+    case 'move':
+      if (D.mode !== 'stand' && (obj.v || obj.w)) setMode('stand');
+      D.cmdV = num(obj.v); D.cmdW = num(obj.w); D.lastMove = D.t; return true;
+    case 'stop': D.cmdV = D.cmdW = 0; return true;
+    case 'stand': case 'sit': case 'lie': setMode(c); return true;
+    case 'paw': case 'jump': case 'bark': doAction(c); return true;
+    case 'ping': setTimeout(publishState, 0); return true;   // 바로 상태를 보내 왕복 시간을 잴 수 있게
+    default: return false;
+  }
+}
+
+/* ===================================================================
+   MQTT
+   =================================================================== */
+const mq = { client: null, connected: false, lastRemote: -99, pub: null };
+function mqStatus(t, cls) { $('mqText').textContent = t; $('mqDot').className = 'dot ' + (cls || ''); }
+function loadMqtt() {
+  return new Promise((res, rej) => {
+    if (window.mqtt) return res(window.mqtt);
+    const s = document.createElement('script'); s.src = 'https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js';
+    s.onload = () => res(window.mqtt); s.onerror = () => rej(new Error('MQTT 라이브러리를 불러오지 못했습니다')); document.head.appendChild(s);
+  });
+}
+async function mqConnect() {
+  if (mq.client) { const c = mq.client; mq.client = null; c.end(true); }
+  mqStatus('연결 중…');
+  try {
+    const lib = await loadMqtt();
+    const c = lib.connect('wss://broker.hivemq.com:8884/mqtt', { clientId: 'bctc-dog-' + Math.random().toString(16).slice(2, 8), connectTimeout: 8000, reconnectPeriod: 3000, clean: true });
+    mq.client = c;
+    c.on('connect', () => { mq.connected = true; mqStatus('브로커 연결됨', 'on'); c.subscribe(topicBase() + '/cmd'); log('📡 구독: ' + topicBase() + '/cmd', 'i'); });
+    c.on('reconnect', () => mqStatus('다시 연결 중…'));
+    c.on('close', () => { mq.connected = false; if (mq.client) mqStatus('연결 끊김', 'bad'); });
+    c.on('message', (t, buf) => {
+      const msg = buf.toString(); mq.lastRemote = D.t;
+      const ok = handleCmd(msg, 'mqtt');
+      const isMove = /move/.test(msg), key = D.cmdV.toFixed(2) + ',' + D.cmdW.toFixed(2);
+      if (!/ping/.test(msg) && (!isMove || key !== mq.lastKey)) log('◀ cmd  ' + msg, ok ? 'm' : 'e');   // 같은 이동 명령은 한 번만 표시
+      if (isMove) mq.lastKey = key;
+      if (!ok) log('  모르는 명령입니다 — 아래 API 명세를 확인하세요', 'e');
+    });
+    clearInterval(mq.pub); mq.pub = setInterval(publishState, 500);
+  } catch (e) { mqStatus(e.message, 'bad'); }
+}
+function stateObj() {
+  return { x: Math.round(D.x), y: Math.round(-D.z), heading: Math.round(((D.th * 180 / Math.PI) % 360 + 360) % 360), mode: D.mode,
+           speed: Math.round(Math.abs(D.v)), balls: D.balls, bump: D.bump, battery: Math.round(D.battery), done: D.done ? 1 : 0, ack: D.ack };
+}
+function publishState() {
+  if (!mq.connected) return;
+  const s = JSON.stringify(stateObj());
+  mq.client.publish(topicBase() + '/state', s);
+  if ($('showState').checked) log('▶ state ' + s, 's');
+}
+
+/* ===================================================================
+   화면
+   =================================================================== */
+const logEl = $('log'), logArr = [];
+function log(t, cls) { logArr.push(`<span class="${cls || ''}">${String(t).replace(/</g, '&lt;')}</span>`); if (logArr.length > 120) logArr.shift(); logEl.innerHTML = logArr.join('\n'); logEl.scrollTop = logEl.scrollHeight; }
+// QR은 항상 공개 주소(https)로: 휴대폰은 PC의 localhost에 접속할 수 없고, 기울기 센서는 https에서만 동작한다
+const PUBLIC_REMOTE = 'https://bctcaiedu.github.io/arduino/dog3d/remote.html';
+function remoteUrl() { return PUBLIC_REMOTE + '?code=' + CODE; }
+function localRemoteUrl() { return new URL('remote.html?code=' + CODE, location.href.split('#')[0].split('?')[0]).href; }
+function renderPairing() {
+  $('code').textContent = CODE; $('url').textContent = remoteUrl(); $('openRemote').href = localRemoteUrl();
+  $('qr').innerHTML = '';
+  if (window.QRCode) new QRCode($('qr'), { text: remoteUrl(), width: 140, height: 140, correctLevel: QRCode.CorrectLevel.M });
+  else $('qr').textContent = 'QR을 불러오지 못했습니다';
+  $('api').innerHTML = `<b>리모컨 → 로봇개</b>  ${topicBase()}/cmd
+  {"c":"move","v":0.7,"w":0}   v 앞뒤 −1~1
+                                 w 회전 −1~1 (+ 왼쪽)
+  {"c":"stop"} · {"c":"sit"} · {"c":"stand"}
+  {"c":"lie"} · {"c":"paw"} · {"c":"jump"} · {"c":"bark"}
+  글자만 보내도 됨: forward · back · left · right · stop
+  ⚠ move는 0.7초 안에 다시 보내야 계속 움직임 (워치독)
+<b>로봇개 → 리모컨</b>  ${topicBase()}/state  (0.5초마다)
+  {"x":0,"y":0,"heading":0,"mode":"stand","speed":0,
+   "balls":0,"bump":0,"battery":100,"done":0,"ack":12}`;
+}
+function renderHud() {
+  const remoteOn = D.t - mq.lastRemote < 2;
+  $('hud').innerHTML = `<span class="pill ${remoteOn ? 'net' : ''}">${remoteOn ? '📱 리모컨 연결됨' : '📱 리모컨 대기'}</span><span class="pill">🎾 ${D.balls}/3</span>${D.done ? '<span class="pill ok">🏁 미션 성공</span>' : ''}${D.inWall ? '<span class="pill bad">💥 충돌</span>' : ''}<span class="pill">${{ stand: '서 있음', sit: '앉음', lie: '엎드림' }[D.mode]}${D.action === 'paw' ? ' · 손' : ''}</span><span class="pill">속도 ${Math.abs(D.v).toFixed(0)} cm/s</span><span class="pill">🔋 ${D.battery.toFixed(0)}%</span>`;
+}
+$('acts').innerHTML = [['sit', '🪑 앉아'], ['stand', '🧍 일어서'], ['lie', '🛏 엎드려'], ['paw', '🐾 손'], ['jump', '⤴ 점프'], ['bark', '🔊 짖어']].map(([c, n]) => `<button data-c="${c}">${n}</button>`).join('');
+$('acts').onclick = (e) => { const b = e.target.closest('button'); if (b) handleCmd({ c: b.dataset.c }, 'pc'); };
+// 키보드 · 화면 패드
+const keys = new Set();
+function applyKeys() {
+  const v = (keys.has('up') ? 0.8 : 0) - (keys.has('down') ? 0.5 : 0), w = (keys.has('left') ? 0.8 : 0) - (keys.has('right') ? 0.8 : 0);
+  if (keys.size || D.src === 'pc') handleCmd({ c: 'move', v, w }, 'pc');
+}
+const KEYMAP = { ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right' };
+addEventListener('keydown', (e) => { if (KEYMAP[e.code]) { e.preventDefault(); keys.add(KEYMAP[e.code]); applyKeys(); } });
+addEventListener('keyup', (e) => { if (KEYMAP[e.code]) { keys.delete(KEYMAP[e.code]); applyKeys(); } });
+document.querySelectorAll('.pad button').forEach((b) => {
+  const k = b.dataset.k;
+  b.addEventListener('pointerdown', (e) => { e.preventDefault(); if (k === 'stop') { keys.clear(); handleCmd({ c: 'stop' }, 'pc'); return; } keys.add(k); b.classList.add('on'); applyKeys(); });
+  const up = () => { keys.delete(k); b.classList.remove('on'); applyKeys(); };
+  b.addEventListener('pointerup', up); b.addEventListener('pointerleave', up);
+});
+setInterval(() => { if (keys.size) applyKeys(); }, 200);
+// 카메라
+let camMode = 'follow';
+function setCam(m) {
+  camMode = m; document.querySelectorAll('.tools [data-cam]').forEach((b) => b.classList.toggle('on', b.dataset.cam === m));
+  if (m === 'top') { camera.position.set(D.x, 620, D.z + 1); controls.target.set(D.x, 0, D.z); }
+  if (m === 'orbit') { camera.position.set(D.x - 160, 140, D.z + 160); controls.target.set(D.x, 20, D.z); }
+  controls.update();
+}
+document.querySelectorAll('.tools [data-cam]').forEach((b) => b.onclick = () => setCam(b.dataset.cam));
+function resetAll() {
+  Object.assign(D, { lastBump: -9, x: 0, z: 100, th: 0, v: 0, w: 0, cmdV: 0, cmdW: 0, mode: 'stand', action: null, balls: 0, bump: 0, dist: 0, done: false, start: null, jumpT: -1, battery: 100, t: 0, lastMove: -1 });
+  mq.lastRemote = -99; makeBalls(); trailN = 0; trailGeo.setDrawRange(0, 0);
+  camera.position.set(-150, 95, 100); controls.target.set(0, 20, 100); controls.update();
+}
+$('resetBtn').onclick = () => { resetAll(); log('↺ 처음부터 시작합니다', 'i'); };
+$('newCode').onclick = () => { CODE = String(Math.floor(1000 + Math.random() * 9000)); store('code', CODE); renderPairing(); mqConnect(); log('🔄 새 연결 코드: ' + CODE + ' — 리모컨에도 새 코드를 넣으세요', 'w'); };
+function resize() { const w = view.clientWidth, h = view.clientHeight; if (!w || !h) return; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize); if (window.ResizeObserver) new ResizeObserver(resize).observe(view);
+
+let last = performance.now(), acc = 0, hudT = 0;
+const camOff = new THREE.Vector3();
+function frame(now) {
+  const dt = Math.min(0.1, (now - last) / 1000); last = now; acc += dt;
+  while (acc >= 1 / 120) { step(1 / 120); acc -= 1 / 120; }
+  pose3D();
+  if (camMode === 'follow') {
+    const want = new THREE.Vector3(D.x - Math.cos(D.th) * 150, 95, D.z + Math.sin(D.th) * 150);
+    camera.position.lerp(want, Math.min(1, dt * 2.5));
+    controls.target.lerp(new THREE.Vector3(D.x + Math.cos(D.th) * 40, 20, D.z - Math.sin(D.th) * 40), Math.min(1, dt * 5));
+  }
+  controls.update(); renderer.render(scene, camera);
+  if (now - hudT > 150) { renderHud(); hudT = now; }
+  requestAnimationFrame(frame);
+}
+resetAll(); renderPairing(); resize(); mqConnect();
+log('📱 휴대폰 카메라로 QR을 찍어 리모컨을 여세요. PC에서는 W A S D · 방향키로도 움직입니다.', 'i');
+log('🎯 미션: 공 3개를 찾아 개집 앞 노란 원으로 돌아오기', 'i');
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

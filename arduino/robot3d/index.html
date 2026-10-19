@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D 두 바퀴 로봇 실습실 · AI로 배우는 아두이노와 사물인터넷</title>
+  <meta name="description" content="두 바퀴 로봇을 3D로 보고, 실제 Arduino 코드(L293D 제어)로 전진 · 후진 · 회전을 시험합니다.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚗</text></svg>">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
+  <script>try{var t=localStorage.getItem('bctc-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <style>
+  :root { --bg:#f4f6f9; --pane:#fff; --card:#fff; --card2:#f7f9fc; --line:#e1e6ee; --fg:#1d2433; --muted:#6b7587; --accent:#00878f; --accent2:#6a3fd0;
+    --ok:#1f9d55; --danger:#d64541; --warn:#c98a00; --shadow:0 1px 2px rgba(20,30,50,.06),0 4px 16px rgba(20,30,50,.06);
+    --mono:'JetBrains Mono',Consolas,monospace; --sans:'Pretendard Variable',Pretendard,-apple-system,'Segoe UI','Malgun Gothic',sans-serif;
+    --term-bg:#0f1419; --term-card:#161d26; --term-line:#273141; --term-fg:#d7dde8; --term-muted:#7d8799; color-scheme:light; }
+  :root[data-theme="dark"] { --bg:#0e1116; --pane:#151a21; --card:#1a2029; --card2:#1f2631; --line:#2a323e; --fg:#e3e8f0; --muted:#8d97a8; --accent:#3cc6cc; --accent2:#b69cff; color-scheme:dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  html, textarea, code, pre { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+  body { background: var(--bg); color: var(--fg); font: 14.5px/1.55 var(--sans); }
+  button, select, textarea, input { font: inherit; color: inherit; }
+  .app { display: grid; grid-template-rows: auto 1fr; height: 100vh; height: 100dvh; }
+  .top { display: flex; align-items: center; gap: 10px; padding: 8px 14px; background: var(--pane); border-bottom: 1px solid var(--line); }
+  .top a { color: var(--fg); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+  .logo { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; font-size: 18px; background: linear-gradient(135deg, #00979d, #6a3fd0); }
+  .top b { display: block; font-size: 15px; line-height: 1.2; } .top small { font-size: 12px; color: var(--muted); }
+  body.embed .top { display: none; } body.embed .app { grid-template-rows: 1fr; }
+  .main { display: grid; grid-template-columns: minmax(0, 1fr) 420px; min-height: 0; }
+  .stage { position: relative; min-height: 0; background: #dfe7ef; }
+  #view { position: absolute; inset: 0; }
+  .hud { position: absolute; left: 10px; top: 10px; display: flex; flex-wrap: wrap; gap: 6px; pointer-events: none; }
+  .pill { background: rgba(255,255,255,.92); color: #1d2433; border: 1px solid #d0d7e2; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 700; font-family: var(--mono); }
+  .pill.run { background: #efe9fc; border-color: #6a3fd0; color: #4b2aa8; }
+  .tools { position: absolute; right: 10px; top: 10px; display: flex; flex-direction: column; gap: 6px; }
+  .tools button, .drive button { border: 1px solid #d0d7e2; background: rgba(255,255,255,.95); color: #1d2433; border-radius: 9px; padding: 5px 10px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+  .tools button.on { background: #00878f; color: #fff; border-color: #00878f; }
+  .drive { position: absolute; left: 10px; bottom: 10px; display: grid; grid-template-columns: repeat(3, 48px); gap: 5px; }
+  .drive button { padding: 8px 0; font-size: 16px; }
+  .side { background: var(--term-bg); color: var(--term-fg); display: flex; flex-direction: column; min-height: 0; border-left: 1px solid var(--line); }
+  .side-body { flex: 1; overflow-y: auto; padding: 10px 12px 14px; display: flex; flex-direction: column; gap: 9px; min-height: 0; }
+  .row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .btn { border: 1px solid var(--term-line); background: var(--term-card); color: var(--term-fg); border-radius: 8px; padding: 5px 11px; font-weight: 700; font-size: 13px; cursor: pointer; }
+  .btn.primary { background: #00979d; border-color: #00979d; color: #fff; }
+  .btn.danger { color: #ff7b72; border-color: #ff7b72; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  select { background: var(--term-card); border: 1px solid var(--term-line); color: var(--term-fg); border-radius: 8px; padding: 5px 8px; font-size: 13px; }
+  textarea.editor { width: 100%; min-height: 300px; flex: 1; resize: vertical; background: #0a0e13; color: #e6edf3; border: 1px solid var(--term-line); border-radius: 8px; padding: 8px 10px; font: 12.5px/1.55 var(--mono); tab-size: 2; white-space: pre; outline: none; }
+  textarea.editor:focus { border-color: #c9a7ff; }
+  .pins { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; font: 11px var(--mono); }
+  .pins div { background: var(--term-card); border: 1px solid var(--term-line); border-radius: 6px; padding: 3px 4px; text-align: center; }
+  .pins div b { display: block; color: #79c0ff; font-size: 10.5px; }
+  .pins div.hi { border-color: #f5c542; color: #f5c542; }
+  .motors { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .motors div { background: var(--term-card); border: 1px solid var(--term-line); border-radius: 8px; padding: 6px 8px; font-size: 12px; }
+  .motors div b { color: #c9a7ff; }
+  .log { background: #0a0e13; border: 1px solid var(--term-line); border-radius: 8px; padding: 6px 9px; font: 11.5px/1.5 var(--mono); height: 110px; overflow-y: auto; white-space: pre-wrap; flex: none; }
+  .log .e { color: #ff7b72; } .log .s { color: #79c0ff; } .log .i { color: #7ee787; } .log .w { color: #f2c14e; }
+  label.chk { font-size: 12.5px; color: var(--term-muted); display: flex; gap: 6px; align-items: center; }
+  .cap { font-size: 11.5px; font-weight: 700; color: var(--term-muted); letter-spacing: .02em; }
+  @media (max-width: 900px) {
+    .app { height: auto; } .main { grid-template-columns: 1fr; } .stage { height: 60vh; min-height: 360px; }
+    .side { border-left: none; }
+  }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <a href="../index.html#l39"><span class="logo">🚗</span><span><b>3D 두 바퀴 로봇 실습실</b><small>← 39차시 두 바퀴 로봇의 구동</small></span></a>
+  </header>
+  <div class="main">
+    <section class="stage">
+      <div id="view"></div>
+      <div class="hud" id="hud"></div>
+      <div class="tools">
+        <button id="labelBtn" class="on" title="부품 이름 보이기/숨기기">🏷 부품 이름</button>
+        <button id="followBtn" title="카메라가 로봇을 따라감">🎥 따라가기</button>
+        <button id="topBtn" title="위에서 보기">⬇ 위에서</button>
+        <button id="resetCam" title="처음 시점">⟲ 시점</button>
+      </div>
+      <div class="drive" title="코드 없이 바로 움직여 보기">
+        <span></span><button data-d="F" title="전진">▲</button><span></span>
+        <button data-d="L" title="제자리 좌회전">⟲</button><button data-d="S" title="정지">■</button><button data-d="R" title="제자리 우회전">⟳</button>
+        <span></span><button data-d="B" title="후진">▼</button><span></span>
+      </div>
+    </section>
+    <aside class="side">
+      <div class="side-body">
+        <div class="row">
+          <select id="exSel" style="flex:1" aria-label="예제"></select>
+          <button class="btn primary" id="runBtn">▶ 업로드 · 실행</button>
+          <button class="btn danger" id="stopBtn" disabled>■</button>
+          <button class="btn" id="resetBtn" title="로봇을 출발점으로">↺</button>
+        </div>
+        <textarea class="editor" id="editor" spellcheck="false" aria-label="Arduino 코드"></textarea>
+        <label class="chk"><input type="checkbox" id="swapR"> ⚠ 오른쪽 모터 선을 반대로 연결 (흔한 실수 재현)</label>
+        <div class="cap">핀 상태 (L293D 연결: EN1 D5 · IN1 D7 · IN2 D8 · EN2 D6 · IN3 D9 · IN4 D10)</div>
+        <div class="pins" id="pins"></div>
+        <div class="motors" id="motors"></div>
+        <div class="cap">시리얼 모니터</div>
+        <div class="log" id="log"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+<script>
+/* ===================================================================
+   설정 (단위: cm)
+   =================================================================== */
+const WR = 3.25, WB = 14, VMAX = 34, TAU = 0.12, DEAD = 60;
+const PIN = { EN1: 5, IN1: 7, IN2: 8, EN2: 6, IN3: 9, IN4: 10 };
+const PWM_PINS = [3, 5, 6, 9, 10, 11];
+const $ = (id) => document.getElementById(id);
+if (new URLSearchParams(location.search).get('embed')) document.body.classList.add('embed');
+const S = { x: 0, z: 0, th: 0, vl: 0, vr: 0, t: 0, dist: 0, spinL: 0, spinR: 0 };
+const pins = {};
+function resetPins() { for (let p = 0; p <= 13; p++) pins[p] = { mode: null, val: 0, pwm: 0 }; }
+resetPins();
+
+/* ===================================================================
+   3D 장면
+   =================================================================== */
+const view = $('view');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
+renderer.shadowMap.enabled = true;
+view.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xdfe7ef);
+const camera = new THREE.PerspectiveCamera(45, 1, 0.5, 2000);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.49; controls.minDistance = 15; controls.maxDistance = 400;
+function homeCam() { camera.position.set(-38, 30, 42); controls.target.set(0, 4, 0); controls.update(); }
+homeCam();
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x9aa5b1, 0.9));
+const sun = new THREE.DirectionalLight(0xffffff, 0.8);
+sun.position.set(-60, 120, 40); sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024); Object.assign(sun.shadow.camera, { left: -150, right: 150, top: 150, bottom: -150 });
+scene.add(sun);
+
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.MeshStandardMaterial({ color: 0xf3f5f8 }));
+floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+const grid = new THREE.GridHelper(400, 40, 0xb7c2cf, 0xd7dee7); grid.position.y = 0.02; scene.add(grid);
+const start = new THREE.Mesh(new THREE.RingGeometry(9, 10, 40), new THREE.MeshBasicMaterial({ color: 0x00979d, side: THREE.DoubleSide }));
+start.rotation.x = -Math.PI / 2; start.position.y = 0.05; scene.add(start);
+// 거리 감 잡기용 콘
+[[100, 0], [0, 100], [-100, 0], [0, -100]].forEach(([x, z]) => {
+  const c = new THREE.Mesh(new THREE.ConeGeometry(4, 10, 20), new THREE.MeshStandardMaterial({ color: 0xf08c00 }));
+  c.position.set(x, 5, z); c.castShadow = true; scene.add(c);
+});
+
+const M = (color, opts = {}) => new THREE.MeshStandardMaterial(Object.assign({ color, roughness: 0.6, metalness: 0.05 }, opts));
+const robot = new THREE.Group(); scene.add(robot);
+const add = (geo, mat, x, y, z, parent = robot) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; parent.add(m); return m; };
+
+// 섀시 (아크릴 판 2층)
+add(new THREE.BoxGeometry(17, 0.4, 11.5), M(0x7cc4e4, { transparent: true, opacity: 0.85, roughness: 0.2 }), 0.5, 5.6, 0);
+add(new THREE.BoxGeometry(13, 0.4, 10), M(0x7cc4e4, { transparent: true, opacity: 0.85, roughness: 0.2 }), 0, 9.2, 0);
+[[-5, -4], [-5, 4], [5, -4], [5, 4]].forEach(([x, z]) => add(new THREE.CylinderGeometry(0.3, 0.3, 3.4, 8), M(0xd4af37, { metalness: 0.6 }), x, 7.4, z));
+// 기어 DC 모터 (TT 모터) + 브래킷
+const motors = [];
+[-1, 1].forEach((side) => {
+  const g = new THREE.Group(); g.position.set(0, WR, side * 4); robot.add(g);
+  add(new THREE.BoxGeometry(5.6, 2.2, 2.0), M(0xf5c518), 1.6, 0, 0, g);                 // 기어박스 (노란색)
+  add(new THREE.CylinderGeometry(1.1, 1.1, 2.6, 20), M(0xc9ced6, { metalness: 0.5 }), -2.4, 0, 0, g).rotation.z = Math.PI / 2;   // 모터 캔
+  add(new THREE.BoxGeometry(0.4, 0.8, 0.5), M(0xb87333, { metalness: 0.7 }), -3.8, 0.4, -0.4, g);  // 단자
+  add(new THREE.BoxGeometry(0.4, 0.8, 0.5), M(0xb87333, { metalness: 0.7 }), -3.8, 0.4, 0.4, g);
+  const shaft = add(new THREE.CylinderGeometry(0.28, 0.28, 3.2, 10), M(0xffffff), 0, 0, side * 1.6, g); shaft.rotation.x = Math.PI / 2;
+  add(new THREE.BoxGeometry(1.0, 3.2, 2.2), M(0x2a2f3a), -0.3, 1.6, 0, g);               // 브래킷
+  motors.push(g);
+});
+// 바퀴
+function makeWheel(side) {
+  const pivot = new THREE.Group(); pivot.position.set(0, WR, side * (WB / 2)); robot.add(pivot);
+  const tire = add(new THREE.CylinderGeometry(WR, WR, 2.6, 36), M(0x1f1f1f, { roughness: 0.9 }), 0, 0, 0, pivot); tire.rotation.x = Math.PI / 2;
+  const hub = add(new THREE.CylinderGeometry(2.3, 2.3, 2.7, 24), M(0xf5c518), 0, 0, 0, pivot); hub.rotation.x = Math.PI / 2;
+  for (let k = 0; k < 3; k++) { const sp = add(new THREE.BoxGeometry(4.4, 0.6, 2.8), M(0xe0a800), 0, 0, 0, pivot); sp.rotation.z = k * Math.PI / 3; }
+  return pivot;
+}
+const wheelL = makeWheel(-1), wheelR = makeWheel(1);
+// 보조 바퀴 (캐스터)
+add(new THREE.CylinderGeometry(0.6, 0.6, 3.6, 10), M(0x9aa1ab, { metalness: 0.6 }), -6.5, 3.6, 0);
+add(new THREE.SphereGeometry(1.2, 20, 14), M(0xd7dbe0, { metalness: 0.8, roughness: 0.2 }), -6.5, 1.2, 0);
+// 9V 배터리 (아래층 가운데)
+add(new THREE.BoxGeometry(4.8, 1.7, 2.6), M(0xd9822b), -3.2, 4.3, 0);
+add(new THREE.BoxGeometry(1.6, 1.72, 2.62), M(0x1f1f1f), -5.0, 4.3, 0);
+// 아두이노 UNO (위층)
+add(new THREE.BoxGeometry(6.9, 0.25, 5.3), M(0x1678be), -1.5, 9.55, 0);
+add(new THREE.BoxGeometry(5.2, 0.8, 0.3), M(0x1d1d1d), -1.3, 10.05, -2.35);
+add(new THREE.BoxGeometry(3.4, 0.8, 0.3), M(0x1d1d1d), -0.4, 10.05, 2.35);
+add(new THREE.BoxGeometry(1.6, 1.1, 1.2), M(0xc7cbd1, { metalness: 0.6 }), -4.6, 10.1, -1.2);
+add(new THREE.BoxGeometry(3.4, 0.45, 0.9), M(0x1d1d1d), 0.3, 9.9, 0.8);
+// 미니 브레드보드 + L293D (위층 앞)
+add(new THREE.BoxGeometry(4.2, 0.8, 3.4), M(0xf1f1f1), 4.2, 9.8, 0);
+add(new THREE.BoxGeometry(2.1, 0.5, 0.75), M(0x262626), 4.2, 10.45, 0);
+// 진행 방향 화살표
+const arrow = add(new THREE.ConeGeometry(0.9, 2.2, 16), M(0x00979d), 8.6, 9.6, 0); arrow.rotation.z = -Math.PI / 2;
+// 배선 (모터 → L293D)
+function wire(points, color) {
+  const curve = new THREE.CatmullRomCurve3(points.map(([x, y, z]) => new THREE.Vector3(x, y, z)));
+  add(new THREE.TubeGeometry(curve, 30, 0.14, 6, false), M(color), 0, 0, 0);
+}
+[-1, 1].forEach((side) => {
+  wire([[-3.9, WR + 0.8, side * 4 - 0.4], [-4.6, 6.5, side * 3.5], [1.5, 10.6, side * 2.6], [3.6, 10.3, side * 0.9]], 0xe5484d);
+  wire([[-3.9, WR + 0.8, side * 4 + 0.4], [-5.0, 6.8, side * 4.2], [1.8, 10.9, side * 3.0], [4.8, 10.3, side * 0.9]], 0x2a2f3a);
+});
+wire([[-5.6, 4.6, 0.6], [-6.6, 7.5, 1.5], [-4.5, 10.0, 1.8], [-4.0, 9.9, 0.6]], 0xe5484d);
+
+// 부품 이름표
+const labels = [];
+function label(text, x, y, z) {
+  const c = document.createElement('canvas'); const ctx = c.getContext('2d');
+  ctx.font = '700 40px Pretendard, sans-serif'; const w = Math.ceil(ctx.measureText(text).width) + 36;
+  c.width = w; c.height = 64;
+  ctx.font = '700 40px Pretendard, sans-serif';
+  ctx.fillStyle = 'rgba(29,36,51,.88)'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(0, 0, w, 64, 18) : ctx.rect(0, 0, w, 64); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.textBaseline = 'middle'; ctx.fillText(text, 18, 34);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false }));
+  sp.scale.set(w / 64 * 2.2, 2.2, 1); sp.position.set(x, y, z); sp.renderOrder = 10; robot.add(sp); labels.push(sp);
+}
+label('왼쪽 바퀴', 0, 9, -11); label('오른쪽 바퀴', 0, 9, 11); label('기어 DC 모터', 2, 0.8, -8.5);
+label('보조 바퀴 (캐스터)', -10, 2.5, 0); label('9V 배터리', -6, 6.5, 0); label('아두이노 UNO', -4, 13, -1);
+label('L293D 모터 드라이버', 7, 16, 2); label('앞 →', 12.5, 6.5, 0);
+
+// 흔적
+const MAXT = 4000, trailPos = new Float32Array(MAXT * 3); let trailN = 0;
+const trailGeo = new THREE.BufferGeometry(); trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPos, 3)); trailGeo.setDrawRange(0, 0);
+scene.add(new THREE.Line(trailGeo, new THREE.LineBasicMaterial({ color: 0x6a3fd0 })));
+function addTrail() {
+  const i = trailN % MAXT;
+  if (trailN > 0) { const j = (trailN - 1) % MAXT; if (Math.hypot(trailPos[j * 3] - S.x, trailPos[j * 3 + 2] - S.z) < 1) return; }
+  if (trailN >= MAXT) return;
+  trailPos.set([S.x, 0.15, S.z], i * 3); trailN++; trailGeo.setDrawRange(0, trailN); trailGeo.attributes.position.needsUpdate = true;
+}
+
+/* ===================================================================
+   물리 (차동 구동)
+   =================================================================== */
+const warned = new Set();
+function warn(key, msg) { if (!warned.has(key)) { warned.add(key); log(msg, 'w'); } }
+function motorCmd(en, a, b) {
+  const pe = pins[en], pa = pins[a], pb = pins[b];
+  [en, a, b].forEach((p) => { if (prog && pins[p].mode !== 'OUTPUT' && (pins[p].val || pins[p].pwm)) warn('mode' + p, `⚠ ${p}번 핀에 pinMode(${p}, OUTPUT)를 하지 않았습니다 — 실제 보드에서는 모터가 제대로 돌지 않습니다`); });
+  const ok = (p) => !prog || pins[p].mode === 'OUTPUT';
+  const pwm = ok(en) ? pe.pwm : 0;
+  const A = ok(a) && pa.val, B = ok(b) && pb.val;
+  const dir = A && !B ? 1 : !A && B ? -1 : 0;
+  return { dir, pwm, A, B };
+}
+function step(dt) {
+  S.t += dt;
+  const L = motorCmd(PIN.EN1, PIN.IN1, PIN.IN2), Rm = motorCmd(PIN.EN2, PIN.IN3, PIN.IN4);
+  if ($('swapR').checked) Rm.dir = -Rm.dir;
+  const target = (m) => (m.pwm < DEAD ? 0 : m.dir * m.pwm / 255 * VMAX);
+  const k = 1 - Math.exp(-dt / TAU);
+  S.vl += (target(L) - S.vl) * k; S.vr += (target(Rm) - S.vr) * k;
+  const v = (S.vl + S.vr) / 2, w = (S.vr - S.vl) / WB;
+  S.th += w * dt;
+  const dx = Math.cos(S.th) * v * dt, dz = -Math.sin(S.th) * v * dt;
+  S.x = Math.max(-195, Math.min(195, S.x + dx)); S.z = Math.max(-195, Math.min(195, S.z + dz));
+  S.dist += Math.abs(v * dt);
+  S.spinL -= S.vl / WR * dt; S.spinR -= S.vr / WR * dt;
+  S.motL = L; S.motR = Rm;
+  wakeWaiters();
+}
+
+/* ===================================================================
+   Arduino 코드 → JavaScript (간단 변환) 실행기
+   =================================================================== */
+const STOP = { stop: true };
+let prog = null, waiters = [];
+function waitSim(ms) { return new Promise((res, rej) => { if (!prog) return rej(STOP); waiters.push({ until: S.t + Math.max(0, ms) / 1000, res, rej }); }); }
+function wakeWaiters() { if (!waiters.length) return; const keep = []; for (const w of waiters) (S.t >= w.until ? w.res() : keep.push(w)); waiters = keep; }
+const TYPES = '(?:unsigned\\s+long|unsigned\\s+int|long|int|float|double|bool|boolean|byte|char|String|uint8_t|int16_t)';
+function cppToJs(src) {
+  let c = src.replace(/^\s*#include.*$/gm, '');
+  c = c.replace(/^\s*#define\s+(\w+)\s+(.+)$/gm, 'const $1 = $2;');
+  c = c.replace(new RegExp('\\b(?:void|' + TYPES + ')\\s+(\\w+)\\s*\\(([^)]*)\\)\\s*\\{', 'g'), (m, name, params) => {
+    const ps = params.trim() && params.trim() !== 'void' ? params.split(',').map((p) => p.trim().split(/\s+/).pop()).join(', ') : '';
+    return `function ${name}(${ps}) {`;
+  });
+  c = c.replace(new RegExp('\\bconst\\s+' + TYPES + '\\s+', 'g'), 'const ');
+  c = c.replace(new RegExp('\\b(?:static\\s+)?' + TYPES + '\\s+(?=[A-Za-z_]\\w*\\s*(?:=|;|,))', 'g'), 'let ');
+  c = c.replace(/\((?:int|long|float|byte)\)\s*/g, '');
+  return c;
+}
+function asyncify(code) {
+  const names = [...code.matchAll(/\bfunction\s+([A-Za-z_$][\w$]*)\s*\(/g)].map((m) => m[1]);
+  code = code.replace(/\bfunction\s+([A-Za-z_$][\w$]*)\s*\(/g, 'async function $1(');
+  for (const n of [...new Set(names), 'delay']) code = code.replace(new RegExp('(?<!function\\s+)(?<![\\w$.])(?<!await\\s+)' + n + '\\s*\\(', 'g'), 'await ' + n + '(');
+  code = code.replace(/\b(while|for)\s*(\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))\s*\{/g, '$1 $2 { await __guard();');
+  return code;
+}
+function makeApi(ctl) {
+  let buf = '', guardN = 0; const t0 = S.t;
+  const num = (v) => Number(v) || 0;
+  return {
+    HIGH: 1, LOW: 0, OUTPUT: 'OUTPUT', INPUT: 'INPUT', INPUT_PULLUP: 'INPUT_PULLUP',
+    pinMode(p, m) { if (pins[p]) pins[p].mode = m; },
+    digitalWrite(p, v) { if (!pins[p]) return; pins[p].val = v ? 1 : 0; pins[p].pwm = v ? 255 : 0; },
+    analogWrite(p, v) {
+      if (!pins[p]) return; v = Math.max(0, Math.min(255, Math.round(num(v))));
+      if (!PWM_PINS.includes(p)) { warn('pwm' + p, `⚠ ${p}번은 PWM(~) 핀이 아니라 analogWrite가 켜기/끄기로만 동작합니다`); v = v >= 128 ? 255 : 0; }
+      pins[p].pwm = v; pins[p].val = v > 0 ? 1 : 0;
+    },
+    delay: (ms) => waitSim(num(ms)), millis: () => Math.floor((S.t - t0) * 1000),
+    abs: Math.abs, min: Math.min, max: Math.max, constrain: (x, a, b) => Math.max(a, Math.min(b, x)), map: (x, a, b, c, d) => (x - a) * (d - c) / (b - a) + c,
+    Serial: { begin() {}, print(v) { buf += String(v); }, println(v = '') { log(buf + String(v), 's'); buf = ''; } },
+    async __guard() { if (ctl.stopped) throw STOP; if (++guardN % 500 === 0) await new Promise((r) => setTimeout(r, 0)); }
+  };
+}
+const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+async function runCode() {
+  stopCode(true); resetRobot(); resetPins(); warned.clear();
+  const src = $('editor').value; try { localStorage.setItem('ard-r3d-code', src); } catch (e) {}
+  const ctl = { stopped: false }; prog = ctl;
+  $('runBtn').disabled = true; $('stopBtn').disabled = false;
+  logEl.innerHTML = ''; log('▶ 업로드 완료 · 실행 시작', 'i');
+  const A = makeApi(ctl), keys = Object.keys(A);
+  try {
+    const js = asyncify(cppToJs(src));
+    const fn = new AsyncFunction(...keys, js + '\n;return { setup: typeof setup === "function" ? setup : null, loop: typeof loop === "function" ? loop : null };');
+    const { setup, loop } = await fn(...keys.map((k) => A[k]));
+    if (setup) await setup();
+    while (loop && !ctl.stopped) { await loop(); await waitSim(5); }
+  } catch (e) {
+    if (e !== STOP) { log('✖ 오류: ' + (e && e.message || e), 'e'); log('  지원하는 문법: void 함수, int · long · float 변수, if · for · while, 삼항 연산자. 배열 · 구조체 · 클래스는 지원하지 않습니다.', 'e'); }
+  }
+  if (prog === ctl) stopCode();
+}
+function stopCode(silent) {
+  if (prog) { prog.stopped = true; if (!silent) log('■ 정지 (모든 핀 LOW)', 'w'); }
+  prog = null; for (const w of waiters) w.rej(STOP); waiters = [];
+  resetPins();
+  $('runBtn').disabled = false; $('stopBtn').disabled = true;
+}
+function resetRobot() { Object.assign(S, { x: 0, z: 0, th: 0, vl: 0, vr: 0, dist: 0 }); trailN = 0; trailGeo.setDrawRange(0, 0); }
+
+/* 직접 조종 버튼 (코드 없이) */
+function driveManual(d) {
+  if (prog) stopCode(true);
+  const set = (l, r) => {
+    const w = (en, a, b, s) => { pins[en].mode = pins[a].mode = pins[b].mode = 'OUTPUT'; pins[a].val = s > 0 ? 1 : 0; pins[b].val = s < 0 ? 1 : 0; pins[en].pwm = Math.abs(s); pins[en].val = s ? 1 : 0; };
+    w(PIN.EN1, PIN.IN1, PIN.IN2, l); w(PIN.EN2, PIN.IN3, PIN.IN4, r);
+  };
+  ({ F: () => set(200, 200), B: () => set(-200, -200), L: () => set(-170, 170), R: () => set(170, -170), S: () => set(0, 0) })[d]();
+}
+
+/* ===================================================================
+   예제
+   =================================================================== */
+const HEADER = `// L293D 핀 연결 (39차시 회로와 같음)
+const int EN1 = 5;   // 왼쪽 모터 속도 (PWM)
+const int IN1 = 7;   // 왼쪽 모터 방향
+const int IN2 = 8;
+const int EN2 = 6;   // 오른쪽 모터 속도 (PWM)
+const int IN3 = 9;   // 오른쪽 모터 방향
+const int IN4 = 10;
+
+void setup() {
+  pinMode(EN1, OUTPUT); pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT);
+  pinMode(EN2, OUTPUT); pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT);
+  Serial.begin(9600);
+}
+
+// speed: -255 ~ 255 (음수면 뒤로)
+void leftMotor(int speed) {
+  digitalWrite(IN1, speed > 0 ? HIGH : LOW);
+  digitalWrite(IN2, speed < 0 ? HIGH : LOW);
+  analogWrite(EN1, abs(speed));
+}
+void rightMotor(int speed) {
+  digitalWrite(IN3, speed > 0 ? HIGH : LOW);
+  digitalWrite(IN4, speed < 0 ? HIGH : LOW);
+  analogWrite(EN2, abs(speed));
+}
+void forward(int s)   { leftMotor(s);  rightMotor(s);  }
+void backward(int s)  { leftMotor(-s); rightMotor(-s); }
+void turnLeft(int s)  { leftMotor(-s); rightMotor(s);  }
+void turnRight(int s) { leftMotor(s);  rightMotor(-s); }
+void stopMotors()     { leftMotor(0);  rightMotor(0);  }
+`;
+const EXAMPLES = {
+  basic: ['1. 전진 · 후진 · 회전', HEADER + `
+void loop() {
+  Serial.println("전진");    forward(200);   delay(2000);
+  Serial.println("정지");    stopMotors();   delay(500);
+  Serial.println("후진");    backward(200);  delay(2000);
+  Serial.println("좌회전");  turnLeft(180);  delay(1000);
+  Serial.println("우회전");  turnRight(180); delay(1000);
+  stopMotors();
+  delay(1500);
+}`],
+  pins: ['2. 함수 없이 핀으로 직접 제어', `// 함수를 쓰지 않고 L293D 핀만으로 전진 → 제자리 좌회전
+void setup() {
+  pinMode(5, OUTPUT); pinMode(7, OUTPUT); pinMode(8, OUTPUT);
+  pinMode(6, OUTPUT); pinMode(9, OUTPUT); pinMode(10, OUTPUT);
+}
+
+void loop() {
+  // 전진: 두 모터 모두 IN1=HIGH, IN2=LOW (정회전)
+  digitalWrite(7, HIGH); digitalWrite(8, LOW);  analogWrite(5, 200);
+  digitalWrite(9, HIGH); digitalWrite(10, LOW); analogWrite(6, 200);
+  delay(2000);
+  // 제자리 좌회전: 왼쪽 역회전, 오른쪽 정회전
+  digitalWrite(7, LOW);  digitalWrite(8, HIGH);
+  digitalWrite(9, HIGH); digitalWrite(10, LOW);
+  delay(500);
+  // 정지: 속도 0
+  analogWrite(5, 0); analogWrite(6, 0);
+  delay(1000);
+}`],
+  speed: ['3. PWM으로 속도 바꾸기', HEADER + `
+void loop() {
+  for (int s = 0; s <= 255; s += 51) {
+    Serial.print("속도 "); Serial.println(s);
+    forward(s);
+    delay(1200);      // 속도가 낮으면 (약 60 미만) 모터가 돌지 못한다
+  }
+  stopMotors();
+  delay(1000);
+  backward(255);
+  delay(2500);
+  stopMotors();
+  delay(2000);
+}`],
+  square: ['4. 정사각형 그리기', HEADER + `
+int turnTime = 600;   // 90° 회전 시간(ms) — 지금은 조금 많이 돈다. 정사각형이 되도록 값을 줄여 보세요
+
+void loop() {
+  for (int i = 0; i < 4; i++) {
+    forward(200);   delay(1500);
+    turnLeft(170);  delay(turnTime);
+  }
+  stopMotors();
+  delay(3000);
+}`],
+  circle: ['5. 곡선 · 8자 주행', HEADER + `
+void loop() {
+  Serial.println("왼쪽으로 크게 돌기 (오른쪽 바퀴가 더 빠름)");
+  leftMotor(110); rightMotor(220);
+  delay(6000);
+  Serial.println("오른쪽으로 크게 돌기 (왼쪽 바퀴가 더 빠름)");
+  leftMotor(220); rightMotor(110);
+  delay(6000);
+}`]
+};
+
+/* ===================================================================
+   화면 갱신
+   =================================================================== */
+const logEl = $('log'); const logArr = [];
+function log(t, cls) { logArr.push(`<span class="${cls || ''}">${String(t).replace(/</g, '&lt;')}</span>`); if (logArr.length > 150) logArr.shift(); logEl.innerHTML = logArr.join('\n'); logEl.scrollTop = logEl.scrollHeight; }
+function renderPanel() {
+  const names = { 5: 'EN1', 7: 'IN1', 8: 'IN2', 6: 'EN2', 9: 'IN3', 10: 'IN4' };
+  $('pins').innerHTML = [5, 7, 8, 6, 9, 10].map((p) => { const s = pins[p]; const v = [5, 6].includes(p) ? s.pwm : (s.val ? 'HIGH' : 'LOW'); return `<div class="${s.val ? 'hi' : ''}"><b>D${p} ${names[p]}</b>${v}</div>`; }).join('');
+  const md = (m, v, name) => { if (!m) return ''; const d = m.dir === 1 ? '정회전 ↻' : m.dir === -1 ? '역회전 ↺' : (m.A && m.B ? '브레이크' : '정지'); return `<div><b>${name}</b> ${d}<br>PWM ${m.pwm}${m.pwm && m.pwm < DEAD ? ' (너무 약해 멈춤)' : ''} · ${v.toFixed(0)} cm/s</div>`; };
+  $('motors').innerHTML = md(S.motL, S.vl, '왼쪽 모터') + md(S.motR, S.vr, '오른쪽 모터');
+  const deg = ((S.th * 180 / Math.PI) % 360 + 360) % 360;
+  $('hud').innerHTML = `${prog ? '<span class="pill run">▶ 실행 중</span>' : ''}<span class="pill">x ${S.x.toFixed(0)} · y ${(-S.z).toFixed(0)} cm</span><span class="pill">방향 ${deg.toFixed(0)}°</span><span class="pill">속도 ${((S.vl + S.vr) / 2).toFixed(0)} cm/s</span><span class="pill">이동 ${(S.dist / 100).toFixed(2)} m</span>`;
+}
+function resize() { const w = view.clientWidth, h = view.clientHeight; renderer.setSize(w, h); camera.aspect = w / Math.max(1, h); camera.updateProjectionMatrix(); }
+window.addEventListener('resize', resize); if (window.ResizeObserver) new ResizeObserver(resize).observe(view);
+
+let follow = false, last = performance.now(), acc = 0, panelT = 0;
+function frame(now) {
+  const dt = Math.min(0.1, (now - last) / 1000); last = now; acc += dt;
+  while (acc >= 1 / 120) { step(1 / 120); acc -= 1 / 120; }
+  robot.position.set(S.x, 0, S.z); robot.rotation.y = S.th;
+  wheelL.rotation.z = S.spinL; wheelR.rotation.z = S.spinR;
+  addTrail();
+  if (follow) { const tgt = new THREE.Vector3(S.x, 4, S.z); const d = tgt.clone().sub(controls.target); controls.target.add(d); camera.position.add(d); }
+  controls.update(); renderer.render(scene, camera);
+  if (now - panelT > 100) { renderPanel(); panelT = now; }
+  requestAnimationFrame(frame);
+}
+
+/* 이벤트 */
+$('exSel').innerHTML = Object.entries(EXAMPLES).map(([k, [n]]) => `<option value="${k}">${n}</option>`).join('');
+$('exSel').onchange = () => { $('editor').value = EXAMPLES[$('exSel').value][1]; };
+$('runBtn').onclick = runCode; $('stopBtn').onclick = () => stopCode();
+$('resetBtn').onclick = () => { stopCode(true); resetRobot(); };
+$('labelBtn').onclick = () => { const on = !$('labelBtn').classList.contains('on'); $('labelBtn').classList.toggle('on', on); labels.forEach((l) => l.visible = on); };
+$('followBtn').onclick = () => { follow = !follow; $('followBtn').classList.toggle('on', follow); };
+$('topBtn').onclick = () => { camera.position.set(S.x, 220, S.z + 0.01); controls.target.set(S.x, 0, S.z); controls.update(); };
+$('resetCam').onclick = () => { follow = false; $('followBtn').classList.remove('on'); homeCam(); };
+document.querySelectorAll('.drive button').forEach((b) => b.onclick = () => driveManual(b.dataset.d));
+$('editor').addEventListener('keydown', (e) => {
+  if (e.key === 'Tab') { e.preventDefault(); const el = e.target, s = el.selectionStart; el.value = el.value.slice(0, s) + '  ' + el.value.slice(el.selectionEnd); el.selectionStart = el.selectionEnd = s + 2; }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); runCode(); }
+});
+const qex = new URLSearchParams(location.search).get('ex');
+let saved = ''; try { saved = localStorage.getItem('ard-r3d-code') || ''; } catch (e) {}
+if (qex && EXAMPLES[qex]) { $('exSel').value = qex; $('editor').value = EXAMPLES[qex][1]; } else $('editor').value = saved || EXAMPLES.basic[1];
+log('예제를 고르고 ▶ 업로드 · 실행을 누르세요. 왼쪽 아래 버튼으로 코드 없이도 움직여 볼 수 있습니다.', 'i');
+resize();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

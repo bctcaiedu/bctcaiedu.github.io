@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>가상 로봇 실습실 · AI로 배우는 아두이노와 사물인터넷</title>
+  <meta name="description" content="브라우저 안의 두 바퀴 로봇과 로봇팔. 키보드, Arduino 스타일 코드, ESP32(MQTT)로 제어합니다.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
+  <script>try{var t=localStorage.getItem('bctc-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+  <style>
+  :root {
+    --bg: #f4f6f9; --pane: #ffffff; --card: #ffffff; --card2: #f7f9fc; --line: #e1e6ee;
+    --fg: #1d2433; --muted: #6b7587;
+    --accent: #00878f; --accent-soft: #e2f4f4; --accent2: #6a3fd0; --accent2-soft: #efe9fc;
+    --ok: #1f9d55; --ok-soft: #e3f6ec; --warn: #c98a00; --warn-soft: #fff6d9; --danger: #d64541; --danger-soft: #fdeaea;
+    --floor: #fbfcfe; --grid: #e9edf3; --wall: #3a4354; --track: #1d2433;
+    --shadow: 0 1px 2px rgba(20, 30, 50, .06), 0 4px 16px rgba(20, 30, 50, .06);
+    --mono: 'JetBrains Mono', Consolas, monospace;
+    --sans: 'Pretendard Variable', Pretendard, -apple-system, 'Segoe UI', 'Malgun Gothic', sans-serif;
+    --term-bg: #0f1419; --term-card: #161d26; --term-line: #273141; --term-fg: #d7dde8; --term-muted: #7d8799;
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e1116; --pane: #151a21; --card: #1a2029; --card2: #1f2631; --line: #2a323e;
+    --fg: #e3e8f0; --muted: #8d97a8;
+    --accent: #3cc6cc; --accent-soft: #0f2e31; --accent2: #b69cff; --accent2-soft: #261d3d;
+    --ok: #4cc983; --ok-soft: #132e20; --warn: #f2c14e; --warn-soft: #33290f; --danger: #ff6b61; --danger-soft: #3a1a18;
+    --floor: #161c24; --grid: #202833; --wall: #aab4c4; --track: #e3e8f0;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  html, code, pre, textarea, input { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+  body { background: var(--bg); color: var(--fg); font: 15px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  .hidden { display: none !important; }
+  .muted { color: var(--muted); }
+  .spacer { flex: 1; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 4px; text-decoration: none; border: 1px solid var(--line); background: var(--card);
+    color: var(--fg); border-radius: 8px; padding: 5px 11px; cursor: pointer; font-weight: 600; font-size: 13.5px; white-space: nowrap;
+  }
+  .btn:hover:not(:disabled) { border-color: var(--accent); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  :root[data-theme="dark"] .btn.primary { color: #06282a; }
+  .btn.danger { color: var(--danger); border-color: var(--danger); }
+  .btn.small { padding: 3px 9px; font-size: 12.5px; border-radius: 7px; }
+  .icon-btn { border: none; background: transparent; cursor: pointer; font-size: 18px; width: 32px; height: 32px; border-radius: 8px; color: var(--muted); }
+  .icon-btn:hover { background: var(--card2); color: var(--fg); }
+
+  .app { display: grid; grid-template-rows: auto 1fr; height: 100vh; height: 100dvh; }
+  .top { display: flex; align-items: center; gap: 10px; padding: 8px 14px; background: var(--pane); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--fg); }
+  .brand-logo { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-size: 19px; background: linear-gradient(135deg, #00979d, #6a3fd0); }
+  .brand b { display: block; font-size: 15px; line-height: 1.2; }
+  .brand small { font-size: 12px; color: var(--muted); }
+  .seg { display: flex; background: var(--card2); border: 1px solid var(--line); border-radius: 9px; padding: 3px; gap: 3px; }
+  .seg button { border: none; background: transparent; border-radius: 7px; padding: 4px 10px; cursor: pointer; font-weight: 700; font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .seg button.active { background: var(--pane); color: var(--accent); box-shadow: var(--shadow); }
+  .vseg { display: flex; background: var(--card2); border: 1px solid var(--line); border-radius: 9px; padding: 3px; gap: 3px; }
+  .vseg button { border: none; background: transparent; border-radius: 7px; padding: 4px 9px; cursor: pointer; font-weight: 800; font-size: 13px; color: var(--muted); }
+  .vseg button.active { background: var(--pane); color: var(--accent2); box-shadow: var(--shadow); }
+  .view3d { position: absolute; inset: 0; touch-action: none; }
+  .view3d canvas { width: 100% !important; height: 100% !important; aspect-ratio: auto; }
+  .v3msg { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-weight: 700; padding: 20px; text-align: center; }
+  .cam-tools { position: absolute; right: 10px; bottom: 10px; display: flex; gap: 5px; }
+  .cam-tools button { border: 1px solid var(--line); background: var(--card); color: var(--fg); border-radius: 8px; padding: 4px 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; box-shadow: var(--shadow); }
+  .cam-tools button.on { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+  select.sel { border: 1px solid var(--line); background: var(--card2); border-radius: 8px; padding: 5px 8px; font-weight: 600; font-size: 13.5px; }
+
+  .main { display: grid; grid-template-columns: minmax(0, 1fr) 400px; min-height: 0; }
+  .stage { overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .canvas-wrap { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); overflow: hidden; }
+  canvas { display: block; width: 100%; height: auto; aspect-ratio: 900 / 560; touch-action: none; }
+  .banner { position: absolute; left: 12px; top: 10px; right: 12px; display: flex; gap: 8px; flex-wrap: wrap; pointer-events: none; }
+  .pill { font-size: 12.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow); }
+  .pill.ok { color: var(--ok); border-color: var(--ok); background: var(--ok-soft); }
+  .pill.warn { color: var(--danger); border-color: var(--danger); background: var(--danger-soft); }
+  .pill.run { color: var(--accent2); border-color: var(--accent2); background: var(--accent2-soft); }
+  .hud { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 8px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 7px 10px; }
+  .stat .k { font-size: 11.5px; color: var(--muted); font-weight: 600; }
+  .stat .v { font: 700 16px var(--mono); }
+  .stat .v small { font-size: 11px; color: var(--muted); font-weight: 500; }
+  .dots { display: flex; gap: 5px; margin-top: 3px; }
+  .dots i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line); background: var(--card2); }
+  .dots i.on { background: var(--fg); border-color: var(--fg); }
+
+  .side { background: var(--term-bg); color: var(--term-fg); display: flex; flex-direction: column; min-height: 0; border-left: 1px solid var(--line); }
+  .side-head { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--term-line); }
+  .side-head .t { font-weight: 700; font-size: 14px; }
+  .side-body { flex: 1; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+  .side .btn { background: var(--term-card); border-color: var(--term-line); color: var(--term-fg); }
+  .side .btn:hover:not(:disabled) { border-color: #c9a7ff; }
+  .side .btn.primary { background: #00979d; border-color: #00979d; color: #fff; }
+  .side .btn.danger { color: #ff7b72; border-color: #ff7b72; }
+  .side label.f { display: block; font: 600 11.5px var(--mono); color: #79c0ff; margin-bottom: 4px; }
+  .side input[type=text], .side select, .side textarea {
+    width: 100%; background: var(--term-card); border: 1px solid var(--term-line); color: var(--term-fg); border-radius: 7px; padding: 6px 9px; font-size: 13.5px; outline: none;
+  }
+  .side input:focus, .side textarea:focus, .side select:focus { border-color: #c9a7ff; }
+  .side p { margin: 0; font-size: 13px; color: var(--term-muted); }
+  .side p b { color: var(--term-fg); }
+  .side code { color: #ffa657; font-size: 12.5px; }
+  .editor { min-height: 260px; flex: 1; resize: vertical; font: 13px/1.55 var(--mono) !important; tab-size: 2; white-space: pre; }
+  .row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .log { background: #0a0e13; border: 1px solid var(--term-line); border-radius: 8px; padding: 8px 10px; font: 12px/1.5 var(--mono); height: 150px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; flex: none; }
+  .log .e { color: #ff7b72; } .log .s { color: #79c0ff; } .log .i { color: #7ee787; } .log .m { color: #c9a7ff; }
+  .pad { display: grid; grid-template-columns: repeat(3, 64px); grid-template-rows: repeat(3, 52px); gap: 6px; justify-content: center; margin: 4px 0; }
+  .pad button { border: 1px solid var(--term-line); background: var(--term-card); color: var(--term-fg); border-radius: 10px; font-size: 20px; cursor: pointer; touch-action: none; user-select: none; }
+  .pad button:active, .pad button.on { background: #00979d; border-color: #00979d; }
+  .slider-row { display: grid; grid-template-columns: 74px 1fr 46px; gap: 8px; align-items: center; font-size: 13px; }
+  .slider-row input[type=range] { width: 100%; accent-color: #00979d; }
+  .slider-row span.v { font-family: var(--mono); text-align: right; }
+  .api { font: 12px/1.6 var(--mono); background: var(--term-card); border: 1px solid var(--term-line); border-radius: 8px; padding: 8px 10px; color: var(--term-fg); white-space: pre-wrap; }
+  .api b { color: #ffa657; font-weight: 600; }
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #7d8799; flex: none; }
+  .status-dot.on { background: #28c840; box-shadow: 0 0 0 3px rgba(40, 200, 64, .2); }
+  .status-dot.bad { background: #ff5f57; }
+  details summary { cursor: pointer; font-size: 13px; font-weight: 700; color: #c9a7ff; }
+
+  @media (max-width: 980px) {
+    .app { height: auto; min-height: 100vh; }
+    .main { grid-template-columns: minmax(0, 1fr); }
+    .side { border-left: none; border-top: 1px solid var(--line); }
+    .editor { min-height: 300px; }
+    .top .brand small { display: none; }
+  }
+  @media (max-width: 520px) {
+    .top { padding: 8px 10px; gap: 8px; }
+    .stage { padding: 10px; }
+    .seg button { padding: 4px 7px; font-size: 12.5px; }
+  }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <a class="brand" href="../index.html#mr1" title="강의실로 돌아가기">
+      <span class="brand-logo">🤖</span>
+      <span><b>가상 로봇 실습실</b><small>← AI로 배우는 아두이노와 사물인터넷</small></span>
+    </a>
+    <span class="spacer"></span>
+    <select id="worldSel" class="sel" aria-label="맵 선택">
+      <option value="free">🟦 자유 주행</option>
+      <option value="obstacle">🧱 장애물 방</option>
+      <option value="delivery">📦 배달 미로</option>
+      <option value="line">〰️ 라인 트랙</option>
+      <option value="arm">🦾 로봇팔</option>
+    </select>
+    <div class="seg" role="group" aria-label="제어 방식">
+      <button data-mode="key">⌨ 조종</button>
+      <button data-mode="code">📝 코드</button>
+      <button data-mode="mqtt">📡 ESP32</button>
+    </div>
+    <div class="vseg" role="group" aria-label="보기 방식"><button data-view="2d" class="active">2D</button><button data-view="3d">3D</button></div>
+    <button id="resetBtn" class="btn small" title="로봇과 맵을 처음 상태로">↺ 리셋</button>
+    <button id="themeBtn" class="icon-btn" title="라이트/다크 전환" aria-label="테마 전환">◐</button>
+  </header>
+
+  <div class="main">
+    <section class="stage">
+      <div class="canvas-wrap">
+        <canvas id="cv" width="900" height="560" aria-label="가상 로봇 시뮬레이션 화면"></canvas>
+        <div class="view3d hidden" id="view3d"></div>
+        <div class="banner" id="banner"></div>
+        <div class="cam-tools hidden" id="camTools"><button data-cam="orbit" class="on" title="마우스로 끌어 돌리기 · 휠로 확대">🧭 자유 시점</button><button data-cam="follow" title="로봇 뒤에서 따라가기">🎥 따라가기</button><button data-cam="top" title="위에서 내려다보기">⬇ 위에서</button></div>
+      </div>
+      <div class="hud" id="hud"></div>
+    </section>
+
+    <aside class="side">
+      <div class="side-head"><span class="t" id="sideTitle"></span><span class="spacer"></span><span id="sideExtra"></span></div>
+      <div class="side-body">
+        <!-- 조종 -->
+        <div id="panelKey" class="hidden" style="display:flex;flex-direction:column;gap:10px">
+          <div id="keyRobot">
+            <p><b>방향키</b> 또는 <b>W A S D</b>로 조종합니다. 화면 버튼은 누르고 있는 동안 움직입니다.</p>
+            <div class="pad" id="pad">
+              <span></span><button data-k="up" aria-label="전진">▲</button><span></span>
+              <button data-k="left" aria-label="왼쪽">◀</button><button data-k="stop" aria-label="정지">■</button><button data-k="right" aria-label="오른쪽">▶</button>
+              <span></span><button data-k="down" aria-label="후진">▼</button><span></span>
+            </div>
+            <div class="slider-row"><span>속도</span><input type="range" id="keySpeed" min="60" max="255" value="180"><span class="v" id="keySpeedV">180</span></div>
+            <p style="margin-top:8px">조종하면서 아래 센서 값이 어떻게 바뀌는지 관찰하세요. 사람이 내린 판단을 말로 적어 두면, 그대로 자율 주행 규칙이 됩니다.</p>
+          </div>
+          <div id="keyArm" class="hidden" style="display:flex;flex-direction:column;gap:10px">
+            <p>슬라이더로 관절 각도를 바꿔 블록을 집어 오른쪽에서 왼쪽 목표 구역으로 옮겨 보세요. 찾은 각도를 기록해 두면 코드로 옮길 수 있습니다. (키보드: Q/A 어깨, W/S 팔꿈치, 스페이스 그리퍼)</p>
+            <div class="slider-row"><span>어깨</span><input type="range" id="sS" min="0" max="180" value="90"><span class="v" id="sSv">90°</span></div>
+            <div class="slider-row"><span>팔꿈치</span><input type="range" id="sE" min="0" max="180" value="90"><span class="v" id="sEv">90°</span></div>
+            <div class="row"><button class="btn" id="gripBtn">✊ 잡기</button><button class="btn" id="armHome">⌂ 기본 자세</button></div>
+          </div>
+        </div>
+
+        <!-- 코드 -->
+        <div id="panelCode" class="hidden" style="display:flex;flex-direction:column;gap:10px;flex:1;min-height:0">
+          <div class="row">
+            <select id="exSel" style="flex:1" aria-label="예제 불러오기"></select>
+            <button id="runBtn" class="btn primary">▶ 실행</button>
+            <button id="stopBtn" class="btn danger" disabled>■ 정지</button>
+          </div>
+          <textarea id="editor" class="editor" spellcheck="false" aria-label="로봇 코드"></textarea>
+          <details>
+            <summary>📘 사용할 수 있는 함수 (API 명세)</summary>
+            <div class="api" style="margin-top:6px"><b>setup()</b>  처음 한 번 실행
+<b>loop()</b>   계속 반복 실행 (약 50번/초)
+
+<b>motors(왼쪽, 오른쪽)</b>  바퀴 속도 −255 ~ 255
+<b>stop()</b>               두 바퀴 정지
+<b>distance()</b>           앞쪽 거리 (cm, 최대 250)
+<b>distanceLeft()</b>       왼쪽 60° 방향 거리
+<b>distanceRight()</b>      오른쪽 60° 방향 거리
+<b>lineLeft()</b> · <b>lineCenter()</b> · <b>lineRight()</b>
+                     검은 선 위면 1, 아니면 0
+<b>bumped()</b>             범퍼가 벽에 닿아 있으면 true
+
+<b>arm(어깨, 팔꿈치)</b>    로봇팔 목표 각도 0 ~ 180°
+<b>grip(true/false)</b>     그리퍼 닫기 / 열기
+<b>armDone()</b>            목표 각도에 도착했으면 true
+
+<b>delay(ms)</b> · <b>millis()</b> · <b>Serial.println(값)</b>
+<b>map()</b> · <b>constrain()</b> · <b>random(최소, 최대)</b></div>
+            <p style="margin-top:6px">JavaScript 문법입니다. 변수는 <code>let</code> / <code>const</code>로 만듭니다. 바퀴는 |속도| &lt; 40에서는 돌지 않습니다(실제 모터처럼).</p>
+          </details>
+          <div class="log" id="log" aria-live="polite"></div>
+        </div>
+
+        <!-- MQTT -->
+        <div id="panelMqtt" class="hidden" style="display:flex;flex-direction:column;gap:10px">
+          <p>Wokwi의 <b>ESP32</b>가 인터넷(MQTT)으로 이 로봇을 조종합니다. 로봇은 센서 값을 보내고, ESP32는 명령을 보냅니다.</p>
+          <div>
+            <label class="f" for="prefix">토픽 접두어 (학생마다 다르게)</label>
+            <input type="text" id="prefix" placeholder="bctc/kim">
+          </div>
+          <div class="row">
+            <span class="status-dot" id="mqDot"></span><span id="mqText" style="font-size:13px;flex:1">연결 안 됨</span>
+            <button class="btn primary" id="mqConnect">연결</button>
+          </div>
+          <div class="api" id="topicInfo"></div>
+          <p>브로커: <code>broker.hivemq.com</code> (ESP32는 1883, 브라우저는 wss 8884). 공개 브로커이므로 개인정보는 보내지 마세요. 명령이 <b>1초</b> 동안 없으면 로봇은 스스로 멈춥니다(워치독).</p>
+          <div class="log" id="mqLog"></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+/* ===================================================================
+   기본 설정 (단위: cm, 1px = 1cm)
+   =================================================================== */
+const W = 900, H = 560;
+const R = 15;          // 로봇 반지름
+const WB = 26;         // 바퀴 간격
+const VMAX = 60;       // 255일 때 바퀴 속도 (cm/s)
+const TAU = 0.15;      // 모터 반응 시간 상수 (s)
+const DEAD = 40;       // 데드존
+const LINE_HALF = 4.5; // 라인 반폭
+const SENSE_MAX = 250;
+const $ = (id) => document.getElementById(id);
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('ard-robot-' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('ard-robot-' + k, JSON.stringify(v)); } catch (e) {} }
+};
+
+function box(x, y, w, h) { return [[x, y, x + w, y], [x + w, y, x + w, y + h], [x + w, y + h, x, y + h], [x, y + h, x, y]]; }
+const BORDER = box(0, 0, W, H);
+
+const TRACK = [];
+const NT = 360;
+for (let i = 0; i < NT; i++) {
+  const t = i / NT * Math.PI * 2;
+  TRACK.push([450 + 330 * Math.cos(t), 280 + 165 * Math.sin(t) + 42 * Math.sin(3 * t)]);
+}
+
+const WORLDS = {
+  free:     { name: '자유 주행', start: { x: 250, y: 430, a: 0 },
+              walls: [...BORDER, ...box(600, 100, 90, 90), ...box(700, 340, 90, 120), ...box(80, 90, 70, 70)] },
+  obstacle: { name: '장애물 방', start: { x: 460, y: 270, a: 0 },
+              walls: [...BORDER, ...box(150, 120, 70, 70), ...box(380, 60, 60, 140), ...box(600, 150, 90, 60), ...box(250, 330, 120, 50),
+                      ...box(520, 360, 60, 120), ...box(740, 320, 80, 80), ...box(80, 420, 60, 60)] },
+  delivery: { name: '배달 미로', start: { x: 90, y: 60, a: Math.PI / 2 }, goal: { x: 830, y: 490, r: 38 },
+              walls: [...BORDER, [180, 0, 180, 400], [380, 160, 380, 560], [580, 0, 580, 400], [760, 160, 760, 560],
+                      [180, 260, 240, 260], [380, 330, 320, 330], [580, 240, 640, 240]] },
+  line:     { name: '라인 트랙', line: true, start: (() => { const p = TRACK[0], q = TRACK[1]; return { x: p[0], y: p[1], a: Math.atan2(q[1] - p[1], q[0] - p[0]) }; })(),
+              walls: [...BORDER] },
+  arm:      { name: '로봇팔', arm: true }
+};
+
+/* 로봇팔 (단위: 1px = 1mm, 표시 cm) */
+const ARM = { px: 450, py: 430, L1: 170, L2: 140, table: 470, blockX: 700, zone: [140, 230], speed: 90 };
+
+/* ===================================================================
+   상태
+   =================================================================== */
+const S = {
+  world: 'free', mode: 'key',
+  t: 0,                // 시뮬레이션 시간 (s)
+  robot: null, arm: null,
+  bumps: 0, inWall: false, trail: [],
+  timer: { start: null, end: null },
+  lap: { count: 0, last: null, best: null, idx: 0, half: false, start: null },
+  msg: null, flash: 0
+};
+
+function resetWorld() {
+  const w = WORLDS[S.world];
+  S.bumps = 0; S.inWall = false; S.trail = []; S.msg = null; S.t0 = S.t;
+  S.timer = { start: null, end: null };
+  S.lap = { count: 0, last: null, best: null, idx: 0, half: false, start: null };
+  if (w.arm) {
+    S.arm = { s: 90, e: 90, ts: 90, te: 90, grip: false, held: false,
+              block: { x: ARM.blockX, y: ARM.table - 17, vy: 0 }, done: false, hit: false };
+    S.robot = null;
+  } else {
+    S.robot = { x: w.start.x, y: w.start.y, a: w.start.a, cl: 0, cr: 0, vl: 0, vr: 0, dist: 0 };
+    S.arm = null;
+  }
+}
+
+/* ===================================================================
+   기하
+   =================================================================== */
+function segDist(px, py, x1, y1, x2, y2) {
+  const dx = x2 - x1, dy = y2 - y1;
+  const l2 = dx * dx + dy * dy;
+  let t = l2 ? ((px - x1) * dx + (py - y1) * dy) / l2 : 0;
+  t = Math.max(0, Math.min(1, t));
+  const qx = x1 + t * dx - px, qy = y1 + t * dy - py;
+  return Math.sqrt(qx * qx + qy * qy);
+}
+function rayCast(x, y, ang) {
+  const dx = Math.cos(ang), dy = Math.sin(ang);
+  let best = Infinity;
+  for (const [x1, y1, x2, y2] of WORLDS[S.world].walls) {
+    const sx = x2 - x1, sy = y2 - y1;
+    const den = dx * sy - dy * sx;
+    if (Math.abs(den) < 1e-9) continue;
+    const t = ((x1 - x) * sy - (y1 - y) * sx) / den;
+    const u = ((x1 - x) * dy - (y1 - y) * dx) / den;
+    if (t > 0 && u >= 0 && u <= 1 && t < best) best = t;
+  }
+  return best;
+}
+const RAYS = { front: 0, left: -Math.PI / 3, right: Math.PI / 3 };
+function sense(dir) {
+  const r = S.robot; if (!r) return 0;
+  const t = rayCast(r.x, r.y, r.a + RAYS[dir]) - R;
+  return Math.round(Math.max(2, Math.min(SENSE_MAX, t + (Math.random() - .5))) * 10) / 10;
+}
+function linePos(k) {   // k: -1 왼쪽, 0 가운데, 1 오른쪽
+  const r = S.robot;
+  const fx = Math.cos(r.a), fy = Math.sin(r.a);
+  const lx = Math.sin(r.a), ly = -Math.cos(r.a);
+  return [r.x + fx * 16 - lx * 7 * k, r.y + fy * 16 - ly * 7 * k];
+}
+function lineAt(k) {
+  if (!S.robot || !WORLDS[S.world].line) return 0;
+  const [x, y] = linePos(k);
+  for (let i = 0; i < NT; i++) {
+    const a = TRACK[i], b = TRACK[(i + 1) % NT];
+    if (segDist(x, y, a[0], a[1], b[0], b[1]) < LINE_HALF) return 1;
+  }
+  return 0;
+}
+function collides(x, y) {
+  for (const s of WORLDS[S.world].walls) if (segDist(x, y, s[0], s[1], s[2], s[3]) < R) return true;
+  return false;
+}
+
+/* 로봇팔 순기구학 (화면 좌표) */
+function armPts(s, e) {
+  const a1 = s * Math.PI / 180, a2 = a1 + (e - 90) * Math.PI / 180;
+  const p1 = [ARM.px + ARM.L1 * Math.cos(a1), ARM.py - ARM.L1 * Math.sin(a1)];
+  const p2 = [p1[0] + ARM.L2 * Math.cos(a2), p1[1] - ARM.L2 * Math.sin(a2)];
+  return [p1, p2, a2];
+}
+
+/* ===================================================================
+   물리
+   =================================================================== */
+function motorTarget(c) { return Math.abs(c) < DEAD ? 0 : c / 255 * VMAX; }
+function step(dt) {
+  S.t += dt;
+  if (S.robot) {
+    const r = S.robot;
+    const k = 1 - Math.exp(-dt / TAU);
+    r.vl += (motorTarget(r.cl) - r.vl) * k;
+    r.vr += (motorTarget(r.cr) - r.vr) * k;
+    const v = (r.vl + r.vr) / 2, w = (r.vl - r.vr) / WB;
+    if ((r.cl || r.cr) && S.timer.start == null) S.timer.start = S.t;
+    const na = r.a + w * dt;
+    const nx = r.x + Math.cos(na) * v * dt, ny = r.y + Math.sin(na) * v * dt;
+    r.a = na;
+    if (collides(nx, ny)) {
+      if (!S.inWall) { S.bumps++; S.flash = 0.5; }
+      S.inWall = true; r.vl *= 0.3; r.vr *= 0.3;
+    } else {
+      S.inWall = false;
+      r.dist += Math.hypot(nx - r.x, ny - r.y);
+      r.x = nx; r.y = ny;
+    }
+    const last = S.trail[S.trail.length - 1];
+    if (!last || Math.hypot(last[0] - r.x, last[1] - r.y) > 3) { S.trail.push([r.x, r.y]); if (S.trail.length > 4000) S.trail.shift(); }
+    const w0 = WORLDS[S.world];
+    if (w0.goal && S.timer.end == null && Math.hypot(r.x - w0.goal.x, r.y - w0.goal.y) < w0.goal.r) {
+      S.timer.end = S.t;
+      S.msg = `🎉 배달 완료! ${(S.timer.end - (S.timer.start ?? S.timer.end)).toFixed(1)}초 · 충돌 ${S.bumps}회`;
+      log(S.msg, 'i');
+    }
+    if (w0.line) lapTrack();
+  }
+  if (S.arm) armStep(dt);
+  if (S.flash > 0) S.flash -= dt;
+  wakeWaiters();
+}
+function lapTrack() {
+  const r = S.robot;
+  let bi = 0, bd = Infinity;
+  for (let i = 0; i < NT; i += 2) { const d = (TRACK[i][0] - r.x) ** 2 + (TRACK[i][1] - r.y) ** 2; if (d < bd) { bd = d; bi = i; } }
+  const L = S.lap;
+  if (L.start == null && (r.cl || r.cr)) L.start = S.t;
+  if (bi > NT * 0.4 && bi < NT * 0.6) L.half = true;
+  if (L.half && L.idx > NT * 0.85 && bi < NT * 0.15) {
+    L.count++; L.half = false;
+    const lt = S.t - L.start; L.start = S.t; L.last = lt;
+    L.best = L.best == null ? lt : Math.min(L.best, lt);
+    S.msg = `🏁 ${L.count}바퀴 완주 · 랩 타임 ${lt.toFixed(1)}초`;
+    log(S.msg, 'i');
+  }
+  L.idx = bi;
+}
+function armStep(dt) {
+  const A = S.arm;
+  const mv = ARM.speed * dt;
+  const ps = A.s, pe = A.e;
+  A.s += Math.max(-mv, Math.min(mv, A.ts - A.s));
+  A.e += Math.max(-mv, Math.min(mv, A.te - A.e));
+  const [p1, p2] = armPts(A.s, A.e);
+  if (p1[1] > ARM.table - 2 || p2[1] > ARM.table - 4) {   // 테이블 충돌: 움직임 막기
+    A.s = ps; A.e = pe; A.ts = ps; A.te = pe;
+    if (!A.hit) { A.hit = true; S.flash = 0.5; log('⚠ 로봇팔이 테이블에 닿아 멈췄습니다.', 'e'); }
+  } else A.hit = false;
+  const B = A.block;
+  if (A.held) { B.x = p2[0]; B.y = p2[1] + 4; B.vy = 0; }
+  else if (B.y < ARM.table - 17) {
+    B.vy += 980 * dt; B.y = Math.min(ARM.table - 17, B.y + B.vy * dt);
+    if (B.y >= ARM.table - 17) {
+      B.vy = 0;
+      if (!A.done && B.x > ARM.zone[0] && B.x < ARM.zone[1]) { A.done = true; S.msg = `🎉 옮기기 성공! ${(S.t - S.t0).toFixed(1)}초`; log(S.msg, 'i'); }
+    }
+  }
+}
+function setGrip(on) {
+  const A = S.arm; if (!A) return;
+  A.grip = !!on;
+  if (on) {
+    const [, p2] = armPts(A.s, A.e);
+    if (Math.hypot(p2[0] - A.block.x, p2[1] - A.block.y) < 24) { A.held = true; log('✊ 블록을 잡았습니다.', 'i'); }
+  } else if (A.held) { A.held = false; }
+}
+
+/* ===================================================================
+   그리기
+   =================================================================== */
+const cv = $('cv'), ctx = cv.getContext('2d');
+let C = {};
+function readColors() {
+  const cs = getComputedStyle(document.documentElement);
+  ['floor', 'grid', 'wall', 'track', 'accent', 'accent2', 'fg', 'muted', 'ok', 'danger', 'warn', 'card', 'line'].forEach((k) => C[k] = cs.getPropertyValue('--' + k).trim());
+}
+function fitCanvas() {
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const w = cv.clientWidth || 900;
+  cv.width = Math.round(w * dpr); cv.height = Math.round(w * 560 / 900 * dpr);
+}
+function draw() {
+  const sc = cv.width / W;
+  ctx.setTransform(sc, 0, 0, sc, 0, 0);
+  ctx.fillStyle = C.floor; ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = C.grid; ctx.lineWidth = 1;
+  ctx.beginPath();
+  for (let x = 50; x < W; x += 50) { ctx.moveTo(x, 0); ctx.lineTo(x, H); }
+  for (let y = 50; y < H; y += 50) { ctx.moveTo(0, y); ctx.lineTo(W, y); }
+  ctx.stroke();
+  const w = WORLDS[S.world];
+  if (w.arm) { drawArm(); return; }
+
+  if (w.line) {
+    ctx.strokeStyle = C.track; ctx.lineWidth = LINE_HALF * 2; ctx.lineJoin = 'round';
+    ctx.beginPath(); TRACK.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.closePath(); ctx.stroke();
+    const p = TRACK[0];
+    ctx.strokeStyle = C.ok; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(p[0] - 22, p[1]); ctx.lineTo(p[0] + 22, p[1]); ctx.stroke();
+    ctx.fillStyle = C.ok; ctx.font = '700 13px Pretendard, sans-serif'; ctx.fillText('START', p[0] + 26, p[1] + 5);
+  }
+  if (w.goal) {
+    ctx.fillStyle = C.warn; ctx.globalAlpha = .18;
+    ctx.beginPath(); ctx.arc(w.goal.x, w.goal.y, w.goal.r, 0, 7); ctx.fill(); ctx.globalAlpha = 1;
+    ctx.strokeStyle = C.warn; ctx.setLineDash([6, 5]); ctx.lineWidth = 2; ctx.stroke(); ctx.setLineDash([]);
+    ctx.font = '28px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('📦', w.goal.x, w.goal.y + 10); ctx.textAlign = 'left';
+  }
+  // 벽
+  ctx.strokeStyle = C.wall; ctx.lineWidth = 6; ctx.lineCap = 'round';
+  ctx.beginPath(); for (const s of w.walls) { ctx.moveTo(s[0], s[1]); ctx.lineTo(s[2], s[3]); } ctx.stroke();
+  // 흔적
+  if (S.trail.length > 1) {
+    ctx.strokeStyle = C.accent2; ctx.globalAlpha = .45; ctx.lineWidth = 2;
+    ctx.beginPath(); S.trail.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.stroke(); ctx.globalAlpha = 1;
+  }
+  drawRobot();
+}
+function drawRobot() {
+  const r = S.robot;
+  // 거리 센서 광선
+  for (const k of ['front', 'left', 'right']) {
+    const d = Math.min(SENSE_MAX + R, rayCast(r.x, r.y, r.a + RAYS[k]));
+    const a = r.a + RAYS[k];
+    ctx.strokeStyle = C.accent2; ctx.globalAlpha = .35; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(r.x, r.y); ctx.lineTo(r.x + Math.cos(a) * d, r.y + Math.sin(a) * d); ctx.stroke();
+    ctx.setLineDash([]); ctx.globalAlpha = 1;
+    if (d <= SENSE_MAX + R) { ctx.fillStyle = C.accent2; ctx.beginPath(); ctx.arc(r.x + Math.cos(a) * d, r.y + Math.sin(a) * d, 3, 0, 7); ctx.fill(); }
+  }
+  ctx.save();
+  ctx.translate(r.x, r.y); ctx.rotate(r.a);
+  ctx.fillStyle = '#2a2f3a';
+  ctx.fillRect(-8, -R - 2, 16, 5); ctx.fillRect(-8, R - 3, 16, 5);   // 바퀴
+  ctx.fillStyle = S.flash > 0 ? C.danger : C.accent;
+  ctx.beginPath(); ctx.arc(0, 0, R - 1, 0, 7); ctx.fill();
+  ctx.fillStyle = '#ffffff'; ctx.globalAlpha = .9;
+  ctx.beginPath(); ctx.moveTo(R - 3, 0); ctx.lineTo(2, -6); ctx.lineTo(2, 6); ctx.closePath(); ctx.fill(); ctx.globalAlpha = 1;
+  ctx.fillStyle = '#c9ced8'; ctx.fillRect(R - 4, -6, 4, 12);          // 초음파 센서
+  ctx.restore();
+  if (WORLDS[S.world].line) {
+    [-1, 0, 1].forEach((k) => {
+      const [x, y] = linePos(k); const on = lineAt(k);
+      ctx.fillStyle = on ? C.danger : '#9aa3b2'; ctx.beginPath(); ctx.arc(x, y, 2.6, 0, 7); ctx.fill();
+    });
+  }
+}
+function drawArm() {
+  const A = S.arm;
+  ctx.font = '600 13px Pretendard, sans-serif';
+  // 테이블
+  ctx.fillStyle = C.line; ctx.fillRect(30, ARM.table, W - 60, 14);
+  ctx.fillStyle = C.ok; ctx.globalAlpha = .18; ctx.fillRect(ARM.zone[0], ARM.table - 60, ARM.zone[1] - ARM.zone[0], 60); ctx.globalAlpha = 1;
+  ctx.strokeStyle = C.ok; ctx.setLineDash([6, 5]); ctx.lineWidth = 2; ctx.strokeRect(ARM.zone[0], ARM.table - 60, ARM.zone[1] - ARM.zone[0], 60); ctx.setLineDash([]);
+  ctx.fillStyle = C.ok; ctx.fillText('목표 구역', ARM.zone[0] + 14, ARM.table - 66);
+  // 작업 범위
+  ctx.strokeStyle = C.grid; ctx.lineWidth = 2; ctx.setLineDash([3, 6]);
+  ctx.beginPath(); ctx.arc(ARM.px, ARM.py, ARM.L1 + ARM.L2, Math.PI, 2 * Math.PI); ctx.stroke(); ctx.setLineDash([]);
+  // 받침
+  ctx.fillStyle = C.wall; ctx.fillRect(ARM.px - 30, ARM.py, 60, ARM.table - ARM.py);
+  const [p1, p2, a2] = armPts(A.s, A.e);
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = A.hit || S.flash > 0 ? C.danger : C.accent; ctx.lineWidth = 16;
+  ctx.beginPath(); ctx.moveTo(ARM.px, ARM.py); ctx.lineTo(p1[0], p1[1]); ctx.stroke();
+  ctx.strokeStyle = C.accent2; ctx.lineWidth = 12;
+  ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.stroke();
+  // 그리퍼
+  const gx = Math.cos(a2), gy = -Math.sin(a2), nx = -gy, ny = gx;
+  const open = A.grip ? 9 : 18;
+  ctx.strokeStyle = C.fg; ctx.lineWidth = 4;
+  [-1, 1].forEach((s) => { ctx.beginPath(); ctx.moveTo(p2[0] + nx * open * s, p2[1] + ny * open * s); ctx.lineTo(p2[0] + nx * open * s + gx * 16, p2[1] + ny * open * s + gy * 16); ctx.stroke(); });
+  [[ARM.px, ARM.py], p1, p2].forEach((p) => { ctx.fillStyle = C.card; ctx.strokeStyle = C.fg; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(p[0], p[1], 7, 0, 7); ctx.fill(); ctx.stroke(); });
+  // 블록
+  const B = A.block;
+  ctx.fillStyle = C.warn; ctx.fillRect(B.x - 17, B.y - 17, 34, 34);
+  ctx.strokeStyle = C.fg; ctx.lineWidth = 1.5; ctx.strokeRect(B.x - 17, B.y - 17, 34, 34);
+  // 각도 표시
+  ctx.fillStyle = C.muted; ctx.font = '600 13px Pretendard, sans-serif';
+  ctx.fillText(`θ1 = ${A.s.toFixed(0)}°`, ARM.px + 36, ARM.py + 22);
+  ctx.fillText(`θ2 = 팔꿈치 − 90 = ${(A.e - 90).toFixed(0)}°`, p1[0] + 14, p1[1] - 12);
+}
+
+/* ===================================================================
+   HUD
+   =================================================================== */
+function stat(k, v) { return `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`; }
+function renderHud() {
+  const banner = [];
+  if (S.mode === 'code' && prog) banner.push('<span class="pill run">▶ 코드 실행 중</span>');
+  if (S.mode === 'mqtt') banner.push(mq.client && mq.connected ? (mq.watchdog ? '<span class="pill warn">⚠ 명령 없음 · 안전 정지</span>' : '<span class="pill ok">📡 ESP32 제어 중</span>') : '<span class="pill">📡 연결 안 됨</span>');
+  if (S.flash > 0) banner.push('<span class="pill warn">💥 충돌!</span>');
+  if (S.msg) banner.push(`<span class="pill ok">${S.msg}</span>`);
+  $('banner').innerHTML = banner.join('');
+
+  if (S.arm) {
+    const A = S.arm; const [, p2] = armPts(A.s, A.e);
+    const x = (p2[0] - ARM.px) / 10, y = (ARM.py - p2[1]) / 10;
+    $('hud').innerHTML = stat('어깨 (θ1)', A.s.toFixed(0) + '°') + stat('팔꿈치 서보', A.e.toFixed(0) + '°')
+      + stat('θ2 = 팔꿈치 − 90', (A.e - 90).toFixed(0) + '°') + stat('손끝 x, y', `${x.toFixed(1)}, ${y.toFixed(1)}<small> cm</small>`)
+      + stat('팔 길이', 'L1 17 · L2 14<small> cm</small>') + stat('그리퍼', A.held ? '✊ 잡음' : A.grip ? '닫힘' : '열림')
+      + stat('도착 (armDone)', Math.abs(A.s - A.ts) < .5 && Math.abs(A.e - A.te) < .5 ? '✓' : '이동 중');
+    return;
+  }
+  const r = S.robot; const w = WORLDS[S.world];
+  const el = S.timer.start == null ? 0 : ((S.timer.end ?? S.t) - S.timer.start);
+  let h = stat('앞 거리', sense('front').toFixed(0) + '<small> cm</small>')
+    + stat('왼쪽 60°', sense('left').toFixed(0) + '<small> cm</small>')
+    + stat('오른쪽 60°', sense('right').toFixed(0) + '<small> cm</small>');
+  if (w.line) h += `<div class="stat"><div class="k">라인 L · C · R</div><div class="dots">${[-1, 0, 1].map((k) => `<i class="${lineAt(k) ? 'on' : ''}"></i>`).join('')}</div></div>`;
+  h += stat('바퀴 명령 L / R', `${Math.round(r.cl)} / ${Math.round(r.cr)}`)
+    + stat('속도', ((r.vl + r.vr) / 2).toFixed(0) + '<small> cm/s</small>')
+    + stat('주행 시간', el.toFixed(1) + '<small> s</small>')
+    + stat('충돌', S.bumps + '<small> 회</small>');
+  if (w.line) h += stat('랩', `${S.lap.count}<small> 바퀴 · 최고 ${S.lap.best ? S.lap.best.toFixed(1) + 's' : '-'}</small>`);
+  else h += stat('주행 거리', (r.dist / 100).toFixed(1) + '<small> m</small>');
+  $('hud').innerHTML = h;
+}
+
+/* ===================================================================
+   로그
+   =================================================================== */
+const logLines = { log: [], mqLog: [] };
+function log(text, cls = '', target = 'log') {
+  const arr = logLines[target];
+  arr.push(`<span class="${cls}">${String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;')}</span>`);
+  if (arr.length > 200) arr.shift();
+  const el = $(target);
+  el.innerHTML = arr.join('\n'); el.scrollTop = el.scrollHeight;
+}
+
+/* ===================================================================
+   코드 실행기 (Arduino 스타일 JavaScript)
+   =================================================================== */
+const STOP = { stop: true };
+let prog = null;
+let waiters = [];
+function waitSim(ms) {
+  return new Promise((res, rej) => {
+    if (!prog) return rej(STOP);
+    waiters.push({ until: S.t + Math.max(0, ms) / 1000, res, rej });
+  });
+}
+function wakeWaiters() {
+  if (!waiters.length) return;
+  const keep = [];
+  for (const w of waiters) (S.t >= w.until ? w.res() : keep.push(w));
+  waiters = keep;
+}
+function api(ctl) {
+  let serialBuf = '';
+  let warnedArm = false, warnedBot = false;
+  const needBot = () => { if (!S.robot) { if (!warnedBot) { log('⚠ 이 맵에는 바퀴 로봇이 없습니다. 맵을 바꾸세요.', 'e'); warnedBot = true; } return false; } return true; };
+  const needArm = () => { if (!S.arm) { if (!warnedArm) { log('⚠ 로봇팔 함수는 로봇팔 맵에서만 동작합니다.', 'e'); warnedArm = true; } return false; } return true; };
+  const t0 = S.t;
+  let guardN = 0;
+  const num = (v) => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
+  return {
+    motors(l, r) { if (!needBot()) return; S.robot.cl = Math.max(-255, Math.min(255, num(l))); S.robot.cr = Math.max(-255, Math.min(255, num(r))); },
+    stop() { if (S.robot) { S.robot.cl = 0; S.robot.cr = 0; } },
+    distance: () => needBot() ? sense('front') : 0,
+    distanceLeft: () => needBot() ? sense('left') : 0,
+    distanceRight: () => needBot() ? sense('right') : 0,
+    lineLeft: () => lineAt(-1), lineCenter: () => lineAt(0), lineRight: () => lineAt(1),
+    bumped: () => !!(S.robot && S.inWall),
+    arm(s, e) { if (!needArm()) return; S.arm.ts = Math.max(0, Math.min(180, num(s))); S.arm.te = Math.max(0, Math.min(180, num(e))); },
+    grip(on) { if (needArm()) setGrip(on); },
+    armDone: () => !S.arm || (Math.abs(S.arm.s - S.arm.ts) < .5 && Math.abs(S.arm.e - S.arm.te) < .5),
+    delay: (ms) => waitSim(num(ms)),
+    millis: () => Math.floor((S.t - t0) * 1000),
+    map: (x, a, b, c, d) => (x - a) * (d - c) / (b - a) + c,
+    constrain: (x, a, b) => Math.max(a, Math.min(b, x)),
+    random: (a, b) => b === undefined ? Math.floor(Math.random() * a) : Math.floor(a + Math.random() * (b - a)),
+    Serial: {
+      begin() {},
+      print(v) { serialBuf += String(v); },
+      println(v = '') { log(serialBuf + String(v), 's'); serialBuf = ''; }
+    },
+    async __guard() {
+      if (ctl.stopped) throw STOP;
+      if (++guardN % 500 === 0) await new Promise((r) => setTimeout(r, 0));
+    }
+  };
+}
+function transform(src) {
+  const names = [...src.matchAll(/\bfunction\s+([A-Za-z_$][\w$]*)\s*\(/g)].map((m) => m[1]);
+  let code = src.replace(/\basync\s+function\b/g, 'function');
+  code = code.replace(/\bfunction\s+([A-Za-z_$][\w$]*)\s*\(/g, 'async function $1(');
+  for (const n of [...new Set(names), 'delay']) {
+    code = code.replace(new RegExp('(?<!function\\s+)(?<![\\w$.])(?<!await\\s+)' + n.replace(/\$/g, '\\$') + '\\s*\\(', 'g'), 'await ' + n + '(');
+  }
+  code = code.replace(/\b(while|for)\s*(\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))\s*\{/g, '$1 $2 { await __guard();');
+  code = code.replace(/\bdo\s*\{/g, 'do { await __guard();');
+  return code;
+}
+const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+async function runCode() {
+  stopCode(true);
+  const src = $('editor').value;
+  store.set('code', src);
+  const ctl = { stopped: false };
+  prog = ctl;
+  $('runBtn').disabled = true; $('stopBtn').disabled = false;
+  logLines.log = []; log('▶ 실행 시작', 'i');
+  const A = api(ctl);
+  const keys = Object.keys(A);
+  try {
+    const fn = new AsyncFunction(...keys, transform(src) +
+      '\n;return { setup: typeof setup === "function" ? setup : null, loop: typeof loop === "function" ? loop : null };');
+    const { setup, loop } = await fn(...keys.map((k) => A[k]));
+    if (setup) await setup();
+    if (!loop) { log('loop() 함수가 없어 setup()만 실행했습니다.', 'm'); }
+    while (loop && !ctl.stopped) {
+      await loop();
+      await waitSim(20);
+    }
+  } catch (e) {
+    if (e !== STOP) {
+      log('✖ 오류: ' + (e && e.message ? e.message : e), 'e');
+      if (e instanceof SyntaxError) log('  문법 오류입니다. 괄호 · 중괄호 짝과 세미콜론을 확인하세요.', 'e');
+    }
+  }
+  if (prog === ctl) stopCode();
+}
+function stopCode(silent) {
+  if (prog) { prog.stopped = true; if (!silent) log('■ 정지', 'm'); }
+  prog = null;
+  for (const w of waiters) w.rej(STOP);
+  waiters = [];
+  if (S.robot) { S.robot.cl = 0; S.robot.cr = 0; }
+  $('runBtn').disabled = false; $('stopBtn').disabled = true;
+}
+
+const EXAMPLES = {
+  basic: { name: '1. 직진하고 멈추기', world: 'free', code:
+`// 2초 직진 → 1초 정지를 반복합니다
+function setup() {
+  Serial.begin(9600);
+}
+
+function loop() {
+  motors(200, 200);          // 두 바퀴 같은 속도 = 직진
+  Serial.println(distance()); // 앞 거리(cm)
+  delay(2000);
+  stop();
+  delay(1000);
+}` },
+  square: { name: '2. 정사각형 그리기 (40차시)', world: 'free', code:
+`// 한 변 약 100cm 정사각형 — 회전 시간을 실험으로 조정하세요
+let forwardTime = 2125;   // 속도 200에서 약 100cm
+let turnTime = 580;       // 90° 회전에 걸리는 시간(ms)
+
+function setup() {
+  for (let i = 0; i < 4; i++) {
+    motors(200, 200);   delay(forwardTime);
+    motors(-150, 150);  delay(turnTime);    // 왼쪽 제자리 회전
+  }
+  stop();
+  Serial.println("완료! 출발점과 얼마나 차이 나나요?");
+}
+
+function loop() {}` },
+  avoid: { name: '3. 장애물 회피 (44차시)', world: 'obstacle', code:
+`// 감지 → 판단 → 동작 루프
+function setup() {
+  Serial.begin(9600);
+}
+
+function loop() {
+  const d = distance();
+  if (d < 30) {
+    if (distanceLeft() > distanceRight()) motors(-150, 150);  // 왼쪽이 넓으면 왼쪽으로
+    else motors(150, -150);                                   // 아니면 오른쪽으로
+    delay(300);
+  } else {
+    motors(180, 180);
+  }
+}` },
+  fsm: { name: '4. 상태 기계 (45차시)', world: 'obstacle', code:
+`// 상태: FORWARD → TURN → (갇히면) BACKUP
+let state = "FORWARD";
+let since = 0;        // 현재 상태가 시작된 시각
+let turns = 0;        // 연속 회전 횟수
+
+function go(next) { state = next; since = millis(); Serial.println("상태: " + next); }
+
+function loop() {
+  const d = distance();
+  if (state === "FORWARD") {
+    motors(180, 180);
+    if (d < 30) { turns++; go(turns > 3 ? "BACKUP" : "TURN"); }
+    if (millis() - since > 3000) turns = 0;
+  } else if (state === "TURN") {
+    if (distanceLeft() > distanceRight()) motors(-140, 140); else motors(140, -140);
+    if (millis() - since > 350 && distance() > 45) go("FORWARD");
+  } else if (state === "BACKUP") {
+    motors(-150, -150);
+    if (millis() - since > 600) { turns = 0; go("TURN"); }
+  }
+}` },
+  line: { name: '5. 라인 트레이서 · 규칙 (46차시)', world: 'line', code:
+`// 라인 센서 3개: 선 위면 1
+let last = 0;   // 마지막으로 선이 보인 쪽: -1 왼쪽, 1 오른쪽
+
+function loop() {
+  const L = lineLeft(), C = lineCenter(), R = lineRight();
+  if (C && !L && !R)  motors(170, 170);               // 가운데만: 직진
+  else if (L)         { motors(60, 170); last = -1; } // 선이 왼쪽: 왼쪽으로
+  else if (R)         { motors(170, 60); last = 1; }  // 선이 오른쪽: 오른쪽으로
+  else if (last < 0)  motors(-80, 140);               // 놓쳤다: 마지막 방향으로
+  else                motors(140, -80);
+}` },
+  pctrl: { name: '6. 라인 트레이서 · P 제어 (47차시)', world: 'line', code:
+`// 보정량 = KP × 오차
+const BASE = 150;   // 기본 속도
+const KP = 90;      // 비례 게인 — 바꿔 가며 랩 타임을 비교하세요
+let lastErr = 0;
+
+function loop() {
+  const L = lineLeft(), C = lineCenter(), R = lineRight();
+  let err;
+  if (L + C + R === 0) err = lastErr * 2;   // 선을 놓치면 마지막 방향으로 크게
+  else err = (R - L) / (L + C + R);          // 왼쪽 -1 ~ 오른쪽 +1
+  const corr = KP * err;
+  motors(BASE + corr, BASE - corr);
+  lastErr = err;
+}` },
+  wall: { name: '7. 오른쪽 벽 따라가기 (50차시)', world: 'delivery', code:
+`// 오른손 법칙: 오른쪽 벽을 따라가면 미로를 빠져나간다
+const WANT = 30;   // 오른쪽 60° 센서로 유지할 거리(cm)
+
+function loop() {
+  const front = distance(), right = distanceRight();
+  if (bumped()) { motors(-150, -150); delay(300); motors(-140, 140); delay(250); return; }  // 범퍼: 물러나서 왼쪽
+  if (front < 30) { motors(-140, 140); delay(150); return; }   // 앞이 막히면 왼쪽으로
+  if (right > 80) {                                            // 오른쪽 벽이 끝났다
+    motors(160, 160); delay(350);                              //   벽 끝을 조금 지나서
+    motors(170, 20);  delay(450);                              //   오른쪽으로 크게 돈다
+    return;
+  }
+  const corr = constrain((right - WANT) * 3, -60, 60);         // 벽과의 거리 유지
+  motors(150 + corr, 150 - corr);
+}` },
+  arm: { name: '8. 로봇팔 집어 옮기기 (42차시)', world: 'arm', code:
+`// 자세로 이동하고 도착할 때까지 기다리기
+function moveTo(s, e) {
+  arm(s, e);
+  while (!armDone()) delay(20);
+}
+
+function setup() {
+  grip(false);
+  moveTo(41, 19);     // 블록 위
+  moveTo(28, 18);     // 내려가기
+  grip(true);   delay(300);
+  moveTo(41, 19);     // 들어 올리기
+  moveTo(144, 151);   // 목표 구역 위
+  moveTo(155, 153);   // 내려놓기
+  grip(false);  delay(300);
+  moveTo(90, 90);     // 기본 자세
+}
+
+function loop() {}` }
+};
+
+/* ===================================================================
+   MQTT (ESP32 연동)
+   =================================================================== */
+const mq = { client: null, connected: false, lastCmd: -1, watchdog: false, pubTimer: null };
+function prefix() { return ($('prefix').value.trim() || 'bctc/guest').replace(/\/+$/, ''); }
+function topicInfo() {
+  const p = prefix();
+  $('topicInfo').innerHTML = S.world === 'arm'
+    ? `<b>받는 명령</b>  ${p}/arm/cmd\n  "어깨,팔꿈치,그리퍼"  예) 41,19,0\n<b>보내는 상태</b>  ${p}/arm/state\n  {"s":41,"e":19,"g":0,"done":1}  (0.2초마다)`
+    : `<b>받는 명령</b>  ${p}/robot/cmd\n  "왼쪽,오른쪽"  예) 150,150 · 0,0\n<b>보내는 센서</b>  ${p}/robot/sensors\n  {"d":82,"dl":40,"dr":120,"l":0,"c":1,"r":0,"hit":0,"bump":0}\n  (0.2초마다)`;
+}
+function loadMqtt() {
+  return new Promise((res, rej) => {
+    if (window.mqtt) return res(window.mqtt);
+    const s = document.createElement('script');
+    s.src = 'https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js';
+    s.onload = () => res(window.mqtt);
+    s.onerror = () => rej(new Error('MQTT 라이브러리를 불러오지 못했습니다 (인터넷 연결 확인)'));
+    document.head.appendChild(s);
+  });
+}
+function mqStatus(text, cls) { $('mqText').textContent = text; $('mqDot').className = 'status-dot ' + (cls || ''); }
+async function mqConnect() {
+  if (mq.client) return mqDisconnect();
+  store.set('prefix', $('prefix').value.trim());
+  mqStatus('연결 중…');
+  $('mqConnect').disabled = true;
+  try {
+    const lib = await loadMqtt();
+    const p = prefix();
+    const c = lib.connect('wss://broker.hivemq.com:8884/mqtt', { clientId: 'bctc-sim-' + Math.random().toString(16).slice(2, 8), connectTimeout: 8000, reconnectPeriod: 3000, clean: true });
+    mq.client = c;
+    c.on('connect', () => {
+      mq.connected = true; mq.lastCmd = -1;
+      mqStatus('연결됨 · ESP32 명령 대기', 'on');
+      c.subscribe([p + '/robot/cmd', p + '/arm/cmd']);
+      log('연결됨: ' + p + '/…', 'i', 'mqLog');
+    });
+    c.on('reconnect', () => mqStatus('다시 연결 중…'));
+    c.on('close', () => { mq.connected = false; if (mq.client) mqStatus('연결 끊김 · 재시도 중', 'bad'); });
+    c.on('error', (e) => log('오류: ' + e.message, 'e', 'mqLog'));
+    c.on('message', (topic, buf) => onCmd(topic, buf.toString()));
+    clearInterval(mq.pubTimer);
+    mq.pubTimer = setInterval(publishState, 200);
+    $('mqConnect').textContent = '끊기';
+  } catch (e) {
+    mqStatus(e.message, 'bad'); mq.client = null;
+  }
+  $('mqConnect').disabled = false;
+}
+function mqDisconnect() {
+  clearInterval(mq.pubTimer);
+  if (mq.client) { const c = mq.client; mq.client = null; c.end(true); }
+  mq.connected = false; mq.watchdog = false;
+  mqStatus('연결 안 됨');
+  $('mqConnect').textContent = '연결';
+  if (S.robot) { S.robot.cl = 0; S.robot.cr = 0; }
+}
+function onCmd(topic, msg) {
+  log('◀ ' + topic.split('/').slice(-2).join('/') + '  ' + msg, 'm', 'mqLog');
+  if (S.mode !== 'mqtt') return;
+  const parts = msg.trim().replace(/[{}"a-z:]/gi, ' ').split(/[\s,]+/).filter(Boolean).map(Number);
+  if (topic.endsWith('/robot/cmd') && S.robot) {
+    if (/stop/i.test(msg)) { S.robot.cl = 0; S.robot.cr = 0; }
+    else if (parts.length >= 2 && parts.every(Number.isFinite)) {
+      S.robot.cl = Math.max(-255, Math.min(255, parts[0])); S.robot.cr = Math.max(-255, Math.min(255, parts[1]));
+    } else { log('  형식 오류: "왼쪽,오른쪽" 숫자 두 개가 필요합니다', 'e', 'mqLog'); return; }
+    mq.lastCmd = S.t; mq.watchdog = false;
+  }
+  if (topic.endsWith('/arm/cmd') && S.arm && parts.length >= 2) {
+    S.arm.ts = Math.max(0, Math.min(180, parts[0])); S.arm.te = Math.max(0, Math.min(180, parts[1]));
+    if (parts.length >= 3) setGrip(parts[2] > 0);
+    mq.lastCmd = S.t;
+  }
+}
+function publishState() {
+  if (!mq.client || !mq.connected || S.mode !== 'mqtt') return;
+  const p = prefix();
+  if (S.robot) {
+    mq.client.publish(p + '/robot/sensors', JSON.stringify({
+      d: Math.round(sense('front')), dl: Math.round(sense('left')), dr: Math.round(sense('right')),
+      l: lineAt(-1), c: lineAt(0), r: lineAt(1), hit: S.inWall ? 1 : 0, bump: S.bumps
+    }));
+  } else if (S.arm) {
+    const A = S.arm;
+    mq.client.publish(p + '/arm/state', JSON.stringify({ s: Math.round(A.s), e: Math.round(A.e), g: A.grip ? 1 : 0, done: Math.abs(A.s - A.ts) < .5 && Math.abs(A.e - A.te) < .5 ? 1 : 0 }));
+  }
+}
+function watchdog() {
+  if (S.mode !== 'mqtt' || !S.robot || !mq.connected) return;
+  if (mq.lastCmd >= 0 && S.t - mq.lastCmd > 1.0) {
+    if (!mq.watchdog) log('⚠ 1초 동안 명령이 없어 안전 정지했습니다 (워치독)', 'e', 'mqLog');
+    mq.watchdog = true; S.robot.cl = 0; S.robot.cr = 0;
+  }
+}
+
+/* ===================================================================
+   키보드 조종
+   =================================================================== */
+const keys = new Set();
+function applyKeys() {
+  if (S.mode !== 'key' || !S.robot) return;
+  const v = +$('keySpeed').value;
+  const up = keys.has('up'), dn = keys.has('down'), lf = keys.has('left'), rt = keys.has('right');
+  let l = 0, r = 0;
+  if (up) { l = v; r = v; } else if (dn) { l = -v; r = -v; }
+  if (lf) { if (up || dn) l *= 0.35; else { l = -v * 0.6; r = v * 0.6; } }
+  if (rt) { if (up || dn) r *= 0.35; else { l = v * 0.6; r = -v * 0.6; } }
+  S.robot.cl = l; S.robot.cr = r;
+}
+const KEYMAP = { ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right' };
+document.addEventListener('keydown', (e) => {
+  if (e.target.closest('textarea, input, select')) return;
+  if (S.mode !== 'key') return;
+  if (S.arm) {
+    const A = S.arm;
+    const d = { KeyQ: ['ts', 3], KeyA: ['ts', -3], KeyW: ['te', 3], KeyS: ['te', -3] }[e.code];
+    if (d) { A[d[0]] = Math.max(0, Math.min(180, A[d[0]] + d[1])); syncArmSliders(); e.preventDefault(); }
+    if (e.code === 'Space') { setGrip(!A.grip); syncArmSliders(); e.preventDefault(); }
+    return;
+  }
+  const k = KEYMAP[e.code]; if (!k) return;
+  e.preventDefault(); keys.add(k); applyKeys();
+});
+document.addEventListener('keyup', (e) => { const k = KEYMAP[e.code]; if (k) { keys.delete(k); applyKeys(); } });
+window.addEventListener('blur', () => { keys.clear(); applyKeys(); });
+document.querySelectorAll('#pad button').forEach((b) => {
+  const k = b.dataset.k;
+  const on = (e) => { e.preventDefault(); if (k === 'stop') { keys.clear(); } else keys.add(k); b.classList.add('on'); applyKeys(); };
+  const off = () => { keys.delete(k); b.classList.remove('on'); applyKeys(); };
+  b.addEventListener('pointerdown', on);
+  b.addEventListener('pointerup', off); b.addEventListener('pointerleave', off); b.addEventListener('pointercancel', off);
+});
+$('keySpeed').oninput = () => { $('keySpeedV').textContent = $('keySpeed').value; applyKeys(); };
+function syncArmSliders() {
+  if (!S.arm) return;
+  $('sS').value = Math.round(S.arm.ts); $('sE').value = Math.round(S.arm.te);
+  $('sSv').textContent = Math.round(S.arm.ts) + '°'; $('sEv').textContent = Math.round(S.arm.te) + '°';
+  $('gripBtn').textContent = S.arm.grip ? '✋ 놓기' : '✊ 잡기';
+}
+$('sS').oninput = () => { if (S.arm) { S.arm.ts = +$('sS').value; syncArmSliders(); } };
+$('sE').oninput = () => { if (S.arm) { S.arm.te = +$('sE').value; syncArmSliders(); } };
+$('gripBtn').onclick = () => { if (S.arm) { setGrip(!S.arm.grip); syncArmSliders(); } };
+$('armHome').onclick = () => { if (S.arm) { S.arm.ts = 90; S.arm.te = 90; syncArmSliders(); } };
+
+/* ===================================================================
+   화면 상태 전환
+   =================================================================== */
+function setWorld(w, keepCode) {
+  if (!WORLDS[w]) w = 'free';
+  S.world = w; $('worldSel').value = w;
+  stopCode(true);
+  resetWorld();
+  keys.clear();
+  $('keyRobot').classList.toggle('hidden', w === 'arm');
+  $('keyArm').classList.toggle('hidden', w !== 'arm');
+  syncArmSliders();
+  topicInfo();
+  store.set('world', w);
+  updateUrl();
+}
+function setMode(m) {
+  if (!['key', 'code', 'mqtt'].includes(m)) m = 'key';
+  stopCode(true);
+  if (m !== 'mqtt' && mq.client) mqDisconnect();
+  S.mode = m;
+  document.querySelectorAll('.seg button').forEach((b) => b.classList.toggle('active', b.dataset.mode === m));
+  $('panelKey').classList.toggle('hidden', m !== 'key');
+  $('panelCode').classList.toggle('hidden', m !== 'code');
+  $('panelMqtt').classList.toggle('hidden', m !== 'mqtt');
+  $('sideTitle').textContent = { key: '⌨ 직접 조종', code: '📝 코드로 제어', mqtt: '📡 ESP32 · MQTT 원격 제어' }[m];
+  if (S.robot) { S.robot.cl = 0; S.robot.cr = 0; }
+  store.set('mode', m);
+  updateUrl();
+}
+function loadExample(id) {
+  const ex = EXAMPLES[id]; if (!ex) return;
+  $('editor').value = ex.code;
+  if (ex.world !== S.world) setWorld(ex.world);
+  store.set('code', ex.code);
+  updateUrl(id);
+}
+function updateUrl(ex) {
+  try {
+    const u = new URL(location.href);
+    u.searchParams.set('world', S.world); u.searchParams.set('mode', S.mode);
+    if (ex) u.searchParams.set('ex', ex); else if (ex === undefined) {}
+    history.replaceState(null, '', u);
+  } catch (e) {}
+}
+
+$('worldSel').onchange = () => setWorld($('worldSel').value);
+document.querySelectorAll('.seg button').forEach((b) => b.onclick = () => setMode(b.dataset.mode));
+$('resetBtn').onclick = () => { const m = S.mode; stopCode(true); resetWorld(); syncArmSliders(); if (m === 'mqtt') mq.lastCmd = -1; };
+$('runBtn').onclick = () => { resetWorld(); syncArmSliders(); runCode(); };
+$('stopBtn').onclick = () => stopCode();
+$('exSel').innerHTML = '<option value="">📂 예제 불러오기…</option>' + Object.entries(EXAMPLES).map(([k, v]) => `<option value="${k}">${v.name}</option>`).join('');
+$('exSel').onchange = () => { if ($('exSel').value) { loadExample($('exSel').value); $('exSel').value = ''; } };
+$('editor').addEventListener('keydown', (e) => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const el = e.target, s = el.selectionStart, en = el.selectionEnd;
+    el.value = el.value.slice(0, s) + '  ' + el.value.slice(en); el.selectionStart = el.selectionEnd = s + 2;
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); $('runBtn').click(); }
+});
+$('editor').addEventListener('input', () => store.set('code', $('editor').value));
+$('mqConnect').onclick = mqConnect;
+$('prefix').addEventListener('input', topicInfo);
+$('themeBtn').onclick = () => {
+  const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  try { localStorage.setItem('bctc-theme', t); } catch (e) {}
+  readColors();
+};
+
+/* ===================================================================
+   3D 보기 (Three.js — 처음 켤 때 불러옴)
+   시뮬레이션 좌표 (x, y: 화면 아래가 +y) → 3D (X = x − W/2, Z = y − H/2, 위가 +Y)
+   =================================================================== */
+const V3 = { on: false, ready: false, loading: false, cam: 'orbit', built: '', spinL: 0, spinR: 0, trailN: -1 };
+function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
+async function set3D(on) {
+  V3.on = !!on; store.set('view', on ? '3d' : '2d');
+  document.querySelectorAll('.vseg button').forEach((b) => b.classList.toggle('active', (b.dataset.view === '3d') === V3.on));
+  $('view3d').classList.toggle('hidden', !V3.on); $('camTools').classList.toggle('hidden', !V3.on);
+  cv.style.visibility = V3.on ? 'hidden' : '';
+  try { const u = new URL(location.href); u.searchParams.set('view', on ? '3d' : '2d'); history.replaceState(null, '', u); } catch (e) {}
+  if (!V3.on || V3.ready || V3.loading) return;
+  V3.loading = true; $('view3d').innerHTML = '<div class="v3msg">3D 화면을 불러오는 중…</div>';
+  try {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js');
+    await loadScript('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js');
+    init3D();
+  } catch (e) {
+    $('view3d').innerHTML = '<div class="v3msg">3D 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인하거나 2D로 보세요.</div>';
+  }
+  V3.loading = false;
+}
+function init3D() {
+  const el = $('view3d'); el.innerHTML = '';
+  const r = V3.renderer = new THREE.WebGLRenderer({ antialias: true });
+  r.setPixelRatio(Math.min(2, devicePixelRatio || 1)); r.shadowMap.enabled = true;
+  el.appendChild(r.domElement);
+  V3.scene = new THREE.Scene();
+  V3.camera = new THREE.PerspectiveCamera(42, 900 / 560, 1, 5000);
+  V3.controls = new THREE.OrbitControls(V3.camera, r.domElement);
+  V3.controls.enableDamping = true; V3.controls.maxPolarAngle = Math.PI * 0.49; V3.controls.minDistance = 40; V3.controls.maxDistance = 1800;
+  V3.scene.add(new THREE.HemisphereLight(0xffffff, 0x8a94a3, 0.85));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.75); sun.position.set(-300, 600, 250); sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048); Object.assign(sun.shadow.camera, { left: -560, right: 560, top: 400, bottom: -400, far: 2000 });
+  V3.scene.add(sun);
+  V3.world = new THREE.Group(); V3.scene.add(V3.world);
+  V3.robot = makeRobot3D(); V3.scene.add(V3.robot.g);
+  V3.arm = makeArm3D(); V3.scene.add(V3.arm.g);
+  // 거리 센서 광선
+  V3.rays = ['front', 'left', 'right'].map(() => {
+    const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+    const line = new THREE.Line(geo, new THREE.LineDashedMaterial({ color: 0x6a3fd0, dashSize: 5, gapSize: 4, transparent: true, opacity: 0.7 }));
+    const dot = new THREE.Mesh(new THREE.SphereGeometry(2.4, 12, 8), new THREE.MeshBasicMaterial({ color: 0x6a3fd0 }));
+    V3.scene.add(line, dot); return { line, dot };
+  });
+  // 흔적
+  V3.trailPos = new Float32Array(4000 * 3);
+  V3.trailGeo = new THREE.BufferGeometry(); V3.trailGeo.setAttribute('position', new THREE.BufferAttribute(V3.trailPos, 3));
+  V3.scene.add(new THREE.Line(V3.trailGeo, new THREE.LineBasicMaterial({ color: 0x8a63e8 })));
+  const resize = () => { const w = el.clientWidth, h = el.clientHeight; if (!w || !h) return; r.setSize(w, h); V3.camera.aspect = w / h; V3.camera.updateProjectionMatrix(); };
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(el); window.addEventListener('resize', resize); resize();
+  V3.ready = true; V3.built = '';
+}
+const mat3 = (color, o = {}) => new THREE.MeshStandardMaterial(Object.assign({ color, roughness: 0.6, metalness: 0.05 }, o));
+function mesh3(geo, m, x, y, z, parent) { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = true; o.receiveShadow = true; if (parent) parent.add(o); return o; }
+function makeRobot3D() {
+  const g = new THREE.Group(), WR3 = 5.5;
+  const bodyMat = mat3(0x00979d);
+  mesh3(new THREE.CylinderGeometry(11.5, 11.5, 2, 32), bodyMat, 0, 7, 0, g);                       // 아래판
+  mesh3(new THREE.CylinderGeometry(10.5, 10.5, 1.6, 32), mat3(0x7cc4e4, { transparent: true, opacity: .8 }), 0, 13, 0, g); // 위판
+  [[5, 5], [5, -5], [-5, 5], [-5, -5]].forEach(([x, z]) => mesh3(new THREE.CylinderGeometry(.5, .5, 6, 8), mat3(0xd4af37, { metalness: .6 }), x, 10, z, g));
+  mesh3(new THREE.BoxGeometry(9, .6, 6.5), mat3(0x1678be), -1, 14.1, 0, g);                       // UNO
+  mesh3(new THREE.BoxGeometry(5, 3, 4), mat3(0xd9822b), -3, 9.5, 0, g);                           // 배터리
+  // 초음파 센서 (앞)
+  mesh3(new THREE.BoxGeometry(1.2, 4, 10), mat3(0x1678be), 11, 10, 0, g);
+  [-2.6, 2.6].forEach((z) => { const c = mesh3(new THREE.CylinderGeometry(1.6, 1.6, 2, 16), mat3(0xc9ced6, { metalness: .6 }), 12.2, 10, z, g); c.rotation.z = Math.PI / 2; });
+  // 방향 표시
+  const arrow = mesh3(new THREE.ConeGeometry(2, 5, 16), mat3(0xffffff), 5, 16, 0, g); arrow.rotation.z = -Math.PI / 2;
+  // 모터 + 바퀴
+  const wheels = [-1, 1].map((side) => {
+    mesh3(new THREE.BoxGeometry(7, 3, 3), mat3(0xf5c518), 0, WR3, side * 8, g);
+    const p = new THREE.Group(); p.position.set(0, WR3, side * (WB / 2)); g.add(p);
+    const t = mesh3(new THREE.CylinderGeometry(WR3, WR3, 3.4, 28), mat3(0x1f1f1f, { roughness: .9 }), 0, 0, 0, p); t.rotation.x = Math.PI / 2;
+    const h = mesh3(new THREE.CylinderGeometry(3.6, 3.6, 3.5, 20), mat3(0xf5c518), 0, 0, 0, p); h.rotation.x = Math.PI / 2;
+    for (let k = 0; k < 3; k++) { const s = mesh3(new THREE.BoxGeometry(7, .8, 3.6), mat3(0xe0a800), 0, 0, 0, p); s.rotation.z = k * Math.PI / 3; }
+    return p;
+  });
+  mesh3(new THREE.SphereGeometry(2.2, 16, 12), mat3(0xd7dbe0, { metalness: .8, roughness: .2 }), -8.5, 2.2, 0, g); // 캐스터
+  mesh3(new THREE.CylinderGeometry(1, 1, 4, 8), mat3(0x9aa1ab), -8.5, 5, 0, g);
+  // 라인 센서 3개 (앞 아래)
+  const ls = [-1, 0, 1].map((k) => mesh3(new THREE.SphereGeometry(1.4, 12, 8), new THREE.MeshBasicMaterial({ color: 0x9aa3b2 }), 16, 1.6, 7 * k, g));
+  mesh3(new THREE.BoxGeometry(6, 1, 18), mat3(0x2a2f3a), 15, 3.2, 0, g);
+  return { g, wheels, bodyMat, ls };
+}
+function makeArm3D() {
+  const g = new THREE.Group();
+  const l1 = mesh3(new THREE.BoxGeometry(1, 16, 22), mat3(0x00979d), 0, 0, 0, g);
+  const l2 = mesh3(new THREE.BoxGeometry(1, 12, 16), mat3(0x6a3fd0), 0, 0, 0, g);
+  const joints = [0, 1, 2].map(() => { const j = mesh3(new THREE.CylinderGeometry(8, 8, 26, 24), mat3(0xe6e9ee, { metalness: .4 }), 0, 0, 0, g); j.rotation.x = Math.PI / 2; return j; });
+  const fingers = [0, 1].map(() => mesh3(new THREE.BoxGeometry(18, 4, 14), mat3(0x2a2f3a), 0, 0, 0, g));
+  const block = mesh3(new THREE.BoxGeometry(34, 34, 34), mat3(0xf08c00), 0, 0, 0, g);
+  return { g, l1, l2, joints, fingers, block };
+}
+function placeLink(m, a, b) {   // 두 점 (x, y) 사이에 막대 배치 (팔 평면)
+  m.position.set((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, 0);
+  m.scale.x = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  m.rotation.z = Math.atan2(b[1] - a[1], b[0] - a[0]);
+}
+const toX = (x) => x - W / 2, toZ = (y) => y - H / 2;
+function css3(k) { return new THREE.Color(C[k] || '#888'); }
+function build3D() {
+  const w = WORLDS[S.world], G = V3.world;
+  while (G.children.length) { const o = G.children.pop(); o.geometry && o.geometry.dispose(); }
+  V3.scene.background = css3('card');
+  V3.robot.g.visible = !w.arm; V3.arm.g.visible = !!w.arm; V3.rays.forEach((r) => { r.line.visible = r.dot.visible = !w.arm; });
+  if (w.arm) {
+    mesh3(new THREE.BoxGeometry(W - 60, 14, 220), mat3(0xc9b48f), 0, -7, 0, G);                         // 테이블
+    const zw = ARM.zone[1] - ARM.zone[0];
+    mesh3(new THREE.BoxGeometry(zw, 2, 200), mat3(0x1f9d55, { transparent: true, opacity: .35 }), toX(ARM.zone[0] + zw / 2), 1, 0, G);
+    const bh = ARM.table - ARM.py; mesh3(new THREE.BoxGeometry(60, bh, 60), mat3(0x3a4354), toX(ARM.px), bh / 2, 0, G);
+    const fl = mesh3(new THREE.PlaneGeometry(2400, 1600), mat3(0xe9edf3), 0, -60, 0, G); fl.rotation.x = -Math.PI / 2;
+    V3.camHome = [[-160, 300, 640], [0, 110, 0]];
+  } else {
+    const fl = mesh3(new THREE.PlaneGeometry(W, H), mat3(css3('floor').getHex()), 0, 0, 0, G); fl.rotation.x = -Math.PI / 2;
+    const grid = []; for (let x = 50; x < W; x += 50) grid.push(toX(x), .3, toZ(0), toX(x), .3, toZ(H)); for (let y = 50; y < H; y += 50) grid.push(toX(0), .3, toZ(y), toX(W), .3, toZ(y));
+    const gg = new THREE.BufferGeometry(); gg.setAttribute('position', new THREE.Float32BufferAttribute(grid, 3));
+    G.add(new THREE.LineSegments(gg, new THREE.LineBasicMaterial({ color: css3('grid') })));
+    const wallMat = mat3(css3('wall').getHex());
+    const ws = w.walls;
+    for (let i = 0; i < ws.length; i++) {   // box()로 만든 닫힌 사각형은 속이 찬 블록으로
+      const q = ws.slice(i, i + 4);
+      if (q.length === 4 && q.every((sg, j) => sg[2] === q[(j + 1) % 4][0] && sg[3] === q[(j + 1) % 4][1])) {
+        const xs = q.map((sg) => sg[0]), ys = q.map((sg) => sg[1]);
+        const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+        if (x1 - x0 < W) mesh3(new THREE.BoxGeometry(x1 - x0, 22, y1 - y0), mat3(0x8b95a7), toX((x0 + x1) / 2), 11, toZ((y0 + y1) / 2), G);
+        i += 3;
+      }
+    }
+    for (const [x1, y1, x2, y2] of w.walls) {
+      const len = Math.hypot(x2 - x1, y2 - y1) + 6;
+      const m = mesh3(new THREE.BoxGeometry(len, 24, 6), wallMat, toX((x1 + x2) / 2), 12, toZ((y1 + y2) / 2), G);
+      m.rotation.y = -Math.atan2(y2 - y1, x2 - x1);
+    }
+    if (w.line) {
+      const pos = [];
+      for (let i = 0; i < NT; i++) {
+        const a = TRACK[i], b = TRACK[(i + 1) % NT], c = TRACK[(i + 2) % NT];
+        const n = (p, q) => { const dx = q[0] - p[0], dy = q[1] - p[1], l = Math.hypot(dx, dy); return [-dy / l * LINE_HALF, dx / l * LINE_HALF]; };
+        const na = n(a, b), nb = n(b, c);
+        const A1 = [toX(a[0] + na[0]), .5, toZ(a[1] + na[1])], A2 = [toX(a[0] - na[0]), .5, toZ(a[1] - na[1])];
+        const B1 = [toX(b[0] + nb[0]), .5, toZ(b[1] + nb[1])], B2 = [toX(b[0] - nb[0]), .5, toZ(b[1] - nb[1])];
+        pos.push(...A1, ...B1, ...A2, ...A2, ...B1, ...B2);
+      }
+      const tg = new THREE.BufferGeometry(); tg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); tg.computeVertexNormals();
+      const tm = new THREE.Mesh(tg, new THREE.MeshBasicMaterial({ color: css3('track'), side: THREE.DoubleSide })); G.add(tm);
+      const p = TRACK[0]; mesh3(new THREE.BoxGeometry(44, .8, 3), new THREE.MeshBasicMaterial({ color: 0x1f9d55 }), toX(p[0]), .7, toZ(p[1]), G);
+    }
+    if (w.goal) {
+      mesh3(new THREE.CylinderGeometry(w.goal.r, w.goal.r, .6, 40), mat3(0xc98a00, { transparent: true, opacity: .3 }), toX(w.goal.x), .4, toZ(w.goal.y), G);
+      mesh3(new THREE.BoxGeometry(22, 18, 22), mat3(0xb7864f), toX(w.goal.x), 9, toZ(w.goal.y), G);
+      mesh3(new THREE.BoxGeometry(22.4, 3, 6), mat3(0xe8d3a6), toX(w.goal.x), 17, toZ(w.goal.y), G);
+    }
+    V3.camHome = [[-40, 600, 560], [0, 0, 30]];
+  }
+  V3.built = S.world + '|' + (document.documentElement.getAttribute('data-theme') || '');
+  V3.trailN = -1;
+  if (V3.cam !== 'follow') setCam3D(V3.cam);
+}
+function setCam3D(mode) {
+  V3.cam = mode;
+  document.querySelectorAll('#camTools button').forEach((b) => b.classList.toggle('on', b.dataset.cam === mode));
+  if (!V3.ready) return;
+  const c = V3.camera, t = V3.controls.target;
+  if (mode === 'top') { const arm = WORLDS[S.world].arm; c.position.set(0, arm ? 900 : 860, arm ? 300 : 1); t.set(0, arm ? 100 : 0, 0); }
+  else if (mode === 'orbit' && V3.camHome) { c.position.set(...V3.camHome[0]); t.set(...V3.camHome[1]); }
+  V3.controls.update();
+}
+function render3D(dt) {
+  if (!V3.on || !V3.ready) return;
+  if (V3.built !== S.world + '|' + (document.documentElement.getAttribute('data-theme') || '')) build3D();
+  const r = S.robot, A = S.arm;
+  if (r) {
+    const g = V3.robot.g;
+    g.position.set(toX(r.x), 0, toZ(r.y)); g.rotation.y = -r.a;
+    V3.spinL -= r.vl / 5.5 * dt; V3.spinR -= r.vr / 5.5 * dt;
+    V3.robot.wheels[0].rotation.z = V3.spinL; V3.robot.wheels[1].rotation.z = V3.spinR;
+    V3.robot.bodyMat.color.set(S.flash > 0 ? 0xd64541 : 0x00979d);
+    const line = WORLDS[S.world].line;
+    V3.robot.ls.forEach((m, i) => { m.visible = !!line; if (line) m.material.color.set(lineAt(i - 1) ? 0xd64541 : 0x9aa3b2); });
+    ['front', 'left', 'right'].forEach((k, i) => {
+      const a = r.a + RAYS[k], d = Math.min(SENSE_MAX + R, rayCast(r.x, r.y, a));
+      const x0 = toX(r.x + Math.cos(a) * 12), z0 = toZ(r.y + Math.sin(a) * 12), x1 = toX(r.x + Math.cos(a) * d), z1 = toZ(r.y + Math.sin(a) * d);
+      const ray = V3.rays[i]; const p = ray.line.geometry.attributes.position;
+      p.setXYZ(0, x0, 10, z0); p.setXYZ(1, x1, 10, z1); p.needsUpdate = true; ray.line.computeLineDistances();
+      ray.dot.position.set(x1, 10, z1); ray.dot.visible = d <= SENSE_MAX + R;
+    });
+    if (V3.trailN !== S.trail.length || S.trail.length >= 4000) {
+      const n = Math.min(4000, S.trail.length);
+      for (let i = 0; i < n; i++) { const q = S.trail[S.trail.length - n + i]; V3.trailPos[i * 3] = toX(q[0]); V3.trailPos[i * 3 + 1] = .8; V3.trailPos[i * 3 + 2] = toZ(q[1]); }
+      V3.trailGeo.setDrawRange(0, n); V3.trailGeo.attributes.position.needsUpdate = true; V3.trailN = S.trail.length;
+    }
+    if (V3.cam === 'follow') {
+      const fx = Math.cos(r.a), fz = Math.sin(r.a);
+      const want = new THREE.Vector3(toX(r.x) - fx * 110, 70, toZ(r.y) - fz * 110);
+      V3.camera.position.lerp(want, Math.min(1, dt * 4));
+      V3.controls.target.lerp(new THREE.Vector3(toX(r.x) + fx * 40, 8, toZ(r.y) + fz * 40), Math.min(1, dt * 6));
+    }
+  } else V3.trailGeo.setDrawRange(0, 0);
+  if (A) {
+    const P = (p) => [toX(p[0]), ARM.table - p[1]];
+    const base = P([ARM.px, ARM.py]), [p1s, p2s, a2] = armPts(A.s, A.e), p1 = P(p1s), p2 = P(p2s);
+    const m = V3.arm;
+    placeLink(m.l1, base, p1); placeLink(m.l2, p1, p2);
+    [base, p1, p2].forEach((p, i) => m.joints[i].position.set(p[0], p[1], 0));
+    m.l1.material.color.set(A.hit || S.flash > 0 ? 0xd64541 : 0x00979d);
+    const gx = Math.cos(a2), gy = Math.sin(a2), nx = -gy, ny = gx, open = A.grip ? 9 : 18;
+    m.fingers.forEach((f, i) => { const s = i ? 1 : -1; f.position.set(p2[0] + nx * open * s + gx * 9, p2[1] + ny * open * s + gy * 9, 0); f.rotation.z = Math.atan2(gy, gx); });
+    m.block.position.set(toX(A.block.x), ARM.table - A.block.y, 0);
+  }
+  V3.controls.update();
+  V3.renderer.render(V3.scene, V3.camera);
+}
+document.querySelectorAll('.vseg button').forEach((b) => b.onclick = () => set3D(b.dataset.view === '3d'));
+document.querySelectorAll('#camTools button').forEach((b) => b.onclick = () => setCam3D(b.dataset.cam));
+
+/* ===================================================================
+   메인 루프
+   =================================================================== */
+let lastT = performance.now(), acc = 0, hudT = 0;
+function frame(now) {
+  let dt = Math.min(0.1, (now - lastT) / 1000); lastT = now;
+  acc += dt;
+  const h = 1 / 120;
+  while (acc >= h) { step(h); acc -= h; }
+  watchdog();
+  draw();
+  render3D(dt);
+  if (now - hudT > 100) { renderHud(); hudT = now; }
+  requestAnimationFrame(frame);
+}
+
+(function init() {
+  readColors();
+  const q = new URLSearchParams(location.search);
+  $('prefix').value = store.get('prefix', '') || 'bctc/' + ['kim', 'lee', 'park', 'choi', 'jung'][Math.floor(Math.random() * 5)] + Math.floor(Math.random() * 90 + 10);
+  setWorld(q.get('world') || store.get('world', 'free'));
+  setMode(q.get('mode') || store.get('mode', 'key'));
+  const ex = q.get('ex');
+  if (ex && EXAMPLES[ex]) loadExample(ex);
+  else $('editor').value = store.get('code', '') || EXAMPLES.basic.code;
+  fitCanvas();
+  window.addEventListener('resize', fitCanvas);
+  if (window.ResizeObserver) new ResizeObserver(fitCanvas).observe(cv);
+  const vq = q.get('view') || store.get('view', '2d'); if (vq === '3d') set3D(true);
+  log('예제를 불러오거나 직접 코드를 쓰고 ▶ 실행을 누르세요. (Ctrl+Enter)', 'm');
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

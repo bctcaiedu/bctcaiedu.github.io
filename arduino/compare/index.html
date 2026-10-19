@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 답변 비교실 · AI로 배우는 아두이노와 사물인터넷</title>
+  <meta name="description" content="같은 프롬프트를 ChatGPT · Gemini · Claude에 보내고 답변을 나란히 비교 · 평가합니다.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚖️</text></svg>">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
+  <script>try{var t=localStorage.getItem('bctc-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+  <style>
+  :root {
+    --bg: #f4f6f9; --pane: #ffffff; --card: #ffffff; --card2: #f7f9fc; --line: #e1e6ee;
+    --fg: #1d2433; --muted: #6b7587;
+    --accent: #00878f; --accent-soft: #e2f4f4; --accent2: #6a3fd0; --accent2-soft: #efe9fc;
+    --ok: #1f9d55; --ok-soft: #e3f6ec; --warn: #c98a00; --warn-soft: #fff6d9; --danger: #d64541; --danger-soft: #fdeaea;
+    --code-bg: #f6f8fb; --code-fg: #24292f;
+    --gpt: #10a37f; --gem: #4b7bec; --cla: #d97757;
+    --shadow: 0 1px 2px rgba(20, 30, 50, .06), 0 4px 16px rgba(20, 30, 50, .06);
+    --mono: 'JetBrains Mono', Consolas, monospace;
+    --sans: 'Pretendard Variable', Pretendard, -apple-system, 'Segoe UI', 'Malgun Gothic', sans-serif;
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e1116; --pane: #151a21; --card: #1a2029; --card2: #1f2631; --line: #2a323e;
+    --fg: #e3e8f0; --muted: #8d97a8;
+    --accent: #3cc6cc; --accent-soft: #0f2e31; --accent2: #b69cff; --accent2-soft: #261d3d;
+    --ok: #4cc983; --ok-soft: #132e20; --warn: #f2c14e; --warn-soft: #33290f; --danger: #ff6b61; --danger-soft: #3a1a18;
+    --code-bg: #11161d; --code-fg: #d6deeb;
+    --gpt: #3fd0a8; --gem: #8aa9ff; --cla: #f0a080;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, code, pre, textarea, input { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.65 var(--sans); -webkit-font-smoothing: antialiased; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  a { color: var(--accent2); }
+  .hidden { display: none !important; }
+  .muted { color: var(--muted); }
+  .spacer { flex: 1; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 4px; text-decoration: none; border: 1px solid var(--line); background: var(--card);
+    color: var(--fg); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-weight: 600; font-size: 13.5px; white-space: nowrap;
+  }
+  .btn:hover:not(:disabled) { border-color: var(--accent); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn.small { padding: 3px 9px; font-size: 12.5px; border-radius: 7px; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.ai { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+  :root[data-theme="dark"] .btn.primary { color: #06282a; }
+  :root[data-theme="dark"] .btn.ai { color: #1c1035; }
+  .icon-btn { border: none; background: transparent; cursor: pointer; font-size: 18px; width: 32px; height: 32px; border-radius: 8px; color: var(--muted); }
+  .icon-btn:hover { background: var(--card2); color: var(--fg); }
+  .seg { display: inline-flex; background: var(--card2); border: 1px solid var(--line); border-radius: 9px; padding: 3px; gap: 3px; }
+  .seg button { border: none; background: transparent; border-radius: 7px; padding: 5px 12px; cursor: pointer; font-weight: 700; font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .seg button.active { background: var(--pane); color: var(--accent); box-shadow: var(--shadow); }
+
+  .top { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: var(--pane); border-bottom: 1px solid var(--line); }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--fg); min-width: 0; }
+  .brand-logo { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-size: 19px; background: linear-gradient(135deg, #00979d, #6a3fd0); flex: none; }
+  .brand b { display: block; font-size: 15px; line-height: 1.2; }
+  .brand small { font-size: 12px; color: var(--muted); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  main { max-width: 1440px; margin: 0 auto; padding: 18px 16px 80px; display: flex; flex-direction: column; gap: 16px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+  .card-head { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .card-head h2 { margin: 0; font-size: 16px; }
+  .card-body { padding: 12px 14px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; border: 1px solid var(--line); background: var(--card2); border-radius: 20px; padding: 1px 9px; color: var(--muted); }
+  textarea.prompt { width: 100%; min-height: 150px; resize: vertical; border: 1px solid var(--line); background: var(--code-bg); border-radius: 8px; padding: 10px 12px; font: 13.5px/1.6 var(--mono); outline: none; }
+  textarea.prompt:focus, .field input:focus, .paste:focus { border-color: var(--accent); }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .callout { border-radius: 10px; padding: 10px 14px; border: 1px solid var(--line); border-left-width: 5px; font-size: 13.5px; }
+  .callout b { font-weight: 800; }
+  .callout.warn { border-left-color: var(--danger); background: var(--danger-soft); }
+  .callout.info { border-left-color: var(--accent2); background: var(--accent2-soft); }
+  .callout.tip { border-left-color: var(--ok); background: var(--ok-soft); }
+  .callout p { margin: 2px 0; }
+
+  .keys { display: grid; gap: 10px; }
+  .keyrow { display: grid; grid-template-columns: 110px minmax(0, 1.2fr) minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+  .keyrow .name { font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .field input { width: 100%; border: 1px solid var(--line); background: var(--card2); border-radius: 8px; padding: 6px 10px; font-size: 13.5px; outline: none; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  .d-gpt { background: var(--gpt); } .d-gem { background: var(--gem); } .d-cla { background: var(--cla); }
+
+  .cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: start; }
+  .col { border-top: 4px solid var(--c); }
+  .col .card-head .name { font-weight: 800; font-size: 15.5px; }
+  .col .model { font: 600 11.5px var(--mono); color: var(--muted); }
+  .status { font-size: 12px; font-weight: 700; padding: 1px 9px; border-radius: 20px; }
+  .status.run { color: var(--accent2); background: var(--accent2-soft); }
+  .status.ok { color: var(--ok); background: var(--ok-soft); }
+  .status.err { color: var(--danger); background: var(--danger-soft); }
+  .answer { max-height: 620px; overflow-y: auto; padding: 4px 14px 12px; font-size: 14px; }
+  .answer.empty { color: var(--muted); font-size: 13.5px; padding: 18px 14px; }
+  .answer h1, .answer h2, .answer h3, .answer h4 { font-size: 15px; margin: 14px 0 6px; }
+  .answer p { margin: 6px 0; }
+  .answer ul, .answer ol { padding-left: 22px; margin: 6px 0; }
+  .answer code { font-family: var(--mono); font-size: .88em; background: var(--card2); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+  .answer pre { position: relative; background: var(--code-bg); color: var(--code-fg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; overflow-x: auto; font: 12.5px/1.55 var(--mono); }
+  .answer pre code { background: none; border: none; padding: 0; font-size: inherit; }
+  .answer pre .cp { position: absolute; top: 6px; right: 6px; }
+  .answer table { border-collapse: collapse; font-size: 13px; margin: 8px 0; display: block; overflow-x: auto; }
+  .answer th, .answer td { border: 1px solid var(--line); padding: 4px 8px; text-align: left; }
+  .answer th { background: var(--card2); }
+  .answer mark { background: var(--warn-soft); color: inherit; border-radius: 3px; padding: 0 2px; }
+  .paste { width: 100%; min-height: 160px; resize: vertical; border: 1px dashed var(--line); background: var(--card2); border-radius: 8px; padding: 8px 10px; font: 13px/1.55 var(--mono); outline: none; }
+  .web-tools { padding: 10px 14px 0; display: flex; flex-direction: column; gap: 8px; }
+  .rate { border-top: 1px solid var(--line); padding: 10px 14px 12px; display: grid; gap: 6px; font-size: 13px; }
+  .rate .r { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 6px; }
+  .stars { display: inline-flex; gap: 2px; }
+  .stars button { border: none; background: none; cursor: pointer; font-size: 18px; line-height: 1; padding: 0 1px; color: var(--line); }
+  .stars button.on { color: var(--warn); }
+  .rate select, .rate input { border: 1px solid var(--line); background: var(--card2); border-radius: 7px; padding: 4px 8px; font-size: 13px; width: 100%; }
+  .total { font-weight: 800; color: var(--accent2); }
+  .best { box-shadow: 0 0 0 2px var(--warn), var(--shadow); }
+
+  .cmp table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  .cmp th, .cmp td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; vertical-align: top; }
+  .cmp th { background: var(--card2); white-space: nowrap; }
+  .cmp td.y { color: var(--ok); font-weight: 700; } .cmp td.n { color: var(--danger); font-weight: 700; }
+  .table-wrap { overflow-x: auto; }
+  .hist { display: grid; gap: 6px; }
+  .hist .h { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--card2); font-size: 13px; }
+  .hist .h .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%); background: #1d2433; color: #fff; padding: 9px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.25); z-index: 50; }
+
+  @media (max-width: 1100px) { .cols { grid-template-columns: minmax(0, 1fr); } .answer { max-height: none; } }
+  @media (max-width: 720px) {
+    .keyrow { grid-template-columns: minmax(0, 1fr); }
+    .top .brand small { display: none; }
+    main { padding: 12px 12px 60px; }
+  }
+  </style>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="../index.html" title="강의실로 돌아가기">
+    <span class="brand-logo">⚖️</span>
+    <span style="min-width:0"><b>AI 답변 비교실</b><small>← AI로 배우는 아두이노와 사물인터넷</small></span>
+  </a>
+  <span class="spacer"></span>
+  <div class="seg" role="group" aria-label="보내는 방식">
+    <button data-mode="web" title="API 키 없이: 각 챗봇 사이트에 붙여넣고 답을 가져옵니다">🌐 웹 챗봇</button>
+    <button data-mode="api" title="API 키로 세 곳에 한 번에 보냅니다">🔑 API</button>
+  </div>
+  <button id="themeBtn" class="icon-btn" title="라이트/다크 전환" aria-label="테마 전환">◐</button>
+</header>
+
+<main>
+  <!-- 프롬프트 -->
+  <section class="card">
+    <div class="card-head">
+      <h2>① 비교할 프롬프트</h2>
+      <span class="chip" id="srcChip">직접 입력</span>
+      <span class="spacer"></span>
+      <button class="btn small" id="copyPrompt">📋 복사</button>
+    </div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+      <textarea id="prompt" class="prompt" spellcheck="false" placeholder="강의실의 🤖 프롬프트 빌더에서 ⚖️ 버튼을 누르면 여기로 들어옵니다. 직접 써도 됩니다."></textarea>
+
+      <div id="webIntro" class="callout info">
+        <p><b>🌐 웹 챗봇 방식 (API 키 필요 없음)</b> — 아래 각 칸의 <b>복사하고 열기</b>를 누르면 프롬프트가 복사되고 챗봇 사이트가 열립니다. 자동으로 입력되지 않으면 <b>Ctrl+V</b>로 붙여넣으세요. 받은 답변 전체를 복사해 각 칸의 <b>답변 붙여넣기</b>에 넣으면 나란히 비교됩니다.</p>
+      </div>
+
+      <div id="apiBox" class="hidden" style="display:flex;flex-direction:column;gap:10px">
+        <div class="callout warn">
+          <p><b>🔒 API 키 주의</b> — 키는 이 브라우저에서 각 회사 서버로만 직접 전송되고, 이 사이트의 서버로는 가지 않습니다. 그래도 공용 PC에서는 쓰지 말고, 수업용 저예산 키를 쓰세요. 호출할 때마다 요금이 나옵니다. 키는 기본적으로 <b>이 탭을 닫으면 지워집니다</b>.</p>
+        </div>
+        <div class="keys">
+          <div class="keyrow" data-p="gpt">
+            <span class="name"><i class="dot d-gpt"></i>ChatGPT</span>
+            <span class="field"><input type="password" data-k="key" placeholder="OpenAI API 키 (sk-…)" autocomplete="off"></span>
+            <span class="field"><input data-k="model" list="dl-gpt" placeholder="모델"></span>
+            <button class="btn small" data-act="models" title="이 키로 쓸 수 있는 모델 목록 불러오기">📃 모델 목록</button>
+          </div>
+          <div class="keyrow" data-p="gem">
+            <span class="name"><i class="dot d-gem"></i>Gemini</span>
+            <span class="field"><input type="password" data-k="key" placeholder="Google AI Studio API 키" autocomplete="off"></span>
+            <span class="field"><input data-k="model" list="dl-gem" placeholder="모델"></span>
+            <button class="btn small" data-act="models">📃 모델 목록</button>
+          </div>
+          <div class="keyrow" data-p="cla">
+            <span class="name"><i class="dot d-cla"></i>Claude</span>
+            <span class="field"><input type="password" data-k="key" placeholder="Anthropic API 키 (sk-ant-…)" autocomplete="off"></span>
+            <span class="field"><input data-k="model" list="dl-cla" placeholder="모델"></span>
+            <button class="btn small" data-act="models">📃 모델 목록</button>
+          </div>
+        </div>
+        <datalist id="dl-gpt"></datalist><datalist id="dl-gem"></datalist><datalist id="dl-cla"></datalist>
+        <div class="row">
+          <label class="row" style="gap:6px;font-size:13px"><input type="checkbox" id="remember"> 이 브라우저에 키 기억하기 (개인 PC에서만)</label>
+          <span class="spacer"></span>
+          <button class="btn" id="clearKeys">🗑 키 지우기</button>
+          <button class="btn ai" id="sendAll">▶ 세 AI에 동시에 보내기</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 답변 3열 -->
+  <section>
+    <div class="row" style="margin-bottom:8px">
+      <h2 style="margin:0;font-size:16px">② 답변 나란히 보기</h2>
+      <span class="spacer"></span>
+      <label class="row" style="gap:6px;font-size:13px"><input type="checkbox" id="codeOnly"> 코드만 보기</label>
+      <label class="row" style="gap:6px;font-size:13px"><input type="checkbox" id="hlKw" checked> 키워드 강조</label>
+    </div>
+    <div class="cols" id="cols"></div>
+  </section>
+
+  <!-- 비교 분석 -->
+  <section class="card cmp">
+    <div class="card-head">
+      <h2>③ 비교하고 검증하기</h2>
+      <span class="spacer"></span>
+      <button class="btn small" id="crossBtn" title="세 답변을 한 AI에게 비교 · 검토시키는 프롬프트를 복사합니다">🔎 교차 검증 프롬프트 복사</button>
+      <button class="btn small" id="noteBtn">📝 학습 노트로 복사</button>
+      <button class="btn small primary" id="saveBtn">💾 비교 기록 저장</button>
+    </div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+      <div class="row">
+        <label for="kw" style="font-weight:700;font-size:13.5px">확인할 키워드</label>
+        <input id="kw" class="field" style="flex:1;min-width:220px;border:1px solid var(--line);background:var(--card2);border-radius:8px;padding:6px 10px;font-size:13.5px" placeholder="쉼표로 구분 — 예: Tinkercad, INPUT_PULLUP, millis">
+        <button class="btn small" id="kwAuto" title="프롬프트에서 환경 · 함수 이름을 뽑아 채웁니다">✨ 프롬프트에서 뽑기</button>
+      </div>
+      <div class="table-wrap" id="cmpTable"></div>
+      <div class="callout tip">
+        <p><b>비교할 때 볼 것</b> — ① 요청한 환경(Tinkercad · Wokwi · 가상 로봇)과 부품 · 함수 이름을 지켰는가 ② 시뮬레이터에서 <b>실제로 실행</b>되는가 ③ 설명이 내 수준에서 이해되는가 ④ 키 노출 · 위험한 배선 같은 안전 문제는 없는가. 길고 자신 있어 보이는 답이 맞는 답은 아닙니다 — 실행 결과로 판단하세요.</p>
+      </div>
+      <div>
+        <div class="row" style="margin-bottom:6px"><b style="font-size:14px">저장한 비교 기록</b><span class="muted" style="font-size:12.5px">(이 브라우저에만 저장, 최대 20개)</span></div>
+        <div class="hist" id="hist"></div>
+      </div>
+    </div>
+  </section>
+</main>
+<div id="toast" class="toast hidden"></div>
+
+<script>
+/* ===================================================================
+   제공자 설정
+   =================================================================== */
+const P = {
+  gpt: { name: 'ChatGPT', company: 'OpenAI', cls: 'gpt', web: 'https://chatgpt.com/', webQ: (q) => 'https://chatgpt.com/?q=' + encodeURIComponent(q), model: 'gpt-5.5' },
+  gem: { name: 'Gemini', company: 'Google', cls: 'gem', web: 'https://gemini.google.com/app', webQ: null, model: 'gemini-3.5-flash' },
+  cla: { name: 'Claude', company: 'Anthropic', cls: 'cla', web: 'https://claude.ai/new', webQ: (q) => 'https://claude.ai/new?q=' + encodeURIComponent(q), model: 'claude-opus-5-5' }
+};
+const IDS = ['gpt', 'gem', 'cla'];
+const CRIT = [['correct', '실행 · 정확성'], ['spec', '환경 · 명세 준수'], ['clear', '설명 이해도'], ['safe', '안전 · 보안']];
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('ard-cmp-' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('ard-cmp-' + k, JSON.stringify(v)); } catch (e) {} },
+  del(k) { try { localStorage.removeItem('ard-cmp-' + k); } catch (e) {} }
+};
+const sess = {
+  get(k) { try { return sessionStorage.getItem('ard-cmp-' + k); } catch (e) { return null; } },
+  set(k, v) { try { sessionStorage.setItem('ard-cmp-' + k, v); } catch (e) {} },
+  del(k) { try { sessionStorage.removeItem('ard-cmp-' + k); } catch (e) {} }
+};
+
+const state = {
+  mode: 'web',
+  label: '',
+  ans: { gpt: blank(), gem: blank(), cla: blank() }
+};
+function blank() { return { text: '', status: '', ms: null, model: '', err: '', run: 'unknown', score: {}, note: '' }; }
+
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.remove('hidden');
+  clearTimeout(toast.tm); toast.tm = setTimeout(() => t.classList.add('hidden'), 1800);
+}
+function copyText(text, msg) {
+  const ok = () => toast(msg || '📋 복사했습니다');
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(ok, fb); else fb();
+  function fb() {
+    const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); ok(); } catch (e) { toast('복사하지 못했습니다. 직접 선택해 복사하세요.'); }
+    ta.remove();
+  }
+}
+
+/* ===================================================================
+   마크다운(간단) 렌더링 — 먼저 HTML을 이스케이프하고 꾸밈만 적용
+   =================================================================== */
+function inline(s) {
+  return s
+    .replace(/`([^`\n]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>')
+    .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<i>$2</i>');
+}
+function codeBlocks(md) {
+  const out = []; const re = /```[^\n]*\n([\s\S]*?)```/g; let m;
+  while ((m = re.exec(md))) out.push(m[1].replace(/\n$/, ''));
+  return out;
+}
+function renderMd(md, codeOnly) {
+  if (!md.trim()) return '';
+  const lines = md.replace(/\r\n/g, '\n').split('\n');
+  const html = []; let i = 0; let blockN = 0;
+  while (i < lines.length) {
+    const ln = lines[i];
+    const fence = ln.match(/^\s*```\s*([\w+#.-]*)/);
+    if (fence) {
+      const buf = []; i++;
+      while (i < lines.length && !/^\s*```/.test(lines[i])) { buf.push(lines[i]); i++; }
+      i++;
+      html.push(`<pre><button class="btn small cp" data-cpcode="${blockN++}">복사</button><code>${esc(buf.join('\n'))}</code></pre>`);
+      continue;
+    }
+    if (codeOnly) { i++; continue; }
+    if (/^\s*\|.*\|\s*$/.test(ln) && i + 1 < lines.length && /^\s*\|?\s*:?-{2,}/.test(lines[i + 1])) {
+      const rows = [];
+      while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) { rows.push(lines[i]); i++; }
+      const cells = (r) => r.trim().replace(/^\||\|$/g, '').split('|').map((c) => inline(esc(c.trim())));
+      const head = cells(rows[0]);
+      html.push('<table><tr>' + head.map((c) => `<th>${c}</th>`).join('') + '</tr>' +
+        rows.slice(2).map((r) => '<tr>' + cells(r).map((c) => `<td>${c}</td>`).join('') + '</tr>').join('') + '</table>');
+      continue;
+    }
+    const h = ln.match(/^(#{1,6})\s+(.*)/);
+    if (h) { html.push(`<h${Math.min(4, h[1].length + 1)}>${inline(esc(h[2]))}</h${Math.min(4, h[1].length + 1)}>`); i++; continue; }
+    if (/^\s*([-*+]|\d+[.)])\s+/.test(ln)) {
+      const ordered = /^\s*\d/.test(ln); const items = [];
+      while (i < lines.length && /^\s*([-*+]|\d+[.)])\s+/.test(lines[i])) { items.push(lines[i].replace(/^\s*([-*+]|\d+[.)])\s+/, '')); i++; }
+      html.push(`<${ordered ? 'ol' : 'ul'}>` + items.map((t) => `<li>${inline(esc(t))}</li>`).join('') + `</${ordered ? 'ol' : 'ul'}>`);
+      continue;
+    }
+    if (!ln.trim()) { i++; continue; }
+    const para = [];
+    while (i < lines.length && lines[i].trim() && !/^\s*(```|#{1,6}\s|([-*+]|\d+[.)])\s+|\|)/.test(lines[i])) { para.push(lines[i]); i++; }
+    if (!para.length) { para.push(lines[i]); i++; }
+    html.push('<p>' + inline(esc(para.join('\n'))).replace(/\n/g, '<br>') + '</p>');
+  }
+  if (codeOnly && !html.length) return '<p class="muted">코드 블록이 없습니다.</p>';
+  return html.join('');
+}
+function highlightKw(html) {
+  const kws = keywords(); if (!kws.length || !$('hlKw').checked) return html;
+  const re = new RegExp('(' + kws.map((k) => esc(k).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'gi');
+  return html.split(/(<[^>]+>)/).map((part) => part.startsWith('<') ? part : part.replace(re, '<mark>$1</mark>')).join('');
+}
+
+/* ===================================================================
+   열(답변 카드)
+   =================================================================== */
+function buildCols() {
+  $('cols').innerHTML = IDS.map((id) => {
+    const p = P[id];
+    return `<article class="card col" id="col-${id}" style="--c:var(--${p.cls})">
+      <div class="card-head">
+        <i class="dot d-${p.cls}"></i><span class="name">${p.name}</span><span class="model" data-f="model"></span>
+        <span class="spacer"></span><span class="status" data-f="status"></span>
+      </div>
+      <div class="web-tools" data-f="web">
+        <div class="row">
+          <button class="btn small" data-act="open" data-p="${id}">📋 복사하고 ${p.name} 열기</button>
+          <button class="btn small" data-act="edit" data-p="${id}" title="붙여넣은 답변 고치기">✏️ 붙여넣기 칸</button>
+        </div>
+        <textarea class="paste" data-f="paste" data-p="${id}" placeholder="${p.name}의 답변 전체를 복사해서 여기에 붙여넣으세요 (Ctrl+V)"></textarea>
+      </div>
+      <div class="answer empty" data-f="answer">아직 답변이 없습니다.</div>
+      <div class="rate">
+        <div class="r"><span>시뮬레이터 실행 결과</span>
+          <select data-f="run" data-p="${id}" style="width:auto">
+            <option value="unknown">미확인</option><option value="ok">✅ 그대로 동작</option><option value="fix">⚠ 고쳐서 동작</option><option value="fail">❌ 동작 안 함</option>
+          </select></div>
+        ${CRIT.map(([k, n]) => `<div class="r"><span>${n}</span><span class="stars" data-crit="${k}" data-p="${id}">${[1, 2, 3, 4, 5].map((v) => `<button data-v="${v}" aria-label="${n} ${v}점">★</button>`).join('')}</span></div>`).join('')}
+        <input data-f="note" data-p="${id}" placeholder="메모 (예: LiquidCrystal_I2C를 써서 컴파일 오류)">
+        <div class="r"><span>합계</span><span class="total" data-f="total">0 / 20</span></div>
+      </div>
+    </article>`;
+  }).join('');
+}
+function col(id, f) { return document.querySelector(`#col-${id} [data-f="${f}"]`); }
+function renderCol(id) {
+  const a = state.ans[id];
+  const st = col(id, 'status');
+  st.className = 'status ' + (a.status === 'run' ? 'run' : a.status === 'err' ? 'err' : a.text ? 'ok' : '');
+  st.textContent = a.status === 'run' ? '⏳ 생성 중…' : a.status === 'err' ? '오류' : a.text ? `${a.text.length.toLocaleString()}자${a.ms != null ? ' · ' + (a.ms / 1000).toFixed(1) + '초' : ''}` : '';
+  col(id, 'model').textContent = a.model || '';
+  col(id, 'web').classList.toggle('hidden', state.mode !== 'web');
+  const pasteEl = col(id, 'paste');
+  if (document.activeElement !== pasteEl) pasteEl.value = a.text;
+  pasteEl.classList.toggle('hidden', state.mode === 'web' && !!a.text && !pasteEl.dataset.editing);
+  const ans = col(id, 'answer');
+  if (a.status === 'err') { ans.className = 'answer'; ans.innerHTML = `<div class="callout warn"><p><b>요청 실패</b></p><p>${esc(a.err).replace(/\n/g, '<br>')}</p></div>`; }
+  else if (!a.text) { ans.className = 'answer empty'; ans.innerHTML = a.status === 'run' ? '답변을 기다리는 중…' : (state.mode === 'web' ? '위 칸에 답변을 붙여넣으면 여기에 정리되어 보입니다.' : '▶ 세 AI에 동시에 보내기를 누르세요.'); }
+  else { ans.className = 'answer'; ans.innerHTML = highlightKw(renderMd(a.text, $('codeOnly').checked)); }
+  col(id, 'run').value = a.run;
+  document.querySelectorAll(`#col-${id} .stars`).forEach((s) => {
+    const v = a.score[s.dataset.crit] || 0;
+    s.querySelectorAll('button').forEach((b) => b.classList.toggle('on', +b.dataset.v <= v));
+  });
+  const ne = col(id, 'note'); if (document.activeElement !== ne) ne.value = a.note;
+  col(id, 'total').textContent = total(id) + ' / 20';
+}
+function total(id) { const s = state.ans[id].score; return CRIT.reduce((t, [k]) => t + (s[k] || 0), 0); }
+function renderAll() {
+  IDS.forEach(renderCol);
+  renderCmp();
+  const tops = IDS.map(total); const max = Math.max(...tops);
+  IDS.forEach((id, i) => $('col-' + id).classList.toggle('best', max > 0 && tops[i] === max));
+  persistWork();
+}
+
+/* ===================================================================
+   비교 표
+   =================================================================== */
+function keywords() { return $('kw').value.split(',').map((s) => s.trim()).filter(Boolean); }
+function autoKeywords() {
+  const p = $('prompt').value;
+  const found = new Set();
+  ['Tinkercad', 'Wokwi', 'ESP32', 'Arduino UNO', 'Wokwi-GUEST', 'broker.hivemq.com', 'PubSubClient', 'ArduinoJson', 'ESP32Servo', 'Adafruit_LiquidCrystal', 'INPUT_PULLUP', 'millis'].forEach((w) => { if (p.toLowerCase().includes(w.toLowerCase())) found.add(w); });
+  (p.match(/\b[A-Za-z_][A-Za-z0-9_]*(?=\()/g) || []).forEach((f) => { if (f.length > 2 && !/^(I|AI)$/.test(f)) found.add(f + '('); });
+  (p.match(/"([a-z]+\/[\w/]+)"/g) || []).forEach((t) => found.add(t.replace(/"/g, '')));
+  return [...found].slice(0, 14);
+}
+function renderCmp() {
+  const kws = keywords();
+  const run = { unknown: '미확인', ok: '✅ 그대로 동작', fix: '⚠ 고쳐서 동작', fail: '❌ 동작 안 함' };
+  const head = '<tr><th>항목</th>' + IDS.map((id) => `<th><i class="dot d-${P[id].cls}" style="display:inline-block;margin-right:6px"></i>${P[id].name}</th>`).join('') + '</tr>';
+  const rows = [];
+  const cell = (fn) => IDS.map((id) => fn(state.ans[id], id)).join('');
+  rows.push('<tr><th>글자 수</th>' + cell((a) => `<td>${a.text ? a.text.length.toLocaleString() : '-'}</td>`) + '</tr>');
+  rows.push('<tr><th>코드 블록 · 줄 수</th>' + cell((a) => { const cb = codeBlocks(a.text); return `<td>${a.text ? cb.length + '개 · ' + cb.reduce((t, c) => t + c.split('\n').length, 0) + '줄' : '-'}</td>`; }) + '</tr>');
+  rows.push('<tr><th>응답 시간</th>' + cell((a) => `<td>${a.ms != null ? (a.ms / 1000).toFixed(1) + '초' : '-'}</td>`) + '</tr>');
+  kws.forEach((k) => {
+    rows.push(`<tr><th>"${esc(k)}" 포함</th>` + cell((a) => !a.text ? '<td>-</td>' : a.text.toLowerCase().includes(k.toLowerCase()) ? '<td class="y">✓</td>' : '<td class="n">✗</td>') + '</tr>');
+  });
+  rows.push('<tr><th>실행 결과</th>' + cell((a) => `<td>${run[a.run]}</td>`) + '</tr>');
+  rows.push('<tr><th>평가 합계</th>' + cell((a, id) => `<td><b>${total(id)}</b> / 20</td>`) + '</tr>');
+  rows.push('<tr><th>메모</th>' + cell((a) => `<td>${esc(a.note || '')}</td>`) + '</tr>');
+  $('cmpTable').innerHTML = '<table>' + head + rows.join('') + '</table>';
+}
+
+/* ===================================================================
+   API 호출 (사용자의 키로 브라우저에서 각 회사로 직접)
+   =================================================================== */
+function keyRow(id) { return document.querySelector(`.keyrow[data-p="${id}"]`); }
+function getKey(id) { return keyRow(id).querySelector('[data-k="key"]').value.trim(); }
+function getModel(id) { return keyRow(id).querySelector('[data-k="model"]').value.trim() || P[id].model; }
+async function readError(res) {
+  let msg = `HTTP ${res.status}`;
+  try { const j = await res.json(); msg += ' — ' + (j.error && (j.error.message || j.error.type) || JSON.stringify(j).slice(0, 300)); } catch (e) {}
+  if (res.status === 401 || res.status === 403) msg += '\n→ API 키를 확인하세요.';
+  if (res.status === 404) msg += '\n→ 모델 이름을 확인하세요 (📃 모델 목록).';
+  if (res.status === 429) msg += '\n→ 사용량 한도 또는 요금 잔액을 확인하세요.';
+  return msg;
+}
+const CALL = {
+  async gpt(prompt, key, model) {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key },
+      body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }] })
+    });
+    if (!res.ok) throw new Error(await readError(res));
+    const j = await res.json();
+    return { text: (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '', model: j.model || model };
+  },
+  async gem(prompt, key, model) {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+      body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: prompt }] }] })
+    });
+    if (!res.ok) throw new Error(await readError(res));
+    const j = await res.json();
+    if (j.promptFeedback && j.promptFeedback.blockReason) throw new Error('Gemini가 요청을 차단했습니다: ' + j.promptFeedback.blockReason);
+    const c = j.candidates && j.candidates[0];
+    const text = c && c.content && c.content.parts ? c.content.parts.map((p) => p.text || '').join('') : '';
+    if (!text && c && c.finishReason) throw new Error('답변 없이 종료되었습니다: ' + c.finishReason);
+    return { text, model: j.modelVersion || model };
+  },
+  async cla(prompt, key, model) {
+    // Claude Opus 5.5 / Opus 5 / Fable 5.1 / Sonnet 5.5는 안전 거절 시 자동 대체 모델(fallbacks)을 켭니다
+    const fb = /^claude-(opus-5(-5)?|fable-5-1|sonnet-5-5)$/.test(model);
+    const headers = {
+      'content-type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    };
+    if (fb) headers['anthropic-beta'] = 'server-side-fallback-2026-07-01';
+    const body = { model, max_tokens: 16000, messages: [{ role: 'user', content: prompt }] };
+    if (fb) body.fallbacks = 'default';
+    const res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers, body: JSON.stringify(body) });
+    if (!res.ok) throw new Error(await readError(res));
+    const j = await res.json();
+    if (j.stop_reason === 'refusal') {
+      const cat = j.stop_details && j.stop_details.category;
+      throw new Error('Claude가 이 요청에 답하지 않았습니다 (refusal' + (cat ? ', ' + cat : '') + ').');
+    }
+    const text = (j.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('\n');
+    return { text: text + (j.stop_reason === 'max_tokens' ? '\n\n_(최대 길이에 도달해 답변이 잘렸습니다)_' : ''), model: j.model || model };
+  }
+};
+const LIST = {
+  async gpt(key) {
+    const res = await fetch('https://api.openai.com/v1/models', { headers: { Authorization: 'Bearer ' + key } });
+    if (!res.ok) throw new Error(await readError(res));
+    const j = await res.json();
+    return j.data.map((m) => m.id).filter((id) => /^(gpt|o\d|chatgpt)/.test(id) && !/(audio|realtime|tts|transcribe|image|embedding|search|moderation|instruct)/.test(id)).sort().reverse();
+  },
+  async gem(key) {
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200', { headers: { 'x-goog-api-key': key } });
+    if (!res.ok) throw new Error(await readError(res));
+    const j = await res.json();
+    return (j.models || []).filter((m) => (m.supportedGenerationMethods || []).includes('generateContent') && /gemini/.test(m.name) && !/(tts|image|embedding|live)/.test(m.name))
+      .map((m) => m.name.replace(/^models\//, '')).sort().reverse();
+  },
+  async cla(key) {
+    const res = await fetch('https://api.anthropic.com/v1/models?limit=100', {
+      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' }
+    });
+    if (!res.ok) throw new Error(await readError(res));
+    const j = await res.json();
+    return (j.data || []).map((m) => m.id);
+  }
+};
+async function loadModels(id) {
+  const key = getKey(id);
+  if (!key) return toast(P[id].name + ' API 키를 먼저 넣으세요');
+  try {
+    const list = await LIST[id](key);
+    $('dl-' + id).innerHTML = list.map((m) => `<option value="${esc(m)}">`).join('');
+    toast(`${P[id].name}: 모델 ${list.length}개 — 모델 칸을 눌러 고르세요`);
+  } catch (e) { toast('모델 목록 실패: ' + netMsg(e).split('\n')[0]); }
+}
+function netMsg(e) {
+  const m = e && e.message ? e.message : String(e);
+  return /Failed to fetch|NetworkError|Load failed/.test(m) ? '네트워크 연결 실패 — 인터넷 연결, 학교망 차단, 브라우저 확장 프로그램을 확인하세요.' : m;
+}
+async function sendAll() {
+  const prompt = $('prompt').value.trim();
+  if (!prompt) return toast('프롬프트를 먼저 입력하세요');
+  saveKeys();
+  const todo = IDS.filter((id) => getKey(id));
+  if (!todo.length) return toast('API 키를 하나 이상 넣으세요');
+  $('sendAll').disabled = true;
+  await Promise.allSettled(todo.map(async (id) => {
+    const a = state.ans[id];
+    Object.assign(a, { text: '', status: 'run', err: '', ms: null, model: getModel(id) });
+    renderCol(id);
+    const t0 = performance.now();
+    try {
+      const r = await CALL[id](prompt, getKey(id), getModel(id));
+      Object.assign(a, { text: r.text, model: r.model, status: '', ms: Math.round(performance.now() - t0) });
+    } catch (e) {
+      Object.assign(a, { status: 'err', err: netMsg(e), ms: Math.round(performance.now() - t0) });
+    }
+    renderAll();
+  }));
+  $('sendAll').disabled = false;
+  const skipped = IDS.filter((id) => !getKey(id)).map((id) => P[id].name);
+  toast(skipped.length ? `완료 — 키가 없는 ${skipped.join(', ')}은(는) 건너뛰었습니다` : '✅ 세 답변이 모두 도착했습니다');
+}
+
+/* 키 저장: 기본은 탭 세션, 체크하면 localStorage */
+function saveKeys() {
+  const remember = $('remember').checked;
+  store.set('remember', remember);
+  IDS.forEach((id) => {
+    const k = getKey(id), m = keyRow(id).querySelector('[data-k="model"]').value.trim();
+    store.set('model-' + id, m);
+    if (remember) { store.set('key-' + id, k); sess.del('key-' + id); }
+    else { sess.set('key-' + id, k); store.del('key-' + id); }
+  });
+}
+function loadKeys() {
+  $('remember').checked = store.get('remember', false);
+  IDS.forEach((id) => {
+    const row = keyRow(id);
+    row.querySelector('[data-k="key"]').value = store.get('key-' + id, '') || sess.get('key-' + id) || '';
+    row.querySelector('[data-k="model"]').value = store.get('model-' + id, '') || P[id].model;
+  });
+}
+
+/* ===================================================================
+   웹 챗봇 방식
+   =================================================================== */
+function openWeb(id) {
+  const prompt = $('prompt').value.trim();
+  if (!prompt) return toast('프롬프트를 먼저 입력하세요');
+  copyText(prompt, `📋 복사했습니다 — ${P[id].name} 입력창에 붙여넣기(Ctrl+V)`);
+  const url = P[id].webQ && prompt.length < 1800 ? P[id].webQ(prompt) : P[id].web;
+  window.open(url, '_blank', 'noopener');
+}
+
+/* ===================================================================
+   교차 검증 · 학습 노트 · 기록
+   =================================================================== */
+function crossPrompt() {
+  const prompt = $('prompt').value.trim();
+  const parts = IDS.filter((id) => state.ans[id].text).map((id, i) => `### 답변 ${String.fromCharCode(65 + i)}\n${state.ans[id].text}`);
+  if (parts.length < 2) return toast('비교할 답변이 2개 이상 있어야 합니다');
+  const txt = `[역할] 너는 아두이노 · IoT 수업의 꼼꼼한 코드 리뷰어야.
+[과제] 아래 원래 질문에 대해 서로 다른 AI가 쓴 답변 ${parts.length}개를 비교해줘. 어느 AI가 썼는지는 신경 쓰지 마.
+[요청] 1) 답변마다 실제 환경에서 동작하지 않을 부분(없는 함수 · 라이브러리, 틀린 핀, 문법 오류)을 찾아줘
+2) 요청한 환경 · 부품 · 조건을 지켰는지 표로 비교해줘
+3) 가장 믿을 만한 답변과 그 이유, 그리고 내가 시뮬레이터에서 직접 확인해야 할 점 3가지를 알려줘
+[제약] 추측은 추측이라고 표시해줘.
+
+## 원래 질문
+${prompt}
+
+## 비교할 답변
+${parts.join('\n\n')}`;
+  copyText(txt, '🔎 교차 검증 프롬프트를 복사했습니다 — 아무 AI에나 붙여넣으세요');
+}
+function noteMd() {
+  const run = { unknown: '미확인', ok: '그대로 동작', fix: '고쳐서 동작', fail: '동작 안 함' };
+  const lines = [`## AI 답변 비교 — ${state.label || new Date().toLocaleDateString('ko-KR')}`, '', '**프롬프트**', '', '```', $('prompt').value.trim(), '```', '',
+    '| 항목 | ' + IDS.map((id) => P[id].name).join(' | ') + ' |', '| --- | --- | --- | --- |',
+    '| 모델 | ' + IDS.map((id) => state.ans[id].model || (state.mode === 'web' ? '웹' : '-')).join(' | ') + ' |',
+    '| 실행 결과 | ' + IDS.map((id) => run[state.ans[id].run]).join(' | ') + ' |'];
+  CRIT.forEach(([k, n]) => lines.push(`| ${n} | ` + IDS.map((id) => (state.ans[id].score[k] || 0) + '/5').join(' | ') + ' |'));
+  lines.push('| 합계 | ' + IDS.map((id) => total(id) + '/20').join(' | ') + ' |');
+  lines.push('| 메모 | ' + IDS.map((id) => (state.ans[id].note || '').replace(/\|/g, '/')).join(' | ') + ' |');
+  keywords().forEach((k) => lines.push(`| "${k}" | ` + IDS.map((id) => !state.ans[id].text ? '-' : state.ans[id].text.toLowerCase().includes(k.toLowerCase()) ? '✓' : '✗').join(' | ') + ' |'));
+  lines.push('', '**내 결론 (직접 작성)**: ');
+  return lines.join('\n');
+}
+function snapshot() {
+  return { t: Date.now(), label: state.label, prompt: $('prompt').value, kw: $('kw').value, mode: state.mode, ans: JSON.parse(JSON.stringify(state.ans)) };
+}
+function restore(s) {
+  $('prompt').value = s.prompt || ''; $('kw').value = s.kw || ''; state.label = s.label || '';
+  state.ans = Object.assign({ gpt: blank(), gem: blank(), cla: blank() }, s.ans || {});
+  IDS.forEach((id) => { state.ans[id] = Object.assign(blank(), state.ans[id]); if (state.ans[id].status === 'run') state.ans[id].status = ''; });
+  setSrcChip(); renderAll();
+}
+function saveHist() {
+  if (!IDS.some((id) => state.ans[id].text)) return toast('저장할 답변이 없습니다');
+  const h = store.get('hist', []); h.unshift(snapshot()); store.set('hist', h.slice(0, 20)); renderHist(); toast('💾 저장했습니다');
+}
+function renderHist() {
+  const h = store.get('hist', []);
+  $('hist').innerHTML = h.length ? h.map((s, i) => {
+    const best = IDS.map((id) => [id, CRIT.reduce((t, [k]) => t + ((s.ans[id] && s.ans[id].score && s.ans[id].score[k]) || 0), 0)]).sort((a, b) => b[1] - a[1])[0];
+    return `<div class="h"><span class="muted">${new Date(s.t).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+      <span class="t">${esc(s.label ? s.label + ' · ' : '')}${esc((s.prompt || '').replace(/\s+/g, ' ').slice(0, 80))}</span>
+      ${best && best[1] ? `<span class="chip">최고: ${P[best[0]].name} ${best[1]}점</span>` : ''}
+      <button class="btn small" data-hload="${i}">열기</button><button class="btn small" data-hdel="${i}" aria-label="삭제">✕</button></div>`;
+  }).join('') : '<span class="muted" style="font-size:13px">아직 없습니다.</span>';
+}
+let persistTm;
+function persistWork() { clearTimeout(persistTm); persistTm = setTimeout(() => store.set('work', snapshot()), 300); }
+
+/* ===================================================================
+   모드 · 이벤트
+   =================================================================== */
+function setMode(m) {
+  state.mode = m === 'api' ? 'api' : 'web';
+  store.set('mode', state.mode);
+  document.querySelectorAll('.seg button').forEach((b) => b.classList.toggle('active', b.dataset.mode === state.mode));
+  $('apiBox').classList.toggle('hidden', state.mode !== 'api');
+  $('webIntro').classList.toggle('hidden', state.mode !== 'web');
+  renderAll();
+}
+function setSrcChip() { $('srcChip').textContent = state.label ? '🤖 ' + state.label + ' 프롬프트 빌더에서' : '직접 입력'; }
+
+document.querySelectorAll('.seg button').forEach((b) => b.onclick = () => setMode(b.dataset.mode));
+$('copyPrompt').onclick = () => copyText($('prompt').value, '📋 프롬프트를 복사했습니다');
+$('sendAll').onclick = sendAll;
+$('clearKeys').onclick = () => { IDS.forEach((id) => { keyRow(id).querySelector('[data-k="key"]').value = ''; store.del('key-' + id); sess.del('key-' + id); }); toast('🗑 키를 지웠습니다'); };
+$('remember').onchange = saveKeys;
+document.querySelectorAll('.keyrow input').forEach((el) => el.addEventListener('change', saveKeys));
+$('prompt').addEventListener('input', () => { persistWork(); });
+$('kw').addEventListener('input', () => { renderAll(); });
+$('kwAuto').onclick = () => { $('kw').value = autoKeywords().join(', '); renderAll(); };
+$('codeOnly').onchange = renderAll; $('hlKw').onchange = renderAll;
+$('crossBtn').onclick = crossPrompt;
+$('noteBtn').onclick = () => copyText(noteMd(), '📝 학습 노트용 표를 복사했습니다');
+$('saveBtn').onclick = saveHist;
+$('themeBtn').onclick = () => {
+  const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  try { localStorage.setItem('bctc-theme', t); } catch (e) {}
+};
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.act === 'open') return openWeb(b.dataset.p);
+  if (b.dataset.act === 'edit') { const p = col(b.dataset.p, 'paste'); p.dataset.editing = '1'; p.classList.remove('hidden'); p.focus(); return; }
+  if (b.dataset.act === 'models') return loadModels(b.closest('.keyrow').dataset.p);
+  if (b.dataset.cpcode != null) { const id = b.closest('.col').id.slice(4); copyText(codeBlocks(state.ans[id].text)[+b.dataset.cpcode] || '', '📋 코드를 복사했습니다'); return; }
+  if (b.dataset.v && b.parentElement.dataset.crit) {
+    const s = b.parentElement, id = s.dataset.p, k = s.dataset.crit, v = +b.dataset.v;
+    state.ans[id].score[k] = state.ans[id].score[k] === v ? 0 : v; renderAll(); return;
+  }
+  if (b.dataset.hload != null) { restore(store.get('hist', [])[+b.dataset.hload]); window.scrollTo({ top: 0, behavior: 'smooth' }); toast('기록을 불러왔습니다'); return; }
+  if (b.dataset.hdel != null) { const h = store.get('hist', []); h.splice(+b.dataset.hdel, 1); store.set('hist', h); renderHist(); }
+});
+document.addEventListener('input', (e) => {
+  const t = e.target;
+  if (t.dataset.f === 'paste') { const a = state.ans[t.dataset.p]; a.text = t.value; a.status = ''; a.err = ''; a.ms = null; a.model = t.value ? '웹 챗봇' : ''; renderAll(); }
+  if (t.dataset.f === 'note') { state.ans[t.dataset.p].note = t.value; renderCmp(); persistWork(); }
+});
+document.addEventListener('change', (e) => {
+  const t = e.target;
+  if (t.dataset.f === 'run') { state.ans[t.dataset.p].run = t.value; renderAll(); }
+});
+document.addEventListener('focusout', (e) => {
+  const t = e.target;
+  if (t.dataset && t.dataset.f === 'paste') { delete t.dataset.editing; renderCol(t.dataset.p); }
+});
+
+/* 시작: 강의실 프롬프트 빌더에서 넘겨받은 프롬프트가 있으면 새 비교로 시작 */
+(function init() {
+  buildCols();
+  loadKeys();
+  const work = store.get('work', null);
+  let incoming = null;
+  try { incoming = JSON.parse(localStorage.getItem('ard-compare-in') || 'null'); } catch (e) {}
+  if (incoming && incoming.t && incoming.t !== store.get('lastIn', 0)) {
+    store.set('lastIn', incoming.t);
+    $('prompt').value = incoming.prompt || '';
+    state.label = incoming.label || '';
+    $('kw').value = autoKeywords().join(', ');
+  } else if (work) restore(work);
+  setSrcChip();
+  setMode(new URLSearchParams(location.search).get('mode') || store.get('mode', 'web'));
+  renderHist();
+})();
+</script>
+</body>
+</html>

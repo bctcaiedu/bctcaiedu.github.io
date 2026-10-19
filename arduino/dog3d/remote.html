@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>로봇개 리모컨 · AI로 배우는 아두이노와 사물인터넷</title>
+  <meta name="description" content="스마트폰으로 3D 로봇개를 MQTT로 조종하는 리모컨입니다.">
+  <meta name="theme-color" content="#0f1419">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
+  <style>
+  :root { --bg:#0f1419; --card:#161d26; --line:#273141; --fg:#e6edf3; --muted:#8b96a8; --accent:#00979d; --accent2:#9b7bff; --ok:#3fb950; --bad:#ff7b72; --warn:#f2c14e;
+    --mono:'JetBrains Mono',Consolas,monospace; --sans:'Pretendard Variable',Pretendard,-apple-system,'Segoe UI','Malgun Gothic',sans-serif; color-scheme: dark; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 var(--sans); }
+  button, input, textarea { font: inherit; color: inherit; }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 12px 14px 28px; display: flex; flex-direction: column; gap: 12px; }
+  header { display: flex; align-items: center; gap: 10px; }
+  header .logo { font-size: 26px; }
+  header b { font-size: 17px; display: block; line-height: 1.2; } header small { color: var(--muted); font-size: 12px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  input.code { width: 110px; background: #0a0e13; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font: 700 20px var(--mono); letter-spacing: .1em; text-align: center; }
+  .btn { border: 1px solid var(--line); background: #0a0e13; border-radius: 10px; padding: 8px 12px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.on { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+  .btn.stop { background: #b3322e; border-color: #b3322e; color: #fff; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #7d8799; display: inline-block; }
+  .dot.on { background: #28c840; box-shadow: 0 0 0 3px rgba(40,200,64,.25); } .dot.bad { background: #ff5f57; }
+  .status { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .tele { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .tele div { background: #0a0e13; border: 1px solid var(--line); border-radius: 10px; padding: 6px 4px; text-align: center; }
+  .tele small { display: block; color: var(--muted); font-size: 11px; }
+  .tele b { font: 700 15px var(--mono); }
+  .joy { position: relative; width: 230px; height: 230px; margin: 4px auto; border-radius: 50%; background: radial-gradient(circle, #1d2633 0 55%, #141b24 56% 100%); border: 2px solid var(--line); touch-action: none; }
+  .joy::before, .joy::after { content: ''; position: absolute; background: #273141; }
+  .joy::before { left: 50%; top: 14px; bottom: 14px; width: 2px; } .joy::after { top: 50%; left: 14px; right: 14px; height: 2px; }
+  .knob { position: absolute; left: 50%; top: 50%; width: 84px; height: 84px; margin: -42px 0 0 -42px; border-radius: 50%; background: linear-gradient(145deg, #12b3b9, #00787d); box-shadow: 0 6px 18px rgba(0,0,0,.5); z-index: 2; display: grid; place-items: center; font-size: 30px; }
+  .joy .lbl { position: absolute; font-size: 12px; color: var(--muted); font-weight: 700; z-index: 1; }
+  .acts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .acts .btn { padding: 12px 6px; font-size: 15px; }
+  textarea { width: 100%; min-height: 120px; background: #0a0e13; border: 1px solid var(--line); border-radius: 10px; padding: 8px; font: 12px/1.5 var(--mono); }
+  .cap { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .log { background: #0a0e13; border: 1px solid var(--line); border-radius: 10px; padding: 6px 9px; font: 11.5px/1.5 var(--mono); height: 92px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; color: var(--muted); }
+  .log .e { color: var(--bad); } .log .i { color: var(--ok); } .log .w { color: var(--warn); }
+  .hint { font-size: 12.5px; color: var(--muted); margin: 0; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header><span class="logo">🎮</span><span><b>로봇개 리모컨</b><small>43차시 · PC 화면의 3D 로봇개를 MQTT로 조종</small></span></header>
+
+  <div class="card">
+    <div class="row">
+      <span style="font-size:13px;color:var(--muted)">연결 코드</span>
+      <input class="code" id="code" inputmode="numeric" maxlength="6" aria-label="연결 코드">
+      <button class="btn primary" id="connBtn">연결</button>
+    </div>
+    <div class="status" style="margin-top:8px"><span class="dot" id="dot"></span><span id="stText">연결 안 됨</span><span style="margin-left:auto" id="rtt"></span></div>
+  </div>
+
+  <div class="tele" id="tele"></div>
+
+  <div class="card">
+    <div class="cap"><span>🕹 조이스틱 (끌어서 조종)</span><span><button class="btn" id="tiltBtn" style="padding:4px 10px;font-size:12.5px">📐 기울여서 조종</button></span></div>
+    <div class="joy" id="joy">
+      <span class="lbl" style="top:6px;left:50%;transform:translateX(-50%)">앞</span>
+      <span class="lbl" style="bottom:6px;left:50%;transform:translateX(-50%)">뒤</span>
+      <span class="lbl" style="left:8px;top:50%;transform:translateY(-50%)">⟲</span>
+      <span class="lbl" style="right:8px;top:50%;transform:translateY(-50%)">⟳</span>
+      <div class="knob" id="knob">🐕</div>
+    </div>
+    <p class="hint" id="joyTxt" style="text-align:center">v 0.00 · w 0.00</p>
+  </div>
+
+  <div class="acts" id="acts"></div>
+
+  <div class="card">
+    <div class="cap"><span>🧩 매크로 (명령 순서를 JSON으로)</span><span id="macroSt"></span></div>
+    <textarea id="macro" spellcheck="false"></textarea>
+    <div class="row" style="margin-top:6px"><button class="btn primary" id="macroRun">▶ 매크로 실행</button><button class="btn" id="macroStop">■ 중지</button></div>
+    <p class="hint" style="margin-top:6px">각 단계: <code>{"c":"명령", "v":앞뒤, "w":회전, "ms":시간}</code> — AI에게 이 형식을 알려 주고 산책 코스를 만들어 달라고 해 보세요.</p>
+  </div>
+
+  <div>
+    <div class="cap"><span>📨 보낸 명령 · 받은 상태</span></div>
+    <div class="log" id="log"></div>
+  </div>
+</div>
+<script>
+const $ = (id) => document.getElementById(id);
+const q = new URLSearchParams(location.search);
+function store(k, v) { try { if (v === undefined) return localStorage.getItem('ard-dogr-' + k); localStorage.setItem('ard-dogr-' + k, v); } catch (e) { return null; } }
+$('code').value = q.get('code') || store('code') || '';
+const mq = { client: null, connected: false, seq: 0, pingSeq: -1, pingT: 0, lastState: 0 };
+const st = { v: 0, w: 0, active: false, tilt: false, macro: null };
+const logEl = $('log'), logArr = [];
+function log(t, cls) { logArr.push(`<span class="${cls || ''}">${String(t).replace(/</g, '&lt;')}</span>`); if (logArr.length > 60) logArr.shift(); logEl.innerHTML = logArr.join('\n'); logEl.scrollTop = logEl.scrollHeight; }
+function status(t, cls) { $('stText').textContent = t; $('dot').className = 'dot ' + (cls || ''); }
+const base = () => 'bctc/dog/' + $('code').value.trim();
+
+function loadMqtt() {
+  return new Promise((res, rej) => {
+    if (window.mqtt) return res(window.mqtt);
+    const s = document.createElement('script'); s.src = 'https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js';
+    s.onload = () => res(window.mqtt); s.onerror = () => rej(new Error('MQTT 라이브러리를 불러오지 못했습니다')); document.head.appendChild(s);
+  });
+}
+async function connect() {
+  const code = $('code').value.trim();
+  if (!/^\d{4,6}$/.test(code)) { status('PC 화면의 숫자 코드를 넣으세요', 'bad'); return; }
+  store('code', code);
+  if (mq.client) { const c = mq.client; mq.client = null; c.end(true); }
+  status('연결 중…');
+  try {
+    const lib = await loadMqtt();
+    const c = lib.connect('wss://broker.hivemq.com:8884/mqtt', { clientId: 'bctc-remote-' + Math.random().toString(16).slice(2, 8), connectTimeout: 8000, reconnectPeriod: 3000, clean: true });
+    mq.client = c;
+    c.on('connect', () => { mq.connected = true; status('브로커 연결됨 · 로봇개 찾는 중…', 'on'); c.subscribe(base() + '/state'); log('구독: ' + base() + '/state', 'i'); ping(); });
+    c.on('reconnect', () => status('다시 연결 중…'));
+    c.on('close', () => { mq.connected = false; if (mq.client) status('연결 끊김', 'bad'); });
+    c.on('message', (t, buf) => onState(buf.toString()));
+  } catch (e) { status(e.message, 'bad'); }
+}
+function send(obj, quiet) {
+  if (!mq.connected) return false;
+  obj.seq = ++mq.seq;
+  const s = JSON.stringify(obj);
+  mq.client.publish(base() + '/cmd', s);
+  if (!quiet) log('▶ ' + s);
+  return true;
+}
+function ping() { if (!mq.connected) return; mq.pingT = performance.now(); send({ c: 'ping' }, true); mq.pingSeq = mq.seq; }
+setInterval(ping, 2000);
+function onState(msg) {
+  let s; try { s = JSON.parse(msg); } catch (e) { return; }
+  mq.lastState = performance.now();
+  if (s.ack === mq.pingSeq && mq.pingSeq > 0) { $('rtt').textContent = '왕복 ' + Math.round(performance.now() - mq.pingT) + ' ms'; mq.pingSeq = -1; }
+  status('로봇개와 연결됨', 'on');
+  const mode = { stand: '서 있음', sit: '앉음', lie: '엎드림' }[s.mode] || s.mode;
+  $('tele').innerHTML = [['상태', mode], ['🎾 공', `${s.balls}/3`], ['🔋 배터리', s.battery + '%'], ['💥 충돌', s.bump]].map(([a, b]) => `<div><small>${a}</small><b>${b}</b></div>`).join('');
+  if (s.done && !mq.doneShown) { mq.doneShown = true; log('🏁 미션 성공!', 'i'); if (navigator.vibrate) navigator.vibrate([100, 60, 100]); }
+}
+setInterval(() => { if (mq.connected && performance.now() - mq.lastState > 3000) status('브로커 연결됨 · 로봇개 응답 없음 (코드 확인)', 'bad'); }, 1000);
+$('tele').innerHTML = [['상태', '-'], ['🎾 공', '-'], ['🔋 배터리', '-'], ['💥 충돌', '-']].map(([a, b]) => `<div><small>${a}</small><b>${b}</b></div>`).join('');
+
+/* 조이스틱: 누르고 있는 동안 0.1초마다 move 전송 (워치독 0.7초) */
+const joy = $('joy'), knob = $('knob');
+function setVW(v, w) {
+  st.v = Math.round(v * 100) / 100; st.w = Math.round(w * 100) / 100;
+  $('joyTxt').textContent = `v ${st.v.toFixed(2)} · w ${st.w.toFixed(2)}`;
+}
+function joyMove(e) {
+  const r = joy.getBoundingClientRect(), R = r.width / 2 - 42;
+  let dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+  const d = Math.hypot(dx, dy); if (d > R) { dx *= R / d; dy *= R / d; }
+  knob.style.transform = `translate(${dx}px, ${dy}px)`;
+  const dz = (x) => (Math.abs(x) < 0.12 ? 0 : x);
+  setVW(dz(-dy / R), dz(-dx / R));
+}
+joy.addEventListener('pointerdown', (e) => { st.active = true; st.macro = null; joy.setPointerCapture(e.pointerId); joyMove(e); sendMove(); });
+joy.addEventListener('pointermove', (e) => { if (st.active) joyMove(e); });
+const joyEnd = () => { if (!st.active) return; st.active = false; knob.style.transform = ''; setVW(0, 0); send({ c: 'move', v: 0, w: 0 }, true); };
+joy.addEventListener('pointerup', joyEnd); joy.addEventListener('pointercancel', joyEnd);
+let lastLogged = '';
+function sendMove() {
+  const key = st.v + ',' + st.w;
+  send({ c: 'move', v: st.v, w: st.w }, key === lastLogged); lastLogged = key;
+}
+setInterval(() => { if (st.active || (st.tilt && (st.v || st.w))) sendMove(); }, 100);
+
+/* 기울여서 조종 (DeviceOrientation, https에서만 동작) */
+let beta0 = null;
+function onTilt(e) {
+  if (!st.tilt || e.beta == null) return;
+  if (beta0 == null) beta0 = e.beta;
+  const c = (x) => Math.max(-1, Math.min(1, x));
+  const v = c(-(e.beta - beta0) / 25), w = c(-(e.gamma || 0) / 25);
+  const dz = (x) => (Math.abs(x) < 0.15 ? 0 : x);
+  setVW(dz(v), dz(w));
+  knob.style.transform = `translate(${-st.w * 60}px, ${-st.v * 60}px)`;
+}
+$('tiltBtn').onclick = async () => {
+  if (st.tilt) { st.tilt = false; $('tiltBtn').classList.remove('on'); setVW(0, 0); knob.style.transform = ''; send({ c: 'stop' }); return; }
+  if (!window.isSecureContext) { log('⚠ 기울기 센서는 https 주소에서만 동작합니다', 'e'); return; }
+  try { if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') { const r = await DeviceOrientationEvent.requestPermission(); if (r !== 'granted') { log('센서 권한이 거부되었습니다', 'e'); return; } } }
+  catch (e) { log('센서 권한 요청 실패: ' + e.message, 'e'); return; }
+  beta0 = null; st.tilt = true; $('tiltBtn').classList.add('on');
+  addEventListener('deviceorientation', onTilt);
+  log('📐 지금 잡은 각도가 "정지"입니다. 앞으로 숙이면 전진, 좌우로 기울이면 회전', 'i');
+};
+
+/* 동작 버튼 */
+const ACTS = [['sit', '🪑 앉아'], ['stand', '🧍 일어서'], ['lie', '🛏 엎드려'], ['paw', '🐾 손'], ['jump', '⤴ 점프'], ['bark', '🔊 짖어']];
+$('acts').innerHTML = ACTS.map(([c, n]) => `<button class="btn" data-c="${c}">${n}</button>`).join('') + '<button class="btn stop" data-c="stop" style="grid-column:1 / -1">■ 정지</button>';
+$('acts').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; st.macro = null; if (b.dataset.c === 'stop') { st.tilt = false; $('tiltBtn').classList.remove('on'); } if (!send({ c: b.dataset.c })) log('먼저 연결하세요', 'e'); };
+
+/* 매크로 */
+$('macro').value = `[
+  {"c":"move", "v":0.7, "w":0,   "ms":2000},
+  {"c":"move", "v":0.5, "w":0.6, "ms":1500},
+  {"c":"bark", "ms":800},
+  {"c":"sit",  "ms":1500},
+  {"c":"paw",  "ms":2500},
+  {"c":"stand","ms":800}
+]`;
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+$('macroRun').onclick = async () => {
+  let steps;
+  try { steps = JSON.parse($('macro').value); if (!Array.isArray(steps)) throw new Error('[ ]로 감싼 배열이어야 합니다'); }
+  catch (e) { log('✖ JSON 오류: ' + e.message, 'e'); return; }
+  if (!mq.connected) { log('먼저 연결하세요', 'e'); return; }
+  const me = {}; st.macro = me;
+  for (let i = 0; i < steps.length; i++) {
+    if (st.macro !== me) break;
+    const s = steps[i], ms = Math.max(0, Math.min(20000, +s.ms || 500));
+    $('macroSt').textContent = `${i + 1}/${steps.length}`;
+    if (s.c === 'move') {   // move는 워치독 때문에 0.1초마다 다시 보낸다
+      const end = performance.now() + ms;
+      send({ c: 'move', v: +s.v || 0, w: +s.w || 0 });
+      while (performance.now() < end && st.macro === me) { await wait(100); send({ c: 'move', v: +s.v || 0, w: +s.w || 0 }, true); }
+      send({ c: 'move', v: 0, w: 0 }, true);
+    } else { send(Object.assign({}, s, { ms: undefined })); await wait(ms); }
+  }
+  if (st.macro === me) { st.macro = null; $('macroSt').textContent = '완료'; log('매크로 끝', 'i'); }
+};
+$('macroStop').onclick = () => { st.macro = null; send({ c: 'stop' }); $('macroSt').textContent = '중지'; };
+
+$('connBtn').onclick = connect;
+if ($('code').value) connect(); else status('PC 화면의 연결 코드를 넣고 연결하세요');
+</script>
+</body>
+</html>
