@@ -1,0 +1,1647 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>쓰고 · 컴파일하고 · 테스트한다 — 로컬 LLM 자바 코드 생성기</title>
+<meta name="description" content="내 PC의 LLM이 자바 코드를 쓰고, 컴파일하고, 테스트해 통과할 때까지 스스로 고친다 — WSL2 · Ollama · Spring Boot 로 만드는 AI응용소프트웨어과 1주 35시간 개인 프로젝트 교안">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
+<script>try{var t=localStorage.getItem('javagen-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<style>
+  :root{
+    --bg:#f4f6f9;--card:#fff;--card2:#f7f9fc;--line:#e1e6ee;--line2:#b9c2d0;--fg:#1d2433;--muted:#6b7587;
+    --accent:#e95420;--accent-soft:#fdece6;--accent2:#77216f;--accent2-soft:#f5e8f3;
+    --ok:#1f9d55;--ok-soft:#e3f6ec;--warn:#c98a00;--warn-soft:#fff6d9;--danger:#d64541;--danger-soft:#fdeaea;
+    --more:#7b4fd1;--more-soft:#f1ebfd;--code-bg:#f6f8fb;--code-fg:#24292f;--tk-def:#953800;
+    --term-bg:#0f1419;--term-fg:#d7dde8;
+    --shadow:0 1px 2px rgba(20,30,50,.06),0 4px 16px rgba(20,30,50,.06);--radius:10px;
+    --mono:'JetBrains Mono','D2Coding',Consolas,'Courier New',monospace;
+    --sans:'Pretendard Variable',Pretendard,-apple-system,'Segoe UI','Malgun Gothic',sans-serif;
+    color-scheme:light}
+  :root[data-theme="dark"]{
+    --bg:#0e1116;--card:#1a2029;--card2:#1f2631;--line:#2a323e;--line2:#4a5566;--fg:#e3e8f0;--muted:#8d97a8;
+    --accent:#ff7f50;--accent-soft:#3b1f14;--accent2:#d58bcb;--accent2-soft:#2f1a2d;
+    --ok:#4cc983;--ok-soft:#132e20;--warn:#f2c14e;--warn-soft:#33290f;--danger:#ff6b61;--danger-soft:#3a1a18;
+    --more:#b695ff;--more-soft:#271d3d;--code-bg:#11161d;--code-fg:#d6deeb;--tk-def:#ffa657;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25);color-scheme:dark}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:20px}
+  html,code,kbd,pre{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0,"clig" 0,"dlig" 0}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15.5px;line-height:1.7;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent2)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+  .topbar{display:flex;align-items:center;gap:10px;padding:14px 0}
+  .topbar .logo{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:19px;background:linear-gradient(135deg,#b45309,#115e59)}
+  .topbar b{font-size:16px;letter-spacing:-.01em;display:block;line-height:1.2}
+  .topbar small{font-size:12px;color:var(--muted)}
+  .topbar .sp{flex:1}
+  .btn{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;padding:6px 12px;cursor:pointer;font:600 13.5px var(--sans);text-decoration:none}
+  .btn:hover{border-color:var(--accent)}
+
+  .hero{border-radius:16px;padding:34px 34px 30px;margin:6px 0 0;color:#fff;position:relative;overflow:hidden;
+    background:radial-gradient(circle at 85% 20%,rgba(255,255,255,.18),transparent 40%),linear-gradient(135deg,#b45309 0%,#8a4b2a 45%,#115e59 100%)}
+  .hero .eyebrow{font:600 12px var(--mono);letter-spacing:.06em;opacity:.9}
+  .hero h1{margin:10px 0 8px;font-size:clamp(28px,4.4vw,38px);line-height:1.25;letter-spacing:-.02em;font-weight:800}
+  .hero p{margin:4px 0;opacity:.95;max-width:62ch;font-size:16px}
+  .hero .meta{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px;position:relative;z-index:1}
+  .hero .meta span{font-size:13px;font-weight:600;background:rgba(255,255,255,.95);color:#1d2433;border-radius:8px;padding:5px 11px}
+  .hero .cup{position:absolute;right:26px;bottom:-18px;font-size:120px;opacity:.22;pointer-events:none}
+
+  .layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:32px;margin-top:28px}
+  nav.toc{position:sticky;top:16px;align-self:start;font-size:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;box-shadow:var(--shadow)}
+  nav.toc b{display:block;font:700 11px var(--mono);letter-spacing:.1em;color:var(--muted);margin:2px 6px 8px}
+  nav.toc a{display:block;padding:7px 10px;border-radius:8px;color:var(--fg);text-decoration:none;line-height:1.35}
+  nav.toc a:hover{background:var(--card2)}
+  nav.toc a.on{background:var(--accent-soft);color:var(--accent);font-weight:700}
+  nav.toc a small{font:700 10.5px var(--mono);color:var(--accent);display:block}
+
+  main{min-width:0}
+  section{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:28px 34px 30px;margin-bottom:24px}
+  .sec{font:700 12px var(--mono);color:var(--accent);margin:0 0 4px}
+  h2{font-size:24px;line-height:1.35;margin:0 0 14px;padding-bottom:8px;border-bottom:2px solid var(--line);letter-spacing:-.01em}
+  h3{font-size:18.5px;margin:30px 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  h3::before{content:'';width:5px;height:18px;border-radius:3px;background:var(--accent)}
+  h3 .n{font:600 12px var(--mono);color:var(--accent2);background:var(--accent2-soft);border-radius:5px;padding:1px 7px}
+  .lead{font-size:16px;margin:0 0 8px}
+  p{margin:8px 0}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:3px 0}
+  li::marker{color:var(--accent)}
+  :not(pre)>code{font-family:var(--mono);background:var(--card2);border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:.88em;color:var(--tk-def);word-break:break-word}
+
+  .tbl{overflow-x:auto;margin:12px 0}
+  table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px;background:var(--card);border-radius:8px;overflow:hidden;box-shadow:var(--shadow)}
+  th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+  th{background:var(--card2);font-weight:700}
+
+  .code{position:relative;margin:14px 0 16px;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--code-bg);box-shadow:var(--shadow)}
+  .code .lang{display:block;padding:7px 90px 7px 14px;background:var(--card);border-bottom:1px solid var(--line);font:600 11.5px var(--mono);color:var(--accent2)}
+  pre{margin:0;padding:12px 16px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.6;color:var(--code-fg);white-space:pre;tab-size:4}
+  pre code{background:none;border:0;padding:0;color:inherit;font-size:inherit}
+  .code.term pre{background:var(--term-bg);color:var(--term-fg)}
+  .copy{position:absolute;top:4px;right:6px;font:600 12px var(--sans);background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:7px;padding:3px 9px;cursor:pointer}
+  .copy:hover{border-color:var(--accent);color:var(--accent)}
+  .code.prompt{border-left:5px solid var(--more)}
+  .code.prompt .lang{color:var(--more);background:var(--more-soft)}
+  .code.prompt pre{font-family:var(--sans);font-size:14.5px;white-space:pre-wrap;background:var(--card)}
+
+  .ok,.warn,.tip,.ask{border-radius:var(--radius);padding:12px 16px;margin:16px 0;border:1px solid var(--line);border-left-width:5px;font-size:15px}
+  .ok::before,.warn::before,.tip::before,.ask::before{display:block;font-weight:800;margin-bottom:2px}
+  .ok{border-left-color:var(--ok);background:var(--ok-soft)}
+  .ok::before{content:"✅ 확인 포인트";color:var(--ok)}
+  .warn{border-left-color:var(--danger);background:var(--danger-soft)}
+  .warn::before{content:"⚠️ 주의";color:var(--danger)}
+  .tip{border-left-color:var(--accent2);background:var(--accent2-soft)}
+  .tip::before{content:"💡 요령";color:var(--accent2)}
+  .ask{border-left-color:var(--more);background:var(--more-soft)}
+  .ask::before{content:"❓ 생각해 볼 것";color:var(--more)}
+  .ok p,.warn p,.tip p,.ask p{margin:4px 0}
+  .muted{color:var(--muted);font-size:13px}
+
+  .checks{list-style:none;padding:0}
+  .checks li{position:relative;padding:9px 12px 9px 42px;background:var(--card2);border:1px solid var(--line);border-radius:8px;margin:8px 0}
+  .checks input{position:absolute;left:14px;top:13px;width:17px;height:17px;accent-color:var(--ok)}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:16px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);transition:transform .12s,border-color .12s}
+  .card:hover{transform:translateY(-2px);border-color:var(--accent)}
+  .card .dn{font:700 12px var(--mono);color:var(--accent)}
+  .card b{display:block;font-size:16px;margin:4px 0 2px}
+  .card span{font-size:13.5px;color:var(--muted);line-height:1.55;display:block}
+
+  .saybox{display:flex;gap:14px;align-items:flex-start;background:var(--accent-soft);border:2px solid var(--accent);
+        border-radius:16px;padding:18px 22px;margin:14px 0 10px}
+  .saybox .ic{font-size:30px;line-height:1.1}
+  .saybox .who{font:700 11px var(--mono);letter-spacing:.08em;color:var(--accent);display:block}
+  .saybox .say{display:block;font-size:21px;font-weight:800;line-height:1.45;letter-spacing:-.01em;margin-top:3px}
+  .saybox small{display:block;color:var(--muted);font-size:13px;margin-top:6px}
+  @media (max-width:760px){.saybox .say{font-size:17px}}
+
+  .mission{border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:var(--radius);background:var(--card2);padding:14px 18px;margin:16px 0}
+  .mission .mh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .mission .mn{font:700 11.5px var(--mono);color:var(--accent)}
+  .mission .mh b{font-size:16px}
+  .mission .tm{font:600 11.5px var(--mono);color:var(--muted);margin-left:auto}
+
+  figure{margin:20px 0 8px}
+  .diagram{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;overflow-x:auto}
+  .diagram svg{display:block;width:100%;min-width:620px;height:auto}
+  figcaption{font-size:13.5px;color:var(--muted);margin-top:8px}
+  svg .bx{fill:var(--card);stroke:var(--line2);stroke-width:1.25}
+  svg .bx.main{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2}
+  svg .bx.dash{fill:none;stroke-dasharray:4 4}
+  svg .pc{fill:var(--bg);stroke:var(--line2);stroke-width:1}
+  svg .ln{fill:none;stroke:var(--line2);stroke-width:1.4}
+  svg .ln.dash{stroke-dasharray:4 4}
+  svg .t{fill:var(--fg);font-weight:700;font-size:13px;text-anchor:middle;font-family:var(--sans)}
+  svg .s{fill:var(--muted);font-size:11.5px;text-anchor:middle;font-family:var(--sans)}
+  svg .h{fill:var(--accent2);font-weight:700;font-size:13px;font-family:var(--sans)}
+  svg .ah{fill:var(--line2)}
+
+  /* 도구 용어: 누르면 설명 창 */
+  .term{font:inherit;color:inherit;background:none;border:0;padding:0 1px;margin:0;cursor:pointer;
+        border-bottom:2px dotted var(--accent);border-radius:2px;line-height:inherit}
+  .term:hover,.term:focus-visible{background:var(--accent-soft);color:var(--accent);outline:none}
+  .toolgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:12px 0 4px}
+  .toolcard{display:flex;gap:10px;align-items:flex-start;text-align:left;font:inherit;color:var(--fg);background:var(--card);
+        border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);cursor:pointer;transition:transform .12s,border-color .12s}
+  .toolcard:hover,.toolcard:focus-visible{transform:translateY(-2px);border-color:var(--accent);outline:none}
+  .toolcard .ic{font-size:22px;line-height:1.2}
+  .toolcard b{display:block;font-size:15px}
+  .toolcard small{display:block;color:var(--muted);font-size:12.5px;line-height:1.45;margin-top:2px}
+  .toolcard .role{font:700 10.5px var(--mono);color:var(--accent2)}
+
+  dialog.tooltip-modal{border:1px solid var(--line);border-radius:16px;padding:0;max-width:640px;width:calc(100% - 32px);
+        background:var(--card);color:var(--fg);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  dialog.tooltip-modal::backdrop{background:rgba(14,17,22,.55)}
+  .tm-head{display:flex;gap:12px;align-items:center;padding:18px 20px 14px;color:#fff;
+        background:linear-gradient(135deg,#b45309 0%,#8a4b2a 55%,#115e59 100%)}
+  .tm-head .ic{font-size:30px}
+  .tm-head h4{margin:0;font-size:20px;line-height:1.3}
+  .tm-head p{margin:2px 0 0;font-size:13.5px;opacity:.92}
+  .tm-head .x{margin-left:auto;align-self:flex-start;background:rgba(255,255,255,.2);color:#fff;border:0;border-radius:8px;
+        width:32px;height:32px;font-size:18px;cursor:pointer}
+  .tm-head .x:hover{background:rgba(255,255,255,.35)}
+  .tm-body{padding:16px 20px 20px;font-size:15px;max-height:65vh;overflow-y:auto}
+  .tm-body h5{font-size:13px;color:var(--accent);margin:14px 0 4px;font-weight:800}
+  .tm-body h5:first-child{margin-top:0}
+  .tm-body p{margin:4px 0}
+  .tm-body ul{margin:4px 0;padding-left:20px}
+  .tm-body .facts{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px;background:var(--card2);
+        border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:4px 0}
+  .tm-body .facts dt{color:var(--muted);font-weight:600}
+  .tm-body .facts dd{margin:0}
+  .tm-body .go{display:inline-block;margin-top:14px;font-weight:700;text-decoration:none;color:var(--accent2);
+        border:1px solid var(--line);border-radius:8px;padding:6px 12px}
+  .tm-body .go:hover{border-color:var(--accent2)}
+
+
+  /* ───────── 나레이션 플레이어 ───────── */
+  #narrFab{position:fixed;left:18px;bottom:20px;z-index:900;width:52px;height:52px;border-radius:50%;border:0;cursor:pointer;
+        background:linear-gradient(135deg,#b45309,#115e59);color:#fff;font-size:22px;box-shadow:0 6px 20px rgba(0,0,0,.28)}
+  #narrFab.playing{animation:narrPulse 1.5s infinite}
+  @keyframes narrPulse{0%{box-shadow:0 0 0 0 rgba(180,83,9,.55)}70%{box-shadow:0 0 0 14px rgba(180,83,9,0)}100%{box-shadow:0 0 0 0 rgba(180,83,9,0)}}
+  #narrPanel{position:fixed;left:18px;bottom:82px;z-index:901;width:min(340px,calc(100vw - 36px));display:none;
+        flex-direction:column;gap:10px;background:var(--card);color:var(--fg);border:1px solid var(--line);
+        border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.28);padding:14px 16px}
+  #narrPanel.open{display:flex}
+  #narrPanel .nhead{display:flex;align-items:center;gap:8px}
+  #narrPanel .nhead b{font-size:14px;flex:1}
+  #narrPanel .nhead button{background:none;border:0;color:var(--muted);font-size:18px;cursor:pointer;line-height:1}
+  #narrPanel .nnow{font:700 12px var(--mono);color:var(--accent)}
+  #narrPanel .ncap{font-size:13.5px;color:var(--ink,var(--fg));background:var(--card2);border:1px solid var(--line);
+        border-radius:8px;padding:8px 10px;min-height:56px;line-height:1.55}
+  #narrPanel .nrow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  #narrPanel .nrow button{flex:0 0 auto;border:1px solid var(--line);background:var(--card2);color:var(--fg);
+        border-radius:8px;padding:6px 11px;font:600 13px var(--sans);cursor:pointer}
+  #narrPanel .nrow button.main{background:var(--accent);border-color:var(--accent);color:#fff;min-width:74px}
+  #narrPanel .nrow button:hover{border-color:var(--accent)}
+  #narrPanel select{flex:1 1 90px;min-width:0;border:1px solid var(--line);background:var(--card2);color:var(--fg);
+        border-radius:8px;padding:5px 7px;font:600 12.5px var(--sans)}
+  #narrPanel .nlist{max-height:190px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--line);padding-top:8px}
+  #narrPanel .nlist button{text-align:left;border:0;background:none;color:var(--fg);border-radius:6px;padding:5px 8px;
+        font:500 13px var(--sans);cursor:pointer}
+  #narrPanel .nlist button:hover{background:var(--card2)}
+  #narrPanel .nlist button.on{background:var(--accent-soft);color:var(--accent);font-weight:700}
+  #narrPanel .nhint{font-size:11.5px;color:var(--muted);line-height:1.5}
+  section.narr-on{outline:2px solid var(--accent);outline-offset:3px}
+  @media print{#narrFab,#narrPanel{display:none!important}}
+
+  footer{padding:20px 0 50px;font-size:13px;color:var(--muted)}
+  footer a{color:var(--muted)}
+
+  @media (max-width:900px){.layout{grid-template-columns:1fr;gap:0} nav.toc{display:none}}
+  @media (max-width:760px){.wrap{padding:0 16px} section{padding:22px 18px} .hero{padding:26px 22px} .hero .cup{font-size:80px}}
+  @media print{nav.toc,.copy,.topbar .btn{display:none} .layout{display:block} section{box-shadow:none} pre{white-space:pre-wrap}}
+</style>
+
+<header class="wrap">
+  <div class="topbar">
+    <div class="logo">⚙️</div>
+    <div><b>쓰고, 컴파일하고, 테스트한다</b><small>AI응용소프트웨어과 · 로컬 LLM 자바 코드 생성기</small></div>
+    <span class="sp"></span>
+    <button class="btn" id="theme" type="button">🌙 다크</button>
+  </div>
+  <div class="hero">
+    <div class="eyebrow">한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과</div>
+    <h1>내 PC 의 LLM 이 자바 코드를<br>쓰고, 컴파일하고, 테스트한다</h1>
+    <p>요구사항 한 줄을 넣으면 그래픽카드 위의 모델이 코드를 쓰고, 서비스가 그 코드를 <b>진짜로 컴파일하고 테스트해</b> 통과할 때까지 스스로 고칩니다. 외부 API 없이 전부 내 컴퓨터 안에서, 리눅스 과정에서 배운 셸·권한·프로세스·systemd 를 써서 만듭니다.</p>
+    <div class="meta"><span>1주 · 35시간</span><span>개인 과제</span><span>WSL2 + Ubuntu 24.04</span><span>RTX 4070 로컬 LLM</span><span>Java 17 · Spring Boot</span></div>
+    <div class="cup">⚙️</div>
+  </div>
+</header>
+
+<div class="wrap layout">
+  <nav class="toc" aria-label="목차">
+    <b>CONTENTS</b>
+    <a href="#overview"><small>OVERVIEW</small>프로젝트 개요</a>
+    <a href="#tools"><small>TOOLS</small>도구 사전</a>
+    <a href="#install"><small>INSTALL</small>설치 과정</a>
+    <a href="#stack"><small>STACK</small>환경과 역할</a>
+    <a href="#plan"><small>PLAN</small>5일 일정</a>
+    <a href="#git"><small>GIT</small>GitHub 기록 남기기</a>
+    <a href="#day1"><small>DAY 1</small>환경 구축</a>
+    <a href="#day2"><small>DAY 2</small>뼈대 만들기</a>
+    <a href="#day3"><small>DAY 3</small>컴파일 · 테스트</a>
+    <a href="#day4"><small>DAY 4</small>재시도 · 서비스화</a>
+    <a href="#day5"><small>DAY 5</small>안전장치 · 측정</a>
+    <a href="#eval"><small>RUBRIC</small>평가 기준</a>
+    <a href="#submit"><small>SUBMIT</small>제출 · 발표</a>
+    <a href="#faq"><small>FAQ</small>자주 막히는 곳</a>
+  </nav>
+
+  <main>
+    <!-- ───────── 개요 ───────── -->
+    <section id="overview">
+      <div class="sec">Overview</div>
+      <h2>프로젝트 개요</h2>
+      <p class="lead">한 문장으로: <b>요구사항 → 코드 생성 → 컴파일 → 테스트 → 실패하면 다시 생성</b>을 자동으로 반복하는 HTTP 서비스를 만듭니다.</p>
+
+      <div class="cards">
+        <div class="card"><div class="dn">WHO</div><b>리눅스 과정을 마친 수강생</b><span>셸·권한·프로세스·systemd 를 한 번씩 써 본 상태를 전제로 합니다. 자바는 기본 문법이면 충분합니다.</span></div>
+        <div class="card"><div class="dn">GOAL</div><b>AI 결과를 검증하는 구조</b><span>작은 로컬 모델은 자주 틀립니다. 틀린 답을 걸러내고 스스로 고치게 만드는 고리를 직접 설계합니다.</span></div>
+        <div class="card"><div class="dn">RESULT</div><b>재부팅해도 살아 있는 서비스</b><span>돌아가는 코드가 아니라 systemd 로 등록되어 자동 복구되는 서비스가 결과물입니다.</span></div>
+      </div>
+
+      <h3>완성했을 때 이렇게 동작합니다</h3>
+      <p>사람이 하는 일은 <b>맨 처음 한 줄</b>뿐입니다. 아래는 그 뒤에 서비스 안에서 실제로 오가는 내용을 순서대로 펼친 것입니다.</p>
+
+      <h4 style="margin:22px 0 0;font-size:15px;color:var(--accent)">① 사람이 보낸 요청 — 이 한 줄이 전부입니다</h4>
+      <div class="saybox">
+        <span class="ic">🙋</span>
+        <span>
+          <span class="who">사람</span>
+          <span class="say">“구구단 2단부터 9단까지 출력하는 메서드 만들어 줘”</span>
+          <small>여기까지가 사람의 몫입니다. 아래 ②~⑥ 은 서비스가 혼자 합니다.</small>
+        </span>
+      </div>
+      <div class="code term"><span class="lang">실제로 보내는 명령 · Ubuntu (WSL) 터미널</span><pre><code>$ curl -s localhost:8080/api/generate     -H 'Content-Type: application/json'     -d '{
+          "requirement": "구구단 2단부터 9단까지 출력하는 메서드"
+        }'</code></pre></div>
+
+      <h4 style="margin:22px 0 0;font-size:15px;color:var(--accent)">② 모델이 처음 쓴 코드</h4>
+      <div class="code"><span class="lang">Gugudan.java · 1차 시도</span><pre><code>public class Gugudan {
+    public static String print() {
+        StringBuilder sb = new StringBuilder();
+        for (int dan = 2; dan &lt; 9; dan++) {          // ← 9단이 빠진다
+            for (int i = 1; i &lt;= 9; i++) {
+                sb.append(dan).append(" x ").append(i)
+                  .append(" = ").append(dan * i).append("
+");
+            }
+        }
+        return sb.toString();
+    }
+}</code></pre></div>
+
+      <h4 style="margin:22px 0 0;font-size:15px;color:var(--accent)">③ 컴파일 — 성공</h4>
+      <div class="code term"><span class="lang">javac 출력</span><pre><code>$ javac -encoding UTF-8 -d out Gugudan.java GugudanTest.java
+$ echo $?
+0</code></pre></div>
+      <div class="warn"><p>컴파일은 멀쩡히 통과했습니다. <b>문법이 맞다고 답이 맞는 것은 아닙니다.</b> 그래서 테스트까지 돌려야 합니다.</p></div>
+
+      <h4 style="margin:22px 0 0;font-size:15px;color:var(--accent)">④ 테스트 실행 — 실패</h4>
+      <div class="code term"><span class="lang">JUnit 출력</span><pre><code>├─ GugudanTest ✘
+│  ├─ 둘째_줄은_2x2() ✔
+│  ├─ 모든_단이_들어_있다() ✘ expected: &lt;8&gt; but was: &lt;7&gt;
+│  └─ 마지막은_9x9_81() ✘ expected: "9 x 9 = 81" but was: "8 x 9 = 72"
+
+[         3 tests successful      ]
+[         2 tests failed          ]</code></pre></div>
+
+      <h4 style="margin:22px 0 0;font-size:15px;color:var(--accent)">⑤ 서비스가 실패를 그대로 모델에게 되돌려 줌</h4>
+      <div class="code prompt"><span class="lang">서비스가 자동으로 만든 재요청</span><pre><code>직전에 네가 쓴 코드는 컴파일은 됐지만 테스트 2개가 실패했다. 고쳐서 다시 써라.
+
+[실패] 모든_단이_들어_있다 — 단의 개수가 8이어야 하는데 7이다
+[실패] 마지막은_9x9_81 — 마지막 줄이 "9 x 9 = 81" 이어야 하는데 "8 x 9 = 72" 이다
+[직전 코드] public class Gugudan { ... for (int dan = 2; dan &lt; 9; dan++) ... }</code></pre></div>
+
+      <h4 style="margin:22px 0 0;font-size:15px;color:var(--accent)">⑥ 모델이 고쳐 쓴 코드 — 통과</h4>
+      <div class="code"><span class="lang">Gugudan.java · 2차 시도</span><pre><code>        for (int dan = 2; dan &lt;= 9; dan++) {         // ← 부등호 하나 고침</code></pre></div>
+      <div class="code term"><span class="lang">JUnit 출력</span><pre><code>[         5 tests successful      ]
+[         0 tests failed          ]</code></pre></div>
+
+      <h4 style="margin:22px 0 0;font-size:15px;color:var(--accent)">⑦ 사람이 받은 응답</h4>
+      <div class="code term"><span class="lang">응답 JSON · 줄여서</span><pre><code>{
+  "status":     "PASSED",        // 통과했다
+  "attempts":   2,               // 두 번째 시도에서
+  "className":  "Gugudan",
+  "code":       "public class Gugudan { ... }",
+  "testReport": "tests: 5, failed: 0",
+  "history": [
+    {"attempt":1, "stage":"TEST", "error":"마지막 줄이 9 x 9 = 81 이 아님"},
+    {"attempt":2, "stage":"TEST", "result":"ok"}
+  ]
+}</code></pre></div>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>응답 항목</th><th>뜻</th><th>왜 필요한가</th></tr></thead>
+          <tbody>
+            <tr><td><code>status</code></td><td>PASSED / COMPILE_ERROR / TEST_FAILED / TIMEOUT</td><td>통과한 코드만 믿고 쓰기 위해</td></tr>
+            <tr><td><code>attempts</code></td><td>몇 번 만에 통과했나</td><td>모델·프롬프트가 좋아졌는지 재는 지표</td></tr>
+            <tr><td><code>code</code></td><td>최종 코드</td><td>바로 가져다 쓸 결과물</td></tr>
+            <tr><td><code>testReport</code></td><td>테스트 몇 개 중 몇 개 통과</td><td>통과의 근거</td></tr>
+            <tr><td><code>history</code></td><td>시도별로 어디서 왜 실패했는지</td><td><b>검증하고 고쳤다는 증거</b> · 평가 항목</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="ok"><p>②부터 ⑥까지는 <b>사람이 한 번도 끼어들지 않습니다.</b> 서비스가 테스트 결과를 읽고 모델에게 다시 시킨 것입니다. 이 고리를 만드는 것이 이번 과제의 전부라고 해도 됩니다.</p></div>
+
+      <div class="ask"><p>구구단처럼 쉬운 것도 작은 모델은 <code>&lt;</code> 와 <code>&lt;=</code> 를 자주 틀립니다. 사람이 눈으로 코드만 훑었다면 이 실수를 잡았을까요? 그리고 <b>테스트도 모델이 썼다면</b> 테스트가 통과했다는 사실은 무엇을 보장하고 무엇은 보장하지 못할까요?</p></div>
+
+      <figure>
+        <div class="diagram">
+          <svg viewBox="0 0 760 330" role="img" aria-label="요청이 들어오면 로컬 LLM이 코드를 쓰고 javac와 JUnit으로 검증한 뒤 실패하면 다시 생성합니다">
+            <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="ah" d="M0 0L10 5L0 10z"/></marker></defs>
+            <rect class="pc" x="24" y="96" width="712" height="214" rx="8"/>
+            <text class="h" x="40" y="120">내 PC · WSL2 Ubuntu · 전부 로컬</text>
+            <rect class="bx" x="40" y="24" width="180" height="52" rx="8"/><text class="t" x="130" y="46">사용자 · VS Code</text><text class="s" x="130" y="64">요구사항 한 줄</text>
+            <path class="ln" d="M220 50H330" marker-end="url(#ah)"/>
+            <rect class="bx main" x="330" y="140" width="190" height="60" rx="8"/><text class="t" x="425" y="165">JavaGen 서비스</text><text class="s" x="425" y="184">Spring Boot · :8080</text>
+            <path class="ln" d="M330 50H425V136" marker-end="url(#ah)"/>
+            <rect class="bx" x="60" y="140" width="180" height="60" rx="8"/><text class="t" x="150" y="165">Ollama + 코더 모델</text><text class="s" x="150" y="184">GPU · :11434</text>
+            <path class="ln" d="M330 160H246" marker-end="url(#ah)"/>
+            <path class="ln dash" d="M246 182H326" marker-end="url(#ah)"/>
+            <text class="s" x="288" y="214">① 프롬프트 ↔ 코드</text>
+            <rect class="bx" x="560" y="140" width="160" height="60" rx="8"/><text class="t" x="640" y="165">javac · JUnit</text><text class="s" x="640" y="184">자식 프로세스</text>
+            <path class="ln" d="M520 160H554" marker-end="url(#ah)"/>
+            <path class="ln dash" d="M554 182H526" marker-end="url(#ah)"/>
+            <text class="s" x="640" y="214">② 컴파일 · 테스트</text>
+            <rect class="bx dash" x="330" y="246" width="190" height="48" rx="8"/><text class="t" x="425" y="268">실패 → 에러 요약</text><text class="s" x="425" y="285">최대 3회 재시도</text>
+            <path class="ln" d="M425 200V242" marker-end="url(#ah)"/>
+            <path class="ln" d="M330 270H150V206" marker-end="url(#ah)"/>
+          </svg>
+        </div>
+        <figcaption>서비스가 모델과 컴파일러 사이를 오가며 통과할 때까지 반복합니다. 외부 API 도, 요금도 없습니다.</figcaption>
+      </figure>
+
+      <div class="tip"><p>모델을 잘 고르는 것이 핵심이 아닙니다. <b>검증 고리를 닫는 것</b>이 핵심입니다. 7B 짜리 작은 모델도 에러를 돌려주며 두세 번 고치게 하면 쓸 만한 결과가 나옵니다.</p></div>
+    </section>
+
+    <!-- ───────── 도구 사전 ───────── -->
+    <section id="tools">
+      <div class="sec">Tools</div>
+      <h2>도구 사전</h2>
+      <p class="lead">설치부터 들어가기 전에, <b>무엇을 왜 쓰는지</b>부터 짚고 갑니다. 쓰는 도구는 모두 무료이고, 아래 카드를 누르면 그 도구가 무엇이고 이 프로젝트에서 어떤 역할을 하는지 설명 창이 열립니다.</p>
+
+      <h3>누가 어디서 도는가</h3>
+      <div class="cards">
+        <div class="card"><div class="dn">WINDOWS 쪽</div><b>편집기와 그래픽 드라이버</b><span>VS Code, NVIDIA 드라이버. 보는 창과 하드웨어만 Windows 가 맡습니다.</span></div>
+        <div class="card"><div class="dn">WSL 안쪽</div><b>리눅스 · 모델 · 빌드</b><span>Ubuntu, Ollama, 코더 모델, Java, Gradle, Git, systemd 가 전부 여기 있습니다.</span></div>
+        <div class="card"><div class="dn">내가 만드는 것</div><b>JavaGen 서비스</b><span>Spring Boot 로 만든, 생성과 검증을 중개하는 프로그램입니다.</span></div>
+      </div>
+
+      <p>본문에서 <button type="button" class="term" data-term="ollama">밑줄 친 도구 이름</button>을 눌러도 같은 설명이 열립니다.</p>
+      <div class="toolgrid" id="toolgrid"></div>
+
+      <div class="tip"><p>처음 보는 이름이 많아 보여도, 직접 설치하는 것은 <b>WSL · Ollama · 모델 · Java · Git · VS Code 여섯 가지</b>뿐입니다. 나머지는 그 안에 딸려 오거나(Gradle 래퍼, systemd) 파일 하나를 받는 것(JUnit 콘솔)입니다.</p></div>
+    </section>
+
+    <!-- ───────── 설치 ───────── -->
+    <section id="install">
+      <div class="sec">Install</div>
+      <h2>설치 과정</h2>
+      <p class="lead">1일차 오전에 하는 작업입니다. 순서를 지키세요. 앞 단계가 안 됐는데 다음으로 가면 원인을 찾기 어려워집니다. 각 단계 끝에 <b>확인 방법</b>이 있으니 통과한 뒤 넘어갑니다.</p>
+
+      <h3>STEP 0 · 설치 전 점검 <span class="n">10분</span></h3>
+      <p>세 가지를 먼저 봅니다.</p>
+      <ul>
+        <li><b>가상화가 켜져 있는가</b> — 작업 관리자 → 성능 → CPU → 오른쪽 아래 "가상화: 사용". <code>사용 안 함</code>이면 재부팅 후 BIOS 에서 Intel VT-x(또는 AMD SVM)를 켭니다.</li>
+        <li><b>디스크 여유</b> — 60GB 이상. 모델 10~20GB, WSL 디스크, Gradle 캐시가 들어갑니다.</li>
+        <li><b>그래픽 드라이버</b> — PowerShell 에서 <code>nvidia-smi</code> 가 동작하고 RTX 4070 이 보이면 됩니다.</li>
+      </ul>
+      <div class="code"><span class="lang">Windows · PowerShell</span><pre><code>nvidia-smi
+# NVIDIA-SMI 610.88   Driver Version: 610.88   CUDA Version: 13.3
+#   0  NVIDIA GeForce RTX 4070   WDDM   12282MiB</code></pre></div>
+
+      <h3>STEP 1 · WSL2 와 Ubuntu 24.04 <span class="n">20분</span></h3>
+      <p>PowerShell 을 <b>관리자 권한</b>으로 열고 실행합니다. 설치가 끝나면 Ubuntu 창이 떠서 사용자 이름과 비밀번호를 묻습니다. 이 비밀번호가 앞으로 <code>sudo</code> 할 때 쓰는 것이고, 입력할 때 화면에 아무것도 안 보이는 게 정상입니다.</p>
+      <div class="code"><span class="lang">Windows · PowerShell (관리자)</span><pre><code>wsl --install -d Ubuntu-24.04
+wsl --update
+wsl --set-default-version 2
+wsl -l -v</code></pre></div>
+      <div class="ok"><p><code>wsl -l -v</code> 결과에 <code>Ubuntu-24.04</code> 가 <code>Running</code> · <code>VERSION 2</code> 로 보이면 성공입니다.</p></div>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>자주 나는 오류</th><th>원인</th><th>해결</th></tr></thead>
+          <tbody>
+            <tr><td><code>0x80370102</code></td><td>가상화가 꺼져 있음</td><td>BIOS 에서 VT-x/SVM 활성화, Windows 기능에서 "가상 머신 플랫폼" 체크</td></tr>
+            <tr><td><code>0x800701bc</code></td><td>WSL2 커널이 낡음</td><td><code>wsl --update</code> 실행 후 재시도</td></tr>
+            <tr><td>설치가 0% 에서 멈춤</td><td>사내망·방화벽 차단</td><td>네트워크를 바꾸거나 강사에게 오프라인 설치본 요청</td></tr>
+            <tr><td>이미 다른 Ubuntu 가 있음</td><td>기존 배포판과 충돌</td><td>이 과제 전용으로 새 배포판을 깔고 그 안에서만 작업</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="warn"><p>이미 WSL 을 쓰고 있다면 기존 배포판을 그대로 쓰지 마세요. <b>망가뜨려도 되는 전용 배포판</b>을 따로 두는 편이 실습에 훨씬 편합니다.</p></div>
+
+      <h3>STEP 2 · 자원 한도와 systemd <span class="n">10분</span></h3>
+      <p>WSL 은 그냥 두면 호스트 메모리의 절반까지 가져갑니다. 모델과 Gradle 이 같이 도는 환경이니 미리 정합니다. 메모장으로 <code>C:\Users\&lt;사용자&gt;\.wslconfig</code> 파일을 새로 만드세요.</p>
+      <div class="code"><span class="lang">.wslconfig · 강의실 PC(32GB · 24코어) 기준</span><pre><code>[wsl2]
+memory=16GB
+processors=12
+swap=8GB</code></pre></div>
+      <p>이어서 Ubuntu 안에서 systemd 를 켭니다. 4일차에 서비스를 등록하려면 반드시 필요합니다.</p>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 터미널</span><pre><code>sudo tee /etc/wsl.conf &lt;&lt;'EOF'
+[boot]
+systemd=true
+EOF</code></pre></div>
+      <div class="code"><span class="lang">Windows · PowerShell — 설정 적용</span><pre><code>wsl --shutdown
+# 몇 초 기다린 뒤 Ubuntu 터미널을 다시 엽니다</code></pre></div>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 확인과 기본 업데이트</span><pre><code>systemctl is-system-running        # running 또는 degraded
+free -h | head -2                  # 메모리가 16G 로 잡혔는지
+sudo apt update &amp;&amp; sudo apt -y upgrade</code></pre></div>
+      <div class="ok"><p><code>systemctl</code> 이 "System has not been booted with systemd" 라고 하면 <code>wsl.conf</code> 가 적용되지 않은 것입니다. 파일 위치와 철자를 확인하고 <code>wsl --shutdown</code> 을 다시 하세요.</p></div>
+
+      <h3>STEP 3 · GPU 가 WSL 에서 보이는지 <span class="n">5분</span></h3>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 터미널</span><pre><code>nvidia-smi</code></pre></div>
+      <div class="warn"><p><b>WSL 안에는 그래픽 드라이버를 설치하지 않습니다.</b> Windows 드라이버가 그대로 전달되는 구조라서, <code>apt install nvidia-driver-…</code> 를 치면 오히려 GPU 가 사라집니다. 되돌리려면 배포판을 다시 깔아야 합니다. 안 보이면 ① Windows 드라이버를 최신으로 올리고 ② <code>wsl --shutdown</code> 후 다시 들어가 보세요. Ollama 만 쓸 것이라면 <b>CUDA 툴킷도 따로 설치할 필요가 없습니다.</b></p></div>
+
+      <h3>STEP 4 · Ollama 설치 <span class="n">15분</span></h3>
+      <p>한 줄 설치 스크립트가 바이너리와 systemd 서비스까지 만들어 줍니다.</p>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 터미널</span><pre><code>curl -fsSL https://ollama.com/install.sh | sh
+systemctl status ollama --no-pager
+ollama --version</code></pre></div>
+      <p>서비스는 <code>ollama</code> 라는 전용 계정으로 돌고, 받은 모델은 <code>/usr/share/ollama/.ollama/models</code> 에 쌓입니다. 동작을 바꾸려면 유닛을 직접 고치지 말고 <b>덮어쓰기 설정</b>을 만듭니다.</p>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 설정 덮어쓰기</span><pre><code>sudo systemctl edit ollama
+# 편집기가 열리면 아래 세 줄을 넣고 저장합니다
+# [Service]
+# Environment="OLLAMA_KEEP_ALIVE=10m"
+# Environment="OLLAMA_HOST=127.0.0.1:11434"
+
+sudo systemctl restart ollama</code></pre></div>
+      <div class="ask"><p><code>OLLAMA_KEEP_ALIVE</code> 는 마지막 요청 뒤 모델을 얼마나 메모리에 두는지입니다. 길게 두면 다음 요청이 빠르고, 짧게 두면 VRAM 이 빨리 풀립니다. 빌드와 번갈아 하는 우리 작업에는 어느 쪽이 나을까요?</p></div>
+      <div class="ok"><p><code>systemctl status ollama</code> 가 <code>active (running)</code> 이고, <code>curl -s localhost:11434</code> 가 <code>Ollama is running</code> 을 돌려주면 성공입니다.</p></div>
+
+      <h3>STEP 5 · 코더 모델 받기 <span class="n">20분</span></h3>
+      <p>VRAM 12GB(실사용 약 11GB)에 맞춰 고릅니다. 먼저 7B 로 시작하고, 여유가 있으면 14B 로 올려 비교해 보세요.</p>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 모델 내려받기</span><pre><code>ollama pull qwen2.5-coder:7b     # 약 4.7GB 내려받기
+ollama list
+ollama run qwen2.5-coder:7b "자바로 두 수를 더하는 메서드만 써 줘" --verbose</code></pre></div>
+      <p><code>--verbose</code> 를 붙이면 끝에 초당 토큰 수가 나옵니다. 이 숫자를 적어 두면 나중에 모델을 바꿨을 때 비교할 수 있습니다.</p>
+      <div class="code term"><span class="lang">GPU 로 돌고 있는지 확인</span><pre><code>ollama ps
+# NAME                 SIZE     PROCESSOR    UNTIL
+# qwen2.5-coder:7b     6.0 GB   100% GPU     9 minutes from now</code></pre></div>
+      <div class="ok"><p><code>PROCESSOR</code> 가 <b>100% GPU</b> 여야 합니다. <code>CPU</code> 가 섞여 있으면 VRAM 이 모자란 것이니 더 작은 모델을 쓰거나 컨텍스트를 줄이세요.</p></div>
+
+      <p>이 프로젝트에서 쓸 설정(낮은 온도, 8K 컨텍스트, 출력 형식)을 고정한 <b>파생 모델</b>을 만들어 두면 코드에서 매번 옵션을 넘기지 않아도 됩니다.</p>
+      <div class="code"><span class="lang">~/javagen/Modelfile</span><pre><code>FROM qwen2.5-coder:7b
+PARAMETER temperature 0.2
+PARAMETER num_ctx 8192
+SYSTEM """
+당신은 자바 코드 생성기입니다. 설명 없이 코드만 출력합니다.
+패키지 선언 없이 public class 하나와, 그에 대한 JUnit 5 테스트 클래스를 작성합니다.
+코드는 ```java 블록 안에만 넣습니다.
+"""</code></pre></div>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 파생 모델 만들기</span><pre><code>cd ~/javagen
+ollama create javagen-coder -f Modelfile
+ollama run javagen-coder "문자열을 뒤집는 메서드"</code></pre></div>
+      <div class="tip"><p>강의실 전체가 동시에 모델을 받으면 네트워크가 막힙니다. 강사가 나눠 준 모델 파일이 있으면 <code>/usr/share/ollama/.ollama/models</code> 에 복사한 뒤 소유자를 바꿔 주세요.</p>
+      <p><code>sudo cp -r models/* /usr/share/ollama/.ollama/models/ &amp;&amp; sudo chown -R ollama:ollama /usr/share/ollama/.ollama</code></p></div>
+
+      <h3>STEP 6 · Java 17 · JUnit <span class="n">10분</span></h3>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 터미널</span><pre><code>sudo apt install -y openjdk-17-jdk git curl jq unzip
+java -version      # openjdk version "17.0.x"
+javac -version     # javac 17.0.x</code></pre></div>
+      <p>Gradle 은 따로 설치하지 않습니다. 2일차에 만들 Spring Boot 프로젝트에 <b>Gradle 래퍼</b>(<code>./gradlew</code>)가 들어 있어 알맞은 버전을 알아서 받아 씁니다. 테스트 실행에 쓸 JUnit 콘솔 런처만 파일 하나로 받아 둡니다.</p>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · JUnit 콘솔 런처</span><pre><code>mkdir -p ~/javagen/tools &amp;&amp; cd ~/javagen/tools
+curl -L -o junit-console.jar \
+  https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.11.4/junit-platform-console-standalone-1.11.4.jar
+java -jar junit-console.jar --version</code></pre></div>
+
+      <h3>STEP 7 · Git 확인 <span class="n">5분</span></h3>
+      <p>Git 은 STEP 6 에서 함께 설치했습니다. 여기서는 버전만 확인하고, <b>저장소 만들기와 GitHub 연결은 다음 절</b>에서 자세히 합니다.</p>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 터미널</span><pre><code>git --version
+git config --global init.defaultBranch main</code></pre></div>
+      <p><a href="#git">GitHub 에 기록 남기기</a> 로 가서 저장소를 만들고 첫 커밋을 올리세요. 1일차 산출물입니다.</p>
+
+      <h3>STEP 8 · VS Code 와 확장 <span class="n">20분</span></h3>
+      <p>VS Code 는 <b>Windows 에 설치</b>하고, 코드와 도구는 WSL 안에 두는 방식으로 씁니다. 편집기 창만 Windows 에 있고 실제 작업은 전부 리눅스에서 일어납니다.</p>
+      <ol>
+        <li>Windows 에서 VS Code 설치 (<code>code.visualstudio.com</code>)</li>
+        <li>확장 탭에서 <b>WSL</b> 설치 (Microsoft 제공)</li>
+        <li>WSL 터미널에서 프로젝트를 엽니다 — 아래 명령</li>
+        <li>왼쪽 아래가 <code>WSL: Ubuntu-24.04</code> 인지 확인</li>
+        <li>그 상태에서 <b>Extension Pack for Java</b> 와 <b>Continue</b> 설치 (WSL 쪽에 설치됩니다)</li>
+      </ol>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 터미널</span><pre><code>cd ~/javagen &amp;&amp; code .</code></pre></div>
+      <p>Continue 는 편집기 안에서 로컬 모델을 쓰게 해 주는 확장입니다. 설치 후 Continue 패널에서 모델 공급자를 <b>Ollama</b> 로 고르면 자동으로 찾습니다. 설정 파일로 직접 적을 수도 있는데, 버전에 따라 <code>~/.continue/config.yaml</code> 또는 <code>config.json</code> 을 씁니다. 확장 화면의 설정 버튼을 눌러 열리는 파일을 고치는 것이 가장 확실합니다.</p>
+      <div class="code"><span class="lang">~/.continue/config.yaml · 예시</span><pre><code>models:
+  - name: javagen-coder
+    provider: ollama
+    model: javagen-coder
+    roles: [chat, edit]
+  - name: 자동완성
+    provider: ollama
+    model: qwen2.5-coder:1.5b
+    roles: [autocomplete]</code></pre></div>
+      <div class="ok"><p>편집기에서 Continue 채팅에 "이 메서드에 JUnit 테스트를 써 줘"라고 했을 때 답이 오고, 그동안 <code>ollama ps</code> 에 모델이 떠 있으면 연결이 된 것입니다.</p></div>
+
+      <h3>STEP 9 · 전체 점검 <span class="n">10분</span></h3>
+      <p>여기까지 한 번에 확인합니다. 하나라도 실패하면 그 단계로 돌아가세요.</p>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 한 번에 확인</span><pre><code>systemctl is-system-running                       # running / degraded
+nvidia-smi --query-gpu=name,memory.total --format=csv
+systemctl is-active ollama                        # active
+curl -s localhost:11434 ; echo
+ollama list | head -3
+java -version 2&gt;&amp;1 | head -1
+java -jar ~/javagen/tools/junit-console.jar --version | head -1
+git -C ~/javagen remote -v</code></pre></div>
+      <ul class="checks">
+        <li><input type="checkbox"> <code>wsl -l -v</code> 에 Ubuntu-24.04 가 VERSION 2 로 보인다</li>
+        <li><input type="checkbox"> <code>systemctl is-system-running</code> 이 동작한다 (systemd 켜짐)</li>
+        <li><input type="checkbox"> WSL 안에서 <code>nvidia-smi</code> 가 RTX 4070 을 보여 준다</li>
+        <li><input type="checkbox"> <code>ollama ps</code> 에 <b>100% GPU</b> 가 뜬다</li>
+        <li><input type="checkbox"> <code>ollama run</code> 으로 자바 코드를 받아 봤다</li>
+        <li><input type="checkbox"> <code>javagen-coder</code> 파생 모델을 만들었다</li>
+        <li><input type="checkbox"> <code>java -version</code> 이 17 이고 JUnit 런처가 동작한다</li>
+        <li><input type="checkbox"> VS Code 가 <code>WSL:</code> 표시로 열리고 Continue 가 모델에 붙는다</li>
+        <li><input type="checkbox"> 원격 저장소에 첫 커밋을 올렸다</li>
+      </ul>
+    </section>
+
+    <!-- ───────── 환경과 도구 ───────── -->
+    <section id="stack">
+      <div class="sec">Stack</div>
+      <h2>환경과 도구</h2>
+      <p class="lead">전부 강의실 PC 한 대 안에서 돕니다. 한 번 환경을 갖춘 뒤로는 API 키도, 요금도, 외부 서버도 필요 없습니다.</p>
+
+      <div class="cards">
+        <div class="card"><div class="dn">WINDOWS</div><b>VS Code</b><span>Remote - WSL 로 접속해 편집기만 Windows 에 둡니다</span></div>
+        <div class="card"><div class="dn">WSL2</div><b>Ubuntu 24.04</b><span>Java 17 · Gradle · Git · systemd</span></div>
+        <div class="card"><div class="dn">GPU</div><b>Ollama + 코더 모델</b><span>RTX 4070 12GB 위에서 구동</span></div>
+        <div class="card"><div class="dn">APP</div><b>Spring Boot</b><span>여러분이 작성할 생성·검증 서비스</span></div>
+      </div>
+
+      <h3>왜 가상머신이 아니라 WSL 인가 <span class="n">23장</span></h3>
+      <ul>
+        <li><b>GPU 를 그대로 씁니다.</b> VirtualBox 에서는 모델을 CPU 로만 돌려야 해 실습이 답답해집니다.</li>
+        <li><b>환경을 통째로 제출할 수 있습니다.</b> <code>wsl --export</code> 로 파일 하나를 내면 채점자가 같은 환경을 띄웁니다.</li>
+        <li><b>Windows 와 주고받는 실습</b>이 가능합니다. 알림 띄우기, 포트 공개 같은 것들입니다.</li>
+      </ul>
+
+      <h3>강의실 PC 기준 모델 선택</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>용도</th><th>크기</th><th>VRAM</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr><td>코드 생성 (기본)</td><td><b>7B 4bit</b></td><td>약 5GB</td><td>여유 있고 빠름. 먼저 이것으로 시작</td></tr>
+            <tr><td>코드 생성 (도전)</td><td>14B 4bit</td><td>약 9GB</td><td>품질이 낫지만 컨텍스트를 8K 로 제한</td></tr>
+            <tr><td>편집기 자동완성</td><td>1.5B</td><td>1~2GB</td><td>Continue 확장에서 인라인 제안</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted">RTX 4070 의 가용 VRAM 은 약 11GB 입니다(화면 출력에 1GB 남짓 씁니다). 32B 급은 올라가지 않습니다. 모델 이름과 최신 버전은 <a href="https://ollama.com/library" target="_blank" rel="noopener">ollama.com/library</a> 에서 확인하세요.</p>
+
+      <h3>리눅스 과정에서 배운 것이 어디에 쓰이나</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>배운 내용</th><th>이 프로젝트에서</th></tr></thead>
+          <tbody>
+            <tr><td>셸 · 경로 · 파일 다루기</td><td>생성된 코드를 임시 작업 디렉터리에 쓰고 지우기</td></tr>
+            <tr><td>권한 · 사용자</td><td>생성 코드를 권한이 낮은 전용 계정으로 실행</td></tr>
+            <tr><td>프로세스 · 시그널</td><td><code>javac</code>·<code>java</code> 를 자식 프로세스로 돌리고 타임아웃에 강제 종료</td></tr>
+            <tr><td>표준 입출력 · 파이프</td><td>컴파일러와 테스트 러너의 출력을 읽어 판정</td></tr>
+            <tr><td>로그 분석 (grep · awk · jq)</td><td>시도 기록에서 실패 유형 집계</td></tr>
+            <tr><td>systemd · 서비스</td><td>자동 기동, 재시작 정책, 로그</td></tr>
+            <tr><td>방화벽 · 포트</td><td>Windows 에서 접속, 필요하면 강의실에 공개</td></tr>
+            <tr><td>셸 스크립트 · cron</td><td>벤치마크 자동 실행, 작업 디렉터리 청소</td></tr>
+            <tr><td>Docker (가산점)</td><td>생성 코드를 컨테이너 안에서 격리 실행</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ───────── 일정 ───────── -->
+    <section id="plan">
+      <div class="sec">Plan</div>
+      <h2>5일 일정</h2>
+      <p class="lead">하루에 고리를 하나씩 닫습니다. 그날 산출물은 그날 끝내야 다음 날이 성립합니다.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>일차</th><th>주제</th><th>그날의 산출물</th></tr></thead>
+          <tbody>
+            <tr><td><b>DAY 1</b></td><td>환경 구축과 첫 호출</td><td>점검 통과 · <code>setup.sh</code> · <code>check-env.sh</code> · 첫 커밋</td></tr>
+            <tr><td><b>DAY 2</b></td><td>뼈대 — 요청받아 코드 받아 오기</td><td>코드 문자열을 돌려주는 <code>/api/generate</code></td></tr>
+            <tr><td><b>DAY 3</b></td><td>검증 — 컴파일과 테스트</td><td>PASSED / COMPILE_ERROR / TEST_FAILED / TIMEOUT 판정</td></tr>
+            <tr><td><b>DAY 4</b></td><td>재시도 고리와 서비스화</td><td>자동 재시도 · 기록 로그 · systemd 유닛</td></tr>
+            <tr><td><b>DAY 5</b></td><td>안전장치 · 측정 · 제출</td><td>벤치 10문제 결과 · README · 운영 문서 · 데모</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="warn"><p><b>AI 사용 규칙:</b> 코드를 AI 에게 시켜도 됩니다. 대신 <code>docs/ai-log.md</code> 에 무엇을 시켰고 무엇을 고쳤는지 하루 3건 이상 남기고, 커밋을 기능 단위로 쪼개세요. 발표 때 자기 코드 아무 곳이나 짚으면 설명할 수 있어야 합니다.</p></div>
+    </section>
+
+    <!-- ───────── GitHub ───────── -->
+    <section id="git">
+      <div class="sec">Git</div>
+      <h2>GitHub 에 기록 남기기</h2>
+      <p class="lead">이 과제는 <b>완성품만큼 과정을 봅니다.</b> AI 에게 시켜서 만드는 과제이기 때문에, 어떤 순서로 쌓아 올렸는지 보이는 커밋 기록 자체가 평가 항목(15점)입니다. 첫날 저장소를 만들고, 그 뒤로는 <b>한 걸음 뗄 때마다</b> 올립니다.</p>
+
+      <h3>1. GitHub 저장소 만들기 <span class="n">1일차</span></h3>
+      <ol>
+        <li>github.com 에 로그인 → 오른쪽 위 <b>+</b> → <b>New repository</b></li>
+        <li>이름 <code>javagen</code>, 공개 범위는 <b>Private</b>, 나머지 체크는 모두 해제 (README·.gitignore 를 만들지 않습니다)</li>
+        <li><b>Create repository</b> → 나오는 주소 중 <b>SSH</b> 주소(<code>git@github.com:계정/javagen.git</code>)를 복사해 둡니다</li>
+      </ol>
+      <div class="tip"><p>체크를 해제하는 이유는, 빈 저장소여야 WSL 에서 만든 폴더를 그대로 올릴 수 있기 때문입니다. README 를 같이 만들면 첫 push 에서 충돌이 납니다.</p></div>
+
+      <h3>2. SSH 키 만들고 등록하기</h3>
+      <p>비밀번호 대신 열쇠 파일로 인증합니다. 한 번만 해 두면 이후로는 묻지 않습니다.</p>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 터미널</span><pre><code>ssh-keygen -t ed25519 -C "학번@pol.ac.kr"     # 엔터 세 번 (암호는 비워도 됩니다)
+cat ~/.ssh/id_ed25519.pub                      # ssh-ed25519 AAAA... 로 시작하는 한 줄</code></pre></div>
+      <p>출력된 <b>한 줄 전체</b>를 복사해 GitHub → 프로필 → <b>Settings</b> → <b>SSH and GPG keys</b> → <b>New SSH key</b> 에 붙여 넣고 저장합니다. 그다음 연결을 확인합니다.</p>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 연결 확인</span><pre><code>ssh -T git@github.com
+# Hi 계정이름! You have successfully authenticated...</code></pre></div>
+      <div class="warn"><p>붙여 넣을 것은 <code>.pub</code> 로 끝나는 <b>공개 키</b>입니다. 짝이 되는 <code>~/.ssh/id_ed25519</code>(비밀 키)는 PC 밖으로 내보내지 않습니다. 저장소에 올리는 일은 더더욱 없어야 합니다.</p></div>
+
+      <h3>3. 처음 올리기</h3>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 터미널</span><pre><code>cd ~/javagen
+git init -b main                      # 이미 했다면 건너뜁니다
+git config user.name  "홍길동"
+git config user.email "학번@pol.ac.kr"
+git config core.autocrlf input
+
+printf 'tools/\nbuild/\nwork/\nlogs/\n.gradle/\n*.log\n*.jar\n' &gt; .gitignore
+mkdir -p docs &amp;&amp; echo '# AI 사용 기록' &gt; docs/ai-log.md
+
+git add .
+git status                            # 올라갈 목록을 눈으로 확인
+git commit -m "chore: 프로젝트 뼈대와 gitignore"
+git remote add origin git@github.com:계정/javagen.git
+git push -u origin main</code></pre></div>
+      <div class="ok"><p>브라우저에서 저장소를 새로고침해 파일이 보이면 성공입니다. 커밋 전에 <code>git status</code> 를 한 번 보는 습관을 들이세요. 모델 파일이나 빌드 결과가 딸려 올라가는 사고의 9할을 여기서 막습니다.</p></div>
+
+      <h3>4. 그다음부터 — 한 걸음마다 올리기</h3>
+      <p>기능 하나를 만들거나 버그 하나를 잡을 때마다 이 네 줄을 반복합니다. <b>하루 최소 세 번</b>입니다.</p>
+      <div class="code term"><span class="lang">작업 → 확인 → 기록 → 올리기</span><pre><code>git status                 # 무엇이 바뀌었나
+git diff                   # 어떻게 바뀌었나 (AI 가 고친 부분을 여기서 읽습니다)
+git add src/main/java/kr/ac/pol/javagen/OllamaClient.java
+git commit -m "feat: Ollama 호출 클라이언트 추가"
+git push</code></pre></div>
+      <div class="tip"><p>여러 가지를 한꺼번에 고쳤다면 <code>git add -p</code> 로 <b>조각을 나눠</b> 담을 수 있습니다. 한 커밋에는 한 가지 변경만 담는 것이 원칙입니다.</p></div>
+
+      <h3>5. 커밋 메시지 규칙</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>접두어</th><th>언제</th><th>이 프로젝트에서의 예</th></tr></thead>
+          <tbody>
+            <tr><td><code>feat:</code></td><td>기능을 더했을 때</td><td>feat: 컴파일 실패 시 자동 재시도 (최대 3회)</td></tr>
+            <tr><td><code>fix:</code></td><td>잘못된 동작을 고쳤을 때</td><td>fix: 타임아웃 후 자식 프로세스가 남는 문제</td></tr>
+            <tr><td><code>test:</code></td><td>검증·실험을 했을 때</td><td>test: 무한 루프 코드로 타임아웃 동작 확인</td></tr>
+            <tr><td><code>docs:</code></td><td>문서·기록을 썼을 때</td><td>docs: 프롬프트 3종 형식 준수율 비교 기록</td></tr>
+            <tr><td><code>chore:</code></td><td>설정·잡일</td><td>chore: systemd 유닛 파일 추가</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="ask"><p>"수정", "ㅇㅇ", "update" 같은 메시지가 열 개 있는 저장소와, 위 형식으로 서른 개가 쌓인 저장소. 채점자가 아니라 <b>세 달 뒤의 여러분</b>에게 쓸모 있는 쪽은 어느 쪽일까요?</p></div>
+
+      <h3>6. 하루가 끝나면 태그</h3>
+      <p>일차별로 어디까지 됐는지 표시를 남깁니다. 채점자가 "3일차에는 여기까지 했구나"를 바로 볼 수 있습니다.</p>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 일차 마감</span><pre><code>git tag -a day1 -m "환경 구축 완료: WSL · GPU · Ollama · Java"
+git push origin day1
+git log --oneline --decorate -5</code></pre></div>
+
+      <h3>7. 사고가 났을 때</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>상황</th><th>조치</th></tr></thead>
+          <tbody>
+            <tr><td>고치다 망쳤다 (아직 커밋 전)</td><td><code>git restore 파일명</code> — 마지막 커밋 상태로 되돌립니다</td></tr>
+            <tr><td>방금 커밋 메시지를 잘못 썼다 (push 전)</td><td><code>git commit --amend -m "새 메시지"</code></td></tr>
+            <tr><td>이미 push 한 커밋을 되돌리고 싶다</td><td><code>git revert &lt;커밋해시&gt;</code> — 지우지 말고 되돌리는 커밋을 쌓습니다</td></tr>
+            <tr><td>빌드 결과·모델 파일을 실수로 올렸다</td><td><code>.gitignore</code> 에 추가 후 <code>git rm -r --cached 경로</code> → 커밋</td></tr>
+            <tr><td>키나 토큰을 커밋했다</td><td><b>먼저 그 키를 폐기</b>하고 새로 만듭니다. 기록에서 지우는 것보다 폐기가 우선입니다</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="warn"><p>개인 과제라 <code>main</code> 에 바로 커밋해도 됩니다. 다만 크게 바꿀 때는 <code>git switch -c feat/retry</code> 로 가지를 치고, 되면 <code>main</code> 에 합치는 연습을 해 보세요. 실무에서는 이쪽이 기본입니다.</p></div>
+
+      <h3>8. 기록이 평가에 쓰이는 방식</h3>
+      <ul>
+        <li><code>git log --oneline</code> 의 흐름 — 과정이 보이는가, 마지막 날에 몰려 있지는 않은가</li>
+        <li>커밋 메시지 — 무엇을 왜 했는지 읽히는가</li>
+        <li><code>docs/ai-log.md</code> — AI 에게 시킨 것과 고친 것이 커밋과 짝이 맞는가</li>
+        <li>태그 <code>day1</code>~<code>day5</code> — 일차별 진행이 표시되어 있는가</li>
+      </ul>
+      <h3>9. VS Code 에서 Git 쓰기 <span class="n">3일차부터</span></h3>
+      <p><b>1~2일차는 터미널로만 합니다.</b> 버튼부터 익히면 <code>add</code> · <code>commit</code> · <code>push</code> 가 각각 무슨 일을 하는지 모른 채 넘어가기 쉽습니다. 손에 익은 3일차부터, 같은 일을 편집기에서 해 보며 둘을 짝지어 보세요.</p>
+      <p>따로 설치할 것은 없습니다. VS Code 에는 Git 이 들어 있고, <code>WSL:</code> 모드로 열었다면 <b>리눅스 안의 git</b> 을 그대로 씁니다. 1일차에 만든 SSH 키와 <code>user.name</code> 설정이 그대로 적용됩니다. 왼쪽의 가지 모양 아이콘(<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd>)이 Git 화면입니다.</p>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>터미널 명령</th><th>VS Code 에서</th></tr></thead>
+          <tbody>
+            <tr><td><code>git status</code></td><td>Source Control 패널의 <b>Changes</b> 목록</td></tr>
+            <tr><td><code>git diff</code></td><td>파일 이름을 클릭 — 왼쪽 옛 내용, 오른쪽 새 내용</td></tr>
+            <tr><td><code>git add 파일</code></td><td>파일 옆 <b>+</b> (Stage Changes)</td></tr>
+            <tr><td><code>git add -p</code></td><td>바뀐 줄을 드래그 선택 → 우클릭 → <b>Stage Selected Ranges</b></td></tr>
+            <tr><td><code>git commit -m "..."</code></td><td>메시지 칸에 입력 후 <b>✓ Commit</b> (<kbd>Ctrl</kbd>+<kbd>Enter</kbd>)</td></tr>
+            <tr><td><code>git push</code></td><td>아래 상태 표시줄의 <b>Sync</b>, 또는 <b>···</b> → Push</td></tr>
+            <tr><td><code>git switch -c 이름</code></td><td>왼쪽 아래 브랜치 이름 클릭 → <b>Create new branch</b></td></tr>
+            <tr><td><code>git restore 파일</code></td><td>파일 옆 <b>↩</b> (Discard Changes)</td></tr>
+            <tr><td><code>git log --oneline</code></td><td>Git Graph 확장 또는 GitLens 의 커밋 목록</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 style="margin:22px 0 0;font-size:15px;color:var(--accent)">넣어 두면 좋은 확장 세 가지</h4>
+      <div class="cards">
+        <div class="card"><div class="dn">GITLENS</div><b>줄마다 누가 언제 왜</b><span>코드 각 줄 옆에 커밋 정보가 떠서, 사흘 전의 내가 왜 그렇게 썼는지 바로 찾을 수 있습니다.</span></div>
+        <div class="card"><div class="dn">GIT GRAPH</div><b>커밋 그래프를 그림으로</b><span>가지와 태그(day1~day5)가 어디 붙었는지 한눈에 보입니다. 제출 전 점검에 좋습니다.</span></div>
+        <div class="card"><div class="dn">GITHUB PR</div><b>편집기 안에서 PR·이슈</b><span>가지를 쳐서 작업할 때 PR 을 편집기에서 열고 닫을 수 있습니다. 선택 사항입니다.</span></div>
+      </div>
+      <p class="muted">확장을 설치할 때 창 왼쪽 아래가 <code>WSL: Ubuntu-24.04</code> 인지 먼저 확인하세요. 그래야 WSL 쪽에 설치되어 프로젝트에 적용됩니다.</p>
+
+      <div class="warn"><p><b>Discard Changes(↩)는 되돌릴 수 없습니다.</b> 커밋하지 않은 변경을 지우는 버튼이라, 한 번 누르면 그 작업은 사라집니다. 터미널의 <code>git restore</code> 와 같은 동작이지만 실수로 누르기는 훨씬 쉽습니다. 헷갈리면 먼저 커밋해 두고 생각하세요.</p></div>
+
+      <div class="ask"><p>발표 때 "지금 누른 그 버튼은 어떤 명령인가요?"라고 물을 수 있습니다. 위 표의 왼쪽과 오른쪽을 짝지어 말할 수 있으면 됩니다. 버튼만 외운 상태로는 막혔을 때 빠져나오지 못합니다.</p></div>
+
+      <ul class="checks">
+        <li><input type="checkbox"> GitHub 에 Private 저장소를 만들고 SSH 키를 등록했다</li>
+        <li><input type="checkbox"> <code>ssh -T git@github.com</code> 가 내 계정 이름을 보여 준다</li>
+        <li><input type="checkbox"> 첫 push 후 브라우저에서 파일이 보인다</li>
+        <li><input type="checkbox"> <code>.gitignore</code> 에 <code>work/</code> · <code>build/</code> · <code>*.jar</code> 가 들어 있다</li>
+        <li><input type="checkbox"> 커밋 메시지에 <code>feat:</code> 같은 접두어를 쓰고 있다</li>
+        <li><input type="checkbox"> (3일차부터) 편집기에서도 커밋해 보고, 어느 버튼이 어떤 명령인지 말할 수 있다</li>
+      </ul>
+    </section>
+
+    <!-- ───────── DAY 1 ───────── -->
+    <section id="day1">
+      <div class="sec">Day 1 · 7시간</div>
+      <h2>환경 구축과 첫 호출</h2>
+      <p class="lead">오늘은 코드를 거의 안 씁니다. 대신 나흘 동안 쓸 바닥을 다집니다. 여기서 대충 넘어가면 3일차에 원인을 못 찾는 문제로 돌아옵니다.</p>
+
+      <h3>1. 설치와 점검 <span class="n">09:00–12:00</span></h3>
+      <p>오전은 <a href="#install">설치 과정</a>을 그대로 따라가며 환경을 세웁니다. 아홉 단계를 모두 통과한 뒤 아래로 넘어오세요. 중간에 막히면 혼자 20분 이상 붙들지 말고 손을 드는 편이 낫습니다.</p>
+      <div class="ok"><p>설치 섹션 끝의 점검 항목 아홉 개에 모두 체크가 되어 있어야 오후 작업이 됩니다. 특히 <b>systemd</b>, <b>100% GPU</b>, <b>WSL 표시가 뜨는 VS Code</b> 세 가지는 뒤쪽 일정이 전부 여기에 걸립니다.</p></div>
+
+      <h3>2. HTTP 로 모델 불러 보기 <span class="n">13:00–14:00</span></h3>
+      <p>2일차에 Java 에서 호출할 바로 그 API 입니다. 먼저 <code>curl</code> 로 모양을 익혀 두세요.</p>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 터미널</span><pre><code>curl -s http://localhost:11434/api/generate -d '{
+  "model": "qwen2.5-coder:7b",
+  "prompt": "자바로 문자열을 뒤집는 메서드를 써 줘. 설명 없이 코드만.",
+  "stream": false,
+  "options": {"temperature": 0.2, "num_ctx": 8192}
+}' | jq -r .response</code></pre></div>
+      <div class="ask">
+        <ul>
+          <li><code>stream</code> 을 <code>true</code> 로 바꾸면 응답 모양이 어떻게 달라지나요?</li>
+          <li><code>temperature</code> 를 0.2 와 1.0 으로 세 번씩 돌리면 결과가 어떻게 다른가요? 코드 생성에는 어느 쪽이 맞을까요?</li>
+          <li>Windows 의 PowerShell 에서 같은 주소로 호출하면 될까요? 되는 이유는 무엇일까요?</li>
+        </ul>
+      </div>
+
+      <h3>3. 오늘 한 일을 스크립트로 <span class="n">14:00–17:00</span></h3>
+      <div class="mission">
+        <div class="mh"><span class="mn">MISSION 1-A</span><b>setup.sh</b><span class="tm">60분</span></div>
+        <p>새 WSL 배포판에서 이 스크립트 하나만 돌리면 오늘 환경이 재현되어야 합니다. 맨 위에 <code>set -euo pipefail</code>, 단계마다 진행 상황 출력, <b>두 번 돌려도 안 깨질 것</b>.</p>
+      </div>
+      <div class="mission">
+        <div class="mh"><span class="mn">MISSION 1-B</span><b>check-env.sh</b><span class="tm">40분</span></div>
+        <p>항목마다 <code>[OK]</code> / <code>[FAIL]</code> 을 출력하고, 하나라도 실패하면 종료 코드 1 로 끝나게 만드세요.</p>
+        <div class="code term"><span class="lang">기대 출력</span><pre><code>[OK]   WSL systemd       running
+[OK]   GPU               NVIDIA GeForce RTX 4070 (12282MiB)
+[OK]   ollama            active, 1 model
+[OK]   model response    2.4s
+[OK]   java              17.0.x
+[OK]   junit runner      1.11.4
+[FAIL] git remote        설정되지 않음</code></pre></div>
+        <p class="muted">힌트: 모델 응답 확인은 <code>curl</code> 결과를 <code>jq -e</code> 로 검사하면 간단합니다. 소요 시간은 <code>SECONDS</code> 변수로 잽니다.</p>
+      </div>
+
+      <h3>1일차 마감 점검</h3>
+      <ul class="checks">
+        <li><input type="checkbox"> <code>wsl --shutdown</code> 후 다시 들어가도 systemd 가 동작한다</li>
+        <li><input type="checkbox"> <code>nvidia-smi</code> 가 RTX 4070 을 보여 준다</li>
+        <li><input type="checkbox"> <code>ollama ps</code> 에 <b>100% GPU</b> 가 뜬다</li>
+        <li><input type="checkbox"> <code>curl</code> 로 모델에서 자바 코드를 받아 봤다</li>
+        <li><input type="checkbox"> Windows 브라우저에서 <code>http://localhost:11434</code> 가 열린다</li>
+        <li><input type="checkbox"> VS Code 가 <code>WSL:</code> 표시로 열린다</li>
+        <li><input type="checkbox"> <code>setup.sh</code> · <code>check-env.sh</code> 가 동작하고 커밋되었다</li>
+        <li><input type="checkbox"> <code>docs/ai-log.md</code> 에 오늘 기록 3건 이상</li>
+      </ul>
+      <h3>오늘의 커밋</h3>
+      <p>기능 단위로 나눠 올린 결과가 하루 끝에 이렇게 남아 있어야 합니다.</p>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 하루 마감</span><pre><code>git commit -m "chore: setup.sh — 환경 재현 스크립트"
+git commit -m "chore: check-env.sh — 점검 스크립트"
+git commit -m "docs: 1일차 환경 점검 결과와 ai-log"
+git push
+git tag -a day1 -m "환경 구축 완료: WSL · GPU · Ollama · Java"
+git push origin day1</code></pre></div>
+
+    </section>
+
+    <!-- ───────── DAY 2 ───────── -->
+    <section id="day2">
+      <div class="sec">Day 2 · 7시간</div>
+      <h2>뼈대 — 요청받아 코드 받아 오기</h2>
+      <p class="lead">오늘 끝에는 <code>curl</code> 로 요구사항을 보내면 자바 코드 문자열이 돌아와야 합니다. 검증은 아직 없습니다.</p>
+
+      <h3>1. Spring Boot 프로젝트 만들기</h3>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 터미널</span><pre><code>cd ~/javagen
+curl -s https://start.spring.io/starter.zip \
+  -d dependencies=web -d javaVersion=17 -d type=gradle-project \
+  -d name=javagen -d packageName=kr.ac.pol.javagen -o starter.zip
+unzip -q starter.zip -d app &amp;&amp; rm starter.zip
+cd app &amp;&amp; ./gradlew bootRun</code></pre></div>
+      <p>처음 한 번은 Gradle 과 라이브러리를 내려받느라 몇 분 걸립니다. 뜨고 나면 Windows 브라우저에서 <code>http://localhost:8080</code> 이 열리는지 확인하세요. 404 가 떠도 서버는 뜬 것입니다.</p>
+      <div class="ask"><p>WSL 안에서 띄운 서버가 Windows 브라우저에 보이는 이유는 무엇일까요? 반대로 <b>옆자리 친구 PC 에서</b> 접속하려면 무엇이 더 필요할까요?</p></div>
+
+      <h3>2. 프롬프트 설계</h3>
+      <p>이 과제에서 가장 효과가 큰 작업입니다. 모델이 <b>기계가 처리하기 쉬운 형태</b>로 답하도록 틀을 정하세요.</p>
+      <div class="code prompt"><span class="lang">프롬프트에 꼭 넣을 조건</span><pre><code>- 패키지 선언 없이 public class 하나만 작성한다
+- 클래스 이름은 영문 파스칼 표기로 짓는다
+- JUnit 5 테스트 클래스를 &lt;클래스명&gt;Test 로 따로 작성한다
+- 코드는 ```java 블록 안에만 넣고, 설명은 블록 밖에 쓴다</code></pre></div>
+      <div class="tip"><p>같은 요구사항으로 프롬프트를 세 가지로 바꿔 각각 5번씩 돌려 보세요. "형식을 지킨 비율"이 눈에 띄게 달라집니다. 이 숫자를 <code>docs/prompt-notes.md</code> 에 적어 두면 5일차 보고서에 그대로 씁니다.</p></div>
+
+      <h3>3. Ollama 호출 클라이언트</h3>
+      <p>JDK 17 에 들어 있는 <code>HttpClient</code> 면 충분합니다. 라이브러리를 더 받을 필요가 없습니다.</p>
+      <div class="code"><span class="lang">OllamaClient.java · 뼈대</span><pre><code>var body = """
+    {"model":"qwen2.5-coder:7b","stream":false,
+     "options":{"temperature":0.2,"num_ctx":8192},
+     "prompt":%s}
+    """.formatted(jsonString(prompt));
+
+var req = HttpRequest.newBuilder()
+        .uri(URI.create("http://localhost:11434/api/generate"))
+        .header("Content-Type","application/json")
+        .timeout(Duration.ofMinutes(3))
+        .POST(HttpRequest.BodyPublishers.ofString(body, UTF_8))
+        .build();
+
+var res = http.send(req, HttpResponse.BodyHandlers.ofString(UTF_8));</code></pre></div>
+      <div class="warn">
+        <ul>
+          <li>요구사항에 따옴표·줄바꿈이 들어가면 JSON 이 깨집니다. 반드시 이스케이프하세요.</li>
+          <li>타임아웃을 안 주면 모델이 길게 물고 있을 때 요청이 영원히 멈춥니다.</li>
+          <li>한글이 깨지면 거의 항상 인코딩 문제입니다. 문자셋을 명시하세요.</li>
+        </ul>
+      </div>
+
+      <div class="mission">
+        <div class="mh"><span class="mn">MISSION 2-A</span><b>코드 블록만 뽑아내기</b><span class="tm">90분</span></div>
+        <p>응답에서 <code>```java</code> 블록의 내용과 <code>public class</code> 뒤의 클래스 이름을 뽑는 함수를 만드세요. 블록이 여러 개면 본체와 테스트를 구분해야 합니다. 모델이 형식을 안 지켰을 때(블록이 없거나 클래스가 둘일 때) 어떻게 처리할지 정하고 이유를 주석으로 남기세요.</p>
+      </div>
+      <div class="mission">
+        <div class="mh"><span class="mn">MISSION 2-B</span><b>/api/generate 1차 완성</b><span class="tm">120분</span></div>
+        <p>요구사항을 받아 코드 문자열과 클래스 이름을 JSON 으로 돌려주는 엔드포인트를 완성합니다.</p>
+        <div class="code term"><span class="lang">오늘의 합격선</span><pre><code>$ curl -s localhost:8080/api/generate \
+    -H 'Content-Type: application/json' \
+    -d '{"requirement":"구구단 2단부터 9단까지 출력하는 메서드"}' | jq -r .className
+Gugudan</code></pre></div>
+      </div>
+      <h3>오늘의 커밋</h3>
+      <p>기능 단위로 나눠 올린 결과가 하루 끝에 이렇게 남아 있어야 합니다.</p>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 하루 마감</span><pre><code>git commit -m "feat: Ollama 호출 클라이언트"
+git commit -m "feat: 응답에서 자바 코드 블록 추출"
+git commit -m "feat: /api/generate 엔드포인트"
+git commit -m "docs: 프롬프트 3종 형식 준수율 비교"
+git push
+git tag -a day2 -m "코드 생성 API 1차 완성"
+git push origin day2</code></pre></div>
+
+    </section>
+
+    <!-- ───────── DAY 3 ───────── -->
+    <section id="day3">
+      <div class="sec">Day 3 · 7시간</div>
+      <h2>검증 — 컴파일과 테스트</h2>
+      <p class="lead">오늘이 이 과제의 심장입니다. 받은 코드를 실제로 돌려 보고 <b>통과·실패를 기계가 판정</b>하게 만듭니다.</p>
+
+      <h3>1. 작업 디렉터리 규칙</h3>
+      <div class="code"><span class="lang">디렉터리 구조</span><pre><code>~/javagen/
+├── app/                 # 스프링 부트 소스
+├── tools/junit-console.jar
+├── work/                # 요청마다 생기는 임시 작업 공간
+│   └── 2026-1021-a3f9/
+│       ├── GcdCalculator.java
+│       ├── GcdCalculatorTest.java
+│       └── out/         # .class 파일
+└── logs/attempts.jsonl</code></pre></div>
+      <div class="warn"><p><code>work/</code> 아래는 모델이 써 준 코드가 실행되는 곳입니다. 서비스 계정의 홈 전체가 아니라 이 디렉터리에만 쓰기 권한이 가도록 구성하세요. 5일차에 더 조입니다.</p></div>
+
+      <h3>2. 손으로 먼저 해 보기</h3>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 터미널</span><pre><code>cd ~/javagen/work/2026-1021-a3f9
+javac -encoding UTF-8 -d out -cp ~/javagen/tools/junit-console.jar *.java
+java -jar ~/javagen/tools/junit-console.jar execute \
+     -cp out --select-class GcdCalculatorTest --details=summary
+# [         3 tests successful      ]
+# [         0 tests failed          ]</code></pre></div>
+
+      <div class="tip"><p><b>오늘부터는 커밋을 편집기에서 해 봐도 좋습니다.</b> 이틀 동안 터미널로 충분히 했으니, 같은 일을 VS Code 의 Source Control 패널에서 해 보며 버튼과 명령을 짝지어 보세요. 대응표는 <a href="#git">GitHub 에 기록 남기기 · 9번</a> 에 있습니다.</p></div>
+
+      <h3>3. Java 에서 프로세스로 실행하기</h3>
+      <div class="code"><span class="lang">CompileRunner.java · 뼈대</span><pre><code>var pb = new ProcessBuilder("javac","-encoding","UTF-8","-d","out",
+                            "-cp", junitJar, "Main.java","MainTest.java")
+        .directory(workDir)
+        .redirectErrorStream(true);
+
+Process p = pb.start();
+String output = new String(p.getInputStream().readAllBytes(), UTF_8);
+boolean done = p.waitFor(30, TimeUnit.SECONDS);
+if (!done) { p.destroyForcibly(); return Result.timeout(output); }
+int code = p.exitValue();</code></pre></div>
+      <div class="warn">
+        <ul>
+          <li><b>타임아웃은 선택이 아닙니다.</b> 모델이 무한 루프를 써 주는 일은 자주 있습니다.</li>
+          <li><code>waitFor</code> 전에 출력 스트림을 읽어야 합니다. 버퍼가 차면 프로세스가 멈춥니다.</li>
+          <li><code>destroyForcibly</code> 뒤에도 자식 프로세스가 남는지 <code>ps</code> 로 확인해 보세요.</li>
+        </ul>
+      </div>
+
+      <div class="mission">
+        <div class="mh"><span class="mn">MISSION 3-A</span><b>판정 결과를 네 가지로</b><span class="tm">120분</span></div>
+        <p><code>PASSED</code> · <code>COMPILE_ERROR</code> · <code>TEST_FAILED</code> · <code>TIMEOUT</code> 으로 분류하고, 각각에 대해 <b>모델에게 다시 알려 줄 짧은 에러 요약</b>을 함께 만들어 두세요. 내일 이 요약을 씁니다.</p>
+        <p class="muted">컴파일러 출력이 수십 줄일 때 전부 넣으면 컨텍스트만 잡아먹습니다. 첫 에러 3개로 줄이면 성공률이 더 좋아지는지 직접 비교해 보세요.</p>
+      </div>
+      <div class="mission">
+        <div class="mh"><span class="mn">MISSION 3-B</span><b>일부러 깨뜨려 보기</b><span class="tm">60분</span></div>
+        <p>다음 세 가지를 손으로 만들어 서비스에 넣고, 서버가 죽지 않는지 확인하세요.</p>
+        <ul>
+          <li>컴파일이 안 되는 코드</li>
+          <li>테스트가 실패하는 코드</li>
+          <li><code>while(true){}</code> 가 들어간 코드</li>
+        </ul>
+        <p class="muted">세 번째가 통과하지 못하면 내일 서비스를 올릴 수 없습니다. 반드시 오늘 잡으세요.</p>
+      </div>
+      <h3>오늘의 커밋</h3>
+      <p>기능 단위로 나눠 올린 결과가 하루 끝에 이렇게 남아 있어야 합니다.</p>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 하루 마감</span><pre><code>git commit -m "feat: 요청별 임시 작업 디렉터리"
+git commit -m "feat: javac 실행과 30초 타임아웃"
+git commit -m "feat: JUnit 실행과 결과 4종 판정"
+git commit -m "test: 무한 루프 코드로 타임아웃 확인"
+git push
+git tag -a day3 -m "컴파일·테스트 판정 완성"
+git push origin day3</code></pre></div>
+
+    </section>
+
+    <!-- ───────── DAY 4 ───────── -->
+    <section id="day4">
+      <div class="sec">Day 4 · 7시간</div>
+      <h2>재시도 고리와 서비스화</h2>
+      <p class="lead">실패를 다시 모델에게 돌려주어 고치게 만들고, 그 과정을 기록한 뒤 서비스로 등록합니다.</p>
+
+      <h3>1. 재시도 고리</h3>
+      <div class="code"><span class="lang">흐름</span><pre><code>attempt = 1
+반복 (attempt &lt;= 3):
+    코드 = 모델에게 요청(요구사항, 직전 코드, 직전 에러 요약)
+    결과 = 컴파일 → 테스트
+    기록에 추가(attempt, 단계, 에러 요약)
+    통과면 중단
+    아니면 attempt += 1
+통과 못 하면 마지막 코드와 전체 기록을 함께 돌려준다</code></pre></div>
+      <div class="ok">
+        <ul>
+          <li>재시도 프롬프트에는 <b>직전 코드와 에러</b>를 함께 넣습니다. 요구사항만 다시 주면 같은 실수를 반복합니다.</li>
+          <li>세 번 모두 실패해도 500 을 내지 말고, 실패 사실과 기록을 정상 응답으로 돌려주세요.</li>
+          <li>한 요청의 전체 시간 상한(예: 3분)을 따로 두면 운영이 편해집니다.</li>
+        </ul>
+      </div>
+
+      <h3>2. 기록 남기기</h3>
+      <p>시도마다 한 줄씩 JSON 으로 남기면 <code>grep</code>·<code>awk</code>·<code>jq</code> 로 바로 집계할 수 있습니다.</p>
+      <div class="code"><span class="lang">logs/attempts.jsonl</span><pre><code>{"ts":"2026-10-21T14:03:11","req":"a3f9","attempt":1,"stage":"COMPILE","ok":false,"msg":"cannot find symbol"}
+{"ts":"2026-10-21T14:03:29","req":"a3f9","attempt":2,"stage":"TEST","ok":true,"ms":17400}</code></pre></div>
+      <div class="code term"><span class="lang">집계 예시</span><pre><code>$ jq -r 'select(.ok==false)|.stage' logs/attempts.jsonl | sort | uniq -c | sort -rn
+     14 COMPILE
+      6 TEST
+      1 TIMEOUT</code></pre></div>
+      <div class="tip"><p>로그가 계속 자라면 디스크를 먹습니다. <code>logrotate</code> 설정을 만들어 일 단위로 돌리고 7일 치만 남겨 보세요.</p></div>
+
+      <h3>3. systemd 서비스로 등록</h3>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 빌드</span><pre><code>cd ~/javagen/app &amp;&amp; ./gradlew bootJar
+ls build/libs/*.jar</code></pre></div>
+      <div class="code"><span class="lang">/etc/systemd/system/javagen.service</span><pre><code>[Unit]
+Description=JavaGen - self-verifying code generator
+After=network.target ollama.service
+
+[Service]
+User=student
+WorkingDirectory=/home/student/javagen
+ExecStart=/usr/bin/java -jar /home/student/javagen/app/build/libs/javagen.jar
+Environment=JAVAGEN_WORK=/home/student/javagen/work
+Restart=on-failure
+RestartSec=3
+StandardOutput=append:/home/student/javagen/logs/service.log
+StandardError=append:/home/student/javagen/logs/service.log
+
+[Install]
+WantedBy=multi-user.target</code></pre></div>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 등록</span><pre><code>sudo systemctl daemon-reload
+sudo systemctl enable --now javagen
+systemctl status javagen --no-pager</code></pre></div>
+      <div class="warn"><p><b>WSL 은 PC 를 켠다고 뜨지 않습니다.</b> 배포판은 누군가 터미널을 열 때 깨어납니다. 로그인하면 자동으로 뜨게 하려면 Windows <b>작업 스케줄러</b>에 "로그온할 때" 트리거로 <code>wsl -d Ubuntu-24.04 -e /bin/true</code> 를 등록하세요. 이 한 줄이 배포판을 깨우고, 그러면 systemd 가 서비스를 올립니다.</p></div>
+
+      <div class="mission">
+        <div class="mh"><span class="mn">MISSION 4-A</span><b>죽여도 살아나는지</b><span class="tm">40분</span></div>
+        <p>아래 세 가지를 차례로 하고 각각 몇 초 만에 복구되는지 기록하세요. 이 표가 5일차 운영 문서에 들어갑니다.</p>
+        <ul>
+          <li><code>sudo systemctl kill -s SIGKILL javagen</code></li>
+          <li>Windows 에서 <code>wsl --shutdown</code> 후 터미널 다시 열기</li>
+          <li>PC 재부팅 후 로그인</li>
+        </ul>
+      </div>
+      <div class="mission">
+        <div class="mh"><span class="mn">MISSION 4-B</span><b>옆자리에 공개하기 (선택)</b><span class="tm">40분</span></div>
+        <p>같은 강의실의 다른 PC 에서 내 서비스에 접속하게 만들어 보세요. Windows 쪽 포트 프록시와 방화벽 규칙이 필요합니다.</p>
+        <div class="warn"><p>열어 둔 채로 두면 <b>임의의 자바 코드를 실행해 주는 서버</b>를 남에게 열어 주는 셈입니다. 실습이 끝나면 반드시 규칙을 지우세요.</p></div>
+      </div>
+
+      <h3>4일차 마감 점검</h3>
+      <ul class="checks">
+        <li><input type="checkbox"> 컴파일 실패 → 재요청 → 통과하는 사례가 로그에 남아 있다</li>
+        <li><input type="checkbox"> 세 번 실패해도 서버가 죽지 않고 기록과 함께 응답한다</li>
+        <li><input type="checkbox"> <code>attempts.jsonl</code> 로 실패 유형 집계가 된다</li>
+        <li><input type="checkbox"> <code>systemctl enable</code> 상태이고 강제 종료 후 자동 복구된다</li>
+        <li><input type="checkbox"> 재부팅 후 로그인만 했는데 서비스가 응답한다</li>
+        <li><input type="checkbox"> 오늘 커밋 3개 이상 · <code>docs/ai-log.md</code> 갱신</li>
+      </ul>
+      <h3>오늘의 커밋</h3>
+      <p>기능 단위로 나눠 올린 결과가 하루 끝에 이렇게 남아 있어야 합니다.</p>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 하루 마감</span><pre><code>git commit -m "feat: 실패 에러를 넣어 최대 3회 재시도"
+git commit -m "feat: attempts.jsonl 시도 기록"
+git commit -m "chore: systemd 유닛 등록"
+git commit -m "docs: 강제 종료 후 복구 시간 측정"
+git push
+git tag -a day4 -m "재시도 고리와 서비스 등록"
+git push origin day4</code></pre></div>
+
+    </section>
+
+    <!-- ───────── DAY 5 ───────── -->
+    <section id="day5">
+      <div class="sec">Day 5 · 7시간</div>
+      <h2>안전장치 · 측정 · 문서</h2>
+      <p class="lead">마지막 날은 새 기능을 넣는 날이 아닙니다. <b>가두고, 재어 보고, 설명하는</b> 날입니다.</p>
+
+      <h3>1. 생성 코드 가두기 <span class="n">09:00–11:00</span></h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>울타리</th><th>방법</th><th>막는 것</th></tr></thead>
+          <tbody>
+            <tr><td><b>시간</b></td><td>컴파일 30초 · 테스트 20초 제한, 넘으면 강제 종료</td><td>무한 루프</td></tr>
+            <tr><td><b>권한</b></td><td>권한이 낮은 전용 계정으로 실행, 작업 디렉터리 밖은 쓰기 금지</td><td>파일 삭제 · 변조</td></tr>
+            <tr><td><b>자원</b></td><td><code>ulimit</code> 또는 <code>systemd-run</code> 으로 메모리·프로세스 수 제한</td><td>메모리 폭주, 프로세스 폭탄</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 전용 계정 예시</span><pre><code>sudo useradd -r -s /usr/sbin/nologin -d /home/student/javagen/work coderun
+sudo chown -R student:coderun ~/javagen/work
+sudo chmod 770 ~/javagen/work
+# 실행할 때
+sudo -u coderun java -jar tools/junit-console.jar execute -cp out ...</code></pre></div>
+      <div class="ok"><p>모델에게 "홈 디렉터리의 파일을 지우는 자바 코드"를 일부러 만들게 해 서비스에 넣어 보세요. 울타리가 서 있다면 <b>권한 오류로 실패</b>하고 서버는 멀쩡해야 합니다. 이 실험 결과를 운영 문서에 적으면 안전장치 점수를 받습니다.</p></div>
+      <div class="warn"><p>이 정도로 완전한 격리가 되지는 않습니다. 제대로 하려면 컨테이너나 가상머신 안에서 돌려야 합니다. <b>무엇까지 막았고 무엇은 못 막았는지</b>를 솔직히 쓰는 쪽이 더 좋은 평가를 받습니다.</p></div>
+
+      <h3>2. 성공률 측정 <span class="n">11:00–13:00</span></h3>
+      <p>"잘 됩니다"가 아니라 <b>"10문제 중 8문제, 평균 1.6회 시도"</b> 라고 말할 수 있어야 합니다.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>#</th><th>요구사항</th><th>난이도</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>구구단 2단부터 9단까지 문자열로 만들기</td><td>쉬움</td></tr>
+            <tr><td>2</td><td>섭씨를 화씨로 바꾸는 변환기</td><td>쉬움</td></tr>
+            <tr><td>3</td><td>FizzBuzz 를 문자열 리스트로 반환</td><td>쉬움</td></tr>
+            <tr><td>4</td><td>점수 배열의 평균과 학점(A~F) 계산</td><td>보통</td></tr>
+            <tr><td>5</td><td>문자열에서 단어별 빈도 세기</td><td>보통</td></tr>
+            <tr><td>6</td><td>날짜 문자열(yyyy-MM-dd)을 파싱해 요일 반환</td><td>보통</td></tr>
+            <tr><td>7</td><td>괄호 짝이 맞는지 검사 (스택 사용)</td><td>보통</td></tr>
+            <tr><td>8</td><td>0 으로 나눌 때 사용자 정의 예외를 던지는 나눗셈기</td><td>보통</td></tr>
+            <tr><td>9</td><td>공학용 계산기 — 사칙연산 · 괄호 · 제곱근 · 거듭제곱이 섞인 수식 계산</td><td>어려움</td></tr>
+            <tr><td>10</td><td>용량 제한이 있는 LRU 캐시</td><td>어려움</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="mission">
+        <div class="mh"><span class="mn">MISSION 5-A</span><b>벤치마크 스크립트</b><span class="tm">90분</span></div>
+        <p>10문제를 차례로 호출해 결과를 표로 뽑는 셸 스크립트를 만드세요. 문제마다 성공 여부·시도 횟수·소요 시간을 기록합니다.</p>
+        <div class="code term"><span class="lang">기대 출력</span><pre><code>#   요구사항                 결과      시도  시간
+1   구구단                   PASSED     1    8.2s
+2   섭씨→화씨                PASSED     1    7.4s
+...
+9   공학용 계산기            FAILED     3   62.1s
+----------------------------------------------
+성공 8/10 · 평균 시도 1.6회 · 평균 12.7초</code></pre></div>
+        <p class="muted">여유가 있으면 7B 와 14B 를 각각 돌려 비교하세요. "더 큰 모델이 몇 % 더 맞히고 몇 배 느린지"를 표로 보이면 가산점입니다.</p>
+      </div>
+
+      <h3>3. 문서 쓰기 <span class="n">14:00–15:30</span></h3>
+      <div class="cards">
+        <div class="card"><div class="dn">README.md</div><b>쓰는 사람을 위한 문서</b><span>한 줄 소개 · 구성도 · 설치 · 실행 · API 예시 · 벤치마크 결과 · 알려진 한계</span></div>
+        <div class="card"><div class="dn">docs/runbook.md</div><b>새벽에 깨어난 사람을 위한 문서</b><span>증상별로 무엇을 확인하고 무엇을 하는지 명령까지</span></div>
+      </div>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>증상</th><th>확인</th><th>조치</th></tr></thead>
+          <tbody>
+            <tr><td>응답이 아예 없다</td><td><code>systemctl status javagen</code></td><td>로그 확인 후 재시작</td></tr>
+            <tr><td>생성이 매우 느리다</td><td><code>ollama ps</code> 의 GPU 비율</td><td>CPU 로 내려갔는지 확인, 더 작은 모델로</td></tr>
+            <tr><td>전부 COMPILE_ERROR</td><td>프롬프트 형식, 코드 추출 로직</td><td>모델 응답 원문을 로그로 남겨 확인</td></tr>
+            <tr><td>디스크가 찬다</td><td><code>du -sh work logs</code></td><td>작업 디렉터리 청소, 로그 로테이션</td></tr>
+            <tr><td>재부팅 후 안 뜬다</td><td>작업 스케줄러 등록 여부</td><td>WSL 깨우기 작업 재등록</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="ok"><p>옆자리 학생에게 <b>문서만 주고</b> 여러분 PC 의 장애를 복구해 보라고 하세요. 문서만으로 해결되면 합격입니다. 말로 거들어야 했다면 그 부분이 문서에서 빠진 곳입니다.</p></div>
+      <h3>오늘의 커밋</h3>
+      <p>기능 단위로 나눠 올린 결과가 하루 끝에 이렇게 남아 있어야 합니다.</p>
+      <div class="code term"><span class="lang">Ubuntu (WSL) · 하루 마감</span><pre><code>git commit -m "feat: 전용 계정으로 생성 코드 실행"
+git commit -m "test: 벤치마크 10문제 스크립트와 결과"
+git commit -m "docs: README · runbook 작성"
+git commit -m "docs: 최종 ai-log 정리"
+git push
+git tag -a day5 -m "최종 제출본"
+git push origin day5</code></pre></div>
+
+    </section>
+
+    <!-- ───────── 평가 ───────── -->
+    <section id="eval">
+      <div class="sec">Rubric</div>
+      <h2>평가 기준</h2>
+      <p class="lead">"돌아간다"에 절반, "운영과 기록"에 절반입니다. 화려한 기능보다 끝까지 살아 있는 서비스가 점수가 높습니다.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>항목</th><th>배점</th><th>상 (90~100%)</th><th>중 (60~80%)</th><th>하 (~50%)</th></tr></thead>
+          <tbody>
+            <tr><td><b>핵심 기능</b></td><td>30</td><td>생성·컴파일·테스트·재시도가 모두 동작하고 기록에 과정이 남음</td><td>재시도가 동작하나 불안정, 일부 판정 누락</td><td>코드 생성만 되고 검증이 없음</td></tr>
+            <tr><td><b>운영</b></td><td>20</td><td>재부팅 후 자동 기동, 강제 종료 시 자동 복구, 로그 관리까지</td><td>수동으로 띄우면 동작</td><td>개발 환경에서만 실행</td></tr>
+            <tr><td><b>측정 · 문서</b></td><td>20</td><td>10문제 측정 + 실패 분석 + 문서만으로 복구 가능</td><td>측정은 했으나 분석이 얕음</td><td>README 만 있음</td></tr>
+            <tr><td><b>안전장치</b></td><td>15</td><td>시간·권한·자원 세 겹 + 한계를 문서화</td><td>타임아웃만 적용</td><td>무한 루프에 서버가 멈춤</td></tr>
+            <tr><td><b>기록</b></td><td>15</td><td>커밋이 과정대로 쌓이고 AI 의 오류를 잡아낸 기록이 있음</td><td>커밋은 있으나 기록이 형식적</td><td>커밋 1~2개, 기록 없음</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="ok"><p><b>가산점 (최대 10점)</b> — 생성 코드를 Docker 컨테이너에서 실행 · 모델 2종 이상 성공률 비교 · 웹 UI 또는 편집기 연동 · 스트리밍 응답으로 생성 과정 표시</p></div>
+      <div class="warn"><p><b>감점</b> — 타임아웃 없이 생성 코드 실행 · API 키나 비밀번호를 저장소에 커밋 · 커밋이 1~2개뿐이라 과정이 보이지 않음 · 영상만 있고 서비스가 실제로 안 뜸</p></div>
+    </section>
+
+    <!-- ───────── 제출 ───────── -->
+    <section id="submit">
+      <div class="sec">Submit</div>
+      <h2>제출 · 발표</h2>
+
+      <h3>발표 5분 구성</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>시간</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td>0:00–0:40</td><td>무엇을 만들었는지 한 문장 + 구성도</td></tr>
+            <tr><td>0:40–2:00</td><td>실제 호출 — 한 번에 통과하는 문제, 그리고 <b>재시도로 고쳐지는 문제</b></td></tr>
+            <tr><td>2:00–3:00</td><td>고장 시연 — 서비스를 죽이고 자동 복구, 무한 루프가 타임아웃으로 끊기는 장면</td></tr>
+            <tr><td>3:00–4:00</td><td>벤치마크 결과표와 실패 분석</td></tr>
+            <tr><td>4:00–5:00</td><td>AI 를 어디에 썼고, AI 가 틀린 것을 어떻게 잡았는지</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>제출물</h3>
+      <ul>
+        <li><b>Git 저장소 주소</b> — 커밋 기록이 남아 있어야 합니다. 마지막에 몰아서 올린 저장소는 감점입니다.</li>
+        <li><b>환경 파일</b> <code>학번_이름.tar</code> — 채점자가 그대로 띄워 확인합니다.</li>
+        <li><b>문서</b> — README.md · docs/runbook.md · docs/ai-log.md · 벤치마크 결과</li>
+        <li><b>데모 영상</b> — 5분 이내 화면 녹화. 발표와 같은 구성</li>
+      </ul>
+      <div class="code"><span class="lang">Windows · PowerShell</span><pre><code>wsl --shutdown
+wsl --export Ubuntu-24.04 D:\제출\20260001_홍길동.tar</code></pre></div>
+      <div class="warn">
+        <ul>
+          <li>내보내기 전에 <code>work/</code> 아래 임시 디렉터리를 비우세요. 안 그러면 파일이 수 GB 가 됩니다.</li>
+          <li>모델 파일(<code>~/.ollama/models</code>)은 빼도 됩니다. 강사가 따로 갖고 있습니다.</li>
+          <li>개인 비밀번호·토큰이 파일에 남아 있지 않은지 확인하세요.</li>
+        </ul>
+      </div>
+
+      <h3>제출 직전 최종 점검</h3>
+      <ul class="checks">
+        <li><input type="checkbox"> PC 를 재부팅하고 로그인만 했는데 서비스가 응답한다</li>
+        <li><input type="checkbox"> 무한 루프 코드를 넣어도 서버가 살아 있다</li>
+        <li><input type="checkbox"> 벤치마크 10문제 결과가 README 에 표로 있다</li>
+        <li><input type="checkbox"> 운영 문서를 보고 다른 사람이 장애를 복구해 봤다</li>
+        <li><input type="checkbox"> 저장소에 비밀번호·토큰이 커밋되지 않았다</li>
+        <li><input type="checkbox"> <code>docs/ai-log.md</code> 에 날짜별 기록이 15건 이상 있다</li>
+        <li><input type="checkbox"> <code>wsl --export</code> 파일이 열리고 용량이 과하지 않다</li>
+        <li><input type="checkbox"> 데모 영상이 5분 이내이고 고장 복구 장면이 들어 있다</li>
+      </ul>
+    </section>
+
+    <!-- ───────── FAQ ───────── -->
+    <section id="faq">
+      <div class="sec">FAQ</div>
+      <h2>자주 막히는 곳</h2>
+
+      <h3>GPU 가 안 잡혀요</h3>
+      <p>WSL 안에 리눅스용 그래픽 드라이버를 설치했는지 먼저 확인하세요. 설치했다면 그것이 원인입니다. Windows 쪽 드라이버를 최신으로 올리고 <code>wsl --shutdown</code> 후 다시 들어가 보세요.</p>
+
+      <h3>모델이 너무 느려요</h3>
+      <p><code>ollama ps</code> 에서 <code>CPU</code> 가 섞여 있으면 VRAM 이 모자란 것입니다. 더 작은 모델을 쓰거나 컨텍스트(<code>num_ctx</code>)를 줄이세요. Gradle 빌드와 동시에 돌리면 체감이 더 나빠집니다.</p>
+
+      <h3>빌드가 유난히 오래 걸려요</h3>
+      <p>프로젝트가 <code>/mnt/c</code> 아래에 있는지 확인하세요. 윈도우 디스크 쪽에 두면 파일 접근이 느립니다. <code>~/</code> 아래로 옮기면 바로 빨라집니다.</p>
+
+      <h3>한글이 깨집니다</h3>
+      <p>세 군데를 확인하세요. 모델 응답을 읽을 때의 문자셋, 파일로 저장할 때의 문자셋, <code>javac -encoding UTF-8</code> 옵션입니다.</p>
+
+      <h3>서비스가 재부팅 후 안 떠요</h3>
+      <p>정상입니다. WSL 은 PC 를 켠다고 저절로 뜨지 않습니다. 작업 스케줄러에 WSL 을 깨우는 작업을 등록했는지 확인하세요.</p>
+
+      <h3>모델이 자꾸 설명을 섞어서 답해요</h3>
+      <p>프롬프트 문제입니다. 형식 조건을 더 분명히 쓰고, 그래도 안 되면 후처리에서 코드 블록만 뽑아내세요. "형식을 지킨 비율"을 재 보면 프롬프트를 고칠 방향이 보입니다.</p>
+    </section>
+  </main>
+</div>
+
+<footer class="wrap">
+  <p>한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과 · 로컬 LLM 자바 코드 생성기 · 1주 35시간 · 개인 과제 — <a href="../">강의실 홈</a></p>
+</footer>
+
+<dialog class="tooltip-modal" id="termDialog" aria-labelledby="tmTitle">
+  <div class="tm-head">
+    <span class="ic" id="tmIcon"></span>
+    <div><h4 id="tmTitle"></h4><p id="tmTag"></p></div>
+    <button class="x" type="button" aria-label="닫기" id="tmClose">×</button>
+  </div>
+  <div class="tm-body" id="tmBody"></div>
+</dialog>
+
+<script>
+  // ───────── 도구 사전 ─────────
+  var TERMS = {
+    wsl: {
+      icon: '🪟', name: 'WSL2', tag: 'Windows 안에서 진짜 리눅스를 돌리는 장치', match: /WSL2/, role: '리눅스 환경',
+      body: '<h5>무엇인가요?</h5><p>Windows Subsystem for Linux 2 의 줄임말입니다. Windows 안에 아주 가벼운 가상 머신을 두고 <b>진짜 리눅스 커널</b>을 돌립니다. 흉내가 아니라 실제 리눅스라서 systemd, apt, 권한, 프로세스가 그대로 동작합니다.</p>' +
+            '<h5>이 프로젝트에서 하는 일</h5><p>우리가 만드는 모든 것이 이 안에 있습니다. 모델도, 자바도, 서비스도요. Windows 에는 편집기 창과 그래픽 드라이버만 남습니다.</p>' +
+            '<h5>알아 둘 점</h5><ul><li>PC 를 켠다고 자동으로 뜨지 않습니다. 터미널을 열거나 <code>wsl</code> 명령을 실행해야 깨어납니다.</li><li>Windows 에서 <code>localhost</code> 로 WSL 안의 서버에 접속할 수 있습니다.</li><li><code>wsl --export</code> 로 환경 전체를 파일 하나로 내보낼 수 있어 과제 제출에 씁니다.</li></ul>' +
+            '<dl class="facts"><dt>비용</dt><dd>무료 (Windows 기능)</dd><dt>설치</dt><dd>wsl --install -d Ubuntu-24.04</dd><dt>가상머신과 차이</dt><dd>GPU 를 그대로 쓸 수 있음</dd></dl>',
+      link: 'https://learn.microsoft.com/ko-kr/windows/wsl/'
+    },
+    ubuntu: {
+      icon: '🐧', name: 'Ubuntu 24.04 LTS', tag: '가장 널리 쓰이는 리눅스 배포판', match: /Ubuntu 24\.04 LTS/, role: '운영체제',
+      body: '<h5>무엇인가요?</h5><p>리눅스 커널에 셸·명령어·패키지 관리자를 묶어 놓은 배포판입니다. LTS 는 장기 지원판이라는 뜻으로, 24.04 는 2029년까지 보안 업데이트를 받습니다.</p>' +
+            '<h5>이 프로젝트에서 하는 일</h5><p>서비스가 돌아가는 바탕입니다. 리눅스 과정에서 쓰던 환경과 같으니 명령이 그대로 통합니다.</p>' +
+            '<dl class="facts"><dt>패키지 도구</dt><dd>apt</dd><dt>기본 셸</dt><dd>bash</dd><dt>버전 확인</dt><dd>cat /etc/os-release</dd></dl>',
+      link: 'https://ubuntu.com/server'
+    },
+    nvidia: {
+      icon: '🎮', name: 'NVIDIA 드라이버 · CUDA', tag: '그래픽카드를 계산에 쓰게 해 주는 소프트웨어', match: /그래픽 드라이버/, role: '가속',
+      body: '<h5>무엇인가요?</h5><p>드라이버는 운영체제가 그래픽카드를 다루게 해 주는 프로그램이고, CUDA 는 그 카드로 일반 계산을 시키는 기술입니다. LLM 이 GPU 에서 빠른 이유가 여기 있습니다.</p>' +
+            '<h5>WSL 에서 특별한 점</h5><p><b>Windows 쪽 드라이버 하나만</b> 있으면 WSL 안에서도 그대로 보입니다. 리눅스용 드라이버를 WSL 안에 설치하면 오히려 GPU 가 사라지니 절대 하지 마세요. Ollama 만 쓸 거라면 CUDA 툴킷도 따로 설치할 필요가 없습니다.</p>' +
+            '<dl class="facts"><dt>확인 명령</dt><dd>nvidia-smi</dd><dt>강의실 PC</dt><dd>RTX 4070 · VRAM 12GB</dd></dl>',
+      link: 'https://docs.nvidia.com/cuda/wsl-user-guide/index.html'
+    },
+    ollama: {
+      icon: '🦙', name: 'Ollama', tag: '내 PC 에서 LLM 을 돌려 주는 프로그램', match: /Ollama/, role: '모델 실행기',
+      body: '<h5>무엇인가요?</h5><p>명령 한 줄로 언어 모델을 내려받아 내 컴퓨터에서 실행해 주는 무료 프로그램입니다. 모델을 GPU 에 올리고, 다른 프로그램이 쓸 수 있도록 <b>HTTP 서버</b>를 열어 줍니다.</p>' +
+            '<h5>이 프로젝트에서 하는 일</h5><p>여러분의 자바 서비스가 <code>http://localhost:11434</code> 로 요청을 보내면 Ollama 가 모델을 돌려 코드를 만들어 돌려줍니다. 외부 API 가 아니라 내 PC 안에서 끝나므로 요금도, 키도 없습니다.</p>' +
+            '<h5>자주 쓰는 명령</h5><ul><li><code>ollama pull &lt;모델&gt;</code> 내려받기 · <code>ollama list</code> 목록</li><li><code>ollama run &lt;모델&gt; "질문"</code> 터미널에서 바로 물어보기</li><li><code>ollama ps</code> 지금 떠 있는 모델과 <b>GPU 비율</b></li><li><code>ollama create</code> 설정을 고정한 파생 모델 만들기</li></ul>' +
+            '<dl class="facts"><dt>비용</dt><dd>무료 · 오픈소스</dd><dt>기본 주소</dt><dd>127.0.0.1:11434</dd><dt>모델 저장 위치</dt><dd>/usr/share/ollama/.ollama/models</dd></dl>',
+      link: 'https://ollama.com'
+    },
+    coder: {
+      icon: '🤖', name: '코더 모델 (Qwen2.5-Coder 등)', tag: '코드 작성에 특화해 학습시킨 언어 모델', match: /코더 모델/, role: '코드 작성',
+      body: '<h5>무엇인가요?</h5><p>일반 대화 모델과 달리 소스 코드와 버그 수정 사례를 집중적으로 학습한 모델입니다. 같은 크기라면 코드 작업에서 범용 모델보다 낫습니다. 크기는 7B(70억 개 변수)처럼 표기합니다.</p>' +
+            '<h5>이 프로젝트에서 하는 일</h5><p>요구사항을 받아 자바 코드와 JUnit 테스트를 씁니다. 작은 모델은 자주 틀리는데, <b>그 틀림을 검증으로 잡아내는 것</b>이 이 과제의 주제입니다.</p>' +
+            '<h5>12GB 에서 고르는 기준</h5><ul><li>7B 4bit — 약 5GB. 여유 있고 빠름. 먼저 이것으로 시작</li><li>14B 4bit — 약 9GB. 품질이 낫지만 컨텍스트를 8K 로 제한</li><li>1.5B — 편집기 자동완성 전용</li></ul>' +
+            '<dl class="facts"><dt>받는 곳</dt><dd>ollama.com/library</dd><dt>비용</dt><dd>무료 · 가중치 공개</dd></dl>',
+      link: 'https://ollama.com/library'
+    },
+    quant: {
+      icon: '🗜️', name: '양자화 (4bit)', tag: '모델을 가볍게 눌러 담는 기술', match: /4bit/, role: '개념',
+      body: '<h5>무엇인가요?</h5><p>모델 안의 숫자를 더 적은 비트로 줄여 저장하는 방법입니다. 16비트를 4비트로 줄이면 용량이 약 4분의 1이 되어 작은 GPU 에도 올라갑니다.</p>' +
+            '<h5>알아 둘 점</h5><p>품질이 아주 조금 떨어지지만, 같은 VRAM 에서 <b>더 큰 모델</b>을 쓸 수 있어 대개 이득입니다. Ollama 가 받는 기본 태그는 보통 4bit 계열입니다.</p>',
+      link: ''
+    },
+    context: {
+      icon: '📏', name: '컨텍스트 (num_ctx)', tag: '모델이 한 번에 읽고 기억할 수 있는 길이', match: /컨텍스트/, role: '개념',
+      body: '<h5>무엇인가요?</h5><p>모델이 한 번에 붙잡을 수 있는 글의 양입니다. 요구사항, 직전 코드, 에러 메시지가 모두 여기에 들어갑니다.</p>' +
+            '<h5>이 프로젝트에서 중요한 이유</h5><p>재시도할 때 <b>직전 코드와 에러</b>를 함께 넣기 때문에 길이가 금세 늘어납니다. 너무 작으면 앞부분이 잘려 같은 실수를 반복하고, 너무 크면 VRAM 을 더 먹습니다. 12GB 환경에서는 8192 정도가 무난합니다.</p>',
+      link: ''
+    },
+    vscode: {
+      icon: '📝', name: 'VS Code', tag: '마이크로소프트의 무료 코드 편집기', match: /VS Code/, role: '편집기',
+      body: '<h5>무엇인가요?</h5><p>가볍고 확장이 많은 코드 편집기입니다. 확장을 설치해 자바 개발, 원격 접속, AI 보조 기능을 더합니다.</p>' +
+            '<h5>이 프로젝트에서 하는 일</h5><p>Windows 에 설치하지만 <b>WSL 모드</b>로 접속해서, 편집기 창만 Windows 에 두고 코드·빌드·실행은 전부 리눅스에서 하게 합니다. 왼쪽 아래에 <code>WSL: Ubuntu-24.04</code> 가 떠 있어야 맞게 쓰는 것입니다.</p>' +
+            '<dl class="facts"><dt>비용</dt><dd>무료</dd><dt>필요한 확장</dt><dd>WSL · Extension Pack for Java · Continue</dd></dl>',
+      link: 'https://code.visualstudio.com'
+    },
+    remotewsl: {
+      icon: '🔌', name: 'WSL 확장', tag: '편집기를 리눅스 쪽에 붙여 주는 확장', match: /WSL 확장/, role: '연결',
+      body: '<h5>무엇인가요?</h5><p>VS Code 를 WSL 안의 리눅스에 연결해 주는 마이크로소프트 공식 확장입니다. 연결하면 터미널, 디버거, 다른 확장들이 모두 리눅스 쪽에서 동작합니다.</p>' +
+            '<h5>왜 꼭 써야 하나요?</h5><ul><li>Windows 쪽에서 리눅스 파일을 열면 줄바꿈(CRLF)과 권한이 섞여 사고가 납니다.</li><li><code>/mnt/c</code> 경로는 파일 접근이 느려 빌드가 몇 배 오래 걸립니다.</li></ul>' +
+            '<h5>쓰는 법</h5><p>WSL 터미널에서 <code>code .</code> 라고 치면 그 폴더가 WSL 모드로 열립니다.</p>',
+      link: 'https://code.visualstudio.com/docs/remote/wsl'
+    },
+    continue: {
+      icon: '🧩', name: 'Continue', tag: 'VS Code 안에서 내 로컬 모델을 쓰게 해 주는 확장', match: /Continue/, role: 'AI 보조',
+      body: '<h5>무엇인가요?</h5><p>편집기 안에 AI 채팅과 자동완성을 붙여 주는 오픈소스 확장입니다. 상용 서비스 대신 <b>Ollama 같은 로컬 모델</b>을 공급자로 지정할 수 있습니다.</p>' +
+            '<h5>이 프로젝트에서 하는 일</h5><p>코드를 쓸 때의 보조입니다. 채팅은 7B 모델, 인라인 자동완성은 더 작은 1.5B 모델로 나눠 쓰면 쾌적합니다.</p>' +
+            '<h5>설정</h5><p>확장 화면의 설정 버튼으로 열리는 파일을 고치는 것이 가장 확실합니다. 버전에 따라 <code>~/.continue/config.yaml</code> 또는 <code>config.json</code> 을 씁니다.</p>' +
+            '<dl class="facts"><dt>비용</dt><dd>무료 · 오픈소스</dd><dt>공급자</dt><dd>ollama</dd></dl>',
+      link: 'https://docs.continue.dev'
+    },
+    jdk: {
+      icon: '☕', name: 'JDK 17', tag: '자바 개발 도구 모음', match: /Java 17/, role: '언어',
+      body: '<h5>무엇인가요?</h5><p>자바 프로그램을 만들고 실행하는 데 필요한 도구 모음입니다. 컴파일러 <code>javac</code>, 실행기 <code>java</code>, 표준 라이브러리가 들어 있습니다. 17 은 장기 지원 버전입니다.</p>' +
+            '<h5>이 프로젝트에서 하는 일</h5><p>두 가지로 씁니다. 하나는 여러분의 서비스를 만드는 언어로, 다른 하나는 <b>모델이 써 준 코드를 컴파일하고 실행하는 도구</b>로요. <code>javac</code> 를 자식 프로세스로 돌리는 것이 3일차의 핵심입니다.</p>' +
+            '<dl class="facts"><dt>설치</dt><dd>sudo apt install openjdk-17-jdk</dd><dt>확인</dt><dd>java -version · javac -version</dd></dl>',
+      link: 'https://openjdk.org/projects/jdk/17/'
+    },
+    gradle: {
+      icon: '🐘', name: 'Gradle', tag: '자바 프로젝트를 빌드하고 라이브러리를 챙겨 주는 도구', match: /Gradle/, role: '빌드',
+      body: '<h5>무엇인가요?</h5><p>소스를 컴파일하고, 필요한 라이브러리를 내려받고, 실행 가능한 jar 로 묶어 주는 빌드 도구입니다.</p>' +
+            '<h5>따로 설치하지 않습니다</h5><p>프로젝트에 들어 있는 <b>래퍼</b>(<code>./gradlew</code>)가 알맞은 버전을 알아서 받아 씁니다. 사람마다 버전이 달라 생기는 문제를 막는 방식입니다.</p>' +
+            '<dl class="facts"><dt>개발 중 실행</dt><dd>./gradlew bootRun</dd><dt>배포용 묶기</dt><dd>./gradlew bootJar</dd></dl>',
+      link: 'https://docs.gradle.org'
+    },
+    junit: {
+      icon: '✅', name: 'JUnit 5', tag: '자바 테스트를 작성하고 실행하는 표준 도구', match: /JUnit 5/, role: '검증',
+      body: '<h5>무엇인가요?</h5><p>자바에서 가장 널리 쓰는 테스트 도구입니다. "이 입력에는 이 결과가 나와야 한다"를 코드로 적어 두고 자동으로 확인합니다.</p>' +
+            '<h5>이 프로젝트에서 하는 일</h5><p>모델이 만든 코드가 <b>정말 맞게 동작하는지</b> 판정하는 잣대입니다. 테스트도 모델에게 함께 쓰게 하고, 콘솔 런처 jar 로 명령줄에서 실행합니다.</p>' +
+            '<h5>생각해 볼 것</h5><p>모델이 코드와 테스트를 둘 다 썼다면, 테스트가 통과했다는 사실은 무엇을 보장하고 무엇은 보장하지 못할까요?</p>',
+      link: 'https://junit.org/junit5/'
+    },
+    spring: {
+      icon: '🌱', name: 'Spring Boot', tag: '자바로 웹 서버를 빠르게 만드는 프레임워크', match: /Spring Boot/, role: '서비스 뼈대',
+      body: '<h5>무엇인가요?</h5><p>설정을 최소로 줄여 자바 웹 애플리케이션을 바로 띄울 수 있게 해 주는 프레임워크입니다. 웹 서버가 안에 들어 있어 jar 하나로 실행됩니다.</p>' +
+            '<h5>이 프로젝트에서 하는 일</h5><p>여러분이 만들 <code>/api/generate</code> 엔드포인트의 바탕입니다. jar 하나로 묶이기 때문에 systemd 에 등록하기도 쉽습니다.</p>' +
+            '<dl class="facts"><dt>프로젝트 생성</dt><dd>start.spring.io</dd><dt>이번에 쓰는 의존성</dt><dd>web 하나면 충분</dd></dl>',
+      link: 'https://spring.io/projects/spring-boot'
+    },
+    git: {
+      icon: '🌳', name: 'Git', tag: '코드의 변경 이력을 기록하는 도구', match: /Git 설정/, role: '기록',
+      body: '<h5>무엇인가요?</h5><p>언제 무엇을 왜 바꿨는지 기록해 두고, 필요하면 되돌릴 수 있게 해 주는 버전 관리 도구입니다.</p>' +
+            '<h5>이 프로젝트에서 하는 일</h5><p>평가 항목입니다. AI 를 써서 만드는 과제이기 때문에 <b>과정이 보이는 커밋 기록</b> 자체가 점수입니다. 하루 최소 3개, 기능 단위로 쪼개세요.</p>' +
+            '<dl class="facts"><dt>줄바꿈 설정</dt><dd>git config core.autocrlf input</dd><dt>커밋 접두어</dt><dd>feat: fix: docs: chore:</dd></dl>',
+      link: 'https://git-scm.com/book/ko/v2'
+    },
+    systemd: {
+      icon: '⚙️', name: 'systemd', tag: '리눅스에서 서비스를 띄우고 지켜보는 관리자', match: /systemd/, role: '서비스 운영',
+      body: '<h5>무엇인가요?</h5><p>리눅스가 부팅할 때 프로그램을 순서대로 띄우고, 죽으면 다시 살리고, 로그를 모아 주는 관리자입니다.</p>' +
+            '<h5>이 프로젝트에서 하는 일</h5><p>여러분의 서비스를 <code>javagen.service</code> 로 등록해 <b>강제로 죽여도 다시 뜨게</b> 만듭니다. 이것이 평가의 운영 항목입니다.</p>' +
+            '<h5>WSL 에서 주의</h5><p>WSL 은 기본으로 systemd 를 쓰지 않습니다. <code>/etc/wsl.conf</code> 에 <code>systemd=true</code> 를 넣어야 하고, PC 를 켠다고 저절로 뜨지도 않습니다.</p>' +
+            '<dl class="facts"><dt>등록</dt><dd>systemctl enable --now 이름</dd><dt>상태</dt><dd>systemctl status 이름</dd></dl>',
+      link: ''
+    }
+  };
+
+  // 사전 카드 그리기
+  var grid = document.getElementById('toolgrid');
+  Object.keys(TERMS).forEach(function (k) {
+    var t = TERMS[k];
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'toolcard'; b.dataset.term = k;
+    b.innerHTML = '<span class="ic">' + t.icon + '</span><span><span class="role">' + t.role + '</span><b>' + t.name + '</b><small>' + t.tag + '</small></span>';
+    grid.appendChild(b);
+  });
+
+  // 본문에서 각 도구 이름을 섹션마다 처음 한 번 클릭할 수 있게 감싸기
+  var SKIP = /^(PRE|CODE|A|BUTTON|H1|H2|H3|H4|SUMMARY|SVG|TEXT|SCRIPT|STYLE|DIALOG)$/;
+  function wrapFirst(root, key, re) {
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        for (var p = n.parentNode; p && p !== root; p = p.parentNode) {
+          if (SKIP.test(p.nodeName.toUpperCase()) || (p.classList && (p.classList.contains('term') || p.classList.contains('toolgrid') || p.classList.contains('code')))) return NodeFilter.FILTER_REJECT;
+        }
+        return re.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+      }
+    });
+    var node = walker.nextNode();
+    if (!node) return;
+    var m = node.nodeValue.match(re);
+    var after = node.splitText(m.index);
+    after.splitText(m[0].length);
+    var btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'term'; btn.dataset.term = key; btn.textContent = m[0];
+    btn.title = TERMS[key].name + ' 설명 보기';
+    after.parentNode.replaceChild(btn, after);
+  }
+  document.querySelectorAll('main section').forEach(function (sec) {
+    Object.keys(TERMS).forEach(function (k) { wrapFirst(sec, k, TERMS[k].match); });
+  });
+
+  // 설명 창 열기 / 닫기
+  var dlg = document.getElementById('termDialog');
+  function openTerm(key) {
+    var t = TERMS[key]; if (!t) return;
+    document.getElementById('tmIcon').textContent = t.icon;
+    document.getElementById('tmTitle').textContent = t.name;
+    document.getElementById('tmTag').textContent = t.tag;
+    document.getElementById('tmBody').innerHTML = t.body +
+      (t.link ? '<a class="go" href="' + t.link + '" target="_blank" rel="noopener">공식 문서 열기 ↗</a>' : '');
+    if (dlg.showModal) { dlg.showModal(); } else { dlg.setAttribute('open', ''); }
+  }
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest && e.target.closest('[data-term]');
+    if (el) { openTerm(el.dataset.term); }
+  });
+  document.getElementById('tmClose').addEventListener('click', function () { dlg.close ? dlg.close() : dlg.removeAttribute('open'); });
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+
+  // 라이트 / 다크 전환
+  var tb = document.getElementById('theme');
+  var setLabel = function () { tb.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️ 라이트' : '🌙 다크'; };
+  setLabel();
+  tb.addEventListener('click', function () {
+    var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('javagen-theme', next); } catch (e) {}
+    setLabel();
+  });
+
+  // 코드 블록 복사 버튼
+  document.querySelectorAll('.code').forEach(function (box) {
+    var btn = document.createElement('button');
+    btn.className = 'copy'; btn.type = 'button'; btn.textContent = '복사';
+    btn.addEventListener('click', function () {
+      var text = box.querySelector('code').textContent;
+      var done = function () { btn.textContent = '복사됨'; setTimeout(function () { btn.textContent = '복사'; }, 1500); };
+      if (navigator.clipboard) { navigator.clipboard.writeText(text).then(done, function () {}); }
+    });
+    box.appendChild(btn);
+  });
+
+  // 체크리스트 상태를 이 브라우저에 기억
+  document.querySelectorAll('.checks input').forEach(function (cb, i) {
+    var key = 'javagen-check-' + i;
+    try { cb.checked = localStorage.getItem(key) === '1'; } catch (e) {}
+    cb.addEventListener('change', function () { try { localStorage.setItem(key, cb.checked ? '1' : '0'); } catch (e) {} });
+  });
+
+  // 현재 보고 있는 섹션을 목차에 표시
+  var links = document.querySelectorAll('nav.toc a');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          links.forEach(function (a) { a.classList.toggle('on', a.getAttribute('href') === '#' + en.target.id); });
+        }
+      });
+    }, { rootMargin: '-30% 0px -60% 0px' });
+    document.querySelectorAll('main section').forEach(function (s) { io.observe(s); });
+  }
+</script>
+
+<button id="narrFab" type="button" title="나레이션 듣기" aria-label="나레이션 열기">🔊</button>
+<div id="narrPanel" role="dialog" aria-label="나레이션 플레이어">
+  <div class="nhead"><b>🔊 나레이션</b><button type="button" id="narrClose" aria-label="닫기">×</button></div>
+  <div class="nnow" id="narrNow">프로젝트 개요</div>
+  <div class="ncap" id="narrCap">재생을 누르면 지금 보고 있는 부분부터 읽어 줍니다.</div>
+  <div class="nrow">
+    <button type="button" id="narrPrev" title="이전 단락">◀</button>
+    <button type="button" class="main" id="narrPlay">▶ 재생</button>
+    <button type="button" id="narrNext" title="다음 단락">▶▶</button>
+  </div>
+  <div class="nrow">
+    <select id="narrRate" title="속도">
+      <option value="0.9">0.9배</option><option value="1" selected>1.0배</option>
+      <option value="1.15">1.15배</option><option value="1.3">1.3배</option><option value="1.5">1.5배</option>
+    </select>
+    <select id="narrVoice" title="목소리"></select>
+  </div>
+  <div class="nlist" id="narrList"></div>
+  <div class="nhint">브라우저 음성 합성을 씁니다. 한국어 목소리가 없으면 Chrome 이나 Edge 로 열어 보세요.</div>
+</div>
+
+<script>
+/* ───────── 나레이션 플레이어 (브라우저 음성 합성) ───────── */
+(function () {
+  var NARR = {
+    overview: "이번 프로젝트에서 만드는 것은, 사람이 요구사항을 한 줄 적으면 내 컴퓨터의 엘엘엠이 자바 코드를 써 주고, 그 코드를 진짜로 컴파일하고 테스트해서 통과한 것만 돌려주는 서비스입니다. 예시를 보면 구구단을 만들어 달라고 했더니 모델이 부등호를 잘못 써서 구 단이 빠졌습니다. 컴파일은 멀쩡히 통과했지만 테스트가 이 실수를 잡아냈어요. 서비스는 그 실패 내용을 그대로 모델에게 돌려주고, 모델은 부등호 하나를 고쳐 다시 씁니다. 사람은 처음 한 줄 말고는 아무것도 하지 않았습니다. 이 과제의 핵심은 좋은 모델을 고르는 것이 아니라, 생성과 검증을 잇는 이 고리를 닫는 것입니다. 작은 모델도 에러를 돌려주며 두세 번 고치게 하면 쓸 만한 결과가 나옵니다.",
+    tools: "설치에 들어가기 전에 무엇을 왜 쓰는지부터 짚겠습니다. 쓰는 도구는 전부 무료입니다. 윈도우 쪽에는 편집기인 브이에스 코드와 그래픽 드라이버만 남고, 더블유에스엘 안쪽에 우분투와 올라마, 코더 모델, 자바, 깃이 들어갑니다. 그리고 그 위에 여러분이 만들 자바젠 서비스가 올라갑니다. 화면의 카드를 누르면 그 도구가 무엇이고 이 프로젝트에서 어떤 역할을 하는지 설명 창이 열립니다. 본문에서 밑줄 쳐진 도구 이름을 눌러도 같은 설명이 나옵니다. 이름이 열여섯 개나 되어 보이지만 직접 설치하는 것은 여섯 가지뿐입니다. 더블유에스엘, 올라마, 모델, 자바, 깃, 브이에스 코드입니다.",
+    install: "설치는 일차 오전에 하는 작업입니다. 순서를 지키세요. 앞 단계가 안 됐는데 다음으로 가면 원인을 찾기 어려워집니다. 먼저 가상화가 켜져 있는지, 디스크 여유가 육십 기가 이상인지, 그래픽 드라이버가 동작하는지를 봅니다. 그다음 더블유에스엘과 우분투를 깔고, 메모리 한도를 정하고, 시스템디를 켭니다. 세 번째 단계에서 지피유가 보이는지 반드시 확인하세요. 여기서 꼭 기억할 것은, 더블유에스엘 안에는 리눅스용 그래픽 드라이버를 절대 설치하지 않는다는 점입니다. 윈도우 드라이버가 그대로 전달되기 때문이고, 리눅스용을 깔면 오히려 지피유가 사라집니다. 이어서 올라마를 설치하고 코더 모델을 받습니다. 모델이 떠 있을 때 올라마 피에스 명령에 백 퍼센트 지피유라고 나와야 정상입니다. 씨피유가 섞여 있으면 더 작은 모델로 내려야 합니다. 마지막으로 자바 십칠과 제이유닛, 깃, 브이에스 코드와 확장을 설치하고, 아홉 번째 단계에서 전부 한 번에 점검합니다.",
+    stack: "환경을 역할로 나눠 보겠습니다. 윈도우는 보는 창과 하드웨어만 맡고, 실제 작업은 전부 더블유에스엘 안에서 일어납니다. 가상머신이 아니라 더블유에스엘을 쓰는 이유는 세 가지입니다. 첫째, 지피유를 그대로 쓸 수 있습니다. 버추얼박스에서는 모델을 씨피유로만 돌려야 해서 실습이 답답해집니다. 둘째, 환경을 통째로 파일 하나로 내보내 제출할 수 있습니다. 셋째, 윈도우와 주고받는 실습이 가능합니다. 모델은 브이램 십이 기가에 맞춰 고릅니다. 칠비급은 약 오 기가로 여유 있고 빠르며, 십사비급은 구 기가로 품질이 낫지만 컨텍스트를 팔 케이로 제한해야 합니다. 표를 보면 리눅스 과정에서 배운 셸과 권한, 프로세스, 로그, 시스템디, 방화벽이 이 프로젝트의 어느 부분에 쓰이는지 한눈에 들어옵니다.",
+    plan: "일정은 닷새입니다. 하루에 고리를 하나씩 닫습니다. 일차에는 환경을 세우고 모델에게 첫 코드를 받아 봅니다. 이차에는 스프링 부트로 뼈대를 만들어 코드를 받아 오는 데까지 갑니다. 삼차에는 받은 코드를 컴파일하고 테스트해서 통과와 실패를 판정합니다. 사차에는 실패를 모델에게 돌려주어 고치게 만들고 서비스로 등록합니다. 오차에는 안전장치를 두르고 성공률을 재고 문서와 발표를 준비합니다. 그날 산출물은 그날 끝내야 다음 날이 성립합니다. 에이아이를 써서 만들어도 됩니다. 대신 무엇을 시켰고 무엇을 고쳤는지 기록으로 남기고, 커밋을 잘게 쪼개세요.",
+    git: "이 과제는 완성품만큼 과정을 봅니다. 에이아이에게 시켜서 만드는 과제이기 때문에, 어떤 순서로 쌓아 올렸는지 보이는 커밋 기록 자체가 평가 항목입니다. 첫날 깃허브에 비공개 저장소를 만들고, 에스에스에이치 키를 만들어 등록한 뒤 첫 커밋을 올립니다. 이때 리드미나 깃이그노어를 같이 만들지 않는 것이 요령입니다. 빈 저장소여야 우리가 만든 폴더를 그대로 올릴 수 있습니다. 그다음부터는 기능 하나를 만들거나 버그 하나를 잡을 때마다 네 줄을 반복합니다. 상태를 보고, 차이를 읽고, 커밋하고, 푸시합니다. 하루 최소 세 번입니다. 커밋 메시지에는 기능이면 피처, 수정이면 픽스처럼 접두어를 붙입니다. 하루가 끝나면 데이 원, 데이 투 같은 태그를 달아 어디까지 했는지 표시합니다. 일차와 이차는 터미널로만 하고, 손에 익은 삼차부터 브이에스 코드의 소스 컨트롤 화면에서 같은 일을 해 보며 버튼과 명령을 짝지어 보세요.",
+    day1: "일차는 코드를 거의 쓰지 않습니다. 대신 나흘 동안 쓸 바닥을 다집니다. 오전에는 설치 과정을 그대로 따라가며 환경을 세웁니다. 아홉 단계를 모두 통과해야 오후 작업이 됩니다. 특히 시스템디, 백 퍼센트 지피유, 그리고 더블유에스엘 표시가 뜨는 브이에스 코드 세 가지가 뒤쪽 일정의 전제입니다. 오후에는 컬 명령으로 모델을 직접 불러 봅니다. 스트림 옵션을 바꿔 보고, 온도를 영 점 이와 일 점 영으로 바꿔 결과가 어떻게 달라지는지 비교해 보세요. 코드 생성에는 어느 쪽이 맞을지 생각해 보는 것이 숙제입니다. 마지막으로 오늘 손으로 한 일을 셋업 에스에이치와 체크 엔브이 에스에이치 두 개의 스크립트로 묶습니다. 새 환경에서 스크립트 하나로 오늘 상태가 재현되어야 합니다.",
+    day2: "이차의 목표는, 컬로 요구사항을 보내면 자바 코드 문자열이 돌아오는 것입니다. 검증은 아직 없습니다. 먼저 스프링 이니셜라이저로 프로젝트를 만들고 띄웁니다. 윈도우 브라우저에서 로컬호스트 팔공팔공이 열리면 성공입니다. 그다음이 오늘의 핵심인 프롬프트 설계입니다. 모델이 기계가 처리하기 쉬운 형태로 답하도록 틀을 정하세요. 패키지 없이 퍼블릭 클래스 하나, 테스트 클래스는 따로, 코드는 자바 블록 안에만 넣게 합니다. 같은 요구사항으로 프롬프트를 세 가지로 바꿔 다섯 번씩 돌려 보면 형식을 지킨 비율이 눈에 띄게 달라집니다. 이 숫자를 적어 두면 마지막 날 보고서에 그대로 씁니다. 호출은 제이디케이에 들어 있는 에이치티티피 클라이언트로 충분합니다. 타임아웃을 꼭 주고, 따옴표와 줄바꿈을 이스케이프하는 것을 잊지 마세요.",
+    day3: "삼차가 이 과제의 심장입니다. 받은 코드를 실제로 돌려 보고 통과와 실패를 기계가 판정하게 만듭니다. 요청마다 독립된 작업 디렉터리를 만들고, 거기에 코드와 테스트를 저장한 뒤 자바씨로 컴파일하고 제이유닛으로 실행합니다. 먼저 터미널에서 손으로 해 보고, 그다음 자바 코드로 옮기는 순서를 권합니다. 여기서 반드시 지킬 것이 세 가지 있습니다. 타임아웃은 선택이 아닙니다. 모델이 무한 루프를 써 주는 일은 자주 있습니다. 또 웨이트 포 전에 출력 스트림을 읽어야 합니다. 버퍼가 차면 프로세스가 멈춥니다. 강제 종료 뒤 자식 프로세스가 남는지도 확인하세요. 결과는 통과, 컴파일 에러, 테스트 실패, 타임아웃 네 가지로 나누고, 각각에 대해 모델에게 다시 알려 줄 짧은 에러 요약을 함께 만들어 둡니다. 내일 이 요약을 씁니다. 마지막으로 일부러 깨뜨려 보세요. 컴파일이 안 되는 코드, 테스트가 실패하는 코드, 그리고 무한 루프가 든 코드입니다. 세 번째가 통과하지 못하면 내일 서비스를 올릴 수 없습니다.",
+    day4: "사차에는 실패를 다시 모델에게 돌려주어 고치게 만들고, 그 과정을 기록한 뒤 서비스로 등록합니다. 재시도 프롬프트에는 직전 코드와 에러를 함께 넣어야 합니다. 요구사항만 다시 주면 같은 실수를 반복합니다. 세 번 모두 실패해도 오류를 내지 말고, 실패 사실과 기록을 정상 응답으로 돌려주세요. 시도마다 한 줄씩 제이슨으로 기록하면 제이큐로 바로 집계할 수 있습니다. 어느 단계에서 몇 번 실패했는지 세어 보세요. 그다음 부트 자를 만들어 시스템디에 등록합니다. 여기서 더블유에스엘의 특징을 하나 기억해야 합니다. 피시를 켠다고 저절로 뜨지 않습니다. 작업 스케줄러에 로그온할 때 더블유에스엘을 깨우는 작업을 등록해야 합니다. 마지막으로 서비스를 강제로 죽여 보고, 더블유에스엘을 내렸다 올려 보고, 피시를 재부팅해 보면서 각각 몇 초 만에 복구되는지 적어 두세요. 이 표가 운영 문서에 들어갑니다.",
+    day5: "마지막 날은 새 기능을 넣는 날이 아닙니다. 가두고, 재어 보고, 설명하는 날입니다. 여러분의 서비스는 모르는 사람이 쓴 코드를 내 컴퓨터에서 실행합니다. 그래서 세 겹의 울타리를 두릅니다. 시간 제한, 권한이 낮은 전용 계정, 그리고 메모리와 프로세스 수 제한입니다. 모델에게 홈 디렉터리를 지우는 코드를 일부러 만들게 해 넣어 보세요. 울타리가 서 있다면 권한 오류로 실패하고 서버는 멀쩡해야 합니다. 다만 완전한 격리는 아니니, 무엇까지 막았고 무엇은 못 막았는지 솔직히 쓰는 쪽이 더 좋은 평가를 받습니다. 그다음 열 문제로 성공률을 잽니다. 잘 된다가 아니라, 열 문제 중 여덟 문제, 평균 일 점 육 회 시도라고 말할 수 있어야 합니다. 문서는 두 개입니다. 쓰는 사람을 위한 리드미와, 새벽에 깨어난 사람을 위한 장애 대응 문서입니다. 옆자리 학생에게 문서만 주고 복구시켜 보면 빠진 곳이 바로 드러납니다.",
+    eval: "평가는 백 점에 가산점 십 점입니다. 돌아간다에 절반, 운영과 기록에 절반입니다. 핵심 기능 삼십 점은 생성과 컴파일, 테스트, 재시도가 모두 동작하고 기록에 과정이 남는지를 봅니다. 운영 이십 점은 재부팅 후 자동 기동과 강제 종료 시 복구를 봅니다. 측정과 문서 이십 점, 안전장치 십오 점, 기록 십오 점입니다. 기록은 커밋이 과정대로 쌓였는지와 에이아이의 오류를 잡아낸 흔적이 있는지를 봅니다. 가산점은 도커 격리, 모델 두 종 비교, 웹 화면, 스트리밍 출력입니다. 감점도 분명히 해 두겠습니다. 타임아웃 없이 생성 코드를 실행하거나, 키를 저장소에 커밋하거나, 커밋이 한두 개뿐이거나, 영상만 있고 서비스가 실제로 안 뜨는 경우입니다.",
+    submit: "발표는 오 분입니다. 구성이 정해져 있습니다. 먼저 무엇을 만들었는지 한 문장과 구성도, 그다음 실제 호출을 보여 줍니다. 한 번에 통과하는 문제와, 재시도로 고쳐지는 문제를 둘 다 보여 주세요. 그다음이 중요합니다. 고장 시연입니다. 서비스를 죽이고 자동으로 살아나는 장면, 무한 루프 코드가 타임아웃으로 끊기는 장면을 보여 주세요. 잘 되는 장면보다 이쪽이 점수가 큽니다. 마지막으로 벤치마크 결과와, 에이아이가 틀린 것을 어떻게 잡았는지를 이야기합니다. 제출물은 네 가지입니다. 깃 저장소 주소, 더블유에스엘 익스포트로 내보낸 환경 파일, 문서들, 그리고 오 분 이내 데모 영상입니다. 내보내기 전에 작업 디렉터리를 비우는 것을 잊지 마세요.",
+    faq: "자주 막히는 곳을 모아 두었습니다. 지피유가 안 잡히면 더블유에스엘 안에 리눅스용 드라이버를 설치했는지부터 확인하세요. 그것이 원인인 경우가 가장 많습니다. 모델이 너무 느리면 올라마 피에스에서 씨피유가 섞였는지 보고, 더 작은 모델을 쓰거나 컨텍스트를 줄이세요. 빌드가 유난히 오래 걸리면 프로젝트가 엠엔티 씨 아래에 있는지 확인하세요. 홈 디렉터리로 옮기면 바로 빨라집니다. 서비스가 재부팅 후 안 뜨는 것은 고장이 아니라 정상입니다. 더블유에스엘은 피시를 켠다고 저절로 뜨지 않습니다. 작업 스케줄러 등록을 확인하세요."
+  };
+  var LABEL = { overview: "프로젝트 개요", tools: "도구 사전", install: "설치 과정", stack: "환경과 역할", plan: "5일 일정", git: "GitHub 기록 남기기", day1: "DAY 1 · 환경 구축", day2: "DAY 2 · 뼈대 만들기", day3: "DAY 3 · 컴파일 · 테스트", day4: "DAY 4 · 재시도 · 서비스화", day5: "DAY 5 · 안전장치 · 측정", eval: "평가 기준", submit: "제출 · 발표", faq: "자주 막히는 곳" };
+  var ORDER = Object.keys(NARR).filter(function (id) { return document.getElementById(id); });
+  if (!('speechSynthesis' in window) || !ORDER.length) { var f = document.getElementById('narrFab'); if (f) f.style.display = 'none'; return; }
+
+  var SS = window.speechSynthesis, idx = 0, playing = false, chunks = [], ci = 0, voices = [], voice = null;
+  var fab = document.getElementById('narrFab'), panel = document.getElementById('narrPanel');
+  var $ = function (id) { return document.getElementById(id); };
+  var LS = { get: function (k, d) { try { var v = localStorage.getItem('javagen-narr-' + k); return v === null ? d : v; } catch (e) { return d; } },
+             set: function (k, v) { try { localStorage.setItem('javagen-narr-' + k, v); } catch (e) {} } };
+
+  // 단락 목록
+  var list = $('narrList');
+  ORDER.forEach(function (id, i) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.textContent = (LABEL[id] || id);
+    b.addEventListener('click', function () { stop(); idx = i; show(); start(); });
+    list.appendChild(b);
+  });
+  function markList() {
+    [].forEach.call(list.children, function (b, i) { b.classList.toggle('on', i === idx); });
+  }
+  function section() { return document.getElementById(ORDER[idx]); }
+  function show() {
+    $('narrNow').textContent = LABEL[ORDER[idx]] || ORDER[idx];
+    markList();
+    document.querySelectorAll('section.narr-on').forEach(function (s) { s.classList.remove('narr-on'); });
+    var el = section(); if (el) { el.classList.add('narr-on'); el.scrollIntoView({ block: 'start' }); }
+  }
+  function splitSentences(t) { return t.split(/(?<=[.?!])\s+/).map(function (x) { return x.trim(); }).filter(Boolean); }
+
+  function speakNext() {
+    if (!playing) return;
+    if (ci >= chunks.length) {
+      if (idx < ORDER.length - 1) { idx++; show(); start(); } else { stop(); }
+      return;
+    }
+    var u = new SpeechSynthesisUtterance(chunks[ci]);
+    u.lang = 'ko-KR';
+    if (voice) u.voice = voice;
+    u.rate = parseFloat($('narrRate').value);
+    u.onend = function () { ci++; speakNext(); };
+    u.onerror = function () { ci++; speakNext(); };
+    $('narrCap').textContent = chunks[ci];
+    SS.speak(u);
+  }
+  function start() {
+    try { SS.cancel(); } catch (e) {}
+    chunks = splitSentences(NARR[ORDER[idx]] || ''); ci = 0; playing = true;
+    $('narrPlay').textContent = '❚❚ 정지'; fab.classList.add('playing');
+    setTimeout(speakNext, 120);
+  }
+  function stop() {
+    playing = false; chunks = []; ci = 0;
+    try { SS.cancel(); } catch (e) {}
+    $('narrPlay').textContent = '▶ 재생'; fab.classList.remove('playing');
+  }
+  function go(d) {
+    var was = playing; stop();
+    idx = Math.max(0, Math.min(ORDER.length - 1, idx + d));
+    show(); if (was) start();
+  }
+
+  // 목소리 목록
+  function loadVoices() {
+    voices = SS.getVoices();
+    var ko = voices.filter(function (v) { return /^ko/i.test(v.lang); });
+    var sel = $('narrVoice'); sel.innerHTML = '';
+    var use = ko.length ? ko : voices.slice(0, 8);
+    if (!use.length) { sel.innerHTML = '<option>음성 없음</option>'; return; }
+    use.forEach(function (v) {
+      var o = document.createElement('option');
+      o.value = v.name; o.textContent = v.name.replace(/Microsoft |Google /, '');
+      sel.appendChild(o);
+    });
+    var saved = LS.get('voice', '');
+    voice = use.filter(function (v) { return v.name === saved; })[0] || use[0];
+    sel.value = voice.name;
+  }
+  loadVoices();
+  if (typeof SS.onvoiceschanged !== 'undefined') SS.onvoiceschanged = loadVoices;
+
+  // 조작
+  fab.addEventListener('click', function () {
+    panel.classList.toggle('open');
+    if (panel.classList.contains('open')) {
+      // 지금 화면에 보이는 단락에서 시작하도록 맞춘다
+      var best = 0, top = Infinity;
+      ORDER.forEach(function (id, i) {
+        var r = document.getElementById(id).getBoundingClientRect();
+        if (Math.abs(r.top) < top) { top = Math.abs(r.top); best = i; }
+      });
+      if (!playing) { idx = best; $('narrNow').textContent = LABEL[ORDER[idx]] || ORDER[idx]; markList(); }
+    }
+  });
+  $('narrClose').addEventListener('click', function () { panel.classList.remove('open'); });
+  $('narrPlay').addEventListener('click', function () { playing ? stop() : (show(), start()); });
+  $('narrPrev').addEventListener('click', function () { go(-1); });
+  $('narrNext').addEventListener('click', function () { go(1); });
+  $('narrRate').addEventListener('change', function () {
+    LS.set('rate', $('narrRate').value);
+    if (playing) { var k = ci; stop(); chunks = splitSentences(NARR[ORDER[idx]]); ci = k; playing = true;
+      $('narrPlay').textContent = '❚❚ 정지'; fab.classList.add('playing'); setTimeout(speakNext, 100); }
+  });
+  $('narrVoice').addEventListener('change', function () {
+    var n = $('narrVoice').value;
+    voice = voices.filter(function (v) { return v.name === n; })[0] || voice;
+    LS.set('voice', n);
+    if (playing) { var k = ci; stop(); chunks = splitSentences(NARR[ORDER[idx]]); ci = k; playing = true;
+      $('narrPlay').textContent = '❚❚ 정지'; fab.classList.add('playing'); setTimeout(speakNext, 100); }
+  });
+  $('narrRate').value = LS.get('rate', '1');
+  window.addEventListener('beforeunload', function () { try { SS.cancel(); } catch (e) {} });
+  markList();
+})();
+</script>
+</html>
