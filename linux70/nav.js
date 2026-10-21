@@ -75,7 +75,7 @@
     '     -webkit-overflow-scrolling:touch}',
     '@media (prefers-color-scheme:dark){.l70nav{--sn-bg:#141A17;--sn-bg2:#1C2320;--sn-ink:#E7ECE8;',
     '     --sn-ink2:#C2CCC6;--sn-mut:#94A29A;--sn-line:#27302B;--sn-ac:#57C294;--sn-soft:#16291F}}',
-    '.sn-hd{padding:20px 18px 16px;border-bottom:1px solid var(--sn-line)}',
+    '.sn-hd{padding:20px 18px 16px;border-bottom:1px solid var(--sn-line)}.sn-home{display:inline-block;margin-bottom:10px;padding:5px 10px;border:1px solid var(--sn-line);border-radius:7px;font-size:12px;font-weight:600;color:var(--sn-mut);text-decoration:none}.sn-home:hover{border-color:var(--sn-ac);color:var(--sn-ac)}',
     '.sn-hd b{display:block;font-size:15px;font-weight:700;letter-spacing:-.02em}',
     '.sn-hd span{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;',
     '     letter-spacing:.12em;color:var(--sn-mut);margin-top:4px}',
@@ -109,6 +109,9 @@
     '     cursor:pointer;box-shadow:0 3px 14px rgba(0,0,0,.28);display:none;align-items:center;',
     '     justify-content:center;padding:0}',
     '.sn-btn:hover{filter:brightness(1.1)}',
+    '.sn-homebtn{bottom:70px;text-decoration:none;align-items:center;justify-content:center;font-size:18px}',
+    'body.sn-drawer .sn-homebtn{display:flex}',
+    '.sn-homebtn.inbar{bottom:auto;font-size:13px}',
     '.sn-btn.inbar{position:static;width:auto;height:auto;border-radius:4px;box-shadow:none;',
     '     padding:6px 11px;font-size:13px;display:inline-flex;border-color:#10684A}',
     '.sn-bd{position:fixed;inset:0;background:rgba(6,12,9,.5);z-index:59;display:none}',
@@ -154,7 +157,7 @@
     nav.className = 'l70nav';
     nav.setAttribute('aria-label', '과정 목차');
 
-    var html = '<div class="sn-hd"><b>' + COURSE + '</b><span>' + SUB + '</span></div><div class="sn-list">';
+    var html = '<div class="sn-hd"><a class="sn-home" href="/">🏠 강의실 홈</a><b>' + COURSE + '</b><span>' + SUB + '</span></div><div class="sn-list">';
 
     DAYS.forEach(function (d) {
       html += '<div class="sn-day' + (d.soon ? ' soon' : '') + '">';
@@ -191,6 +194,16 @@
     var bar = document.querySelector('.bar');
     if (isDeck && bar) { btn.classList.add('inbar'); btn.innerHTML = '☰ 목차'; bar.insertBefore(btn, bar.firstChild); }
     else { document.body.appendChild(btn); }
+
+    /* 강의실 홈 버튼: 사이드바가 접히는 화면에서도 항상 보이게 */
+    var hbtn = document.createElement('a');
+    hbtn.className = 'sn-btn sn-homebtn';
+    hbtn.href = '/';
+    hbtn.title = '강의실 홈으로';
+    hbtn.setAttribute('aria-label', '강의실 홈');
+    hbtn.innerHTML = '🏠';
+    if (isDeck && bar) { hbtn.classList.add('inbar'); hbtn.innerHTML = '🏠 홈'; bar.insertBefore(hbtn, bar.firstChild); }
+    else { document.body.appendChild(hbtn); }
 
     document.body.classList.add(isDeck ? 'sn-drawer' : 'sn-push');
 
