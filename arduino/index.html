@@ -786,13 +786,19 @@ const LESSONS = [
     ai: 'delay 버전과 millis 버전을 나란히 놓고 차이를 설명받은 뒤, 내 말로 다시 정리합니다.',
     checks: ['버튼을 누르면 3초 뒤 보행 신호가 된다', '신호 대기 중에도 버튼 입력이 들어간다', 'AI 없이 보행 시간을 7초로 바꿨다'],
     tn: '미니 미션 ① (평가 6점): 동작 여부와 AI 없이 수정한 부분을 확인합니다.',
-    ext: [
-      { icon: '⚡', t: '반응속도 게임', d: 'LED가 무작위 시간 뒤에 켜지면 버튼을 누르고, 걸린 시간(ms)을 시리얼 모니터에 출력합니다.',
-        uses: '디지털 입출력, <code>millis()</code>, <code>random()</code>', up: '2인 대결 모드, LED가 켜지기 전에 누르면 부정 출발 판정',
-        parts: 'LED 1~2개, 220Ω 저항, 푸시버튼 1~2개' },
-      { icon: '📡', t: '모스부호 입력기', d: '버튼을 짧게 · 길게 눌러 점과 선을 입력하고, 해석한 글자를 시리얼 모니터에 표시합니다.',
-        uses: '3차시 SOS, 버튼 입력, <code>millis()</code>로 누른 시간 재기', up: '알파벳 해석표를 배열로 만들기, 입력 중 LED · 피에조 피드백',
-        parts: '푸시버튼 1개, LED 1개, 220Ω 저항, (선택) 피에조' }
+    more: [
+      { id: 'react', icon: '⚡', t: '반응속도 게임', req: 'code',
+        mission: 'LED가 2~5초 사이의 무작위 시간 뒤에 켜지면 최대한 빨리 버튼을 누르고, 걸린 시간(ms)을 시리얼 모니터에 출력합니다. LED가 켜지기 전에 누르면 "부정 출발"로 처리합니다.',
+        uses: '디지털 입출력, <code>millis()</code>, <code>random()</code>', up: '플레이어 2 버튼(D3)을 더해 2인 대결 모드, 5판 평균 기록',
+        parts: 'LED 1개, 220Ω 저항 1개, 푸시버튼 2개',
+        ask: '반응속도 게임을 만들고 싶어. D9의 LED가 2~5초 사이 무작위 시간 뒤에 켜지면 D2 버튼(INPUT_PULLUP)을 누르고, 걸린 시간(ms)을 시리얼 모니터에 출력해줘. LED가 켜지기 전에 누르면 "부정 출발"을 출력해줘. delay 대신 millis()를 써줘',
+        checks: ['LED가 매번 다른 시간 뒤에 켜진다', '버튼을 누르면 반응 시간(ms)이 시리얼 모니터에 찍힌다', 'LED가 켜지기 전에 누르면 "부정 출발"이 표시된다'] },
+      { id: 'morse', icon: '📡', t: '모스부호 입력기', req: 'code',
+        mission: '버튼을 짧게 누르면 점(.), 길게 누르면 선(-)으로 입력하고, 잠시 쉬면 그때까지의 신호를 알파벳 한 글자로 바꿔 시리얼 모니터에 표시합니다. 누르는 동안 LED와 피에조로 신호를 확인합니다.',
+        uses: '3차시 SOS 모스부호, 버튼 입력, <code>millis()</code>로 누른 시간 재기', up: '해석표를 배열로 만들어 숫자까지 지원, 시리얼로 입력한 글자를 모스부호로 깜빡이기',
+        parts: '푸시버튼 1개, LED 1개, 220Ω 저항 1개, 피에조 1개',
+        ask: '모스부호 입력기를 만들고 싶어. D2 버튼(INPUT_PULLUP)을 300ms보다 짧게 누르면 점(.), 길게 누르면 선(-)으로 기록하고, 1초 동안 입력이 없으면 기록한 신호를 알파벳으로 바꿔 시리얼 모니터에 출력해줘. 누르는 동안 D13 LED를 켜고 D8 피에조로 소리를 내줘. 알파벳 해석표는 배열로 만들어줘',
+        checks: ['짧게 · 길게 누른 것을 점(.)과 선(-)으로 구분한다', '1초 쉬면 신호를 알파벳 한 글자로 바꿔 출력한다', 'AI 없이 길게 누름 기준 시간을 바꿔 봤다'] }
     ] },
 
   // ---------------- M4
@@ -844,13 +850,19 @@ const LESSONS = [
     ai: '명세 리뷰 → 수정 → 코드 요청 순서를 지킵니다. 코드부터 요청하지 않습니다.',
     checks: ['요구사항 명세를 먼저 작성했다', 'AI 리뷰를 반영한 부분을 표시했다', '세 센서가 모두 동작한다'],
     tn: '미니 미션 ② (평가 6점): 명세 → 리뷰 → 구현 순서를 지켰는지도 봅니다.',
-    ext: [
-      { icon: '📖', t: '스마트 책상 도우미', d: '주변이 어두우면 스탠드 LED를 밝기에 맞춰 켜고, 얼굴이 화면에 너무 가까우면(초음파) 경고음을 냅니다.',
-        uses: '조도 센서, 초음파 거리 센서, PWM', up: '임계값을 직접 측정해서 정하기, 오래 앉아 있으면 휴식 알림',
-        parts: '포토레지스터, 초음파 센서, LED, 피에조, 저항' },
-      { icon: '🧊', t: '냉장고 문 열림 경보기', d: '문이 열리면(조도 변화) 시간을 재고, 10초 넘게 열려 있으면 경보를 울립니다.',
-        uses: '조도 센서, <code>millis()</code>, 조건문', up: '온도(TMP36)까지 감시해 너무 따뜻하면 별도 경고',
-        parts: '포토레지스터, TMP36, 피에조, LED, 저항' }
+    more: [
+      { id: 'desk', icon: '📖', t: '스마트 책상 도우미', req: 'code',
+        mission: '주변이 어두울수록 스탠드 LED를 밝게 켜고(PWM), 얼굴이 화면에 20cm보다 가까워지면 경고음을 냅니다. 임계값은 시리얼 모니터로 직접 측정해서 정합니다.',
+        uses: '조도 센서(전압 분배), 초음파 거리 센서, PWM 밝기 제어', up: '자리에 앉은 지 오래되면(거리 기준) 휴식 알림 멜로디',
+        parts: '포토레지스터, 10kΩ 저항, 초음파 센서, LED 1개, 220Ω 저항, 피에조',
+        ask: '스마트 책상 도우미를 만들고 싶어. A0의 조도 센서 값이 작을수록(어두울수록) D9 LED를 PWM으로 밝게 켜고, 초음파 센서(TRIG D7, ECHO D6)로 잰 거리가 20cm보다 가까우면 D8 피에조로 경고음을 내줘. 조도 값과 거리를 시리얼 모니터에 함께 출력해줘',
+        checks: ['어두울수록 스탠드 LED가 밝아진다 (PWM)', '20cm보다 가까우면 경고음이 나고, 멀어지면 멈춘다', '조도 임계값을 시리얼 모니터로 직접 측정해서 정했다'] },
+      { id: 'fridge', icon: '🧊', t: '냉장고 문 열림 경보기', req: 'code',
+        mission: '냉장고 안이 밝아지면(문 열림) 시간을 재기 시작하고, 10초 넘게 열려 있으면 빨간 LED와 피에조로 경보를 울립니다. 문을 닫으면(어두워지면) 경보가 멈춥니다. 냉장고 안 온도도 함께 감시합니다.',
+        uses: '조도 센서, 온도 센서 TMP36, <code>millis()</code>, 조건문', up: '온도가 8℃를 넘으면 문 열림과 다른 소리로 경고, 하루 열림 횟수 세기',
+        parts: '포토레지스터, 10kΩ 저항, TMP36, LED 1개, 220Ω 저항, 피에조',
+        ask: '냉장고 문 열림 경보기를 만들고 싶어. A0 조도 센서 값이 기준보다 커지면 문이 열린 것으로 보고 millis()로 시간을 재서, 10초가 넘으면 D13 LED를 깜빡이고 D8 피에조로 경보를 울려줘. 어두워지면 경보를 멈춰줘. A1의 TMP36 온도도 섭씨로 바꿔 시리얼 모니터에 출력해줘',
+        checks: ['빛이 들어오면(문 열림) 시간 재기를 시작한다', '10초 넘게 열려 있으면 경보가 울리고, 닫으면 멈춘다', 'AI 없이 경보 시간을 5초로 바꿨다'] }
     ] },
 
   // ---------------- M5
@@ -910,16 +922,25 @@ const LESSONS = [
     ai: '리뷰 의견마다 반영 / 기각을 정하고 그 이유를 기록합니다.',
     checks: ['차량 감지 → 차단기 → LCD 표시가 이어진다', 'AI 없이 기능 1개를 추가했다', '리뷰 반영 / 기각 사유를 기록했다'],
     tn: '미니 미션 ③ (평가 6점). M1~M5 회고로 "AI가 틀렸던 순간 베스트 3"을 공유하면 효과적입니다.',
-    ext: [
-      { icon: '🔐', t: '디지털 금고', d: '가변저항 다이얼을 돌려 숫자 3개를 맞추면 서보 잠금이 열리고, LCD에 입력 상태를 안내합니다.',
-        uses: '아날로그 입력, 서보 모터, I2C LCD', up: '3회 틀리면 30초 잠금 + 부저 경고',
-        parts: '가변저항, 푸시버튼, 마이크로 서보, LCD 16x2 (I2C), 피에조' },
-      { icon: '🎵', t: '음악 상자 · 리듬 게임', d: 'NeoPixel이 박자를 보여 주며 피에조로 멜로디를 연주합니다.',
-        uses: '피에조 멜로디, NeoPixel', up: '빛이 끝에 닿을 때 버튼을 누르면 점수가 오르는 리듬 게임',
-        parts: '피에조, NeoPixel 링 또는 스트립, 푸시버튼' },
-      { icon: '📻', t: '보드 2개 무전기', d: '보드 A에서 버튼으로 고른 메시지를 보드 B의 LCD에 표시합니다.',
-        uses: '26차시 보드 간 시리얼 통신, I2C LCD', up: '짧은 명령어 규칙(프로토콜)을 직접 설계하고, 받은 쪽이 응답 보내기',
-        parts: '아두이노 UNO 2개, 푸시버튼 2개, LCD 16x2 (I2C)' }
+    more: [
+      { id: 'safe', icon: '🔐', t: '디지털 금고', req: 'code',
+        mission: '가변저항 다이얼을 돌려 0~9 숫자를 고르고 버튼으로 확정합니다. 숫자 3개가 비밀번호와 맞으면 서보 잠금이 열리고, LCD에 입력 상태와 결과를 안내합니다.',
+        uses: '아날로그 입력과 <code>map()</code>, 서보 모터, I2C LCD', up: '3번 틀리면 30초 동안 입력을 막고 부저 경고, 잠금 상태에서 버튼을 길게 누르면 다시 잠그기',
+        parts: '가변저항 10kΩ, 푸시버튼 1개, 마이크로 서보, LCD 16x2 (I2C), 피에조',
+        ask: '디지털 금고를 만들고 싶어. A0 가변저항 값을 0~9 숫자로 바꿔 LCD(I2C, A4 · A5)에 보여 주고, D2 버튼(INPUT_PULLUP)을 누르면 그 숫자를 확정해줘. 숫자 3개가 비밀번호 "3 7 1"과 같으면 D9 서보를 90도로 열고 "OPEN"을, 틀리면 D8 피에조로 짧게 울리고 "WRONG"을 표시해줘',
+        checks: ['다이얼 값이 LCD에 0~9 숫자로 표시된다', '숫자 3개를 맞추면 서보가 90°로 열린다', '틀리면 부저가 울리고 처음부터 다시 입력한다'] },
+      { id: 'music', icon: '🎵', t: '음악 상자 · 리듬 게임', req: 'code',
+        mission: '피에조로 멜로디를 연주하면서 NeoPixel 링이 박자에 맞춰 한 칸씩 돌아가게 합니다. 음 높이와 길이는 배열로 관리합니다.',
+        uses: '피에조 <code>tone()</code>, NeoPixel, 배열', up: '빛이 맨 위 칸에 왔을 때 버튼을 누르면 점수가 오르는 리듬 게임, 점수를 시리얼 모니터에 출력',
+        parts: 'NeoPixel 링 (12개), 피에조, 푸시버튼 1개',
+        ask: '음악 상자를 만들고 싶어. D8 피에조로 "학교종" 멜로디를 연주하고, 음 하나가 바뀔 때마다 D6의 NeoPixel 링(12개)이 한 칸씩 돌아가며 켜지게 해줘. 음 높이와 길이는 배열 두 개로 관리하고, D2 버튼(INPUT_PULLUP)을 누르면 처음부터 다시 연주해줘',
+        checks: ['멜로디가 연주되는 동안 NeoPixel이 박자에 맞춰 움직인다', '음 높이와 길이를 배열로 관리한다', 'AI 없이 멜로디 한 소절을 바꿨다'] },
+      { id: 'radio', icon: '📻', t: '보드 2개 무전기', req: 'code',
+        mission: '보드 A의 버튼 두 개로 미리 정한 메시지를 고르면, 시리얼 통신으로 보드 B에 보내 LCD에 표시합니다. 보낼 명령어 규칙(프로토콜)을 먼저 표로 정합니다.',
+        uses: '26차시 보드 간 시리얼 통신, I2C LCD', up: '보드 B가 "OK"를 돌려보내 보드 A의 LED로 수신 확인, 메시지를 4개 이상으로 늘리기',
+        parts: '아두이노 UNO 2개, 푸시버튼 2개, LCD 16x2 (I2C)',
+        ask: '아두이노 두 대로 무전기를 만들고 싶어. 보드 A는 D2 버튼을 누르면 "M1", D3 버튼을 누르면 "M2"를 줄바꿈과 함께 Serial로 보내고, 보드 B는 받은 명령에 따라 LCD(I2C, A4 · A5)에 "HELLO" 또는 "COME HERE"를 표시해줘. 보드 A와 보드 B 코드를 따로 나눠줘',
+        checks: ['보드 A의 버튼을 누르면 보드 B의 LCD에 메시지가 뜬다', '명령어 규칙(예: M1 → HELLO)을 표로 정리했다', 'TX ↔ RX를 엇갈려 연결하고 GND를 공통으로 묶었다'] }
     ] },
 
   // ---------------- M6
@@ -2437,16 +2458,75 @@ function breadboardSVG(spec) {
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="브레드보드 배선도" style="min-width:${Math.min(W, 680)}px">${defs}${bb}${board.svg}${spec.boardName ? `<text x="${bx0 + board.W / 2}" y="${Y0 + board.H + 18}" text-anchor="middle" font-size="12" font-weight="800" fill="var(--fg)">${esc(spec.boardName)}</text>` : ''}${modsSVG}${parts.join('')}${wires.join('')}${labels.join('')}</svg>`;
 }
 
+/* 미니 미션 차시의 추가 미션(more) 회로 — id로 찾는다 */
+const neoRing = { name: 'NeoPixel 링 (12개)', right: [['5V', '5V'], ['GND', 'GND']], order: ['5V', 'DIN', 'GND'] };
+const MORE_FIGS = {
+  react: { board: 'uno', lines: [ledRow('D9', '빨강', '신호'), btnRow('D2', '플레이어 1'), btnRow('D3', '플레이어 2')],
+           note: '버튼은 한쪽을 GND에 연결하고 INPUT_PULLUP을 씁니다. 플레이어 2 버튼(D3)은 2인 대결 모드에서 씁니다.' },
+  morse: { board: 'uno', lines: [btnRow('D2', '모스 키'), ledRow('D13', '노랑', '신호 표시'), pzRow('D8')],
+           note: '버튼을 누르는 동안 LED와 피에조가 함께 켜지면 점과 선의 길이를 눈과 귀로 확인할 수 있습니다.' },
+  desk: { board: 'uno', lines: [...ldrRows('A0'), { pin: 'D7', to: { m: 'us', p: 'TRIG' } }, { pin: 'D6', to: { m: 'us', p: 'ECHO' } }, ledRow('D9', '노랑', '스탠드'), pzRow('D8')],
+          mods: { us: MOD.us }, note: '스탠드 LED는 밝기를 조절하므로 PWM이 되는 ~9번 핀에 연결합니다.' },
+  fridge: { board: 'uno', lines: [...ldrRows('A0'), { pin: 'A1', to: { m: 'tmp', p: 'Vout' } }, ledRow('D13', '빨강', '경보'), pzRow('D8')],
+            mods: { tmp: MOD.tmp }, note: '포토레지스터가 냉장고 안 조명을 감지합니다. Tinkercad에서는 포토레지스터를 클릭해 밝기 슬라이더로 문 열림을 흉내 냅니다.' },
+  safe: { board: 'uno', lines: [{ pin: 'A0', to: { m: 'pot', p: '가운데 (W)' } }, btnRow('D2', '확정'), { pin: 'D9', to: { m: 'servo', p: 'SIG (주황)' } },
+          { pin: 'A4 (SDA)', to: { m: 'lcd', p: 'SDA' } }, { pin: 'A5 (SCL)', to: { m: 'lcd', p: 'SCL' } }, pzRow('D8')],
+          mods: { pot: MOD.pot(), servo: MOD.servo(), lcd: MOD.lcd }, note: '가변저항 값(0~1023)을 map()으로 0~9 숫자로 바꿉니다. LCD는 24 · 27차시와 같은 I2C 연결입니다.' },
+  music: { board: 'uno', lines: [{ pin: 'D6', to: { m: 'neo', p: 'DIN' } }, pzRow('D8'), btnRow('D2', '다시 연주')], mods: { neo: neoRing },
+           note: 'NeoPixel은 DIN 한 선으로 12개를 모두 제어합니다. 전원은 5V와 GND에서 받습니다.' },
+  radio: [
+    { title: '보드 A (송신): 버튼 2개', board: 'uno', boardName: 'UNO 보드 A (송신)', lines: [btnRow('D2', '메시지 1'), btnRow('D3', '메시지 2'),
+      { pin: 'D1 (TX)', to: { m: 'b', p: 'D0 (RX)' } }, { pin: 'D0 (RX)', to: { m: 'b', p: 'D1 (TX)' } }, { pin: 'GND', to: { m: 'b', p: 'GND' } }],
+      mods: { b: { name: 'UNO 보드 B (수신)', right: [] } },
+      note: 'TX는 상대의 RX로, RX는 상대의 TX로 엇갈려 연결하고 GND는 공통으로 묶습니다. 코드를 올리는 동안에는 TX · RX 선을 잠시 빼 둡니다.' },
+    { title: '보드 B (수신): LCD', board: 'uno', boardName: 'UNO 보드 B (수신)', lines: [{ pin: 'A4 (SDA)', to: { m: 'lcd', p: 'SDA' } }, { pin: 'A5 (SCL)', to: { m: 'lcd', p: 'SCL' } }],
+      mods: { lcd: MOD.lcd }, note: '보드 B의 LCD는 24차시와 같은 I2C 연결입니다. 보드 A와 잇는 TX · RX · GND 선은 위 그림을 따릅니다.' }
+  ]
+};
+
+function circuitFigs(figs) {
+  return figs.map((f) => `${f.title ? `<h3>${f.title}</h3>` : ''}
+      <div class="figure">${breadboardSVG(f)}<p class="caption">브레드보드 배선도 — 부품은 아래쪽 f~j 칸에 꽂고, 빨강 = 전원(+), 검정 = GND(−), 다른 색 = 신호선입니다. 같은 세로줄 f~j의 5칸은 안에서 이어져 있습니다.</p></div>
+      <div class="figure">${circuitSVG(f)}<p class="caption">${f.note ? esc(f.note) : '왼쪽 보드의 핀에서 시작해 부품을 차례로 거쳐 오른쪽 끝(GND · 전원 · 모듈 핀)까지 연결합니다.'}</p></div>
+      <details style="margin:-6px 0 14px"><summary style="cursor:pointer;font-weight:700;font-size:13.5px;color:var(--accent2)">🔌 연결표 보기 (배선할 때 하나씩 체크)</summary>${circuitTable(f)}</details>`).join('');
+}
 function circuitSection(l) {
   const figs = CIRCUITS[l.n];
   if (!figs) return '';
   const env = l.env === 'wk' ? 'Wokwi' : 'Tinkercad';
   return `<h2>배선도와 회로도</h2>
     <p>이 차시에서 ${env}에 만들 회로입니다. 위는 실제로 꽂는 모습(브레드보드 배선도), 아래는 같은 회로를 기호로 나타낸 회로도입니다. 핀 번호는 아래 예시 프롬프트와 같게 맞췄습니다. 핀을 바꾸면 프롬프트의 핀 번호도 함께 바꾸세요.</p>
-    ${figs.map((f) => `${f.title ? `<h3>${f.title}</h3>` : ''}
-      <div class="figure">${breadboardSVG(f)}<p class="caption">브레드보드 배선도 — 부품은 아래쪽 f~j 칸에 꽂고, 빨강 = 전원(+), 검정 = GND(−), 다른 색 = 신호선입니다. 같은 세로줄 f~j의 5칸은 안에서 이어져 있습니다.</p></div>
-      <div class="figure">${circuitSVG(f)}<p class="caption">${f.note ? esc(f.note) : '왼쪽 보드의 핀에서 시작해 부품을 차례로 거쳐 오른쪽 끝(GND · 전원 · 모듈 핀)까지 연결합니다.'}</p></div>
-      <details style="margin:-6px 0 14px"><summary style="cursor:pointer;font-weight:700;font-size:13.5px;color:var(--accent2)">🔌 연결표 보기 (배선할 때 하나씩 체크)</summary>${circuitTable(f)}</details>`).join('')}`;
+    ${circuitFigs(figs)}`;
+}
+
+/* 미니 미션 차시의 미니 미션 2, 3 … — 미션마다 회로 · 단계 · 프롬프트 · 체크리스트 */
+const moreFields = (l, x) => ({ ...l, req: x.req, ask: x.ask, parts: x.parts });
+function moreMissions(l) {
+  if (!l.more) return '';
+  const env = ENV[l.env];
+  const chk = app.checks[l.n] || [];
+  return `<div class="callout more teacher-only"><div class="ct">🧑‍🏫 미니 미션 2번부터</div>
+      <p>평가(6점)는 미니 미션 1로 합니다. 2번부터는 미션 1을 일찍 끝낸 학생이나 다음 시간 과제로 쓰세요. 미션마다 Tinkercad 1~2시간 분량입니다.</p></div>
+    ${l.more.map((x, k) => `<h2>${x.icon} 미니 미션 ${k + 2} · ${x.t}</h2>
+    <div class="practice">
+      <div class="practice-head"><b>🛠 미니 미션 ${k + 2}</b><span class="level">${env.short.toUpperCase()}</span></div>
+      <div class="practice-body">
+        <p>${x.mission}</p>
+        <p class="parts"><b>쓰는 내용</b> · ${x.uses}</p>
+        <p class="parts"><b>부품</b> · ${esc(x.parts)}</p>
+        ${stepsHTML(moreFields(l, x))}
+        <p class="parts"><b>더 해 보기</b> · ${x.up}</p>
+        <div class="actions">
+          <button class="btn ai small" data-act="fill" data-mx="${k}">🤖 프롬프트 빌더 열기</button>
+          ${env.url ? `<a class="btn small" href="${env.url}" target="_blank" rel="noopener">🔗 ${env.short} 열기</a>` : ''}
+        </div>
+      </div>
+    </div>
+    <h3>배선도와 회로도</h3>
+    ${circuitFigs([].concat(MORE_FIGS[x.id]))}
+    ${codeBlock(`미니 미션 ${k + 2} 예시 프롬프트`, 'PROMPT', buildPrompt(lessonFields(moreFields(l, x))), { prompt: true })}
+    <h3>검증 체크리스트</h3>
+    <ul class="checks">${x.checks.map((c, i) => { const j = (k + 1) * 10 + i; return `<li><label><input type="checkbox" data-chk="${j}" ${chk[j] ? 'checked' : ''}><span>${c}</span></label></li>`; }).join('')}</ul>`).join('')}`;
 }
 
 /* 7차시: 아두이노 UNO 보드와 핀 */
@@ -3837,7 +3917,7 @@ function pageLesson(l) {
 
     <h2>실습 미션</h2>
     <div class="practice">
-      <div class="practice-head"><b>🛠 ${l.mini ? '미니 미션' : '미션'}</b><span class="level">${env.short.toUpperCase()}</span></div>
+      <div class="practice-head"><b>🛠 ${l.more ? '미니 미션 1' : l.mini ? '미니 미션' : '미션'}</b><span class="level">${env.short.toUpperCase()}</span></div>
       <div class="practice-body">
         <p>${l.mission}</p>
         ${l.parts ? `<p class="parts"><b>부품</b> · ${esc(l.parts)}</p>` : ''}
@@ -3850,18 +3930,6 @@ function pageLesson(l) {
       </div>
     </div>
 
-    ${l.ext ? `<h2>🚀 확장 과제 (선택)</h2>
-    <p class="muted">미니 미션을 일찍 마쳤거나 다음 시간 과제로 도전합니다 (Tinkercad, 1~2시간). 평가 점수에는 들어가지 않습니다.</p>
-    ${l.ext.map((x) => `<div class="practice">
-      <div class="practice-head"><b>${x.icon} ${x.t}</b><span class="level">EXTRA</span></div>
-      <div class="practice-body">
-        <p>${x.d}</p>
-        <p class="parts"><b>쓰는 내용</b> · ${x.uses}</p>
-        <p class="parts"><b>더 해 보기</b> · ${x.up}</p>
-        <p class="parts"><b>부품</b> · ${esc(x.parts)}</p>
-      </div>
-    </div>`).join('')}` : ''}
-
     ${l.extra === 'api' ? apiTable() : ''}
     ${l.code ? `<h3>참고 코드</h3>${codeBlock(CODES[l.code].title, CODES[l.code].tag, CODES[l.code].src)}` : ''}
 
@@ -3871,6 +3939,8 @@ function pageLesson(l) {
 
     <h2>검증 체크리스트</h2>
     <ul class="checks">${l.checks.map((c, i) => `<li><label><input type="checkbox" data-chk="${i}" ${chk[i] ? 'checked' : ''}><span>${c}</span></label></li>`).join('')}</ul>
+
+    ${moreMissions(l)}
 
     ${l.tn ? `<div class="callout more teacher-only"><div class="ct">🧑‍🏫 교사 노트</div><p>${l.tn}</p></div>` : ''}
     <div class="callout more teacher-only"><div class="ct">⏱ 시간 배분 가이드</div>
@@ -4144,7 +4214,7 @@ document.addEventListener('click', (e) => {
   const act = e.target.closest('[data-act]');
   if (act) {
     const l = lessonByN(+app.page.slice(1));
-    if (act.dataset.act === 'fill') { pbForLesson(l); toggleOut(true); return; }
+    if (act.dataset.act === 'fill') { pbForLesson(act.dataset.mx ? moreFields(l, l.more[+act.dataset.mx]) : l); toggleOut(true); return; }
     if (act.dataset.act === 'done') {
       app.done.has(l.n) ? app.done.delete(l.n) : app.done.add(l.n);
       store.set('done', [...app.done]);
