@@ -516,7 +516,7 @@ const ENV = {
   tc: { name: 'Tinkercad Circuits', short: 'Tinkercad', icon: '🟧', url: 'https://www.tinkercad.com/circuits',
         prompt: 'Tinkercad Circuits, Arduino UNO R3 (Tinkercad에서 제공하는 라이브러리만 사용)' },
   wk: { name: 'Wokwi 시뮬레이터', short: 'Wokwi', icon: '🟪', url: 'https://wokwi.com/projects/new/esp32',
-        prompt: 'Wokwi 시뮬레이터, ESP32 DevKit V1, Arduino 프레임워크 (Wi-Fi는 Wokwi-GUEST, 비밀번호 없음)' },
+        prompt: 'Wokwi 시뮬레이터, ESP32 DevKitC V4, Arduino 프레임워크 (Wi-Fi는 Wokwi-GUEST, 비밀번호 없음)' },
   rb: { name: '가상 로봇 실습실', short: '가상 로봇', icon: '🤖', url: 'robot/index.html',
         prompt: '이 강의실의 가상 로봇 실습실 (JavaScript, Arduino 스타일). setup()은 한 번, loop()는 계속 반복. 사용할 수 있는 함수만 써줘: motors(왼쪽, 오른쪽) −255~255 (|값|<40은 정지), stop(), distance() · distanceLeft() · distanceRight() (cm, 좌우 센서는 앞쪽 60° 방향, 최대 250), lineLeft() · lineCenter() · lineRight() (검은 선 위면 1), bumped() (충돌 중이면 true), arm(어깨, 팔꿈치) 0~180°, grip(true/false), armDone(), delay(ms), millis(), Serial.println(), map(), constrain(), random()' },
   ide: { name: 'Arduino IDE', short: 'Arduino IDE', icon: '💻', url: 'https://www.arduino.cc/en/software',
@@ -1073,7 +1073,7 @@ void loop() {
     goals: ['ESP32와 UNO의 차이를 설명할 수 있다', 'UNO 코드를 ESP32용으로 옮길 수 있다'],
     concepts: ['ESP32: Wi-Fi · 블루투스 내장, 3.3V 동작, 더 빠른 듀얼 코어', 'GPIO 번호 체계, ADC 0~4095 (12비트)', 'Wokwi 프로젝트 = 코드(sketch.ino) + 회로(diagram.json) + 라이브러리 목록'],
     mission: 'Wokwi에서 ESP32 프로젝트를 만들고, 9차시 LED 순차 점등과 15차시 가변저항 코드를 ESP32용으로 옮깁니다.',
-    parts: 'ESP32 DevKit V1, LED 3개, 저항, 가변저항', ask: '아래 아두이노 UNO 코드를 ESP32 DevKit V1용으로 바꿔줘. 바뀌는 핀 번호, 전압, ADC 범위 차이를 표로 정리해줘.\n(코드 붙여넣기)',
+    parts: 'ESP32 DevKitC V4, LED 3개, 저항, 가변저항', ask: '아래 아두이노 UNO 코드를 ESP32 DevKitC V4용으로 바꿔줘. 바뀌는 핀 번호, 전압, ADC 범위 차이를 표로 정리해줘.\n(코드 붙여넣기)',
     ai: 'AI가 정리한 차이표를 Wokwi 부품 핀 정보와 대조합니다. 특히 ADC 범위(1023 → 4095)를 확인합니다.',
     checks: ['ESP32에서 LED가 순서대로 켜진다', '가변저항 값이 0~4095로 나온다', 'UNO와의 차이 3가지를 설명할 수 있다'],
     tn: 'Wokwi는 로그인 없이도 실행되지만 저장하려면 계정이 필요합니다. 차시 시작 프로젝트 링크를 미리 공유하세요.' },
@@ -1081,7 +1081,7 @@ void loop() {
     goals: ['ESP32를 Wi-Fi에 연결할 수 있다', 'NTP로 인터넷 시간을 받아 표시할 수 있다'],
     concepts: ['Wokwi 가상 Wi-Fi: SSID <code>Wokwi-GUEST</code>, 비밀번호 없음', 'IP 주소 · 연결 상태 확인 (<code>WiFi.status()</code>)', 'NTP: 인터넷 시간 서버 — 한국은 UTC+9'],
     mission: 'ESP32를 Wokwi-GUEST에 연결하고 NTP 시간을 받아 OLED(SSD1306)에 날짜와 시각을 표시하는 인터넷 시계를 만듭니다.',
-    parts: 'ESP32 DevKit V1, SSD1306 OLED (I2C)', ask: 'ESP32를 Wokwi-GUEST(비밀번호 없음)에 연결하고 NTP로 한국 시간(UTC+9)을 받아 SSD1306 OLED에 날짜와 시각을 표시하고 싶어',
+    parts: 'ESP32 DevKitC V4, SSD1306 OLED (I2C)', ask: 'ESP32를 Wokwi-GUEST(비밀번호 없음)에 연결하고 NTP로 한국 시간(UTC+9)을 받아 SSD1306 OLED에 날짜와 시각을 표시하고 싶어',
     ai: '연결이 안 되면 시리얼 로그를 그대로 붙여넣어 원인 후보를 받습니다.',
     checks: ['시리얼에 IP 주소가 출력된다', 'OLED에 한국 시간이 표시된다', '연결 실패 시 메시지를 직접 추가했다'],
     tn: '아래 Wi-Fi 기본 코드를 먼저 실행해 연결을 확인한 뒤 시계 기능을 요청하게 하면 오류 범위가 좁아집니다.' },
@@ -1089,7 +1089,7 @@ void loop() {
     goals: ['HTTP GET으로 공개 API 데이터를 받을 수 있다', 'JSON에서 필요한 값을 꺼낼 수 있다'],
     concepts: ['HTTP 요청 / 응답, 상태 코드 (200 = 성공)', 'JSON: <code>{"키": 값}</code> 구조 — ArduinoJson으로 파싱', 'API 응답은 먼저 브라우저로 열어 구조를 확인'],
     mission: 'Open-Meteo 날씨 API(키 불필요)로 서울의 현재 기온과 습도를 받아 OLED에 표시합니다. API 주소를 먼저 브라우저로 열어 응답 구조를 확인합니다.',
-    parts: 'ESP32 DevKit V1, SSD1306 OLED', ask: 'ESP32에서 Open-Meteo API로 서울(위도 37.57, 경도 126.98)의 현재 기온과 습도를 받아 OLED에 표시하고 싶어. 응답 JSON은 이렇게 생겼어:\n(브라우저에서 복사한 JSON 붙여넣기)',
+    parts: 'ESP32 DevKitC V4, SSD1306 OLED', ask: 'ESP32에서 Open-Meteo API로 서울(위도 37.57, 경도 126.98)의 현재 기온과 습도를 받아 OLED에 표시하고 싶어. 응답 JSON은 이렇게 생겼어:\n(브라우저에서 복사한 JSON 붙여넣기)',
     ai: '실제 응답 JSON을 함께 주면 AI가 키 이름을 지어내지 않습니다. 주지 않았을 때와 비교해 봅니다.',
     checks: ['응답 JSON 구조를 브라우저로 확인했다', '기온과 습도가 OLED에 표시된다', '10분마다 갱신하도록 직접 바꿨다'],
     tn: 'API 주소 예: <code>https://api.open-meteo.com/v1/forecast?latitude=37.57&amp;longitude=126.98&amp;current=temperature_2m,relative_humidity_2m</code>' },
@@ -1097,7 +1097,7 @@ void loop() {
     goals: ['로컬 센서 데이터와 인터넷 데이터를 결합할 수 있다', 'AI 없이 표시 항목을 추가할 수 있다'],
     concepts: ['DHT22: 온도와 습도를 함께 측정 (DHT sensor library)', '로컬(실내) + 원격(실외) 데이터 결합 = IoT 서비스의 기본형', '(선택) ESP32 웹서버: Wokwi IoT Gateway 설치 필요'],
     mission: 'DHT22로 실내 온습도를 측정하고, 30차시 날씨 API의 실외 값과 함께 OLED에 비교 표시합니다. 온도 차이가 크면 "환기하세요"를 띄웁니다.',
-    parts: 'ESP32 DevKit V1, DHT22, SSD1306 OLED', ask: 'ESP32에 DHT22(15번 핀)와 SSD1306 OLED가 있어. 실내 온습도와 Open-Meteo의 실외 온습도를 함께 표시하고, 온도 차이가 5도 이상이면 "환기하세요"를 표시하고 싶어',
+    parts: 'ESP32 DevKitC V4, DHT22, SSD1306 OLED', ask: 'ESP32에 DHT22(15번 핀)와 SSD1306 OLED가 있어. 실내 온습도와 Open-Meteo의 실외 온습도를 함께 표시하고, 온도 차이가 5도 이상이면 "환기하세요"를 표시하고 싶어',
     ai: '구현은 AI와 함께, 마지막 표시 항목 1개는 AI 없이 추가합니다.',
     checks: ['실내 · 실외 값이 함께 표시된다', '환기 알림 조건이 동작한다', 'AI 없이 표시 항목을 하나 추가했다'],
     tn: '미니 미션 ④ (평가 6점). 웹서버는 Wokwi IoT Gateway 설치가 필요하므로 빠른 학습자용 선택 과제로만 안내합니다.' },
@@ -1123,7 +1123,7 @@ void loop() {
     goals: ['클라우드 플랫폼의 채널과 API 키를 설정할 수 있다', 'ESP32 센서 값을 HTTP로 올리고 위젯 대시보드를 만들 수 있다', '스마트폰을 IoT 노드로 써서 ESP32와 데이터를 주고받을 수 있다'],
     concepts: ['ThingSpeak 채널 = 필드(field1, field2 …)가 있는 데이터 표', 'Write API Key: 내 채널에 쓰는 비밀 열쇠 — 공유 금지', '무료 계정은 업로드 간격 제한이 있다 (약 15초 이상)'],
     mission: 'ThingSpeak 채널 두 개(ESP32용 A, 스마트폰용 B)를 만들고, ESP32가 DHT22 온습도를 채널 A에 20초마다 올리게 합니다. 채널 A에 게이지 · 숫자 위젯으로 대시보드를 꾸미고, 스마트폰 노드 페이지에서 채널 B로 LED 명령을 보내 ESP32의 LED를 켜 봅니다.',
-    parts: 'ESP32 DevKit V1, DHT22, LED, 스마트폰', ask: 'ESP32에서 DHT22 온도와 습도를 20초마다 ThingSpeak의 field1, field2로 업로드하고 싶어. API 키는 YOUR_API_KEY로 비워 둘게',
+    parts: 'ESP32 DevKitC V4, DHT22, LED, 스마트폰', ask: 'ESP32에서 DHT22 온도와 습도를 20초마다 ThingSpeak의 field1, field2로 업로드하고 싶어. API 키는 YOUR_API_KEY로 비워 둘게',
     ai: 'API 키는 절대 AI에게 붙여넣지 않고 자리표시자(<code>YOUR_API_KEY</code>)로 바꿔서 질문하는 습관을 훈련합니다.',
     checks: ['채널 A 차트에 온습도가 쌓이고 위젯 대시보드를 꾸몄다', '스마트폰에서 보낸 LED 명령으로 ESP32 LED가 바뀐다', 'API 키를 AI에 노출하지 않았다'],
     tn: '학생이 실수로 키를 화면 공유하거나 채팅에 붙여넣으면 바로 키를 재발급하는 시연을 해 주세요. 스마트폰 노드 페이지는 강의실 사이트(HTTPS)에 올린 뒤 휴대폰으로 열어야 기울기 센서가 동작합니다. ThingSpeak는 20초 정도 늦게 반응한다는 점이 다음 차시 MQTT를 배우는 동기가 됩니다.' },
@@ -1131,7 +1131,7 @@ void loop() {
     goals: ['브로커 · 토픽 · 발행 · 구독의 관계를 설명할 수 있다', 'ESP32에서 MQTT로 센서 값을 발행할 수 있다'],
     concepts: ['브로커: 메시지를 중계하는 서버 (공개 브로커 예: <code>broker.hivemq.com</code>)', '토픽: 주소 같은 이름 — <code>bctc/내이니셜/room1/temp</code>', '공개 브로커는 누구나 볼 수 있다 → 고유 접두어, 개인정보 금지'],
     mission: 'ESP32가 5초마다 온도를 MQTT로 발행하고, HiveMQ 웹 클라이언트에서 그 토픽을 구독해 실시간으로 확인합니다.',
-    parts: 'ESP32 DevKit V1, DHT22', ask: 'ESP32에서 PubSubClient로 broker.hivemq.com(1883)에 접속해 5초마다 DHT22 온도를 "bctc/kim/room1/temp" 토픽으로 발행하고 싶어. 연결이 끊기면 다시 접속하게 해줘',
+    parts: 'ESP32 DevKitC V4, DHT22', ask: 'ESP32에서 PubSubClient로 broker.hivemq.com(1883)에 접속해 5초마다 DHT22 온도를 "bctc/kim/room1/temp" 토픽으로 발행하고 싶어. 연결이 끊기면 다시 접속하게 해줘',
     ai: '내가 설계한 토픽 구조(위치 / 장치 / 값)를 AI에게 리뷰받고, 겹치지 않는 이름 규칙을 정합니다.',
     checks: ['웹 클라이언트에서 실시간 값이 보인다', '토픽 이름에 고유 접두어를 넣었다', '재접속 코드를 확인했다'],
     tn: '반 전체가 같은 토픽을 쓰면 메시지가 섞입니다. 이니셜 규칙을 먼저 정해 주세요.' },
@@ -1139,7 +1139,7 @@ void loop() {
     goals: ['MQTT 구독으로 ESP32를 원격 제어할 수 있다', 'AI로 웹 대시보드를 만들고 검증할 수 있다'],
     concepts: ['양방향: ESP32가 발행(센서)과 구독(명령)을 동시에', '웹 브라우저는 WebSocket으로 MQTT 접속 (<code>wss://broker.hivemq.com:8884/mqtt</code>)', 'HTML 한 페이지 + MQTT.js = 스마트폰에서도 열리는 대시보드'],
     mission: 'ESP32가 <code>…/led/set</code> 토픽을 구독해 LED와 서보를 제어하게 하고, AI로 온도 표시와 ON / OFF 버튼이 있는 HTML 대시보드를 만들어 스마트폰에서 제어합니다.',
-    parts: 'ESP32 DevKit V1, DHT22, LED, 마이크로 서보', ask: 'MQTT.js로 wss://broker.hivemq.com:8884/mqtt 에 접속하는 HTML 한 페이지 대시보드를 만들어줘. "bctc/kim/room1/temp"를 구독해 온도를 크게 표시하고, ON/OFF 버튼으로 "bctc/kim/room1/led/set"에 발행해줘',
+    parts: 'ESP32 DevKitC V4, DHT22, LED, 마이크로 서보', ask: 'MQTT.js로 wss://broker.hivemq.com:8884/mqtt 에 접속하는 HTML 한 페이지 대시보드를 만들어줘. "bctc/kim/room1/temp"를 구독해 온도를 크게 표시하고, ON/OFF 버튼으로 "bctc/kim/room1/led/set"에 발행해줘',
     ai: 'ESP32 코드와 웹 코드의 토픽 이름이 한 글자라도 다르면 동작하지 않습니다. 두 코드의 토픽을 표로 대조합니다.',
     checks: ['웹 버튼으로 ESP32 LED가 켜진다', '온도가 대시보드에 실시간 표시된다', '스마트폰에서 대시보드를 열어 봤다'],
     tn: '대시보드 HTML은 학생 PC에서 파일로 열거나 CodePen 같은 온라인 편집기에서 실행합니다.' },
@@ -1147,7 +1147,7 @@ void loop() {
     goals: ['수집한 데이터를 AI와 함께 해석할 수 있다', 'IoT 보안의 기본 위험을 설명할 수 있다'],
     concepts: ['데이터 → 패턴 → 규칙: 분석 결과를 코드의 경보 조건으로', 'AI의 분석 결론은 원래 차트와 교차 확인', '보안 기본: 기본 비밀번호 변경, 키 노출 금지, 공개 브로커 주의, 펌웨어 업데이트'],
     mission: 'ThingSpeak 데이터를 CSV로 내보내 AI에게 패턴과 이상치 분석을 요청하고, 결론을 차트로 확인한 뒤 경보 규칙을 ESP32 코드에 반영합니다.',
-    parts: 'ESP32 DevKit V1, DHT22', ask: '첨부한 온습도 CSV를 분석해줘. 시간대별 패턴, 이상치, 그리고 경보를 울릴 만한 기준값을 근거와 함께 제안해줘',
+    parts: 'ESP32 DevKitC V4, DHT22', ask: '첨부한 온습도 CSV를 분석해줘. 시간대별 패턴, 이상치, 그리고 경보를 울릴 만한 기준값을 근거와 함께 제안해줘',
     ai: 'AI가 말한 패턴이 실제 차트에서도 보이는지 확인합니다. 데이터에 없는 결론을 지어내는지 살펴봅니다.',
     checks: ['AI 분석 결과를 차트와 대조했다', '경보 규칙을 코드에 반영했다', '실제 보안 사고 사례 1개를 보고 원인 · 예방법을 정리했다', '우리 서비스의 보안 위험 2가지와 대책을 적었다'],
     tn: '시뮬레이터 데이터는 단조로울 수 있으니, 강사가 준비한 예시 CSV를 함께 제공하면 좋습니다.' },
@@ -1181,7 +1181,7 @@ void loop() {
     goals: ['여러 서보를 동시에 제어할 수 있다', '동작을 기록하고 재생하는 티칭 방식을 구현할 수 있다'],
     concepts: ['로봇팔 관절 하나 = 서보 하나 (베이스 · 어깨 · 팔꿈치 · 그리퍼)', '티칭 & 플레이백: 사람이 만든 자세를 배열에 저장 → 순서대로 재생 (공장 로봇의 기본 방식)', '각도를 한 번에 바꾸지 않고 1°씩 이동해야 부드럽다'],
     mission: 'Wokwi에서 ESP32와 서보 4개, 가변저항 4개로 로봇팔을 만듭니다. 기록 버튼을 누를 때마다 자세를 저장하고, 재생 버튼을 누르면 저장한 자세를 부드럽게 이어서 재생합니다. 같은 코드를 <b>3D 로봇팔 실습실</b>에 붙여 넣어 실제 팔이 어떻게 움직이는지 확인하고, 티칭으로 블록을 목표 구역까지 옮겨 봅니다.',
-    parts: 'ESP32 DevKit V1, 서보 4개, 가변저항 4개, 푸시버튼 2개', ask: 'Wokwi에서 ESP32와 ESP32Servo 라이브러리로 서보 4개(베이스, 어깨, 팔꿈치, 그리퍼)를 가변저항 4개로 조종하고 싶어. 기록 버튼을 누르면 현재 자세를 최대 10개까지 저장하고, 재생 버튼을 누르면 저장한 자세 사이를 1도씩 부드럽게 이동하며 반복 재생해줘',
+    parts: 'ESP32 DevKitC V4, 서보 4개, 가변저항 4개, 푸시버튼 2개', ask: 'Wokwi에서 ESP32와 ESP32Servo 라이브러리로 서보 4개(베이스, 어깨, 팔꿈치, 그리퍼)를 가변저항 4개로 조종하고 싶어. 기록 버튼을 누르면 현재 자세를 최대 10개까지 저장하고, 재생 버튼을 누르면 저장한 자세 사이를 1도씩 부드럽게 이동하며 반복 재생해줘',
     ai: '핀이 많아 AI 코드와 회로가 어긋나기 쉽습니다. 서보 · 가변저항 · 버튼의 핀을 표 하나로 만들어 대조합니다.',
     checks: ['가변저항으로 4개 관절이 움직인다', '자세 기록 · 재생이 동작한다', '재생이 부드럽게 이어진다', '3D 실습실에서 티칭으로 블록을 목표 구역에 옮겼다'],
     tn: 'ESP32는 Wi-Fi를 켜면 ADC2 핀을 쓸 수 없습니다. 이 차시는 Wi-Fi를 쓰지 않지만, 나중을 위해 가변저항은 ADC1 핀(32~39번)에 연결하게 하세요.' },
@@ -1237,7 +1237,7 @@ void loop() {
     goals: ['MQTT로 센서 값을 받고 명령을 보내는 원격 제어 구조를 만들 수 있다', '통신이 끊겼을 때의 안전 정지(워치독)를 설명할 수 있다'],
     concepts: ['디지털 트윈: 브라우저의 가상 로봇 ↔ MQTT 브로커 ↔ Wokwi의 ESP32', '토픽: <code>접두어/robot/sensors</code>(로봇 → ESP32, JSON), <code>접두어/robot/cmd</code>(ESP32 → 로봇, "왼쪽,오른쪽")', '워치독: 1초 동안 명령이 없으면 로봇이 스스로 정지 — 원격 로봇의 기본 안전 장치'],
     mission: '가상 로봇 실습실을 📡 ESP32 모드로 연결하고, Wokwi의 ESP32가 거리 센서 값을 받아 장애물 회피 명령을 보내게 합니다. Wokwi 시뮬레이션을 멈추면 로봇이 워치독으로 정지하는지 확인합니다.',
-    parts: 'ESP32 DevKit V1 (Wokwi), 가상 로봇 (📡 ESP32 모드)', ask: 'Wokwi의 ESP32가 MQTT(broker.hivemq.com:1883)로 가상 로봇을 조종하게 하고 싶어. "bctc/kim/robot/sensors" 토픽으로 {"d":앞거리,"dl":왼쪽,"dr":오른쪽,"l":0,"c":1,"r":0,"hit":0} JSON이 0.2초마다 오고, "bctc/kim/robot/cmd" 토픽에 "왼쪽속도,오른쪽속도"(−255~255) 문자열을 보내면 로봇이 움직여. 0.2초마다 판단해서 장애물을 피하게 해줘. PubSubClient와 ArduinoJson을 써줘',
+    parts: 'ESP32 DevKitC V4 (Wokwi), 가상 로봇 (📡 ESP32 모드)', ask: 'Wokwi의 ESP32가 MQTT(broker.hivemq.com:1883)로 가상 로봇을 조종하게 하고 싶어. "bctc/kim/robot/sensors" 토픽으로 {"d":앞거리,"dl":왼쪽,"dr":오른쪽,"l":0,"c":1,"r":0,"hit":0} JSON이 0.2초마다 오고, "bctc/kim/robot/cmd" 토픽에 "왼쪽속도,오른쪽속도"(−255~255) 문자열을 보내면 로봇이 움직여. 0.2초마다 판단해서 장애물을 피하게 해줘. PubSubClient와 ArduinoJson을 써줘',
     ai: '장애물 회피 차시의 JavaScript 로직을 ESP32 C++로 옮기는 일을 AI에게 맡기고, 두 코드의 판단 규칙이 같은지 대조합니다.',
     checks: ['실습실에 "ESP32 제어 중"이 표시된다', 'ESP32 명령으로 로봇이 장애물을 피한다', 'ESP32를 멈추면 1초 안에 로봇이 정지한다'],
     tn: '통신 지연(0.1~0.5초) 때문에 코드 모드보다 반응이 느립니다. 속도를 150 이하로 낮추게 하고, 지연이 로봇 제어에 주는 영향을 토론 소재로 쓰세요. 토픽 접두어는 학생마다 반드시 다르게 정합니다.' },
@@ -1245,7 +1245,7 @@ void loop() {
     goals: ['웹 대시보드에서 로봇을 원격 조종할 수 있다', '자율 · 수동 모드를 전환하는 구조를 설계할 수 있다'],
     concepts: ['명령 경로: 스마트폰 대시보드 → <code>접두어/robot/remote</code> → ESP32 → <code>접두어/robot/cmd</code> → 로봇', 'ESP32가 최종 결정권자: 수동 명령이 와도 앞이 막혀 있으면 정지 (안전 우선)', '텔레메트리: 로봇 상태(거리 · 모드)를 대시보드에 실시간 표시'],
     mission: 'AI로 방향 버튼, 자율 / 수동 전환 버튼, 거리 표시가 있는 HTML 대시보드를 만들고, ESP32가 모드에 따라 자율 주행 또는 원격 명령을 로봇에 전달하게 합니다. 수동 모드에서도 벽 앞 20cm에서는 전진 명령을 막습니다.',
-    parts: 'ESP32 DevKit V1 (Wokwi), 가상 로봇 (📡 ESP32 모드), 스마트폰 또는 PC 브라우저', ask: 'MQTT.js로 wss://broker.hivemq.com:8884/mqtt 에 접속하는 로봇 조종 대시보드(HTML 한 페이지)를 만들어줘. 방향 버튼(전진/후진/좌/우/정지)은 "bctc/kim/robot/remote"에 "F","B","L","R","S"를 보내고, 자율/수동 버튼은 "AUTO","MANUAL"을 보내. "bctc/kim/robot/sensors"를 구독해서 앞 거리를 크게 보여줘. 스마트폰에서 누르기 쉽게 버튼을 크게 만들어줘',
+    parts: 'ESP32 DevKitC V4 (Wokwi), 가상 로봇 (📡 ESP32 모드), 스마트폰 또는 PC 브라우저', ask: 'MQTT.js로 wss://broker.hivemq.com:8884/mqtt 에 접속하는 로봇 조종 대시보드(HTML 한 페이지)를 만들어줘. 방향 버튼(전진/후진/좌/우/정지)은 "bctc/kim/robot/remote"에 "F","B","L","R","S"를 보내고, 자율/수동 버튼은 "AUTO","MANUAL"을 보내. "bctc/kim/robot/sensors"를 구독해서 앞 거리를 크게 보여줘. 스마트폰에서 누르기 쉽게 버튼을 크게 만들어줘',
     ai: '대시보드 · ESP32 · 실습실 세 곳의 토픽과 메시지 형식을 표 하나로 정리해 대조합니다. 하나라도 다르면 동작하지 않습니다.',
     checks: ['스마트폰에서 로봇을 조종했다', '자율 · 수동 모드가 전환된다', '수동 모드에서도 벽 앞에서 전진이 막힌다'],
     tn: '36차시 대시보드를 재사용하면 시간이 절약됩니다. 현재 모드를 대시보드에 표시하는 기능은 AI 없이 직접 추가하게 하세요.' },
@@ -1516,7 +1516,7 @@ function pageHome() {
 
 function pageMethod() {
   const code = `[역할] 너는 아두이노 입문자를 가르치는 강사야.
-[환경] Tinkercad Circuits, Arduino UNO R3  (또는 Wokwi, ESP32 DevKit V1)
+[환경] Tinkercad Circuits, Arduino UNO R3  (또는 Wokwi, ESP32 DevKitC V4)
 [목표] 버튼을 누르면 LED가 켜지고, 다시 누르면 꺼지게 하고 싶어.
 [부품] 푸시버튼 1개, LED 1개, 220Ω 저항 1개
 [요청] 1) 핀 연결표  2) 주석이 달린 코드  3) 동작 원리 3줄 설명
@@ -1974,7 +1974,7 @@ const CIRCUITS = {
          note: 'DHT22 값은 채널 A로 올리고, 스마트폰이 채널 B에 쓴 LED 명령을 읽어 GPIO2의 LED를 켜고 끕니다.' }],
   35: [{ board: 'esp32', lines: [{ pin: 'GPIO15', to: { m: 'dht', p: 'SDA (데이터)' } }], mods: { dht: MOD.dht } }],
   36: [{ board: 'esp32', lines: [{ pin: 'GPIO15', to: { m: 'dht', p: 'SDA (데이터)' } }, ledRow('GPIO2', '빨강', '원격 LED'), { pin: 'GPIO18', to: { m: 'servo', p: 'SIG (주황)' } }],
-         mods: { dht: MOD.dht, servo: MOD.servo('5V (VIN)') } }],
+         mods: { dht: MOD.dht, servo: MOD.servo('5V') } }],
   37: [{ board: 'esp32', lines: [{ pin: 'GPIO15', to: { m: 'dht', p: 'SDA (데이터)' } }, ledRow('GPIO2', '빨강', '경보')], mods: { dht: MOD.dht } }],
   39: [{ board: 'uno', lines: drv2Rows, mods: { drv: drv2 },
          note: '모터 전원은 9V 배터리(VCC2)에서, 칩 전원은 아두이노 5V(VCC1)에서 받습니다. 배터리 −와 아두이노 GND는 공통으로 연결합니다.' }],
@@ -1982,11 +1982,11 @@ const CIRCUITS = {
          { pin: 'GPIO13', to: { m: 'sv', p: '베이스 SIG' } }, { pin: 'GPIO14', to: { m: 'sv', p: '어깨 SIG' } }, { pin: 'GPIO27', to: { m: 'sv', p: '팔꿈치 SIG' } }, { pin: 'GPIO26', to: { m: 'sv', p: '그리퍼 SIG' } },
          { pin: 'GPIO32', to: { m: 'pot', p: '베이스 W' } }, { pin: 'GPIO33', to: { m: 'pot', p: '어깨 W' } }, { pin: 'GPIO34', to: { m: 'pot', p: '팔꿈치 W' } }, { pin: 'GPIO35', to: { m: 'pot', p: '그리퍼 W' } },
          btnRow('GPIO25', '기록'), btnRow('GPIO4', '재생')],
-         mods: { sv: { name: '서보 4개', right: [['V+ (모두)', '5V (VIN)'], ['GND (모두)', 'GND']] }, pot: { name: '가변저항 4개', right: [['한쪽 끝 (모두)', '3V3'], ['다른 끝 (모두)', 'GND']] } },
+         mods: { sv: { name: '서보 4개', right: [['V+ (모두)', '5V'], ['GND (모두)', 'GND']] }, pot: { name: '가변저항 4개', right: [['한쪽 끝 (모두)', '3V3'], ['다른 끝 (모두)', 'GND']] } },
          note: '가변저항은 ADC1 핀(32~35번)에 연결합니다. GPIO12처럼 부팅에 쓰이는 핀은 피합니다. 버튼은 INPUT_PULLUP을 씁니다.' }],
 };
 
-const BOARD_NAME = { uno: 'Arduino UNO', esp32: 'ESP32 DevKit V1', bat: '9V 배터리' };
+const BOARD_NAME = { uno: 'Arduino UNO', esp32: 'ESP32 DevKitC V4', bat: '9V 배터리' };
 const LED_FILL = { 빨강: '#e5484d', 노랑: '#f5b70a', 초록: '#2e9c49', 파랑: '#3a6fd8' };
 const tw = (s) => [...String(s)].reduce((a, c) => a + (c.charCodeAt(0) > 255 ? 12 : 7), 0);
 const isPower = (t) => typeof t === 'string' && t !== 'GND';
@@ -2197,32 +2197,34 @@ function unoPic(x, y) {
   };
   return { W, H, svg: s, find };
 }
-function espPic(x, y) {
-  const W = 380, H = 150, pins = {};
-  const top = ['3V3', 'GND', 'D15', 'D2', 'D4', 'RX2', 'TX2', 'D5', 'D18', 'D19', 'D21', 'RX0', 'TX0', 'D22', 'D23'];
-  const bot = ['VIN', 'GND', 'D13', 'D12', 'D14', 'D27', 'D26', 'D25', 'D33', 'D32', 'D35', 'D34', 'VN', 'VP', 'EN'];
-  const num = { RX2: 16, TX2: 17, RX0: 3, TX0: 1, VN: 39, VP: 36 };
-  const pp = 20; let s = `<rect x="${x}" y="${y}" width="${W}" height="${H}" rx="8" fill="#1f2328"/>
+function espPic(x, y) {           // ESP32 DevKitC V4 (38핀, Wokwi 기본 ESP32) — 세로 보드를 시계 방향으로 눕힌 모습
+  const W = 430, H = 150, pins = {};
+  const top = ['5V', 'CMD', 'D3', 'D2', '13', 'GND', '12', '14', '27', '26', '25', '33', '32', '35', '34', 'VN', 'VP', 'EN', '3V3'];
+  const bot = ['CLK', 'D0', 'D1', '15', '2', '0', '4', '16', '17', '5', '18', '19', 'GND', '21', 'RX', 'TX', '22', '23', 'GND'];
+  const flash = { CMD: 1, CLK: 1, D0: 1, D1: 1, D2: 1, D3: 1 };          // 내장 플래시 핀 (GPIO6~11): 쓰지 않음
+  const key = (n) => flash[n] ? 'F_' + n : /^\d+$/.test(n) ? 'D' + n : ({ TX: 'D1', RX: 'D3', VP: 'D36', VN: 'D39' })[n] || n;
+  const pp = 20; let s = `<rect x="${x}" y="${y}" width="${W}" height="${H}" rx="8" fill="#1f1f1f"/>
     <rect x="${x - 14}" y="${y + 52}" width="40" height="46" rx="3" fill="#c7cbd1" stroke="#8d939c"/>
-    <rect x="${x + 110}" y="${y + 34}" width="230" height="82" rx="4" fill="#b9bec6" stroke="#8d939c"/>
-    <rect x="${x + 116}" y="${y + 40}" width="170" height="70" rx="2" fill="#d4d8de"/>
-    <text x="${x + 201}" y="${y + 72}" text-anchor="middle" font-size="12" font-weight="800" fill="#4b5563">ESP-WROOM-32</text>
-    <text x="${x + 201}" y="${y + 90}" text-anchor="middle" font-size="8.5" fill="#6b7280">Wi-Fi · Bluetooth</text>
-    <path d="M${x + 296} ${y + 46} h28 v8 h-22 v8 h22 v8 h-22 v8 h22 v8 h-22 v8 h22" fill="none" stroke="#c9a227" stroke-width="2.5"/>
-    <text x="${x + 60}" y="${y + 80}" font-size="10" font-weight="800" fill="#e5e7eb">ESP32</text><text x="${x + 60}" y="${y + 93}" font-size="7.5" fill="#9ca3af">DevKit V1</text>`;
+    <rect x="${x + 44}" y="${y + 30}" width="22" height="16" rx="2" fill="#3a3a3a"/><text x="${x + 55}" y="${y + 56}" text-anchor="middle" font-size="7" fill="#e5e7eb">EN</text>
+    <rect x="${x + 44}" y="${y + 104}" width="22" height="16" rx="2" fill="#3a3a3a"/><text x="${x + 55}" y="${y + 100}" text-anchor="middle" font-size="7" fill="#e5e7eb">BOOT</text>
+    <rect x="${x + 108}" y="${y + 54}" width="40" height="40" rx="3" fill="#2b2b2b" stroke="#444"/>
+    <rect x="${x + 214}" y="${y + 30}" width="196" height="90" rx="4" fill="#4a4a4a"/>
+    <rect x="${x + 220}" y="${y + 36}" width="150" height="78" rx="3" fill="#a9a9a9" stroke="#8a8a8a"/>
+    <text x="${x + 295}" y="${y + 80}" text-anchor="middle" font-size="18" fill="#efefef">ESP32</text>
+    <path d="M${x + 384} ${y + 40} h18 v10 h-12 v10 h12 v10 h-12 v10 h12 v10 h-12 v10 h18" fill="none" stroke="#6b6b6b" stroke-width="2.5"/>
+    <text x="${x + 160}" y="${y + 70}" font-size="10" font-weight="800" fill="#e5e7eb">ESP32</text><text x="${x + 160}" y="${y + 83}" font-size="7.5" fill="#9ca3af">DevKitC V4</text>`;
   const row = (list, yy, dir) => list.forEach((n, i) => {
     const px = x + 40 + i * pp;
-    s += `<circle cx="${px}" cy="${yy}" r="4" fill="#c9a227"/><circle cx="${px}" cy="${yy}" r="1.8" fill="#1f2328"/>`;
-    s += `<text x="${px}" y="${dir < 0 ? yy + 14 : yy - 8}" text-anchor="middle" font-size="7" font-weight="700" fill="#e5e7eb">${n}</text>`;
-    const key = n in num ? 'D' + num[n] : n;
-    pins[pins[key] ? key + '_2' : key] = { x: px, y: yy, dir };
+    s += `<circle cx="${px}" cy="${yy}" r="4.6" fill="#f5d90a"/><circle cx="${px}" cy="${yy}" r="1.8" fill="#1f1f1f"/>`;
+    s += `<text x="${px}" y="${dir < 0 ? yy + 14 : yy - 8}" text-anchor="middle" font-size="7" font-weight="700" fill="${flash[n] ? '#8b8b8b' : '#e5e7eb'}">${n}</text>`;
+    const k = key(n);
+    pins[pins[k] ? k + '_2' : k] = { x: px, y: yy, dir };
   });
   row(top, y + 10, -1); row(bot, y + H - 10, 1);
   const find = (name) => {
     let k = String(name).replace(/\s*\(.*\)$/, '');
     if (/^GPIO\d+/.test(k)) k = 'D' + k.match(/\d+/)[0];
-    if (k === '5V') k = 'VIN';
-    if (/VIN/.test(String(name))) k = 'VIN';
+    if (k === 'VIN' || /VIN/.test(String(name))) k = '5V';
     return pins[k];
   };
   return { W, H, svg: s, find };
@@ -3034,23 +3036,25 @@ function wokwiGuide() {
 }
 
 /* 28차시: ESP32 소개 · UNO 비교 · 핀맵 */
-const ESP_COL = { pwr: '#d64541', gnd: '#2a2f3a', in: '#64748b', adc1: '#2e9c49', adc2: '#f08c00', strap: '#c99a06', uart: '#9b51e0', i2c: '#0d9488', spi: '#2f6fd6', etc: '#7d8799' };
+const ESP_COL = { flash: '#9ca3af', pwr: '#d64541', gnd: '#2a2f3a', in: '#64748b', adc1: '#2e9c49', adc2: '#f08c00', strap: '#c99a06', uart: '#9b51e0', i2c: '#0d9488', spi: '#2f6fd6', etc: '#7d8799' };
 const ESP_LEFT = [
-  ['EN', 'EN', 'etc', '리셋 (LOW면 재시작)'], ['VP', 'GPIO36', 'in', '입력 전용 · ADC1'], ['VN', 'GPIO39', 'in', '입력 전용 · ADC1'],
-  ['D34', 'GPIO34', 'in', '입력 전용 · ADC1'], ['D35', 'GPIO35', 'in', '입력 전용 · ADC1'], ['D32', 'GPIO32', 'adc1', 'ADC1 · 터치 · PWM'],
-  ['D33', 'GPIO33', 'adc1', 'ADC1 · 터치 · PWM'], ['D25', 'GPIO25', 'adc2', 'ADC2 · DAC1 · PWM'], ['D26', 'GPIO26', 'adc2', 'ADC2 · DAC2 · PWM'],
-  ['D27', 'GPIO27', 'adc2', 'ADC2 · 터치 · PWM'], ['D14', 'GPIO14', 'adc2', 'ADC2 · 터치 · PWM'], ['D12', 'GPIO12', 'strap', '부팅 핀 ⚠ · ADC2'],
-  ['D13', 'GPIO13', 'adc2', 'ADC2 · 터치 · PWM'], ['GND', 'GND', 'gnd', '0V 기준'], ['VIN', 'VIN', 'pwr', '5V 입력 (USB 5V)']
+  ['3V3', '3V3', 'pwr', '3.3V 출력'], ['EN', 'EN', 'etc', '리셋 (LOW면 재시작)'], ['VP', 'GPIO36', 'in', '입력 전용 · ADC1'], ['VN', 'GPIO39', 'in', '입력 전용 · ADC1'],
+  ['34', 'GPIO34', 'in', '입력 전용 · ADC1'], ['35', 'GPIO35', 'in', '입력 전용 · ADC1'], ['32', 'GPIO32', 'adc1', 'ADC1 · 터치 · PWM'],
+  ['33', 'GPIO33', 'adc1', 'ADC1 · 터치 · PWM'], ['25', 'GPIO25', 'adc2', 'ADC2 · DAC1 · PWM'], ['26', 'GPIO26', 'adc2', 'ADC2 · DAC2 · PWM'],
+  ['27', 'GPIO27', 'adc2', 'ADC2 · 터치 · PWM'], ['14', 'GPIO14', 'adc2', 'ADC2 · 터치 · PWM'], ['12', 'GPIO12', 'strap', '부팅 핀 ⚠ · ADC2'],
+  ['GND', 'GND', 'gnd', '0V 기준'], ['13', 'GPIO13', 'adc2', 'ADC2 · 터치 · PWM'],
+  ['D2', 'GPIO9', 'flash', '내장 플래시 ⛔ 쓰지 않기'], ['D3', 'GPIO10', 'flash', '내장 플래시 ⛔ 쓰지 않기'], ['CMD', 'GPIO11', 'flash', '내장 플래시 ⛔ 쓰지 않기'], ['5V', '5V', 'pwr', '5V 입력 (USB 5V)']
 ];
 const ESP_RIGHT = [
-  ['D23', 'GPIO23', 'spi', 'SPI MOSI · PWM'], ['D22', 'GPIO22', 'i2c', 'I2C SCL · PWM'], ['TX0', 'GPIO1', 'uart', 'USB 시리얼 TX ⚠'],
-  ['RX0', 'GPIO3', 'uart', 'USB 시리얼 RX ⚠'], ['D21', 'GPIO21', 'i2c', 'I2C SDA · PWM'], ['D19', 'GPIO19', 'spi', 'SPI MISO · PWM'],
-  ['D18', 'GPIO18', 'spi', 'SPI SCK · PWM'], ['D5', 'GPIO5', 'strap', '부팅 핀 · SPI SS'], ['TX2', 'GPIO17', 'uart', 'UART2 TX · PWM'],
-  ['RX2', 'GPIO16', 'uart', 'UART2 RX · PWM'], ['D4', 'GPIO4', 'adc2', 'ADC2 · 터치 · PWM'], ['D2', 'GPIO2', 'strap', '내장 LED · 부팅 핀'],
-  ['D15', 'GPIO15', 'strap', '부팅 핀 · ADC2'], ['GND', 'GND', 'gnd', '0V 기준'], ['3V3', '3V3', 'pwr', '3.3V 출력']
+  ['GND', 'GND', 'gnd', '0V 기준'], ['23', 'GPIO23', 'spi', 'SPI MOSI · PWM'], ['22', 'GPIO22', 'i2c', 'I2C SCL · PWM'],
+  ['TX', 'GPIO1', 'uart', 'USB 시리얼 TX ⚠'], ['RX', 'GPIO3', 'uart', 'USB 시리얼 RX ⚠'], ['21', 'GPIO21', 'i2c', 'I2C SDA · PWM'],
+  ['GND', 'GND', 'gnd', '0V 기준'], ['19', 'GPIO19', 'spi', 'SPI MISO · PWM'], ['18', 'GPIO18', 'spi', 'SPI SCK · PWM'],
+  ['5', 'GPIO5', 'strap', '부팅 핀 · SPI SS'], ['17', 'GPIO17', 'uart', 'UART2 TX · PWM'], ['16', 'GPIO16', 'uart', 'UART2 RX · PWM'],
+  ['4', 'GPIO4', 'adc2', 'ADC2 · 터치 · PWM'], ['0', 'GPIO0', 'strap', '부팅 핀 (BOOT 버튼)'], ['2', 'GPIO2', 'strap', '부팅 핀 · ADC2'],
+  ['15', 'GPIO15', 'strap', '부팅 핀 · ADC2'], ['D1', 'GPIO8', 'flash', '내장 플래시 ⛔ 쓰지 않기'], ['D0', 'GPIO7', 'flash', '내장 플래시 ⛔ 쓰지 않기'], ['CLK', 'GPIO6', 'flash', '내장 플래시 ⛔ 쓰지 않기']
 ];
 function esp32PinoutSVG() {
-  const X0 = 270, X1 = 490, TOP = 64, PY = (i) => 168 + i * 27;
+  const X0 = 270, X1 = 490, TOP = 64, PY = (i) => 168 + i * 25, B = PY(18) + 74;
   const pill = (x, y, t, col, anchor) => {
     const w = tw(t) * 0.86 + 14, x0 = anchor === 'end' ? x - w : x;
     return `<rect x="${x0}" y="${y - 9}" width="${w}" height="18" rx="9" fill="${col}"/><text x="${x0 + w / 2}" y="${y + 3.8}" text-anchor="middle" font-size="10.5" font-weight="800" fill="#fff">${t}</text>`;
@@ -3058,35 +3062,34 @@ function esp32PinoutSVG() {
   const side = (list, left) => list.map(([silk, gpio, cat, fn], i) => {
     const y = PY(i), px = left ? X0 + 12 : X1 - 12, col = ESP_COL[cat];
     const lineX = left ? X0 - 6 : X1 + 6;
-    return `<circle cx="${px}" cy="${y}" r="5" fill="#c9a227"/><circle cx="${px}" cy="${y}" r="2.2" fill="#1f2328"/>
+    return `<circle cx="${px}" cy="${y}" r="5" fill="#f5d90a"/><circle cx="${px}" cy="${y}" r="2.2" fill="#1f2328"/>
       <text x="${left ? px + 10 : px - 10}" y="${y + 3.5}" text-anchor="${left ? 'start' : 'end'}" font-size="9" font-weight="700" fill="#e5e7eb">${silk}</text>
       <line x1="${left ? X0 : X1}" y1="${y}" x2="${left ? X0 - 14 : X1 + 14}" y2="${y}" stroke="${col}" stroke-width="2"/>
       ${pill(left ? X0 - 14 : X1 + 14, y, gpio, col, left ? 'end' : 'start')}
       <text x="${left ? X0 - 92 : X1 + 92}" y="${y + 3.8}" text-anchor="${left ? 'end' : 'start'}" font-size="10.5" fill="var(--fg)">${fn}</text>`;
   }).join('');
-  const key = [['전원', 'pwr'], ['GND', 'gnd'], ['입력 전용', 'in'], ['ADC1', 'adc1'], ['ADC2 (Wi-Fi 중 사용 불가)', 'adc2'], ['부팅 핀', 'strap'], ['UART', 'uart'], ['I2C', 'i2c'], ['SPI', 'spi']];
+  const key = [['전원', 'pwr'], ['GND', 'gnd'], ['입력 전용', 'in'], ['ADC1', 'adc1'], ['ADC2 (Wi-Fi 중 사용 불가)', 'adc2'], ['부팅 핀', 'strap'], ['UART', 'uart'], ['I2C', 'i2c'], ['SPI', 'spi'], ['내장 플래시 (쓰지 않기)', 'flash']];
   let kx = 24, ky = 22;
   const keys = key.map(([t, c]) => { const w = tw(t) * 0.86 + 34; if (kx + w > 740) { kx = 24; ky += 20; } const s = `<rect x="${kx}" y="${ky - 9}" width="12" height="12" rx="3" fill="${ESP_COL[c]}"/><text x="${kx + 17}" y="${ky + 1.5}" font-size="11" fill="var(--fg)">${t}</text>`; kx += w; return s; }).join('');
-  return `<svg viewBox="0 0 760 600" role="img" aria-label="ESP32 DevKit V1 30핀 핀맵">
+  return `<svg viewBox="0 0 760 ${B + 16}" role="img" aria-label="ESP32 DevKitC V4 38핀 핀맵">
     ${keys}
-    <rect x="${X0}" y="${TOP}" width="${X1 - X0}" height="512" rx="10" fill="#1f2328"/>
+    <rect x="${X0}" y="${TOP}" width="${X1 - X0}" height="${B - TOP}" rx="10" fill="#1f1f1f"/>
     <rect x="${X0 + 22}" y="${TOP + 10}" width="${X1 - X0 - 44}" height="64" rx="3" fill="#2b3038"/>
     <path d="M${(X0 + X1) / 2 - 44} ${TOP + 24} h88 v10 h-80 v10 h80 v10 h-80 v10 h88" fill="none" stroke="#c9a227" stroke-width="3"/>
     <rect x="${X0 + 56}" y="${TOP + 74}" width="${X1 - X0 - 112}" height="150" rx="3" fill="#b9bec6"/><rect x="${X0 + 62}" y="${TOP + 80}" width="${X1 - X0 - 124}" height="138" rx="2" fill="#d4d8de"/>
-    <text x="${(X0 + X1) / 2}" y="${TOP + 140}" text-anchor="middle" font-size="11" font-weight="800" fill="#4b5563">ESP-WROOM</text><text x="${(X0 + X1) / 2}" y="${TOP + 154}" text-anchor="middle" font-size="11" font-weight="800" fill="#4b5563">-32</text>
+    <text x="${(X0 + X1) / 2}" y="${TOP + 150}" text-anchor="middle" font-size="20" fill="#6b7280">ESP32</text>
     <text x="${(X0 + X1) / 2}" y="${TOP + 172}" text-anchor="middle" font-size="9" fill="#6b7280">Wi-Fi · Bluetooth</text>
     <rect x="${(X0 + X1) / 2 - 18}" y="${TOP + 260}" width="36" height="36" rx="3" fill="#111827"/>
-    <rect x="${X0 + 66}" y="${TOP + 448}" width="20" height="14" rx="2" fill="#d4d4d4"/><text x="${X0 + 76}" y="${TOP + 474}" text-anchor="middle" font-size="7" fill="#e5e7eb">EN</text>
-    <rect x="${X1 - 86}" y="${TOP + 448}" width="20" height="14" rx="2" fill="#d4d4d4"/><text x="${X1 - 76}" y="${TOP + 474}" text-anchor="middle" font-size="7" fill="#e5e7eb">BOOT</text>
-    <rect x="${(X0 + X1) / 2 - 22}" y="${TOP + 494}" width="44" height="30" rx="3" fill="#c7cbd1" stroke="#8d939c"/><text x="${(X0 + X1) / 2}" y="${TOP + 513}" text-anchor="middle" font-size="9" font-weight="800" fill="#374151">USB</text>
-    <circle cx="${(X0 + X1) / 2 - 26}" cy="${TOP + 320}" r="4" fill="#3b82f6"/><text x="${(X0 + X1) / 2 - 18}" y="${TOP + 323}" font-size="7.5" fill="#e5e7eb">LED (GPIO2)</text>
+    <rect x="${X0 + 66}" y="${B - 50}" width="20" height="14" rx="2" fill="#d4d4d4"/><text x="${X0 + 76}" y="${B - 56}" text-anchor="middle" font-size="7" fill="#e5e7eb">EN</text>
+    <rect x="${X1 - 86}" y="${B - 50}" width="20" height="14" rx="2" fill="#d4d4d4"/><text x="${X1 - 76}" y="${B - 56}" text-anchor="middle" font-size="7" fill="#e5e7eb">BOOT</text>
+    <rect x="${(X0 + X1) / 2 - 22}" y="${B - 30}" width="44" height="30" rx="3" fill="#c7cbd1" stroke="#8d939c"/><text x="${(X0 + X1) / 2}" y="${B - 11}" text-anchor="middle" font-size="9" font-weight="800" fill="#374151">USB</text>
     ${side(ESP_LEFT, true)}${side(ESP_RIGHT, false)}
   </svg>`;
 }
 
 function esp32Guide() {
   const spec = [
-    ['칩', 'ESP32 (Espressif, 듀얼 코어 Xtensa LX6)'], ['클럭', '최대 240MHz'], ['메모리', 'SRAM 520KB · 플래시 4MB (DevKit V1 기준)'],
+    ['칩', 'ESP32 (Espressif, 듀얼 코어 Xtensa LX6)'], ['클럭', '최대 240MHz'], ['메모리', 'SRAM 520KB · 플래시 4MB (DevKitC V4 기준)'],
     ['무선', 'Wi-Fi 802.11 b/g/n (2.4GHz) · Bluetooth 4.2 / BLE'], ['동작 전압', '3.3V (USB 5V를 보드에서 3.3V로 변환)'],
     ['아날로그 입력', '12비트 (0~4095), ADC1 8채널 · ADC2 10채널'], ['아날로그 출력', 'PWM: 대부분의 출력 핀 · DAC: GPIO25 · 26'],
     ['통신', 'UART 3개 · I2C 2개 · SPI · 정전식 터치 입력'], ['절전', '딥 슬립 모드로 배터리 장시간 사용 가능']
@@ -3095,7 +3098,7 @@ function esp32Guide() {
     ['칩 · 클럭', 'ATmega328P · 16MHz (1코어)', 'ESP32 · 240MHz (2코어)'],
     ['메모리 (변수 / 코드)', '2KB / 32KB', '520KB / 4MB'],
     ['동작 전압 (논리)', '<b>5V</b>', '<b>3.3V</b> — 5V 신호를 바로 넣으면 안 됨'],
-    ['디지털 입출력', '14핀', '약 25핀 (DevKit 30핀 보드 기준)'],
+    ['디지털 입출력', '14핀', '약 25핀 (DevKitC V4 38핀 보드 기준)'],
     ['아날로그 입력', '6핀 · 10비트 (0~1023)', '최대 15핀 · <b>12비트 (0~4095)</b>'],
     ['PWM 출력', '~ 표시 6핀', '거의 모든 출력 핀'],
     ['무선 통신', '없음', '<b>Wi-Fi · Bluetooth 내장</b>'],
@@ -3116,7 +3119,7 @@ function esp32Guide() {
     ['📥 입력 전용', '34, 35, 36(VP), 39(VN)', '가변저항 · 센서 아날로그 입력 (출력 · 내부 풀업 불가)'],
     ['📶 Wi-Fi 쓸 때 아날로그 입력', 'ADC1: 32, 33, 34, 35, 36, 39', 'Wi-Fi를 켜면 ADC2(0, 2, 4, 12~15, 25~27)는 analogRead 불가'],
     ['⚠ 부팅 핀 (주의)', '0, 2, 5, 12, 15', '부팅 순간 전압이 정해져 있어야 하는 핀. 특히 12번은 HIGH면 부팅 실패'],
-    ['⛔ 쓰지 않기', '1(TX0), 3(RX0)', 'USB 시리얼 통신용. 업로드 · 시리얼 모니터가 망가짐']
+    ['⛔ 쓰지 않기', '1(TX), 3(RX), 6~11(CLK · D0~D3 · CMD)', '1 · 3은 USB 시리얼 통신용, 6~11은 내장 플래시용. 쓰면 업로드 · 시리얼 모니터 · 부팅이 망가짐']
   ];
   const use = [
     ['LED', 'GPIO16 · 17 · 18 · 2', '28 · 34 · 36 · 37차시'], ['가변저항 (아날로그)', 'GPIO34 · 32~35', '28 · 41차시'], ['OLED · I2C', 'GPIO21 (SDA) · 22 (SCL)', '29 · 30 · 31차시'],
@@ -3124,21 +3127,21 @@ function esp32Guide() {
   ];
   return `
     <h2>ESP32 알아보기</h2>
-    <p><b>ESP32</b>는 중국 Espressif가 만든 마이크로컨트롤러로, <b>Wi-Fi와 블루투스가 칩 안에 들어 있습니다</b>. 아두이노 UNO보다 훨씬 빠르고 메모리도 크면서 값이 싸서 사물인터넷 기기에 가장 많이 쓰입니다. 아두이노와 같은 방식(스케치, <code>setup()</code> · <code>loop()</code>)으로 프로그래밍할 수 있어서, 지금까지 배운 코드를 거의 그대로 쓸 수 있습니다. 이 과정에서는 가장 흔한 <b>ESP32 DevKit V1 (30핀)</b> 보드를 씁니다.</p>
-    <div class="table-wrap"><table><tr><th>항목</th><th>ESP32 DevKit V1</th></tr>${spec.map(([a, b]) => `<tr><td><b>${a}</b></td><td>${b}</td></tr>`).join('')}</table></div>
+    <p><b>ESP32</b>는 중국 Espressif가 만든 마이크로컨트롤러로, <b>Wi-Fi와 블루투스가 칩 안에 들어 있습니다</b>. 아두이노 UNO보다 훨씬 빠르고 메모리도 크면서 값이 싸서 사물인터넷 기기에 가장 많이 쓰입니다. 아두이노와 같은 방식(스케치, <code>setup()</code> · <code>loop()</code>)으로 프로그래밍할 수 있어서, 지금까지 배운 코드를 거의 그대로 쓸 수 있습니다. 이 과정에서는 가장 흔한 <b>ESP32 DevKitC V4 (30핀)</b> 보드를 씁니다.</p>
+    <div class="table-wrap"><table><tr><th>항목</th><th>ESP32 DevKitC V4</th></tr>${spec.map(([a, b]) => `<tr><td><b>${a}</b></td><td>${b}</td></tr>`).join('')}</table></div>
 
     <h3>아두이노 UNO와 비교</h3>
-    <div class="table-wrap"><table><tr><th></th><th>Arduino UNO</th><th>ESP32 DevKit V1</th></tr>${cmp.map(([a, b, c]) => `<tr><td><b>${a}</b></td><td>${b}</td><td>${c}</td></tr>`).join('')}</table></div>
+    <div class="table-wrap"><table><tr><th></th><th>Arduino UNO</th><th>ESP32 DevKitC V4</th></tr>${cmp.map(([a, b, c]) => `<tr><td><b>${a}</b></td><td>${b}</td><td>${c}</td></tr>`).join('')}</table></div>
     <h3>UNO 코드를 ESP32로 옮길 때 달라지는 것</h3>
     <div class="table-wrap"><table><tr><th>코드</th><th>달라지는 점</th></tr>${code.map(([a, b]) => `<tr><td><code>${esc(a)}</code></td><td>${b}</td></tr>`).join('')}</table></div>
 
-    <h3>ESP32 DevKit V1 핀맵</h3>
-    <p>보드 가운데 글자(D13, TX2 …)는 보드에 인쇄된 이름이고, 바깥쪽 색 상자는 <b>코드에서 쓰는 GPIO 번호</b>입니다. 색은 핀의 주요 기능을 나타냅니다.</p>
-    <div class="figure">${esp32PinoutSVG()}<p class="caption">ESP32 DevKit V1 (30핀) — 안테나가 위, USB가 아래인 방향. 보드 제조사에 따라 핀 순서가 다를 수 있으니 실제 보드의 인쇄를 확인하세요.</p></div>
+    <h3>ESP32 DevKitC V4 핀맵</h3>
+    <p>보드 가운데 글자(13, TX …)는 보드에 인쇄된 이름이고, 바깥쪽 색 상자는 <b>코드에서 쓰는 GPIO 번호</b>입니다. 색은 핀의 주요 기능을 나타냅니다.</p>
+    <div class="figure">${esp32PinoutSVG()}<p class="caption">ESP32 DevKitC V4 (38핀) — Wokwi의 기본 ESP32 보드(Starter Templates의 <b>ESP32</b>)와 같은 보드입니다. 안테나가 위, USB가 아래인 방향. 회색 핀(D0~D3 · CMD · CLK)은 내장 플래시용이라 쓰지 않습니다.</p></div>
     <h3>어떤 핀을 써야 할까?</h3>
     <div class="table-wrap"><table><tr><th>구분</th><th>GPIO</th><th>쓰임 · 주의</th></tr>${safe.map(([a, b, c]) => `<tr><td><b>${a}</b></td><td>${b}</td><td>${c}</td></tr>`).join('')}</table></div>
     <div class="callout warn"><div class="ct">⚠ ESP32를 지키는 규칙</div>
-      <p>① ESP32 핀은 <b>3.3V</b>입니다. 5V 센서의 출력 신호를 그대로 넣지 않습니다. ② 센서 전원은 3V3에, 서보처럼 전류가 큰 부품은 VIN(5V)에서 받습니다. ③ 핀당 전류는 약 20mA 이하로 씁니다. ④ 부팅 핀(0 · 2 · 5 · 12 · 15)에 버튼이나 풀업 · 풀다운을 달 때는 부팅이 되는지 확인합니다.</p></div>
+      <p>① ESP32 핀은 <b>3.3V</b>입니다. 5V 센서의 출력 신호를 그대로 넣지 않습니다. ② 센서 전원은 3V3에, 서보처럼 전류가 큰 부품은 5V 핀에서 받습니다. ③ 핀당 전류는 약 20mA 이하로 씁니다. ④ 부팅 핀(0 · 2 · 5 · 12 · 15)에 버튼이나 풀업 · 풀다운을 달 때는 부팅이 되는지 확인합니다.</p></div>
     <h3>이 과정에서 쓰는 ESP32 핀</h3>
     <div class="table-wrap"><table><tr><th>용도</th><th>GPIO</th><th>나오는 차시</th></tr>${use.map(([a, b, c]) => `<tr><td>${a}</td><td><b>${b}</b></td><td>${c}</td></tr>`).join('')}</table></div>
     <div class="callout info"><div class="ct">🤖 AI 코드를 검증할 때</div><p>AI가 UNO 코드를 ESP32로 바꿔 줄 때 자주 틀리는 곳: <code>analogRead</code> 범위(1023 → 4095), 입력 전용 핀(34~39)에 출력이나 INPUT_PULLUP 사용, Wi-Fi를 쓰면서 ADC2 핀으로 아날로그 읽기, <code>Servo.h</code>를 그대로 쓰기. 위 핀맵과 표로 하나씩 확인하세요.</p></div>`;
@@ -3920,7 +3923,7 @@ function arm3dGuide() {
     <h3>관절 · 서보 · 핀 한눈에 보기</h3>
     <div class="table-wrap"><table><tr><th>관절</th><th>하는 일</th><th>서보 신호선</th><th>가변저항</th><th>각도의 뜻 (3D 실습실 기준)</th></tr>
       ${joints.map(([a, b, c, d, e]) => `<tr><td><b>${a}</b></td><td>${b}</td><td><code>${c}</code></td><td><code>${d}</code></td><td>${e}</td></tr>`).join('')}
-      <tr><td><b>버튼</b></td><td>기록 · 재생</td><td colspan="2"><code>GPIO25</code> 기록 · <code>GPIO4</code> 재생 (INPUT_PULLUP, 누르면 LOW)</td><td>서보 전원 V+는 모두 5V(VIN), GND는 공통</td></tr>
+      <tr><td><b>버튼</b></td><td>기록 · 재생</td><td colspan="2"><code>GPIO25</code> 기록 · <code>GPIO4</code> 재생 (INPUT_PULLUP, 누르면 LOW)</td><td>서보 전원 V+는 모두 5V 핀, GND는 공통</td></tr>
     </table></div>
     <div class="callout info"><div class="ct">💡 각도의 뜻은 조립 방법에 따라 다르다</div><p>같은 <code>write(90)</code>이라도 서보 혼(날개)을 어떤 방향으로 끼웠는지에 따라 팔이 가리키는 방향이 다릅니다. 그래서 실제 로봇팔을 만들면 먼저 <b>모든 서보를 90°로 맞춘 다음 팔을 조립</b>합니다. AI에게 코드를 부탁할 때도 "각도 몇 도가 어떤 자세인지"를 알려 줘야 합니다.</p></div>
 
