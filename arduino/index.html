@@ -1997,6 +1997,7 @@ function circuitSVG(spec) {
   lines.forEach((ln, i) => {
     if (i > 0 && ln.to && ln.to.m && lines.find((l) => l.to && l.to.m === ln.to.m) === ln) row += 0.7;
     ln._row = row; row++;
+    if (ln.join) row += 0.4;                       // 갈라진 줄은 부품 이름을 아래에 쓰므로 여유를 둔다
     if (ln.to && ln.to.m) {
       const m = mods[ln.to.m];
       const mine = lines.filter((l) => l.to && l.to.m === ln.to.m);
@@ -2036,7 +2037,7 @@ function circuitSVG(spec) {
     out.push(`<rect x="${x + 12}" y="${y - 10}" width="${w}" height="20" rx="10" fill="${pw ? 'var(--danger-soft)' : 'var(--card2)'}" stroke="${pw ? 'var(--danger)' : 'var(--line)'}"/>`);
     label(x + 12 + w / 2, y + 4, t, 'middle', 11, pw ? 'var(--danger)' : fg, 700);
   };
-  const sym = (p, cx, y) => {
+  const sym = (p, cx, y, below) => {
     const t = p[0];
     if (t === 'R' || t === 'LDR') {
       wire(cx - 30, y, cx - 18, y); wire(cx + 18, y, cx + 30, y);
@@ -2056,7 +2057,7 @@ function circuitSVG(spec) {
       wire(cx - 30, y, cx - 14, y); wire(cx + 14, y, cx + 30, y);
       out.push(`<circle cx="${cx}" cy="${y}" r="14" fill="var(--card2)" stroke="${fg}" stroke-width="1.6"/>`); label(cx, y + 5, p[1], 'middle', 14, fg, 800);
     }
-    if (t !== 'MET') label(cx + (t === 'LDR' ? 10 : 0), y - (t === 'LDR' ? 33 : 22), partLabel(p), 'middle', 11, mu);
+    if (t !== 'MET') label(cx + (t === 'LDR' && !below ? 10 : 0), below ? y + (t === 'LDR' ? 36 : 26) : y - (t === 'LDR' ? 33 : 22), partLabel(p), 'middle', 11, mu);
   };
   // 보드
   const bY0 = TOP - 34, bY1 = lastY + 30;
@@ -2078,14 +2079,14 @@ function circuitSVG(spec) {
         const span = xb - xa, n = ln.parts.length;
         const s0 = xa + (span - n * PW) / 2;
         wire(xa, y, s0, y);
-        ln.parts.forEach((p, k) => sym(p, s0 + k * PW + PW / 2, y));
+        ln.parts.forEach((p, k) => sym(p, s0 + k * PW + PW / 2, y, true));
         wire(s0 + n * PW, y, xb, y); wire(xb, y, xb, py); dot(xb, py);
         return;
       }
     }
     (ln.parts || []).forEach((p, k) => {
       const x = ln._x0 + k * PW;
-      wire(x, y, x + PW / 2 - 30, y); sym(p, x + PW / 2, y); wire(x + PW / 2 + 30, y, x + PW, y);
+      wire(x, y, x + PW / 2 - 30, y); sym(p, x + PW / 2, y, !!ln.join); wire(x + PW / 2 + 30, y, x + PW, y);
     });
     if (ln.to && ln.to.m) wire(ln._x1, y, MX, y);
     else if (ln.to) terminal(ln._x1, y, ln.to);
