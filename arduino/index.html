@@ -773,10 +773,127 @@ const LESSONS = [
   { n: 12, m: 'm3', env: 'tc', req: 'debug', t: '조건문과 토글 · 디버깅 연습',
     goals: ['if문과 상태 변수로 토글을 구현할 수 있다', '디버깅 프롬프트로 원인을 찾을 수 있다'],
     concepts: ['if / else로 조건에 따라 동작 선택', '토글: 버튼을 "누르는 순간"에만 상태를 뒤집기 (이전 값과 비교)', '채터링과 디바운싱: 실제 버튼은 접점이 떨린다'],
-    mission: '버튼을 한 번 누르면 LED가 켜지고, 다시 누르면 꺼지는 토글을 만듭니다. 먼저 "누르고 있는 동안 계속 깜빡이는" 버그 코드를 받아 디버깅합니다.',
+    mission: '버튼을 한 번 누르면 LED가 켜지고, 다시 누르면 꺼지는 토글을 만듭니다. 먼저 아래 디버깅 연습 코드의 버그 ①(누르고 있는 동안 계속 깜빡임)을 Tinkercad에서 실행해 증상을 확인하고 고칩니다. 다 고치면 버그 ②~④에 도전합니다.',
     parts: '푸시버튼 1개, LED 1개, 220Ω 저항 1개', ask: '이 토글 코드를 Tinkercad에서 실행했더니 버튼을 누르고 있는 동안 LED가 계속 깜빡여. 나는 한 번 누를 때 한 번만 바뀌길 원해.\n(코드 붙여넣기)',
     ai: '디버깅 프롬프트로 정답이 아니라 원인 후보를 받고, 하나씩 확인해 직접 고칩니다.',
-    checks: ['한 번 누를 때 한 번만 바뀐다', '이전 상태와 비교하는 이유를 설명할 수 있다', '디버깅 과정을 학습 노트에 기록했다'],
+    checks: ['한 번 누를 때 한 번만 바뀐다', '이전 상태와 비교하는 이유를 설명할 수 있다', '디버깅 과정을 학습 노트에 기록했다', '버그 ②~④ 중 하나 이상을 AI 없이 고쳤다'],
+    bugs: [
+      { t: '버그 ① 누르고 있으면 계속 깜빡인다', sym: '버튼을 한 번 눌렀다 떼면 잘 바뀌는 것 같지만, 누르고 있으면 LED가 계속 켜졌다 꺼졌다 합니다. 시리얼 모니터에도 ON · OFF가 계속 찍힙니다.', hint: '<code>loop()</code>는 1초에 수천 번 돕니다. "버튼이 눌려 있다"와 "버튼이 방금 눌렸다"는 다릅니다. 지난번 <code>loop()</code>에서 읽은 값을 기억해 두면 어떨까요?', ans: '버튼이 눌려 있는 <b>상태</b>만 보고 있어서, 누르고 있는 동안 200ms마다 계속 뒤집힙니다. 이전 값(<code>before</code>)을 저장해 두고 HIGH → LOW로 <b>바뀐 순간</b>에만 뒤집습니다 (아래 정답 예시).', src:
+`// 버그 ① 버튼을 누르고 있으면 LED가 계속 깜빡인다
+const int BUTTON = 2;   // 버튼: D2와 GND 사이
+const int LED = 13;     // LED: D13 → 220Ω → GND
+bool ledOn = false;     // LED 상태 (켜짐 / 꺼짐)
+
+void setup() {
+  pinMode(BUTTON, INPUT_PULLUP);  // 안 누르면 HIGH, 누르면 LOW
+  pinMode(LED, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  if (digitalRead(BUTTON) == LOW) {  // 버튼이 눌려 있으면
+    ledOn = !ledOn;                   // 상태를 뒤집는다
+    digitalWrite(LED, ledOn);
+    Serial.println(ledOn ? "ON" : "OFF");
+    delay(200);
+  }
+}` },
+      { t: '버그 ② 이전 값과 비교하도록 고쳤는데도 계속 깜빡인다', sym: '버그 ①을 고치려고 <code>before</code>와 비교하는 코드를 넣었는데, 증상이 그대로입니다.', hint: '<code>Serial.println(before);</code>를 넣어 <code>before</code> 값을 찍어 보세요. <code>loop()</code>가 다시 시작될 때 <code>before</code>는 어떤 값일까요? 변수를 <b>어디에</b> 선언했는지 보세요.', ans: '<code>before</code>를 <code>loop()</code> 안에서 선언해서 <code>loop()</code>가 돌 때마다 HIGH로 다시 만들어집니다. 그래서 <code>before == HIGH</code>가 늘 참이 되어 버그 ①과 같아집니다. 선언을 <code>loop()</code> 밖(전역)으로 옮깁니다. AI가 고쳐 준 코드에서도 자주 나오는 실수입니다.', src:
+`// 버그 ② 이전 값과 비교하도록 고쳤는데도 계속 깜빡인다
+const int BUTTON = 2;
+const int LED = 13;
+bool ledOn = false;
+
+void setup() {
+  pinMode(BUTTON, INPUT_PULLUP);
+  pinMode(LED, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int before = HIGH;                  // 지난번에 읽은 버튼 값
+  int now = digitalRead(BUTTON);      // 지금 읽은 버튼 값
+
+  if (before == HIGH && now == LOW) { // 안 눌림 → 눌림으로 바뀐 순간
+    ledOn = !ledOn;
+    digitalWrite(LED, ledOn);
+    Serial.println(ledOn ? "ON" : "OFF");
+    delay(200);
+  }
+  before = now;                       // 다음 비교를 위해 저장
+}` },
+      { t: '버그 ③ 누를 때가 아니라 손을 뗄 때 바뀐다', sym: '한 번에 한 번씩 바뀌기는 하는데, 버튼을 누르는 순간이 아니라 손을 떼는 순간에 LED가 바뀝니다.', hint: '<code>INPUT_PULLUP</code>일 때 버튼을 누르면 HIGH일까요, LOW일까요? 조건문 옆의 주석과 실제 조건이 같은 말을 하는지 비교해 보세요.', ans: '조건이 LOW → HIGH(손을 뗀 순간)로 반대로 쓰였습니다. 주석은 "누른 순간"이라고 적혀 있어 더 헷갈립니다. <code>before == HIGH &amp;&amp; now == LOW</code>로 바꿉니다. 주석도 틀릴 수 있다는 점을 짚어 주세요.', src:
+`// 버그 ③ 누를 때가 아니라 손을 뗄 때 LED가 바뀐다
+const int BUTTON = 2;
+const int LED = 13;
+bool ledOn = false;
+int before = HIGH;                    // 지난번에 읽은 버튼 값
+
+void setup() {
+  pinMode(BUTTON, INPUT_PULLUP);
+  pinMode(LED, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int now = digitalRead(BUTTON);
+
+  if (before == LOW && now == HIGH) { // 버튼을 누른 순간
+    ledOn = !ledOn;
+    digitalWrite(LED, ledOn);
+    Serial.println(ledOn ? "ON" : "OFF");
+    delay(50);
+  }
+  before = now;
+}` },
+      { t: '버그 ④ 누르지 않아도 저절로 깜빡인다', sym: '시뮬레이션을 시작하자마자 버튼을 건드리지 않았는데도 LED가 계속 깜빡이고, 시리얼 모니터에 ON · OFF가 찍힙니다.', hint: '<code>if</code> 줄의 끝을 한 글자씩 보세요. 같은 코드를 Arduino IDE에서 ✓ 확인(컴파일)하면 경고가 하나 나옵니다.', ans: '<code>if (...)</code> 뒤의 세미콜론(<code>;</code>) 때문에 <code>if</code>는 빈 문장으로 끝나고, 중괄호 블록은 조건과 상관없이 매번 실행됩니다. 세미콜론을 지웁니다. Arduino IDE는 "suggest braces around empty body" 경고로 알려 줍니다.', src:
+`// 버그 ④ 버튼을 누르지 않아도 LED가 저절로 깜빡인다
+const int BUTTON = 2;
+const int LED = 13;
+bool ledOn = false;
+int before = HIGH;
+
+void setup() {
+  pinMode(BUTTON, INPUT_PULLUP);
+  pinMode(LED, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int now = digitalRead(BUTTON);
+
+  if (before == HIGH && now == LOW); {  // 버튼을 누른 순간
+    ledOn = !ledOn;
+    digitalWrite(LED, ledOn);
+    Serial.println(ledOn ? "ON" : "OFF");
+    delay(300);
+  }
+  before = now;
+}` }
+    ],
+    bugFix: `// 정답 예시: 한 번 누를 때 한 번만 바뀌는 토글
+const int BUTTON = 2;
+const int LED = 13;
+bool ledOn = false;
+int before = HIGH;                    // loop 밖(전역)에 두어야 값이 유지된다
+
+void setup() {
+  pinMode(BUTTON, INPUT_PULLUP);
+  pinMode(LED, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int now = digitalRead(BUTTON);
+
+  if (before == HIGH && now == LOW) { // 안 눌림(HIGH) → 눌림(LOW)으로 바뀐 순간만
+    ledOn = !ledOn;
+    digitalWrite(LED, ledOn);
+    Serial.println(ledOn ? "ON" : "OFF");
+    delay(50);                        // 실제 버튼의 떨림(채터링) 무시
+  }
+  before = now;                       // 다음 loop에서 비교할 값
+}`,
     tn: 'Tinkercad 버튼은 채터링이 거의 재현되지 않습니다. 대신 "상태 변화 감지 누락" 버그를 디버깅 소재로 쓰고, 채터링은 실제 하드웨어 이야기로 설명합니다.' },
   { n: 13, m: 'm3', env: 'tc', req: 'code', mini: 1, t: 'millis()와 미니 미션 ① 보행자 버튼 신호등',
     goals: ['<code>delay</code> 대신 <code>millis()</code>로 여러 일을 동시에 처리할 수 있다', 'AI 없이 기존 코드의 시간과 순서를 수정할 수 있다'],
@@ -2499,6 +2616,21 @@ function circuitSection(l) {
     ${circuitFigs(figs)}`;
 }
 
+/* 디버깅 연습 차시: 일부러 버그를 넣은 코드 — 증상 · 힌트, 교사용 원인과 정답 */
+function bugSection(l) {
+  if (!l.bugs) return '';
+  const no = '①②③④⑤⑥';
+  return `<h2>🐞 디버깅 연습 코드</h2>
+    <p>아래 코드에는 일부러 버그를 넣었습니다. 회로는 위 배선도(버튼 D2, LED D13) 그대로 씁니다. Tinkercad의 <b>코드</b> 창을 <b>문자</b>로 바꾸고 붙여넣어 실행한 뒤, 증상을 내 눈으로 확인하고 고칩니다. 시리얼 모니터에 찍히는 ON · OFF가 단서입니다.</p>
+    <div class="callout tip"><div class="ct">🔍 디버깅 순서</div><p>① 실행해서 증상 확인 → ② 무엇을 기대했는지 한 문장으로 쓰기 → ③ 아래 예시 프롬프트의 증상 부분을 바꿔 AI에게 <b>원인 후보</b>만 받기 → ④ 후보를 하나씩 확인하고 직접 고치기 → ⑤ 고친 줄에 이유를 주석으로 달기</p></div>
+    ${l.bugs.map((b, i) => `<h3>${b.t}</h3>
+      <p><b>증상</b> · ${b.sym}</p>
+      ${codeBlock(`버그 ${no[i]} 코드`, 'C++', b.src)}
+      <details style="margin:-6px 0 10px"><summary style="cursor:pointer;font-weight:700;font-size:13.5px;color:var(--accent2)">💡 힌트 보기</summary><p>${b.hint}</p></details>
+      <div class="callout more teacher-only"><div class="ct">🧑‍🏫 원인과 고치는 법</div><p>${b.ans}</p></div>`).join('')}
+    ${l.bugFix ? `<div class="teacher-only"><h3>🧑‍🏫 정답 예시 (교사용)</h3>${codeBlock('한 번 누를 때 한 번만 바뀌는 토글', 'C++', l.bugFix)}</div>` : ''}`;
+}
+
 /* 미니 미션 차시의 미니 미션 2, 3 … — 미션마다 회로 · 단계 · 프롬프트 · 체크리스트 */
 const moreFields = (l, x) => ({ ...l, req: x.req, ask: x.ask, parts: x.parts });
 function moreMissions(l) {
@@ -3930,6 +4062,7 @@ function pageLesson(l) {
       </div>
     </div>
 
+    ${bugSection(l)}
     ${l.extra === 'api' ? apiTable() : ''}
     ${l.code ? `<h3>참고 코드</h3>${codeBlock(CODES[l.code].title, CODES[l.code].tag, CODES[l.code].src)}` : ''}
 
