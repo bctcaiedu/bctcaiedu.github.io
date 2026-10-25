@@ -950,7 +950,15 @@ void loop() {
     parts: 'TMP36 온도 센서 1개, LED 1개, 220Ω 저항 1개, 피에조 1개', ask: 'TMP36 온도 센서를 A0에 연결했어. 온도를 섭씨로 출력하고, 30도 이상이면 LED와 피에조(8번 핀)로 경보를 울리고 싶어. 변환식의 근거도 알려줘',
     ai: '변환식을 AI에게 묻고, TMP36 데이터시트에서 같은 값을 찾아 대조합니다.',
     checks: ['시뮬레이터 온도 슬라이더와 출력값이 일치한다', '변환식 근거를 데이터시트에서 확인했다', '경보 온도를 직접 바꿔 봤다'],
-    tn: '' },
+    tn: '',
+    ds: { name: 'TMP36 데이터시트 (Analog Devices, PDF)', url: 'https://www.analog.com/media/en/technical-documentation/data-sheets/TMP35_36_37.pdf',
+      note: 'TMP35 · TMP36 · TMP37이 한 문서에 있으므로 학생이 <b>TMP36</b> 줄을 보는지 확인하세요.',
+      items: ['<b>기울기(Output Scale Factor)</b>: 10 mV/°C — 1°C 오를 때 출력이 10mV 오른다',
+        '<b>25°C일 때 출력</b>: 750 mV',
+        '<b>0°C일 때 출력</b>: 위 두 값으로 학생이 직접 계산 → 750 − 25 × 10 = 500 mV (0.5V 오프셋)',
+        '<b>변환식</b>: 온도(°C) = (전압 − 0.5) × 100 — AI가 준 식과 같은지 대조',
+        '<b>측정 범위</b>: −40 ~ +125°C'],
+      tip: 'AI는 TMP35(오프셋 없음, 25°C에서 250 mV)나 다른 센서의 식과 섞어 답하기도 합니다. 그런 답이 나오면 데이터시트로 대조하는 좋은 소재로 쓰세요.' } },
   { n: 18, m: 'm4', env: 'tc', req: 'code', t: '초음파 거리 센서와 주차 보조기',
     goals: ['초음파 센서로 거리를 계산할 수 있다', '거리에 따라 경고 간격을 바꿀 수 있다'],
     concepts: ['초음파 왕복 시간 측정 → <code>pulseIn()</code>', '거리(cm) = 시간(µs) × 0.0343 ÷ 2', '거리 구간별 동작을 조건문으로 나누기'],
@@ -4077,6 +4085,10 @@ function pageLesson(l) {
     ${moreMissions(l)}
 
     ${l.tn ? `<div class="callout more teacher-only"><div class="ct">🧑‍🏫 교사 노트</div><p>${l.tn}</p></div>` : ''}
+    ${l.ds ? `<div class="callout more teacher-only"><div class="ct">📄 데이터시트에서 찾을 값 (교사용)</div>
+      <p><a href="${l.ds.url}" target="_blank" rel="noopener">${l.ds.name}</a> — ${l.ds.note}</p>
+      <ul>${l.ds.items.map((t) => `<li>${t}</li>`).join('')}</ul>
+      <p>${l.ds.tip}</p></div>` : ''}
     <div class="callout more teacher-only"><div class="ct">⏱ 시간 배분 가이드</div>
       <p>${l.mini ? '미션 안내 5분 → 수행 40분(마지막 10분은 AI 없이) → 결과 공유 · 평가 5분' : '개념 10분 → 시연 5분 → 학생 실습 30분(5단계 사이클) → 노트 정리 5분'}</p></div>
 
