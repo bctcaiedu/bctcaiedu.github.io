@@ -2150,6 +2150,7 @@ const BB_SIG = ['#2e9c49', '#f08c00', '#2f6fd6', '#9b51e0', '#0ea5e9', '#d4a106'
 const BB_SPAN = { R: 4, LDR: 2, LED: 1, BTN: 2, PZ: 2, MET: 3 };
 const BANDS = { '220Ω': ['#d64541', '#d64541', '#8b5a2b'], '10kΩ': ['#8b5a2b', '#1d2433', '#f08c00'], '470Ω': ['#e5c210', '#7c3aed', '#8b5a2b'],
   '1kΩ': ['#8b5a2b', '#1d2433', '#d64541'], '150Ω': ['#8b5a2b', '#2e9c49', '#8b5a2b'] };
+const LED_BODY = { 빨강: ['#7f1f1f', '#9b3232'], 노랑: ['#c49a0c', '#dcb32c'], 초록: ['#1f6e33', '#2f8a46'], 파랑: ['#1f4a9e', '#3463bd'] };
 const LED_GLOW = { 빨강: ['#ff5a5a', '#b32020'], 노랑: ['#ffd23f', '#b38600'], 초록: ['#4cd964', '#1d7a33'], 파랑: ['#5aa0ff', '#1f4fb3'] };
 
 /* ---------- 보드 그림 ---------- */
@@ -2239,18 +2240,14 @@ function batPic(x, y) {
 }
 
 /* ---------- 모듈(센서 · 액추에이터) 그림: 핀은 위쪽 ---------- */
-function potPic(cx, by, k) {          // 회전형 가변저항 (위: 다리 3개 / 아래: 손잡이)
-  const r = 33 * k, cy = by + 14 * k + r, ticks = 28;
-  return `<rect x="${cx - 30 * k}" y="${by}" width="${60 * k}" height="${16 * k}" rx="${3 * k}" fill="#1b2f50"/>
-    <rect x="${cx - 24 * k}" y="${by + 3 * k}" width="${48 * k}" height="${3 * k}" rx="1" fill="#2c4772"/>
-    <circle cx="${cx}" cy="${cy}" r="${r + 3 * k}" fill="#1b2f50"/>
-    ${Array.from({ length: ticks }, (_, i) => { const a = i / ticks * Math.PI * 2; return `<rect x="${cx + Math.cos(a) * (r + 1.5 * k) - 1.6 * k}" y="${cy + Math.sin(a) * (r + 1.5 * k) - 1.6 * k}" width="${3.2 * k}" height="${3.2 * k}" rx=".6" fill="#2f4e80" transform="rotate(${i / ticks * 360} ${cx + Math.cos(a) * (r + 1.5 * k)} ${cy + Math.sin(a) * (r + 1.5 * k)})"/>`; }).join('')}
-    <circle cx="${cx}" cy="${cy}" r="${r - 4 * k}" fill="#2b4a7a"/>
-    <circle cx="${cx}" cy="${cy}" r="${r - 9 * k}" fill="#5f97dd"/>
-    <path d="M${cx - (r - 13 * k)} ${cy - 3 * k} a${r - 13 * k} ${r - 13 * k} 0 0 1 ${2 * (r - 13 * k)} 0" fill="none" stroke="#9cc4f2" stroke-width="${2.2 * k}" opacity=".7"/>
-    ${Array.from({ length: 11 }, (_, i) => { const a = (-225 + i * 27) * Math.PI / 180; return `<circle cx="${cx + Math.cos(a) * (r - 6.5 * k)}" cy="${cy + Math.sin(a) * (r - 6.5 * k)}" r="${0.9 * k}" fill="#cfe1f8"/>`; }).join('')}
-    <g transform="rotate(-40 ${cx} ${cy})"><rect x="${cx - 2.6 * k}" y="${cy - (r - 10 * k)}" width="${5.2 * k}" height="${2 * (r - 10 * k)}" rx="${2 * k}" fill="#1b2f50"/></g>
-    <circle cx="${cx}" cy="${cy}" r="${3 * k}" fill="#1b2f50"/>`;
+function potPic(cx, by, k) {          // 회전형 가변저항 (위: 다리 3개 / 아래: 다이얼)
+  const r = 34 * k, cy = by + r - 4 * k, ticks = 60;
+  return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#2d4459"/>
+    ${Array.from({ length: 8 }, (_, i) => { const a = (i / 8) * Math.PI * 2; return `<circle cx="${cx + Math.cos(a) * (r - 5 * k)}" cy="${cy + Math.sin(a) * (r - 5 * k)}" r="${1.9 * k}" fill="#5e8fb8"/>`; }).join('')}
+    <circle cx="${cx}" cy="${cy}" r="${r * 0.79}" fill="#1c2e3e"/>
+    ${Array.from({ length: ticks }, (_, i) => { const a = (i / ticks) * Math.PI * 2, c = Math.cos(a), s = Math.sin(a); return `<path d="M${cx + c * r * 0.67} ${cy + s * r * 0.67} L${cx + c * r * 0.75} ${cy + s * r * 0.75}" stroke="#8fb5d6" stroke-width="${0.6 * k}"/>`; }).join('')}
+    <circle cx="${cx}" cy="${cy}" r="${r * 0.64}" fill="#6a9ed0"/>
+    <path d="M${cx + 3 * k} ${cy - 3 * k} L${cx - r * 0.5} ${cy + r * 0.5}" stroke="#1c2e3e" stroke-width="${6.5 * k}" stroke-linecap="round"/>`;
 }
 function modKind(name) {
   const rules = [[/가변저항 4/, 'pot4'], [/서보 4/, 'servo4'], [/가변저항/, 'pot'], [/TMP36/, 'tmp'], [/초음파/, 'us'], [/PIR/, 'pir'], [/서보/, 'servo'],
@@ -2284,7 +2281,9 @@ function modPicture(kind, x, y, w, h, name) {
       ${Array.from({ length: 12 }, (_, i) => { const a = i / 12 * Math.PI * 2; return `<rect x="${cx + Math.cos(a) * 29 - 4}" y="${by + 38 + Math.sin(a) * 29 - 4}" width="8" height="8" rx="1" fill="${['#ff5a5a', '#4cd964', '#5aa0ff'][i % 3]}"/>`; }).join('')}`;
     case 'seg': return `<rect x="${x + 8}" y="${by}" width="${w - 16}" height="${h - 30}" rx="3" fill="#3a3a3a"/>
       <g fill="#ff4d4d" transform="translate(${cx - 14} ${by + 10})"><rect x="4" y="0" width="20" height="5" rx="2"/><rect x="24" y="4" width="5" height="22" rx="2"/><rect x="24" y="30" width="5" height="22" rx="2"/><rect x="4" y="52" width="20" height="5" rx="2"/><rect x="-1" y="30" width="5" height="22" rx="2" opacity=".25"/><rect x="-1" y="4" width="5" height="22" rx="2" opacity=".25"/><rect x="4" y="26" width="20" height="5" rx="2"/></g>`;
-    case 'rgb': return `<path d="M${cx - 15} ${by + 4} h30 v18 a15 15 0 0 1 -30 0 z" fill="#f8fafc" stroke="#cbd5e1"/><circle cx="${cx - 5}" cy="${by + 16}" r="3" fill="#ff5a5a" opacity=".7"/><circle cx="${cx + 4}" cy="${by + 12}" r="3" fill="#4cd964" opacity=".7"/><circle cx="${cx + 4}" cy="${by + 21}" r="3" fill="#5aa0ff" opacity=".7"/>`;
+    case 'rgb': return `<path d="M${cx - 14} ${by + 6} h28 v20 a14 14 0 0 1 -28 0 z" fill="#f7f8fa" fill-opacity=".9" stroke="#c3c7cd" stroke-width="1.2"/>
+      <ellipse cx="${cx}" cy="${by + 6}" rx="16" ry="3" fill="#fbfcfd" stroke="#c3c7cd" stroke-width="1"/>
+      <path d="M${cx - 7.5} ${by + 8} V${by + 18} M${cx - 2.5} ${by + 8} V${by + 22} h-4 M${cx + 2.5} ${by + 8} V${by + 18} M${cx + 7.5} ${by + 8} V${by + 16} l-3 4" stroke="#9a9a9a" stroke-width="1.6" fill="none" stroke-linejoin="round"/>`;
     case 'ir': return `<rect x="${cx - 16}" y="${by}" width="32" height="30" rx="3" fill="#1f1f1f"/><circle cx="${cx}" cy="${by + 15}" r="9" fill="#3b3b3b"/>`;
     case 'ic': return `<rect x="${x + 4}" y="${by}" width="${w - 8}" height="${h - 30}" rx="3" fill="#2b2b2b"/><path d="M${x + 4} ${by + 12} a6 6 0 0 0 0 12" fill="#1a1a1a"/>
       <text x="${cx}" y="${by + (h - 30) / 2 + 5}" text-anchor="middle" font-size="12" font-weight="800" fill="#e5e7eb">${esc(name.split(' ')[0])}</text>`;
@@ -2429,23 +2428,33 @@ function breadboardSVG(spec) {
         <rect x="${mid - 19}" y="${y - 10}" width="38" height="12" rx="6" fill="#e9cf9f" stroke="#b89b66"/><rect x="${mid - 15}" y="${y - 9}" width="30" height="4" rx="2" fill="#f6e3bd"/>
         ${bands.map((b, i) => `<rect x="${mid - 12 + i * 7}" y="${y - 10}" width="3.6" height="12" fill="${b}"/>`).join('')}<rect x="${mid + 10}" y="${y - 10}" width="3" height="12" fill="#c9a227"/>`);
       lab(p[1]);
-    } else if (p[0] === 'LED') {
-      const [c1c, c2c] = LED_GLOW[p[1]] || LED_GLOW['빨강'];
-      parts.push(`<path d="M${x1} ${y} V${y - 9} L${x1 + 3} ${y - 13} M${x2} ${y} V${y - 12}" stroke="#a7adb6" stroke-width="2.2" fill="none"/>
-        <path d="M${x1 - 8} ${y - 12} h${x2 - x1 + 16} v-6 a${(x2 - x1 + 16) / 2} ${(x2 - x1 + 16) / 2} 0 0 0 -${x2 - x1 + 16} 0 z" fill="${c1c}" stroke="${c2c}" stroke-width="1.2" opacity=".95"/>
-        <rect x="${x1 - 10}" y="${y - 14}" width="${x2 - x1 + 20}" height="3.5" rx="1.5" fill="${c2c}"/>
-        <ellipse cx="${mid - 3}" cy="${y - 24}" rx="2.6" ry="4" fill="#ffffff" opacity=".6"/>`);
+    } else if (p[0] === 'LED') {                    // 꺼진 LED: 둥근 머리 + 테두리, 긴 다리(+, 왼쪽)는 꺾여 있다
+      const [body, rim] = LED_BODY[p[1]] || LED_BODY['빨강'];
+      parts.push(`<path d="M${mid - 4} ${y - 12} V${y - 8} L${x1} ${y - 4} V${y} M${mid + 4} ${y - 12} L${x2} ${y - 7} V${y}" stroke="#8d8d8d" stroke-width="2.4" fill="none" stroke-linejoin="round"/>
+        <path d="M${mid - 9} ${y - 13} V${y - 27} a9 9 0 0 1 18 0 V${y - 13} z" fill="${body}"/>
+        <ellipse cx="${mid}" cy="${y - 13}" rx="10.5" ry="3.2" fill="${rim}" stroke="${body}" stroke-width="1"/>
+        <path d="M${mid - 9} ${y - 15.5} h18" stroke="${rim}" stroke-width="1" opacity=".8"/>`);
       lab(p[2] || 'LED');
-    } else if (p[0] === 'BTN') {
-      parts.push(`<rect x="${x1 - 6}" y="${y - 20}" width="${x2 - x1 + 12}" height="${x2 - x1 + 12 > 30 ? 26 : 22}" rx="2" fill="#b9bdc4" stroke="#8d939c"/><circle cx="${mid}" cy="${y - 9}" r="${Math.min(8, (x2 - x1) / 2 + 2)}" fill="#2b2b2b"/>
-        ${[x1 - 6, x2 + 6].map((lx) => `<rect x="${lx - 1.5}" y="${y - 2}" width="3" height="4" fill="#a7adb6"/>`).join('')}`);
+    } else if (p[0] === 'BTN') {                    // 택트 스위치: 회색 몸체 + 모서리 점 4개 + 검은 버튼, 다리 4개
+      const t = y - 34, l = mid - 16;
+      parts.push(`<path d="M${x1} ${y} V${y - 4} M${x2} ${y} V${y - 4} M${x1} ${t} V${t - 5} M${x2} ${t} V${t - 5}" stroke="#8d8d8d" stroke-width="2.4"/>
+        <rect x="${l}" y="${t}" width="32" height="30" rx="2" fill="#c4c4c4" stroke="#a3a3a3" stroke-width="1.2"/>
+        ${[[l + 5, t + 5], [l + 27, t + 5], [l + 5, t + 25], [l + 27, t + 25]].map(([px, py]) => `<circle cx="${px}" cy="${py}" r="3" fill="#555"/>`).join('')}
+        <circle cx="${mid}" cy="${t + 15.8}" r="9.5" fill="#575757"/><circle cx="${mid}" cy="${t + 15}" r="9" fill="#2f2f2f"/>`);
       lab(p[1]);
-    } else if (p[0] === 'LDR') {
-      parts.push(`<path d="M${x1} ${y} V${y - 10} M${x2} ${y} V${y - 10}" stroke="#a7adb6" stroke-width="2.2"/><circle cx="${mid}" cy="${y - 20}" r="12" fill="#e4a46b" stroke="#a5582a" stroke-width="2"/>
-        <path d="M${mid - 7} ${y - 25} h12 q2 0 2 2.5 t-2 2.5 h-10 q-2 0 -2 2.5 t2 2.5 h12" fill="none" stroke="#a5582a" stroke-width="1.6"/>`);
+    } else if (p[0] === 'LDR') {                    // 포토레지스터: 베이지 원판 + 주황 지그재그 무늬, 다리 2개
+      const c = y - 24;
+      const zz = `M${mid - 6} ${c - 7} h11 a2.4 2.4 0 0 1 0 4.8 h-11 a2.4 2.4 0 0 0 0 4.8 h11 a2.4 2.4 0 0 1 0 4.8 h-11`;
+      parts.push(`<path d="M${mid - 6} ${c + 10} L${x1} ${y - 6} V${y} M${mid + 6} ${c + 10} L${x2} ${y - 6} V${y}" stroke="#8d8d8d" stroke-width="2.4" fill="none" stroke-linejoin="round"/>
+        <ellipse cx="${mid}" cy="${c}" rx="14" ry="12" fill="#ecdfae" stroke="#b5602a" stroke-width="2.4"/>
+        <path d="${zz}" fill="none" stroke="#b5602a" stroke-width="3.4" stroke-linecap="round"/><path d="${zz}" fill="none" stroke="#ecdfae" stroke-width="1.1" stroke-linecap="round"/>`);
       lab('포토레지스터');
-    } else if (p[0] === 'PZ') {
-      parts.push(`<path d="M${x1} ${y} V${y - 6} M${x2} ${y} V${y - 6}" stroke="#a7adb6" stroke-width="2.2"/><circle cx="${mid}" cy="${y - 20}" r="15" fill="#1f1f1f"/><circle cx="${mid}" cy="${y - 20}" r="4" fill="#c9a227"/>`);
+    } else if (p[0] === 'PZ') {                     // 피에조 버저: 검은 원판 + 금색 가운데, + / − 표시, 다리 2개
+      const c = y - 23;
+      const mark = (mx, plus) => `<circle cx="${mx}" cy="${c + 9}" r="4.2" fill="none" stroke="#6f6f6f" stroke-width="1"/><path d="M${mx - 2.4} ${c + 9} h4.8${plus ? ` M${mx} ${c + 6.6} v4.8` : ''}" stroke="#e6e6e6" stroke-width="1.2"/>`;
+      parts.push(`<path d="M${x1} ${y} V${c + 10} M${x2} ${y} V${c + 10}" stroke="#8d8d8d" stroke-width="2.4"/>
+        <circle cx="${mid}" cy="${c}" r="18" fill="#333"/><circle cx="${mid}" cy="${c - 2}" r="5" fill="#b3a57a"/>
+        ${mark(mid - 10, true)}${mark(mid + 10, false)}`);
       lab('피에조');
     } else if (p[0] === 'MET') {
       const my = R.b;
@@ -2569,7 +2578,9 @@ function breadboardSVG(spec) {
   // 모듈 그림
   const modsSVG = modList.map((md) => {
     if (md.kind === 'unoB') return `<g>${md.pic.svg}<text x="${md.x + 16 + 170}" y="${md.y + md.h + 18}" text-anchor="middle" font-size="12" font-weight="800" fill="var(--fg)">${esc(md.m.name)}</text></g>`;
-    const legs = md.pins.map((p) => `<rect x="${p.x - 1.4}" y="${p.y}" width="2.8" height="26" fill="#a7adb6"/><rect x="${p.x - 3}" y="${p.y - 2}" width="6" height="6" rx="1" fill="#6b7280"/>`).join('');
+    const legs = md.pins.map((p, k) => md.kind === 'rgb'             // RGB LED: 다리 4개가 머리 아래로 모인다
+      ? `<path d="M${p.x} ${p.y} V${p.y + 12} L${md.x + md.w / 2 + (k - 1.5) * 5} ${p.y + 30}" stroke="#8d8d8d" stroke-width="2.4" fill="none" stroke-linejoin="round"/><rect x="${p.x - 3}" y="${p.y - 2}" width="6" height="6" rx="1" fill="#6b7280"/>`
+      : `<rect x="${p.x - 1.4}" y="${p.y}" width="2.8" height="26" fill="#a7adb6"/><rect x="${p.x - 3}" y="${p.y - 2}" width="6" height="6" rx="1" fill="#6b7280"/>`).join('');
     const pic = modPicture(md.kind, md.x, md.y, md.w, md.h, md.m.name);
     const names = md.pins.map((p, k) => {
       const t = short(p.n);
