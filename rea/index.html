@@ -1,0 +1,1420 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>실행 파일만 주세요 — REA 리버스 엔지니어링 프로젝트</title>
+<meta name="description" content="REA(Reverse Engineer Anything) 로 프로그램의 동작을 조사하고, 그 기능을 내가 만든 계산기와 그림판에 옮겨 보는 AI응용소프트웨어과 프로젝트 교안">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔎</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
+<script>try{var t=localStorage.getItem('rea-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<style>
+  :root{
+    --bg:#f4f6f9;--card:#fff;--card2:#f7f9fc;--line:#e1e6ee;--line2:#b9c2d0;--fg:#1d2433;--muted:#6b7587;
+    --accent:#4338ca;--accent-soft:#eceafd;--accent2:#0f766e;--accent2-soft:#e2f1ef;
+    --ok:#1f9d55;--ok-soft:#e3f6ec;--warn:#c98a00;--warn-soft:#fff6d9;--danger:#d64541;--danger-soft:#fdeaea;
+    --more:#7b4fd1;--more-soft:#f1ebfd;--code-bg:#f6f8fb;--code-fg:#24292f;--tk-def:#953800;
+    --term-bg:#0f1419;--term-fg:#d7dde8;
+    --shadow:0 1px 2px rgba(20,30,50,.06),0 4px 16px rgba(20,30,50,.06);--radius:10px;
+    --mono:'JetBrains Mono','D2Coding',Consolas,'Courier New',monospace;
+    --sans:'Pretendard Variable',Pretendard,-apple-system,'Segoe UI','Malgun Gothic',sans-serif;
+    color-scheme:light}
+  :root[data-theme="dark"]{
+    --bg:#0e1116;--card:#1a2029;--card2:#1f2631;--line:#2a323e;--line2:#4a5566;--fg:#e3e8f0;--muted:#8d97a8;
+    --accent:#8b9cff;--accent-soft:#1d2140;--accent2:#5ec8bb;--accent2-soft:#13302c;
+    --ok:#4cc983;--ok-soft:#132e20;--warn:#f2c14e;--warn-soft:#33290f;--danger:#ff6b61;--danger-soft:#3a1a18;
+    --more:#b695ff;--more-soft:#271d3d;--code-bg:#11161d;--code-fg:#d6deeb;--tk-def:#ffa657;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25);color-scheme:dark}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:20px}
+  html,code,kbd,pre{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15.5px;line-height:1.7;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent2)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+  .topbar{display:flex;align-items:center;gap:10px;padding:14px 0}
+  .topbar .logo{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:19px;background:linear-gradient(135deg,#4338ca,#0f766e)}
+  .topbar b{font-size:16px;letter-spacing:-.01em;display:block;line-height:1.2}
+  .topbar small{font-size:12px;color:var(--muted)}
+  .topbar .sp{flex:1}
+  .btn{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;padding:6px 12px;cursor:pointer;font:600 13.5px var(--sans);text-decoration:none}
+  .btn:hover{border-color:var(--accent)}
+
+  .hero{border-radius:16px;padding:34px 34px 30px;margin:6px 0 0;color:#fff;position:relative;overflow:hidden;
+    background:radial-gradient(circle at 85% 20%,rgba(255,255,255,.18),transparent 40%),linear-gradient(135deg,#312e81 0%,#4338ca 45%,#0f766e 100%)}
+  .hero .eyebrow{font:600 12px var(--mono);letter-spacing:.06em;opacity:.9}
+  .hero h1{margin:10px 0 8px;font-size:clamp(28px,4.4vw,38px);line-height:1.25;letter-spacing:-.02em;font-weight:800}
+  .hero p{margin:4px 0;opacity:.95;max-width:62ch;font-size:16px}
+  .hero .meta{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px;position:relative;z-index:1}
+  .hero .meta span{font-size:13px;font-weight:600;background:rgba(255,255,255,.95);color:#1d2433;border-radius:8px;padding:5px 11px}
+  .hero .cup{position:absolute;right:26px;bottom:-18px;font-size:120px;opacity:.22;pointer-events:none}
+
+  .layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:32px;margin-top:28px}
+  nav.toc{position:sticky;top:16px;align-self:start;font-size:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;box-shadow:var(--shadow)}
+  nav.toc b{display:block;font:700 11px var(--mono);letter-spacing:.1em;color:var(--muted);margin:2px 6px 8px}
+  nav.toc a{display:block;padding:7px 10px;border-radius:8px;color:var(--fg);text-decoration:none;line-height:1.35}
+  nav.toc a:hover{background:var(--card2)}
+  nav.toc a.on{background:var(--accent-soft);color:var(--accent);font-weight:700}
+  nav.toc a small{font:700 10.5px var(--mono);color:var(--accent);display:block}
+
+  main{min-width:0}
+  section{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:28px 34px 30px;margin-bottom:24px}
+  .sec{font:700 12px var(--mono);color:var(--accent);margin:0 0 4px}
+  h2{font-size:24px;line-height:1.35;margin:0 0 14px;padding-bottom:8px;border-bottom:2px solid var(--line);letter-spacing:-.01em}
+  h3{font-size:18.5px;margin:30px 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  h3::before{content:'';width:5px;height:18px;border-radius:3px;background:var(--accent)}
+  h3 .n{font:600 12px var(--mono);color:var(--accent2);background:var(--accent2-soft);border-radius:5px;padding:1px 7px}
+  h4{font-size:15px;margin:22px 0 0;color:var(--accent)}
+  .lead{font-size:16px;margin:0 0 8px}
+  p{margin:8px 0}
+  ul,ol{padding-left:24px;margin:8px 0}
+  li{margin:3px 0}
+  li::marker{color:var(--accent)}
+  :not(pre)>code{font-family:var(--mono);background:var(--card2);border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:.88em;color:var(--tk-def);word-break:break-word}
+  kbd{font-family:var(--mono);font-size:12px;border:1px solid var(--line2);border-bottom-width:2px;border-radius:4px;padding:1px 6px;background:var(--card)}
+
+  .tbl{overflow-x:auto;margin:12px 0}
+  table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px;background:var(--card);border-radius:8px;overflow:hidden;box-shadow:var(--shadow)}
+  th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+  th{background:var(--card2);font-weight:700}
+  tr.grp th{background:var(--accent-soft);color:var(--accent);font:700 13px var(--sans)}
+  tr.use td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
+  .tg{display:inline-block;font:700 11px var(--mono);border-radius:999px;padding:1px 8px;white-space:nowrap;margin-right:6px;border:1px solid}
+  .tg.b{color:var(--ok);background:var(--ok-soft);border-color:var(--ok)}
+  .tg.x{color:var(--more);background:var(--more-soft);border-color:var(--more)}
+  .tg.e{color:var(--accent2);background:var(--accent2-soft);border-color:var(--accent2)}
+
+  .code{position:relative;margin:14px 0 16px;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--code-bg);box-shadow:var(--shadow)}
+  .code .lang{display:block;padding:7px 90px 7px 14px;background:var(--card);border-bottom:1px solid var(--line);font:600 11.5px var(--mono);color:var(--accent2)}
+  pre{margin:0;padding:12px 16px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.6;color:var(--code-fg);white-space:pre;tab-size:2}
+  pre code{background:none;border:0;padding:0;color:inherit;font-size:inherit}
+  .code.term pre{background:var(--term-bg);color:var(--term-fg)}
+  .copy{position:absolute;top:4px;right:6px;font:600 12px var(--sans);background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:7px;padding:3px 9px;cursor:pointer}
+  .copy:hover{border-color:var(--accent);color:var(--accent)}
+  .code.prompt{border-left:5px solid var(--more)}
+  .code.prompt .lang{color:var(--more);background:var(--more-soft)}
+  .code.prompt pre{font-family:var(--sans);font-size:14.5px;white-space:pre-wrap;background:var(--card)}
+  details.full{margin:12px 0}
+  details.full summary{cursor:pointer;font-weight:700;padding:10px 16px;background:var(--accent2-soft);color:var(--accent2);border:1px solid var(--line);border-radius:var(--radius)}
+  details.full[open] summary{border-radius:var(--radius) var(--radius) 0 0}
+  details.full .code{margin-top:0;border-radius:0 0 var(--radius) var(--radius)}
+
+  .ok,.warn,.tip,.ask{border-radius:var(--radius);padding:12px 16px;margin:16px 0;border:1px solid var(--line);border-left-width:5px;font-size:15px}
+  .ok::before,.warn::before,.tip::before,.ask::before{display:block;font-weight:800;margin-bottom:2px}
+  .ok{border-left-color:var(--ok);background:var(--ok-soft)}
+  .ok::before{content:"✅ 확인 포인트";color:var(--ok)}
+  .warn{border-left-color:var(--danger);background:var(--danger-soft)}
+  .warn::before{content:"⚠️ 주의";color:var(--danger)}
+  .tip{border-left-color:var(--accent2);background:var(--accent2-soft)}
+  .tip::before{content:"💡 요령";color:var(--accent2)}
+  .ask{border-left-color:var(--more);background:var(--more-soft)}
+  .ask::before{content:"❓ 생각해 볼 것";color:var(--more)}
+  .ok p,.warn p,.tip p,.ask p{margin:4px 0}
+  .muted{color:var(--muted);font-size:13px}
+
+  .checks{list-style:none;padding:0}
+  .checks li{position:relative;padding:9px 12px 9px 42px;background:var(--card2);border:1px solid var(--line);border-radius:8px;margin:8px 0}
+  .checks input{position:absolute;left:14px;top:13px;width:17px;height:17px;accent-color:var(--ok)}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:16px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
+  .card .dn{font:700 12px var(--mono);color:var(--accent)}
+  .card b{display:block;font-size:16px;margin:4px 0 2px}
+  .card span{font-size:13.5px;color:var(--muted);line-height:1.55;display:block}
+
+  .toolgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:12px 0 4px}
+  .toolcard{display:flex;gap:10px;align-items:flex-start;text-align:left;font:inherit;color:var(--fg);background:var(--card);
+        border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);cursor:pointer;transition:transform .12s,border-color .12s}
+  .toolcard:hover,.toolcard:focus-visible{transform:translateY(-2px);border-color:var(--accent);outline:none}
+  .toolcard .ic{font-size:22px;line-height:1.2}
+  .toolcard b{display:block;font-size:15px}
+  .toolcard small{display:block;color:var(--muted);font-size:12.5px;line-height:1.45;margin-top:2px}
+  .toolcard .role{font:700 10.5px var(--mono);color:var(--accent2)}
+  .term{font:inherit;color:inherit;background:none;border:0;padding:0 1px;cursor:pointer;border-bottom:2px dotted var(--accent);border-radius:2px}
+  .term:hover,.term:focus-visible{background:var(--accent-soft);color:var(--accent);outline:none}
+
+  dialog.tooltip-modal{border:1px solid var(--line);border-radius:16px;padding:0;max-width:640px;width:calc(100% - 32px);
+        background:var(--card);color:var(--fg);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  dialog.tooltip-modal::backdrop{background:rgba(14,17,22,.55)}
+  .tm-head{display:flex;gap:12px;align-items:center;padding:18px 20px 14px;color:#fff;
+        background:linear-gradient(135deg,#312e81 0%,#4338ca 55%,#0f766e 100%)}
+  .tm-head .ic{font-size:30px}
+  .tm-head h4{margin:0;font-size:20px;line-height:1.3;color:#fff}
+  .tm-head p{margin:2px 0 0;font-size:13.5px;opacity:.92}
+  .tm-head .x{margin-left:auto;align-self:flex-start;background:rgba(255,255,255,.2);color:#fff;border:0;border-radius:8px;width:32px;height:32px;font-size:18px;cursor:pointer}
+  .tm-body{padding:16px 20px 20px;font-size:15px;max-height:65vh;overflow-y:auto}
+  .tm-body h5{font-size:13px;color:var(--accent);margin:14px 0 4px;font-weight:800}
+  .tm-body h5:first-child{margin-top:0}
+  .tm-body .facts{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:4px 0}
+  .tm-body .facts dt{color:var(--muted);font-weight:600}
+  .tm-body .facts dd{margin:0}
+  .tm-body .go{display:inline-block;margin-top:14px;font-weight:700;text-decoration:none;color:var(--accent2);border:1px solid var(--line);border-radius:8px;padding:6px 12px}
+
+  .mission{border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:var(--radius);background:var(--card2);padding:14px 18px;margin:16px 0}
+  .mission .mh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .mission .mn{font:700 11.5px var(--mono);color:var(--accent)}
+  .mission .mh b{font-size:16px}
+  .mission .tm{font:600 11.5px var(--mono);color:var(--muted);margin-left:auto}
+
+  figure{margin:20px 0 8px}
+  .diagram{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;overflow-x:auto}
+  .diagram svg{display:block;width:100%;min-width:620px;height:auto}
+  figcaption{font-size:13.5px;color:var(--muted);margin-top:8px}
+  svg .bx{fill:var(--card);stroke:var(--line2);stroke-width:1.25}
+  svg .bx.main{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2}
+  svg .bx.dash{fill:none;stroke-dasharray:4 4}
+  svg .pc{fill:var(--bg);stroke:var(--line2);stroke-width:1}
+  svg .ln{fill:none;stroke:var(--line2);stroke-width:1.4}
+  svg .t{fill:var(--fg);font-weight:700;font-size:13px;text-anchor:middle;font-family:var(--sans)}
+  svg .s{fill:var(--muted);font-size:11.5px;text-anchor:middle;font-family:var(--sans)}
+  svg .h{fill:var(--accent2);font-weight:700;font-size:13px;font-family:var(--sans)}
+  svg .ah{fill:var(--line2)}
+
+  footer{padding:20px 0 50px;font-size:13px;color:var(--muted)}
+  footer a{color:var(--muted)}
+
+  @media (max-width:900px){.layout{grid-template-columns:1fr;gap:0} nav.toc{display:none}}
+  @media (max-width:760px){.wrap{padding:0 16px} section{padding:22px 18px} .hero{padding:26px 22px} .hero .cup{font-size:80px}}
+  @media print{nav.toc,.copy,.topbar .btn{display:none} .layout{display:block} section{box-shadow:none} pre{white-space:pre-wrap}}
+</style>
+
+<header class="wrap">
+  <div class="topbar">
+    <div class="logo">🔎</div>
+    <div><b>실행 파일만 주세요</b><small>AI응용소프트웨어과 · REA 리버스 엔지니어링 프로젝트</small></div>
+    <span class="sp"></span>
+    <a class="btn" href="/" title="강의실 홈으로">🏠 강의실 홈</a>
+    <button class="btn" id="theme" type="button">🌙 다크</button>
+  </div>
+  <div class="hero">
+    <div class="eyebrow">한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과</div>
+    <h1>실행 파일만 주세요,<br>소스 코드는 제가 만들어 드립니다</h1>
+    <p>소스가 없는 프로그램에서 <b>읽을 수 있는 코드</b>를 꺼내는 일, 그것이 리버스 엔지니어링입니다. 계산기와 그림판을 직접 만들고, 그 실행 파일을 다시 뜯어 소스로 되돌려 봅니다. 그다음 실제로 쓰이는 프로그램의 기능 하나를 조사해 근거를 모으고, 그 기능을 내 앱에 옮깁니다. 분석은 전부 내 컴퓨터에서 돌고, 도구는 무료입니다.</p>
+    <div class="meta"><span>6차시 · 차시당 3시간</span><span>개인 또는 2인</span><span>비용 0원</span><span>Node.js + 에이전트</span><span>결과물 2개 + 조사 보고서</span></div>
+    <div class="cup">🔎</div>
+  </div>
+</header>
+
+<div class="wrap layout">
+  <nav class="toc" aria-label="목차">
+    <b>CONTENTS</b>
+    <a href="#overview"><small>OVERVIEW</small>과정 개요</a>
+    <a href="#whatis"><small>BASICS</small>리버스 엔지니어링이란</a>
+    <a href="#rules"><small>RULES</small>지켜야 할 선</a>
+    <a href="#tools"><small>TOOLS</small>도구 사전</a>
+    <a href="#targets"><small>TARGETS</small>분석할 수 있는 대상</a>
+    <a href="#ghidra"><small>GHIDRA</small>Ghidra 알아보기</a>
+    <a href="#setup"><small>SETUP</small>설치와 설정</a>
+    <a href="#step1"><small>STEP 1</small>계산기 만들기</a>
+    <a href="#step2"><small>STEP 2</small>내 앱 뜯어보기</a>
+    <a href="#step3"><small>STEP 3</small>그림판 만들기</a>
+    <a href="#step4"><small>STEP 4</small>남의 앱 조사하기</a>
+    <a href="#step5"><small>STEP 5</small>기능 옮겨 담기</a>
+    <a href="#step6"><small>STEP 6</small>보고서와 발표</a>
+    <a href="#rubric"><small>RUBRIC</small>평가 기준</a>
+    <a href="#faq"><small>FAQ</small>자주 막히는 곳</a>
+  </nav>
+
+  <main>
+    <!-- ───────── 개요 ───────── -->
+    <section id="overview">
+      <div class="sec">Overview</div>
+      <h2>과정 개요</h2>
+      <p class="lead">이 과정의 한 줄 목표는 <b>"좋아 보이는 기능을 보고, 그게 어떻게 되는지 알아낸 다음, 내 프로그램에 넣는 것"</b> 입니다.</p>
+
+      <div class="cards">
+        <div class="card"><div class="dn">WHO</div><b>프로그래밍 기초를 뗀 수강생</b><span>HTML 과 자바스크립트를 조금 다룰 줄 알면 됩니다. 어셈블리를 몰라도 시작할 수 있습니다.</span></div>
+        <div class="card"><div class="dn">GOAL</div><b>근거를 갖고 말하기</b><span>그럴 것 같다가 아니라, 어느 파일 어느 줄에서 확인했다고 말할 수 있게 됩니다.</span></div>
+        <div class="card"><div class="dn">RESULT</div><b>계산기 · 그림판 · 조사 보고서</b><span>내가 만든 앱 두 개와, 남의 앱 기능 하나를 분석해 옮긴 기록이 남습니다.</span></div>
+      </div>
+
+      <h3>왜 먼저 만들고 나서 뜯어보나</h3>
+      <p>리버스 엔지니어링을 처음 배울 때 가장 어려운 것은 도구가 아니라 <b>결과를 읽는 일</b>입니다. 모르는 프로그램을 처음부터 뜯으면 무엇이 정상이고 무엇이 특이한지 판단할 수가 없습니다.</p>
+      <p>그래서 이 과정은 순서를 뒤집었습니다. 먼저 계산기를 직접 만들고, <b>내가 짠 코드를 REA 로 분석해 봅니다.</b> 정답을 이미 알고 있으니 분석 결과가 무엇을 말하는지 바로 비교됩니다. 그 감각이 생긴 뒤에 남의 앱으로 넘어갑니다.</p>
+
+      <figure>
+        <div class="diagram">
+          <svg viewBox="0 0 760 300" role="img" aria-label="에이전트가 REA 에 질문하면 REA 가 로컬 대상을 검사해 근거를 돌려주고, 학생은 그 근거로 자기 앱에 기능을 구현합니다">
+            <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path class="ah" d="M0 0L10 5L0 10z"/></marker></defs>
+            <rect class="pc" x="24" y="86" width="712" height="190" rx="8"/>
+            <text class="h" x="40" y="110">내 컴퓨터 · 분석은 전부 로컬에서</text>
+            <rect class="bx" x="40" y="22" width="200" height="50" rx="8"/><text class="t" x="140" y="43">나 (질문하는 사람)</text><text class="s" x="140" y="61">이 기능 어떻게 돌아가지?</text>
+            <path class="ln" d="M240 47H330" marker-end="url(#ah)"/>
+            <rect class="bx main" x="330" y="124" width="190" height="56" rx="8"/><text class="t" x="425" y="148">REA (MCP 도구)</text><text class="s" x="425" y="166">검사 · 추적 · 근거 수집</text>
+            <rect class="bx" x="330" y="22" width="190" height="50" rx="8"/><text class="t" x="425" y="43">AI 에이전트</text><text class="s" x="425" y="61">Claude Code · Codex 등</text>
+            <path class="ln" d="M425 72V120" marker-end="url(#ah)"/>
+            <rect class="bx" x="560" y="124" width="176" height="56" rx="8"/><text class="t" x="648" y="148">분석 대상</text><text class="s" x="648" y="166">내 앱 · 오픈소스 앱</text>
+            <path class="ln" d="M520 140H556" marker-end="url(#ah)"/>
+            <path class="ln" d="M556 166H524" marker-end="url(#ah)"/>
+            <rect class="bx" x="40" y="124" width="200" height="56" rx="8"/><text class="t" x="140" y="148">Ghidra · Hopper</text><text class="s" x="140" y="166">네이티브 분석용 (선택)</text>
+            <path class="ln" d="M330 152H246" marker-end="url(#ah)"/>
+            <rect class="bx dash" x="330" y="212" width="190" height="48" rx="8"/><text class="t" x="425" y="234">근거 (Evidence)</text><text class="s" x="425" y="251">파일 · 위치 · 확인 안 된 것</text>
+            <path class="ln" d="M425 180V208" marker-end="url(#ah)"/>
+            <rect class="bx" x="560" y="212" width="176" height="48" rx="8"/><text class="t" x="648" y="234">내 앱에 구현</text><text class="s" x="648" y="251">계산기 · 그림판</text>
+            <path class="ln" d="M520 236H556" marker-end="url(#ah)"/>
+          </svg>
+        </div>
+        <figcaption>REA 는 에이전트가 쓰는 분석 도구 모음입니다. 질문을 받으면 대상을 검사해 <b>근거와 한계</b>를 함께 돌려주고, 사람은 그 근거를 보고 구현합니다.</figcaption>
+      </figure>
+
+      <h3>6차시 일정</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>차시</th><th>하는 일</th><th>그날의 결과물</th></tr></thead>
+          <tbody>
+            <tr><td><b>1</b></td><td>REA 설치·설정, 계산기 만들기</td><td>동작하는 계산기 + REA 설치 확인</td></tr>
+            <tr><td><b>2</b></td><td>내가 만든 계산기를 REA 로 분석</td><td>첫 분석 결과와 읽는 법 정리</td></tr>
+            <tr><td><b>3</b></td><td>그림판 만들기</td><td>동작하는 그림판</td></tr>
+            <tr><td><b>4</b></td><td>남의 앱(오픈소스) 기능 하나 조사</td><td>근거를 붙인 조사 메모</td></tr>
+            <tr><td><b>5</b></td><td>조사한 기능을 내 앱에 옮기기</td><td>기능이 추가된 계산기 또는 그림판</td></tr>
+            <tr><td><b>6</b></td><td>보고서 정리와 발표</td><td>조사 보고서 + 5분 시연</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted">시간이 모자라면 3차시(그림판)를 과제로 돌리고 4~5차시에 집중하세요. 이 과정의 핵심은 조사와 이식입니다.</p>
+    </section>
+
+    <!-- ───────── 리버스 엔지니어링 ───────── -->
+    <section id="whatis">
+      <div class="sec">Basics</div>
+      <h2>리버스 엔지니어링이란</h2>
+      <p class="lead">완성된 물건을 가지고 <b>어떻게 만들어졌는지, 어떻게 동작하는지를 되짚어 알아내는 일</b>입니다. 소프트웨어만의 이야기가 아닙니다. 시계를 뜯어 톱니바퀴 배치를 알아내는 것도, 맛본 음식에서 재료와 조리 순서를 추정하는 것도 같은 일입니다.</p>
+
+      <h3>왜 되짚기가 어려운가 — 만들 때 정보가 사라지기 때문</h3>
+      <p>프로그램은 사람이 읽는 소스 코드에서 기계가 읽는 실행 파일로 바뀝니다. 이 과정에서 <b>사람을 위한 정보가 대부분 버려집니다.</b></p>
+      <div class="code"><span class="lang">만들어지는 방향 (정보가 줄어든다)</span><pre><code>소스 코드          컴파일 · 최적화          실행 파일
+─────────          ─────────────          ─────────
+변수 이름 totalPrice   →   레지스터 RAX, 스택 +0x18
+주석 "할인 적용"       →   (사라짐)
+타입 struct Order     →   그냥 24바이트 덩어리
+함수 calcDiscount()   →   주소 0x401a30 (이름 없을 수도)
+반복문 for            →   조건 분기와 점프의 조합
+</code></pre></div>
+      <p>그래서 되짚기는 <b>복원이 아니라 추론</b>입니다. 같은 기계어를 보고도 사람마다 다르게 설명할 수 있고, 그래서 <button type="button" class="term" data-term="evidence">근거</button>를 붙여 말하는 훈련이 필요합니다. 이 과정이 처음부터 끝까지 근거를 강조하는 이유입니다.</p>
+
+      <h3>난이도 사다리 — 어디서 시작할 것인가</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>단계</th><th>대상</th><th>왜 이 난이도인가</th><th>우리 과정</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>웹 · 자바스크립트</td><td>소스가 거의 그대로 들어 있음. 압축·난독화되어도 구조가 남음</td><td><b>여기서 시작</b></td></tr>
+            <tr><td>2</td><td>바이트코드 (.NET · 자바 · 안드로이드)</td><td>중간 언어라 이름과 구조가 많이 남아 디컴파일이 잘 됨</td><td>맛보기</td></tr>
+            <tr><td>3</td><td>네이티브 바이너리 (C · C++ · Rust · Go)</td><td>기계어까지 내려감. 이름과 타입이 사라져 추론이 필요</td><td>가산점</td></tr>
+            <tr><td>4</td><td>난독화 · 패킹 · 안티디버깅</td><td>일부러 분석을 방해하도록 만든 것. 먼저 푸는 단계가 필요</td><td>다루지 않음</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tip"><p>처음 배우는 사람이 네이티브부터 덤비면 거의 포기합니다. 우리 과정이 계산기와 그림판 같은 <b>자바스크립트</b>에서 출발하는 것은 쉬워서가 아니라, 같은 사고방식을 정답을 아는 상태에서 익히기 위해서입니다.</p></div>
+
+      <h3>두 가지 방법 — 정적 분석과 동적 분석</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>구분</th><th>정적 분석</th><th>동적 분석</th></tr></thead>
+          <tbody>
+            <tr><td>무엇을 하나</td><td>실행하지 않고 파일을 읽는다</td><td>실제로 돌려 놓고 관찰한다</td></tr>
+            <tr><td>보는 것</td><td>구조, 문자열, 함수, 호출 관계, 의사 코드</td><td>실제 값, 메모리, 오가는 요청, 실행 순서</td></tr>
+            <tr><td>장점</td><td>안전하고 반복 가능. 전체 지도를 그리기 좋음</td><td>진짜 동작을 본다. 조건이 복잡해도 결과가 보임</td></tr>
+            <tr><td>단점</td><td>실행 시점에만 정해지는 값은 알 수 없음</td><td>실행하는 행위 자체가 위험할 수 있음. 환경 영향</td></tr>
+            <tr><td>이 과정에서</td><td>REA 의 정적 자바스크립트 분석</td><td>REA 의 브라우저 관찰, 개발자 도구</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="warn"><p>동적 분석은 <b>대상을 실제로 실행</b>합니다. 출처가 불분명한 프로그램을 내 PC 에서 그냥 돌리는 것은 위험합니다. 실무에서는 격리된 가상머신에서 하고, 수업에서는 우리가 만든 앱과 강사가 지정한 대상만 다룹니다.</p></div>
+
+      <h3>조사는 이 순서로 돌아간다</h3>
+      <div class="cards">
+        <div class="card"><div class="dn">1. 정찰</div><b>지도를 그린다</b><span>파일 구조, 큰 덩어리, 눈에 띄는 문자열과 이름을 훑습니다. 여기서 답을 찾으려 하지 않습니다.</span></div>
+        <div class="card"><div class="dn">2. 가설</div><b>질문을 좁힌다</b><span>"되돌리기는 화면을 통째로 저장할 것이다" 처럼 확인 가능한 문장으로 적습니다.</span></div>
+        <div class="card"><div class="dn">3. 확인</div><b>근거를 찾는다</b><span>그 문장을 뒷받침하거나 깨뜨리는 자리를 찾습니다. 못 찾으면 가설을 버립니다.</span></div>
+        <div class="card"><div class="dn">4. 기록</div><b>남긴다</b><span>주장·근거·확신 정도를 적습니다. 기록하지 않은 조사는 다음 주면 사라집니다.</span></div>
+      </div>
+      <div class="ask"><p>초보자가 가장 많이 하는 실수는 2번을 건너뛰는 것입니다. 질문 없이 도구만 돌리면 출력은 산더미인데 알아낸 것은 없습니다. <b>오늘 알아낼 것 한 가지</b>를 먼저 쓰고 시작하세요.</p></div>
+
+      <h3>어디에 쓰이나</h3>
+      <ul>
+        <li><b>보안 점검</b> — 우리 제품에 어떤 약점이 있는지 공격자의 눈으로 먼저 봅니다.</li>
+        <li><b>악성코드 분석</b> — 감염된 파일이 무엇을 하는지 밝혀 대응합니다.</li>
+        <li><b>상호운용</b> — 문서 없는 파일 형식이나 통신 규약을 알아내 우리 시스템과 연결합니다.</li>
+        <li><b>레거시 유지보수</b> — 소스가 사라진 오래된 시스템을 고쳐 써야 할 때.</li>
+        <li><b>장애 원인 규명</b> — 소스가 없는 라이브러리에서 터진 문제를 추적합니다.</li>
+        <li><b>소프트웨어 보존</b> — 더 이상 동작하지 않는 옛 프로그램을 되살립니다.</li>
+      </ul>
+      <p>공통점이 보이시나요. 모두 <b>소스가 없는 대상을 근거를 갖고 설명해야 하는 상황</b>입니다. 그래서 이 기술은 "남의 것을 베끼는 기술"이 아니라 "설명할 수 없는 것을 설명 가능하게 만드는 기술"에 가깝습니다.</p>
+
+      <h3>알아 두면 좋은 용어</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>용어</th><th>뜻</th></tr></thead>
+          <tbody>
+            <tr><td>디스어셈블리</td><td>기계어를 어셈블리 명령으로 바꿔 보여 주는 것. 1:1 대응이라 정확하지만 읽기 어렵습니다</td></tr>
+            <tr><td>디컴파일 · 의사 코드</td><td>그보다 한 단계 올려 C 비슷한 형태로 보여 주는 것. 읽기 쉽지만 <b>원본과 다를 수 있습니다</b></td></tr>
+            <tr><td>심볼</td><td>함수와 변수의 이름 정보. 남아 있으면 분석이 훨씬 쉽습니다</td></tr>
+            <tr><td>스트립</td><td>배포할 때 심볼을 지우는 것. 지워진 바이너리는 함수가 <code>FUN_00401a30</code> 처럼 주소로만 보입니다</td></tr>
+            <tr><td>엔트리 포인트</td><td>프로그램이 시작되는 자리. 분석의 출발점으로 자주 씁니다</td></tr>
+            <tr><td>xref (상호 참조)</td><td>"이 함수를 누가 부르는가", "이 문자열을 어디서 쓰는가". 길을 찾는 가장 강력한 단서입니다</td></tr>
+            <tr><td>패킹 · 난독화</td><td>분석을 어렵게 하려고 압축하거나 일부러 꼬아 놓은 것</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tip"><p><b>리눅스 과정과 이어집니다.</b> 프로세스와 메모리, 파일과 권한, 표준 입출력을 배운 것이 여기서 그대로 쓰입니다. 실행 파일이 어떻게 메모리에 올라가는지 알아야 분석 결과가 읽히고, 권한을 알아야 안전하게 실행해 볼 수 있습니다.</p></div>
+    </section>
+
+    <!-- ───────── 규칙 ───────── -->
+    <section id="rules">
+      <div class="sec">Rules</div>
+      <h2>지켜야 할 선</h2>
+      <p class="lead">리버스 엔지니어링은 기술이기 전에 <b>권한의 문제</b>입니다. 수업에서는 아래 세 가지만 분석합니다. 이 선을 넘지 않는 것이 이 과정의 첫 번째 평가 항목입니다.</p>
+
+      <div class="cards">
+        <div class="card"><div class="dn">허용 1</div><b>내가 만든 것</b><span>이번 과정에서 직접 만든 계산기와 그림판, 내가 빌드한 실행 파일.</span></div>
+        <div class="card"><div class="dn">허용 2</div><b>소스가 공개된 것</b><span>오픈소스 라이선스로 공개된 프로그램. 소스와 분석 결과를 맞춰 볼 수 있어 공부에 가장 좋습니다.</span></div>
+        <div class="card"><div class="dn">허용 3</div><b>허가받은 것</b><span>분석해도 된다고 권한을 가진 쪽이 밝힌 대상. 수업에서는 강사가 지정한 샘플입니다.</span></div>
+      </div>
+
+      <div class="warn">
+        <p><b>수업에서 하지 않는 것</b></p>
+        <ul>
+          <li>상용 프로그램·게임의 보호 장치나 라이선스 검사 우회, 크랙, 시리얼 생성</li>
+          <li>유료 기능 잠금 해제, 광고 제거처럼 <b>권리자의 수익 구조를 건드리는 변경</b></li>
+          <li>남의 서버·계정·네트워크를 대상으로 한 분석이나 트래픽 가로채기</li>
+          <li>분석 결과로 얻은 코드를 출처 없이 그대로 복사해 제출하기</li>
+        </ul>
+      </div>
+
+      <div class="tip">
+        <p>법적으로도 결이 다릅니다. 우리나라 저작권법은 <b>호환성 확보를 위한 프로그램코드역분석</b>을 제한된 범위에서 허용하지만, 이용 허락 범위를 벗어난 분석이나 배포는 다른 문제입니다. 상용 소프트웨어의 사용 약관이 역분석을 금지하는 경우도 많습니다.</p>
+        <p>REA 프로젝트 역시 "법을 준수하는 연구, 교육, 상호운용성, 소프트웨어 보존, 그리고 본인이 소유하거나 조사 권한을 가진 소프트웨어"를 위한 도구라고 밝히고 있습니다. 수업에서도 같은 기준을 씁니다.</p>
+      </div>
+
+      <div class="ask"><p>왜 이 선을 먼저 배울까요? 같은 기술이 보안 점검과 침해 행위 양쪽에 쓰이기 때문입니다. 무엇을 할 수 있느냐보다 <b>무엇을 해도 되는지 판단하는 힘</b>이 실무에서 더 중요합니다.</p></div>
+    </section>
+
+    <!-- ───────── 도구 사전 ───────── -->
+    <section id="tools">
+      <div class="sec">Tools</div>
+      <h2>도구 사전</h2>
+      <p class="lead">카드를 누르면 그 도구가 무엇이고 이 과정에서 어떤 역할을 하는지 설명이 열립니다. 본문에서 <button type="button" class="term" data-term="rea">밑줄 친 이름</button>을 눌러도 같은 설명이 나옵니다.</p>
+      <div class="toolgrid" id="toolgrid"></div>
+      <div class="tip"><p>직접 설치하는 것은 <b>Node.js 와 에이전트, 그리고 REA</b> 셋뿐입니다. Ghidra 같은 네이티브 분석 도구는 이번 과정의 필수가 아닙니다. 우리가 다룰 대상이 웹과 자바스크립트이기 때문입니다.</p></div>
+    </section>
+
+    <!-- ───────── 분석 대상 ───────── -->
+    <section id="targets">
+      <div class="sec">Targets</div>
+      <h2>분석할 수 있는 대상</h2>
+      <p class="lead">REA 는 한 가지 형식만 보는 도구가 아닙니다. 공식 문서는 <b>33가지 대상</b>을 표로 정리해 두었습니다. 대상마다 <b>REA 가 돌려주는 것</b>과 <b>그러려면 무엇이 깔려 있어야 하는지</b>가 다릅니다. 조사할 프로그램을 만나면 먼저 이 표에서 <b>어느 줄에 해당하는지</b>를 찾는 것이 분석의 출발점입니다.</p>
+
+      <div class="cards">
+        <div class="card"><div class="dn">공통 조건</div><b>Node.js 와 npm</b><span>어떤 대상이든 공통입니다. 22.19 이상의 22.x, 24.11 이상의 24.x, 또는 26 이상.</span></div>
+        <div class="card"><div class="dn">배지 ①</div><b><span class="tg b">내장</span></b><span>REA 안에 분석기가 들어 있어 추가 설치 없이 바로 됩니다.</span></div>
+        <div class="card"><div class="dn">배지 ②</div><b><span class="tg x">도구 필요</span></b><span>외부 프로그램을 직접 설치하고 경로를 알려 줘야 합니다.</span></div>
+        <div class="card"><div class="dn">배지 ③</div><b><span class="tg e">환경 조건</span></b><span>운영체제나 런타임 버전 같은 조건이 맞아야 합니다.</span></div>
+      </div>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th style="width:21%">대상</th><th style="width:40%">REA 가 돌려주는 것</th><th>필요한 것</th></tr></thead>
+          <tbody>
+            <tr class="grp"><th colspan="3">① 앱과 웹 — 이번 과정에서 다루는 범위</th></tr>
+            <tr class="use"><td><b>설치된 데스크톱 앱</b></td><td>실행 파일 후보, 함께 깔린 파일, 어떤 기술로 만들었는지 알려 주는 흔적, 다음에 볼 곳</td><td><span class="tg b">내장</span>디렉터리와 파일 헤더를 범위를 정해 훑습니다</td></tr>
+            <tr class="use"><td><b>자바스크립트 · 일렉트론 앱</b></td><td>모듈과 import 관계, 소스맵, 라우트, IPC 통신, 네이티브 애드온 연결</td><td><span class="tg b">내장</span>Node.js 와 npm. 리눅스에서는 <code>ps</code> 명령</td></tr>
+            <tr class="use"><td><b>웹사이트</b></td><td>페이지 구조, 불러오는 스크립트, 네트워크 관찰 기록, 요청한 화면 캡처</td><td><span class="tg x">도구 필요</span>Chrome 계열 브라우저</td></tr>
+            <tr class="use"><td><b>패키지와 리소스 묶음</b></td><td>파일 목록과 해시, plist, 애플 번들 구조, 추출한 리소스</td><td><span class="tg b">내장</span>압축·번들 구조를 그대로 읽습니다</td></tr>
+            <tr class="use"><td><b>프로그램을 실제로 돌려본 기록</b></td><td>터미널 출력, 주고받은 입력, 종료 상태, 파일 접근 관찰, 두 번 실행한 결과 비교</td><td><span class="tg e">환경 조건</span>리눅스 · macOS 의 네이티브 PTY</td></tr>
+            <tr class="grp"><th colspan="3">② 네이티브 실행 파일 — 컴파일된 프로그램</th></tr>
+            <tr><td><b>네이티브 바이너리</b></td><td>의사 코드, 어셈블리, 문자열, 심볼, 호출 관계와 상호 참조</td><td><span class="tg x">도구 필요</span>Ghidra · Hopper · IDA 중 하나</td></tr>
+            <tr><td><b>ELF 구조 (오프라인)</b></td><td>섹션과 세그먼트, 원본 심볼과 재배치 정보, 보호 기법 적용 여부</td><td><span class="tg x">도구 필요</span>리눅스 x64 + pwntools</td></tr>
+            <tr><td><b>Go 로 만든 프로그램</b></td><td>빌드에 쓴 Go 버전, 모듈 목록, 교체(replace) 내역, 빌드 설정</td><td><span class="tg b">내장</span>Go 를 설치하지 않아도 됩니다</td></tr>
+            <tr><td><b>Rust 로 만든 프로그램</b></td><td>cargo-auditable 로 박혀 있는 크레이트 이름·버전·출처와 의존 관계</td><td><span class="tg b">내장</span>정적 분석만으로 읽습니다</td></tr>
+            <tr><td><b>PyInstaller 로 묶은 실행 파일</b></td><td>내부 파일 목록, 파이썬 버전, 시작 스크립트, 추출한 바이트코드</td><td><span class="tg b">내장</span>정적 분석만</td></tr>
+            <tr><td><b>.NET 어셈블리</b></td><td>메타데이터, CIL 명령, 선언된 네이티브 의존성, 빌드 간 비교</td><td><span class="tg b">내장</span>정적 분석만</td></tr>
+            <tr><td><b>Erlang BEAM</b></td><td>IFF 청크, 아톰, export·import, 람다, 코드 헤더</td><td><span class="tg b">내장</span>정적 분석만</td></tr>
+            <tr><td><b>WebAssembly (WASM)</b></td><td>검증 결과, 섹션, import·export 의 정확한 WAT 형태, 디코딩한 WAT</td><td><span class="tg x">도구 필요</span>WABT 1.0.42</td></tr>
+            <tr><td><b>PE 서명 (윈도우 실행 파일)</b></td><td>Authenticode 인증서 항목, PKCS#7 서명자와 X.509 신원 정보</td><td><span class="tg b">내장</span>정적 분석만</td></tr>
+            <tr><td><b>ELF 노트</b></td><td>PT_NOTE · SHT_NOTE 의 소유자와 종류, GNU build-id, ABI 태그</td><td><span class="tg b">내장</span>정적 분석만</td></tr>
+            <tr class="grp"><th colspan="3">③ 모바일과 게임 엔진</th></tr>
+            <tr><td><b>안드로이드 APK</b></td><td>매니페스트 선언, 클래스, 디컴파일한 메서드, 참조 관계</td><td><span class="tg x">도구 필요</span>헤드리스 JADX 와 전체 JDK (x64)</td></tr>
+            <tr><td><b>APK 서명</b></td><td>v1/v2/v3/v3.1 서명자, 인증서 지문, 키 교체 이력, 다이제스트 일관성</td><td><span class="tg b">내장</span>정적 분석만</td></tr>
+            <tr><td><b>안드로이드 기기</b></td><td>기기·패키지·프로세스 목록, 로그, 덤프, 화면 캡처, APK 와 파일 전송</td><td><span class="tg x">도구 필요</span>adb (에뮬레이터 또는 실기기)</td></tr>
+            <tr><td><b>안드로이드 리소스</b></td><td>디코딩한 매니페스트, 문자열 테이블, 언어별 리소스, 버전 정보</td><td><span class="tg x">도구 필요</span>Apktool</td></tr>
+            <tr><td><b>Flutter 앱</b></td><td>Dart 스냅샷 해시, ABI 별 라이브러리 지문, 엔진 빌드 출처</td><td><span class="tg b">내장</span>APK 를 그대로 읽습니다</td></tr>
+            <tr><td><b>JEB 프로젝트</b></td><td>JEB 엔진이 분석한 단위, 아티팩트 해시, 타입·메서드 의사 코드</td><td><span class="tg x">도구 필요</span>상용 JEB 클라이언트 (MCP 연결)</td></tr>
+            <tr><td><b>Unity IL2CPP 메타데이터</b></td><td>global-metadata.dat 의 어셈블리 이미지, 타입·메서드 이름, 인덱스 범위</td><td><span class="tg b">내장</span>Unity 없이 버전 24·27·29·31·39 해독</td></tr>
+            <tr><td><b>Godot PCK</b></td><td>아카이브 목록과 추출, 원본 헤더·디렉터리 정보, 내용 식별값</td><td><span class="tg b">내장</span>Godot 없이 포맷 2·3·4 지원</td></tr>
+            <tr class="grp"><th colspan="3">④ 데이터 · 기록 · 하드웨어</th></tr>
+            <tr><td><b>SQLite 데이터베이스</b></td><td>테이블, 컬럼, 인덱스, 뷰, 트리거, 선택한 테이블의 행</td><td><span class="tg e">환경 조건</span>Node.js 24.15 이상 또는 26 이상</td></tr>
+            <tr><td><b>저장된 네트워크 캡처</b></td><td>요청과 응답, 노출된 데이터, 그 값이 나온 위치</td><td><span class="tg x">도구 필요</span>HAR 또는 Fiddler SAZ 파일, 리눅스에서는 mitmdump</td></tr>
+            <tr><td><b>패킷 기록 (상세)</b></td><td>선택한 필드, 반복되는 값, 필터, decode-as 규칙</td><td><span class="tg x">도구 필요</span>리눅스 + TShark 4.x</td></tr>
+            <tr><td><b>패킷 기록 (요약)</b></td><td>통신 상대, DNS, TLS SNI, 프로토콜 분포, HTTP 요청</td><td><span class="tg x">도구 필요</span>tshark 와 capinfos</td></tr>
+            <tr><td><b>리눅스 크래시 덤프</b></td><td>원본 노트, 기록된 모든 스레드의 레지스터와 시그널, 메모리 매핑 후보</td><td><span class="tg x">도구 필요</span>리눅스 x64 + pwntools, 선택적으로 GDB · pwndbg</td></tr>
+            <tr><td><b>로직 애널라이저 신호 기록</b></td><td>디코더가 해석한 주석, 샘플 구간, 진단 정보</td><td><span class="tg x">도구 필요</span>리눅스 + sigrok-cli 0.7.2</td></tr>
+            <tr><td><b>펌웨어 이미지</b></td><td>영역 구분, 추출 결과, 네이티브 분석으로 넘기는 연결 고리</td><td><span class="tg x">도구 필요</span>리눅스 + Binwalk 또는 Unblob</td></tr>
+            <tr><td><b>GPU 코드 오브젝트</b></td><td>CUDA · HIP 대상, 커널 파라미터와 자원, 남아 있는 PTX 텍스트</td><td><span class="tg b">내장</span>ELF · PE · fatbin · CUBIN · PTX 정적 분석</td></tr>
+            <tr><td><b>AI 모델 파일</b></td><td>GGUF · safetensors 메타데이터, 텐서 선언, 계산한 합계</td><td><span class="tg b">내장</span>헤더만 읽습니다. 전체 해시는 선택</td></tr>
+            <tr><td><b>EVM 바이트코드</b></td><td>함수 선택자(dispatch), 바이트 오프셋, 추론한 인자와 변경 가능성</td><td><span class="tg b">내장</span>로컬 파일 기준, 리눅스 x64</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted">출처: REA 공식 저장소 README 의 “What you can analyze” 표 (MIT 라이선스). 항목과 조건은 버전이 올라가면 바뀔 수 있습니다.</p>
+
+      <div class="ok">
+        <p><b>왼쪽에 파란 줄이 그어진 ① 묶음이 이번 과정의 범위입니다.</b> 우리가 만들 계산기와 그림판은 웹 기술로 만들고, 조사할 대상도 웹사이트와 자바스크립트 앱으로 고릅니다. 그래서 추가로 설치할 분석 도구가 사실상 없습니다.</p>
+      </div>
+
+      <div class="tip">
+        <p>표를 읽는 요령은 <b>가운데 칸부터</b> 보는 것입니다. “내가 알고 싶은 것이 저기에 적혀 있나?”가 먼저고, 도구 설치는 그다음 문제입니다. 알고 싶은 것이 적혀 있지 않다면 그 대상은 REA 로 풀 문제가 아닙니다.</p>
+        <p>조건이 맞는지는 짐작하지 말고 확인하세요. <code>rea doctor --json</code> 은 지금 이 컴퓨터에서 어떤 대상을 다룰 수 있는지 점검해 줍니다.</p>
+      </div>
+
+      <div class="warn">
+        <p>표에 있다는 것은 <b>기술적으로 가능하다</b>는 뜻일 뿐, <b>해도 된다</b>는 뜻이 아닙니다. 안드로이드 기기나 네트워크 캡처처럼 남의 데이터가 섞이기 쉬운 항목은 특히 조심해야 합니다. 앞의 <a href="#rules">지켜야 할 선</a>을 먼저 통과한 대상만 다룹니다.</p>
+      </div>
+
+      <div class="ask">
+        <p>같은 프로그램이라도 <b>여러 줄에 걸칠 수 있습니다.</b> 예를 들어 일렉트론으로 만든 데스크톱 앱은 “설치된 데스크톱 앱”이자 “자바스크립트 · 일렉트론 앱”이고, 안에 네이티브 애드온이 있으면 “네이티브 바이너리”이기도 합니다. 내가 알고 싶은 것이 무엇이냐에 따라 <b>어느 줄로 들어갈지</b>가 달라집니다. 여러분이 조사하려는 프로그램은 어느 줄입니까?</p>
+      </div>
+    </section>
+
+    <!-- ───────── Ghidra ───────── -->
+    <section id="ghidra">
+      <div class="sec">Ghidra</div>
+      <h2>Ghidra 알아보기</h2>
+      <p class="lead">네이티브 바이너리를 다룰 때 가장 널리 쓰이는 무료 도구입니다. 이번 과정의 필수는 아니지만, 리버스 엔지니어링을 이야기할 때 반드시 나오는 이름이라 제대로 짚고 갑니다.</p>
+
+      <h3>무엇인가</h3>
+      <p><b>Ghidra(기드라)</b> 는 미국 국가안보국(NSA)이 내부에서 쓰던 소프트웨어 리버스 엔지니어링 도구를 2019년에 오픈소스로 공개한 것입니다. Apache 2.0 라이선스이고, 자바로 만들어져 Windows · macOS · Linux 에서 모두 돕니다.</p>
+      <div class="ok"><p>공개 당시 화제가 된 이유는 <b>디컴파일러가 들어 있는데 무료</b>라는 점이었습니다. 그전까지 쓸 만한 디컴파일러는 수백만 원짜리 상용 도구(IDA Pro)에만 있었습니다. Ghidra 덕분에 학생과 연구자도 같은 수준의 도구를 쓸 수 있게 되었습니다.</p></div>
+
+      <h3>무엇을 해 주나</h3>
+      <div class="cards">
+        <div class="card"><div class="dn">DISASSEMBLY</div><b>기계어 → 어셈블리</b><span>바이트를 명령으로 해석하고, 함수 경계와 호출 관계를 찾아 줍니다.</span></div>
+        <div class="card"><div class="dn">DECOMPILER</div><b>어셈블리 → C 비슷한 코드</b><span>읽기 훨씬 쉬운 의사 코드를 만들어 줍니다. 이 기능이 Ghidra 의 핵심입니다.</span></div>
+        <div class="card"><div class="dn">NAVIGATION</div><b>길 찾기</b><span>문자열·심볼 검색, 상호 참조(xref), 함수 그래프로 흐름을 따라갑니다.</span></div>
+        <div class="card"><div class="dn">ANNOTATION</div><b>이름 붙이기</b><span>함수와 변수에 이름과 타입을 붙여 가며 이해한 만큼 지도를 채웁니다.</span></div>
+        <div class="card"><div class="dn">AUTOMATION</div><b>스크립트와 헤드리스</b><span>자바·파이썬 스크립트로 반복 작업을 자동화하고, 화면 없이 일괄 분석할 수 있습니다.</span></div>
+        <div class="card"><div class="dn">COLLABORATION</div><b>여럿이 한 파일</b><span>Ghidra 서버를 두면 한 바이너리를 여러 사람이 나눠 분석할 수 있습니다.</span></div>
+      </div>
+
+      <h3>어떻게 여러 CPU 를 다 지원하나</h3>
+      <p>Ghidra 는 CPU 명령어 집합을 <b>SLEIGH</b> 라는 명세 언어로 기술해 두고, 읽어 들인 명령을 <b>P-Code</b> 라는 중간 언어로 바꿉니다. 디컴파일러는 이 중간 언어만 다루면 되므로, 새 CPU 를 지원하려면 명세만 추가하면 됩니다. x86 과 ARM 은 물론 MIPS, PowerPC, RISC-V 같은 구조까지 폭넓게 다루는 이유입니다.</p>
+      <div class="ask"><p>이 설계는 컴파일러의 구조와 닮았습니다. 컴파일러도 중간 표현을 두고 앞단(언어)과 뒷단(CPU)을 분리하지요. 왜 이런 구조가 반복해서 나타날까요?</p></div>
+
+      <h3>쓰는 흐름</h3>
+      <ol>
+        <li><b>프로젝트 만들기</b> — 분석할 파일들을 담을 작업 공간을 만듭니다.</li>
+        <li><b>파일 가져오기</b> — 실행 파일을 넣으면 형식(PE/ELF/Mach-O)과 CPU 를 알아서 인식합니다.</li>
+        <li><b>자동 분석</b> — 함수 찾기, 문자열 추출, 참조 연결을 자동으로 수행합니다. 큰 파일은 몇 분 걸립니다.</li>
+        <li><b>길 찾기</b> — 문자열이나 임포트에서 출발해 xref 를 타고 관심 함수로 들어갑니다.</li>
+        <li><b>읽고 이름 붙이기</b> — 디컴파일 창을 보며 변수에 이름을 붙이고 타입을 지정합니다. 붙일수록 코드가 읽혀집니다.</li>
+        <li><b>기록</b> — 주석과 북마크를 남기고, 필요하면 스크립트로 정리합니다.</li>
+      </ol>
+      <div class="tip"><p>5번이 실제 작업의 대부분입니다. 처음엔 <code>uVar1</code>, <code>FUN_00401a30</code> 같은 기계가 붙인 이름뿐이지만, 하나씩 <code>price</code>, <code>applyDiscount</code> 로 바꿔 나가면 어느 순간 전체가 읽히기 시작합니다. 리버스 엔지니어링이 <b>지도를 채우는 일</b>이라고 불리는 이유입니다.</p></div>
+
+      <h3>한계도 알고 써야 합니다</h3>
+      <ul>
+        <li>의사 코드는 <b>원본 소스가 아닙니다.</b> 컴파일러 최적화와 인라인 때문에 구조가 달라져 있습니다.</li>
+        <li>자동 분석이 함수 경계를 잘못 잡기도 합니다. 이상하면 의심하고 어셈블리를 직접 보세요.</li>
+        <li>패킹·난독화된 대상은 먼저 그것을 풀어야 합니다.</li>
+        <li>실행 중 동작을 보는 데는 디버거가 따로 필요한 경우가 많습니다.</li>
+      </ul>
+
+      <h3>다른 도구와 비교</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>도구</th><th>성격</th><th>비용</th><th>메모</th></tr></thead>
+          <tbody>
+            <tr><td><b>Ghidra</b></td><td>정적 분석 + 디컴파일러</td><td>무료 · 오픈소스</td><td>교육·연구의 사실상 표준. 자바 기반이라 조금 무겁습니다</td></tr>
+            <tr><td>IDA Pro</td><td>정적 분석 + 디컴파일러</td><td>상용 (고가)</td><td>업계에서 오래 쓰인 기준. 디컴파일러는 별도 상품인 경우가 있습니다</td></tr>
+            <tr><td>Binary Ninja</td><td>정적 분석</td><td>상용 (중간)</td><td>가볍고 스크립트 친화적</td></tr>
+            <tr><td>radare2 · rizin</td><td>명령줄 중심</td><td>무료</td><td>자동화에 강하지만 배우는 문턱이 높습니다</td></tr>
+            <tr><td>x64dbg</td><td>동적 디버거 (Windows)</td><td>무료</td><td>실행하며 추적할 때. Ghidra 와 함께 쓰는 조합이 흔합니다</td></tr>
+            <tr><td>Hopper</td><td>정적 분석 + 디컴파일러</td><td>상용 (저가)</td><td>macOS 에서 가볍게 쓰기 좋습니다</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>REA 와의 관계</h3>
+      <p>REA 는 네이티브 바이너리를 다룰 때 <b>직접 디컴파일하지 않고</b> Ghidra · Hopper · IDA 중 하나를 분석 엔진으로 불러 씁니다. 즉 Ghidra 는 REA 의 선택적 부품입니다. 자바스크립트와 일렉트론, 웹사이트 분석에는 필요하지 않습니다.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>항목</th><th>REA 가 요구하는 것</th></tr></thead>
+          <tbody>
+            <tr><td>Ghidra 버전</td><td>12.1.x (문서 기준 12.1.4 에서 검증)</td></tr>
+            <tr><td>자바</td><td>64비트 전체 JDK 21 이상</td></tr>
+            <tr><td>운영체제</td><td>Linux x64/arm64, macOS x64/arm64 · Windows x64 는 실험 단계이며 읽기 전용</td></tr>
+            <tr><td>설치 방식</td><td>REA 가 Ghidra 를 설치해 주지 않습니다. 직접 받아 압축을 풀고 경로를 알려 줍니다</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted">버전 조건은 REA 가 업데이트되면 달라질 수 있습니다. 수업 직전에 <code>rea doctor --provider ghidra --json</code> 으로 확인하세요.</p>
+
+      <div class="mission">
+        <div class="mh"><span class="mn">가산점 과제</span><b>내가 컴파일한 프로그램 뜯어보기</b><span class="tm">90분</span></div>
+        <p>남의 프로그램이 아니라 <b>내가 방금 만든 실행 파일</b>로 연습합니다. 정답(소스)을 알고 있으니 의사 코드가 얼마나 다른지 바로 비교됩니다.</p>
+        <div class="code term"><span class="lang">WSL · 작은 C 프로그램 만들기</span><pre><code>cat &gt; secret.c &lt;&lt;'EOF'
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+int check(const char *pw) { return strcmp(pw, "polytech2026") == 0; }
+int main(int argc, char **argv) {
+  if (argc &lt; 2) { puts("사용법: ./secret 암호"); return 1; }
+  puts(check(argv[1]) ? "통과" : "실패");
+  return 0;
+}
+EOF
+gcc -O0 -g secret.c -o secret      # 기호 있음
+gcc -O2 -s secret.c -o secret_strip # 최적화 + 기호 제거
+./secret polytech2026</code></pre></div>
+        <p>두 파일을 Ghidra 로 각각 열어 비교하세요.</p>
+        <ul>
+          <li><code>secret</code> 에서는 <code>check</code> 라는 이름이 그대로 보입니다. <code>secret_strip</code> 에서는 어떻게 보이나요?</li>
+          <li>문자열 검색으로 <code>polytech2026</code> 을 찾고, xref 로 그 문자열을 쓰는 함수로 들어가 보세요.</li>
+          <li>의사 코드와 내가 쓴 C 소스를 나란히 두고, 달라진 부분과 그 이유를 적어 보세요.</li>
+        </ul>
+        <div class="warn"><p>이 실습의 요점은 "암호를 알아내는 것"이 아닙니다. <b>소스에 적힌 문자열이 실행 파일에 그대로 남는다</b>는 사실을 눈으로 확인하는 것입니다. 그래서 비밀번호나 API 키를 코드에 적으면 안 된다는 보안 원칙이 왜 생겼는지 알게 됩니다.</p></div>
+      </div>
+    </section>
+
+    <!-- ───────── 설치 ───────── -->
+    <section id="setup">
+      <div class="sec">Setup</div>
+      <h2>설치와 설정</h2>
+      <p class="lead">1차시 앞부분에서 함께 합니다. 설치 자체는 명령 한 줄이지만, <b>무엇을 승인하는지 읽고 넘어가는 것</b>이 이 단계의 진짜 학습입니다.</p>
+
+      <h3>STEP 0 · 준비물 확인 <span class="n">10분</span></h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>항목</th><th>조건</th><th>확인 방법</th></tr></thead>
+          <tbody>
+            <tr><td>Node.js</td><td>22.19 이상의 22.x · 24.11 이상의 24.x · 26 이상</td><td><code>node -v</code></td></tr>
+            <tr><td>npm</td><td>Node 와 함께 설치됨</td><td><code>npm -v</code></td></tr>
+            <tr><td>에이전트</td><td>로컬 MCP 를 지원하는 것 하나 (Claude Code · Codex · Cursor · Gemini CLI 등)</td><td>실행해 보기</td></tr>
+            <tr><td>디스크</td><td>수 GB 여유 (네이티브 분석을 할 거라면 더)</td><td>-</td></tr>
+            <tr><td>리눅스·WSL</td><td><code>ps</code> 명령 (procps)</td><td><code>ps --version</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="code term"><span class="lang">터미널 · 버전 확인</span><pre><code>node -v
+npm -v
+ps --version      # 리눅스 · WSL 에서만</code></pre></div>
+      <div class="warn"><p>리눅스(WSL 포함)에서는 REA 가 자식 프로세스를 띄우기 전에 <b>소유 프로세스 확인</b>을 합니다. 이때 procps 호환 <code>ps</code> 가 없으면 정적 자바스크립트 분석과 Ghidra·JADX 계열 작업이 시작도 못 하고 거부됩니다. <code>sudo apt install procps</code> 로 먼저 설치하세요.</p></div>
+
+      <h3>STEP 1 · 에이전트 정하기 <span class="n">10분</span></h3>
+      <p>REA 는 혼자 쓰는 프로그램이 아니라 <button type="button" class="term" data-term="mcp">에이전트에 붙여 쓰는 도구</button>입니다. 먼저 쓸 에이전트를 하나 정하세요. 수업에서는 강사가 지정한 하나로 통일하는 편이 좋습니다. 설정 화면과 재시작 방법이 조금씩 다르기 때문입니다.</p>
+      <div class="tip"><p>Claude Desktop 을 쓴다면 <b>설정 전에 앱을 완전히 종료</b>하세요. 실행 중이면 앱이 설정 파일을 덮어써서 등록이 사라질 수 있습니다.</p></div>
+
+      <h3>STEP 2 · 설정 명령 실행 <span class="n">15분</span></h3>
+      <div class="code term"><span class="lang">터미널</span><pre><code>npx rea-agents setup</code></pre></div>
+      <p>명령을 치면 바로 설치되지 않고 <b>세 번 물어봅니다.</b> 각각 무엇을 묻는지 알고 답하세요.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>물어보는 것</th><th>무엇을 고르나</th></tr></thead>
+          <tbody>
+            <tr><td>① 패키지를 내려받아도 되는가</td><td>npm 의 질문입니다. 승인해야 설치가 시작됩니다</td></tr>
+            <tr><td>② 어떤 에이전트에 등록할까</td><td>여러 개를 고를 수 있습니다. 이미 REA 가 등록된 것은 기본 선택됩니다</td></tr>
+            <tr><td>③ 이 변경 내용을 적용해도 되는가</td><td><b>여기서 멈춰서 읽으세요.</b> 바뀔 파일 경로와 내용이 전부 나옵니다</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>③ 화면에는 이런 것들이 적혀 있습니다. 설치되거나 연결될 분석 엔진, 손댈 에이전트 설정 파일의 경로, 설치될 작업 지침의 위치, 그리고 어디서 무엇을 받아 오는지와 그 무결성 근거입니다. REA 는 기존 설정을 백업한 뒤 바꾸고, 어느 단계에서든 취소할 수 있습니다.</p>
+      <div class="warn"><p>설치 명령을 어디선가 복사해 붙일 때는 <b>출처를 확인</b>하세요. 공식 경로는 <code>github.com/morluto/rea</code> 저장소, <code>rea.tools</code>, 그리고 <code>rea-agents</code> npm 패키지입니다. 이름이 비슷한 저장소나 README 를 베낀 페이지는 공식이 아닙니다. 리버스 엔지니어링 도구를 가장한 악성 패키지는 실제로 있습니다.</p></div>
+      <p class="muted">설치 중 <code>prebuild-install</code> 관련 경고가 보여도 정상입니다. 하위 의존성에서 나오는 안내이고 설치 실패를 뜻하지 않습니다. 최신 릴리스로 받으려면 <code>npx rea-agents@latest setup</code> 을 씁니다.</p>
+
+      <h3>STEP 3 · 에이전트 재시작과 확인 <span class="n">10분</span></h3>
+      <p>설정이 끝나면 완료 메시지에 적힌 에이전트를 <b>완전히 종료했다가 다시 실행</b>합니다. 그다음 도구 목록에 REA 가 보이는지 확인하세요. 재시작을 빼먹어 "도구가 없다"고 하는 경우가 가장 많습니다.</p>
+      <div class="code term"><span class="lang">터미널 · 상태 진단</span><pre><code>npx rea-agents@latest doctor --json</code></pre></div>
+      <p><code>doctor</code> 는 아무것도 바꾸지 않고 현재 상태만 점검합니다. 전체 점검은 항목이 많아 <code>healthy</code> 가 거짓이어도 내가 쓸 기능은 멀쩡할 수 있습니다. 그래서 <b>필요한 부분만 범위를 좁혀</b> 보는 편이 낫습니다.</p>
+      <div class="code term"><span class="lang">터미널 · 범위를 좁힌 점검</span><pre><code>rea doctor --skill --json                 # 설치된 작업 지침만
+rea doctor --client codex --json          # 특정 에이전트 등록만
+rea doctor --provider ghidra --json       # 특정 분석 엔진만</code></pre></div>
+      <div class="ok"><p>우리 과정에서 꼭 되어야 하는 것은 하나입니다. <b>정적 자바스크립트 분석</b>이 돌아가는지만 보면 됩니다. 2차시에 쓸 바로 그 명령으로 확인하세요.</p></div>
+      <div class="code term"><span class="lang">터미널 · 이게 되면 준비 끝</span><pre><code>npx -y rea-agents@latest analyze-javascript-application /절대/경로/rea-project/calculator --json</code></pre></div>
+
+      <h3>STEP 4 · 자주 쓸 거라면 전역 설치 <span class="n">5분</span></h3>
+      <div class="code term"><span class="lang">터미널</span><pre><code>npm install --global rea-agents
+rea --help</code></pre></div>
+      <p>이렇게 하면 <code>npx</code> 없이 <code>rea</code> 명령으로 바로 쓸 수 있습니다. 설치 방식에 따라 업데이트 방법이 다릅니다.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>설치 방식</th><th>업데이트</th></tr></thead>
+          <tbody>
+            <tr><td>전역 설치 (<code>npm install --global</code>)</td><td><code>rea update</code></td></tr>
+            <tr><td><code>npx</code> 로만 사용</td><td><code>npx rea-agents@latest setup</code> 으로 등록 갱신</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tip"><p>REA 는 자주 바뀝니다. 수업 전날 한 번 업데이트하고, 업데이트 뒤에는 <b>설정을 다시 돌려 에이전트 등록과 지침을 갱신</b>하세요. 버전이 어긋나면 에이전트가 예전 방식으로 도구를 부르다 실패합니다.</p></div>
+
+      <h3>STEP 5 · (선택) Ghidra 연결 <span class="n">40분 · 가산점</span></h3>
+      <p>네이티브 바이너리까지 해 보고 싶을 때만 합니다. <a href="#ghidra">앞 절</a>에서 본 조건을 그대로 갖춰야 합니다. REA 는 Ghidra 를 설치해 주지 않습니다. <b>직접 받아 압축을 풀고, 경로를 알려 주는 방식</b>입니다.</p>
+      <ol>
+        <li>JDK 21 이상(64비트 전체 JDK)을 설치합니다.</li>
+        <li>Ghidra 12.1.x 를 내려받아 원하는 폴더에 압축을 풉니다.</li>
+        <li>환경 변수 두 개를 설정하고 진단을 돌립니다.</li>
+      </ol>
+      <div class="code term"><span class="lang">Linux · macOS</span><pre><code>export GHIDRA_INSTALL_DIR=/절대/경로/ghidra_12.1.4_PUBLIC
+export JAVA_HOME=/절대/경로/jdk-21
+rea doctor --provider ghidra --json
+rea setup</code></pre></div>
+      <div class="code"><span class="lang">Windows · PowerShell</span><pre><code>$env:GHIDRA_INSTALL_DIR = "C:\tools\ghidra_12.1.4_PUBLIC"
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-21"
+rea doctor --provider ghidra --json</code></pre></div>
+      <div class="warn">
+        <ul>
+          <li>Windows 에서 REA 의 Ghidra 연동은 <b>실험 단계이고 읽기 전용</b>입니다. 수업에서 네이티브 분석까지 할 생각이면 WSL 이나 리눅스를 쓰는 편이 안전합니다.</li>
+          <li>JDK 가 호스트와 다른 아키텍처로 돌고 있으면(예: 애플 실리콘에서 에뮬레이션으로 도는 x86_64 JDK) 진단이 실패합니다. <code>JAVA_HOME</code> 으로 맞는 JDK 를 직접 지정하세요.</li>
+          <li>버전 조건은 REA 업데이트에 따라 달라집니다. 반드시 <code>rea doctor --provider ghidra</code> 로 확인하고 수업에 들어가세요.</li>
+        </ul>
+      </div>
+      <p class="muted">Ghidra 없이 네이티브 분석만 가볍게 보고 싶다면, 설정 과정에서 Hopper 설치를 제안받을 수 있습니다. 이것도 별도 승인 항목이며 선택입니다.</p>
+
+      <h3>설치가 안 될 때</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>증상</th><th>원인</th><th>해결</th></tr></thead>
+          <tbody>
+            <tr><td>설정 명령이 시작부터 실패</td><td>Node 버전 미달</td><td><code>node -v</code> 확인 후 LTS 재설치, 터미널 새로 열기</td></tr>
+            <tr><td>도구 목록에 REA 가 없음</td><td>에이전트 재시작 안 함</td><td>완전히 종료 후 재실행, 그래도 없으면 <code>npx rea-agents@latest setup</code></td></tr>
+            <tr><td>등록했는데 다음 날 사라짐</td><td>앱이 실행 중일 때 설정함</td><td>앱을 완전히 끄고 다시 설정</td></tr>
+            <tr><td>분석이 시작도 안 되고 거부됨</td><td>리눅스에 <code>ps</code> 없음</td><td><code>sudo apt install procps</code></td></tr>
+            <tr><td>분석 결과가 비어 있음</td><td>상대 경로, 또는 소스가 없는 폴더</td><td>절대 경로로 지정, 스크립트 파일이 있는 폴더인지 확인</td></tr>
+            <tr><td>Ghidra 진단 실패</td><td>버전·JDK 불일치</td><td>Ghidra 12.1.x + JDK 21 이상, <code>JAVA_HOME</code> 확인</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ul class="checks">
+        <li><input type="checkbox"> <code>node -v</code> 가 요구 버전을 만족한다</li>
+        <li><input type="checkbox"> (리눅스·WSL) <code>ps --version</code> 이 동작한다</li>
+        <li><input type="checkbox"> <code>npx rea-agents setup</code> 을 돌리고 변경 내용을 읽고 승인했다</li>
+        <li><input type="checkbox"> 에이전트를 재시작했고 도구 목록에 REA 가 보인다</li>
+        <li><input type="checkbox"> <code>analyze-javascript-application</code> 으로 내 폴더가 분석된다</li>
+        <li><input type="checkbox"> (선택) <code>rea doctor --provider ghidra</code> 가 통과한다</li>
+      </ul>
+    </section>
+
+    <!-- ───────── 1차시 ───────── -->
+    <section id="step1">
+      <div class="sec">Step 1 · 1차시</div>
+      <h2>계산기 만들기</h2>
+      <p class="lead">분석 대상 1호는 <b>내가 만든 계산기</b>입니다. 먼저 돌아가는 것을 만들어 두어야, 다음 시간에 분석 결과를 정답과 맞춰 볼 수 있습니다.</p>
+
+      <h3>폴더 구조</h3>
+      <p>REA 의 자바스크립트 분석은 <b>폴더나 패키지</b>를 대상으로 합니다. 그래서 HTML 과 JS 를 한 파일에 몰아넣지 않고 아래처럼 나눕니다. 이 구조 자체가 다음 차시의 실습 대상입니다.</p>
+      <div class="code"><span class="lang">폴더 구조</span><pre><code>rea-project/
+├── calculator/
+│   ├── index.html
+│   ├── calc.js        ← 계산 로직 (분석 대상)
+│   └── ui.js          ← 화면과 입력 처리
+└── paint/             ← 3차시에 만듭니다</code></pre></div>
+
+      <details class="full">
+        <summary>calculator/index.html — 전체 코드</summary>
+        <div class="code"><span class="lang">calculator/index.html</span><pre><code>&lt;!doctype html&gt;
+&lt;html lang="ko"&gt;
+&lt;meta charset="utf-8"&gt;
+&lt;title&gt;계산기&lt;/title&gt;
+&lt;style&gt;
+  body{font-family:system-ui,'Malgun Gothic',sans-serif;background:#eef1f6;display:grid;place-items:center;height:100vh;margin:0}
+  .calc{width:280px;background:#fff;border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.12)}
+  #out{height:64px;display:flex;align-items:flex-end;justify-content:flex-end;font-size:32px;font-weight:700;
+       padding:6px 10px;overflow:hidden;word-break:break-all}
+  #hist{height:18px;text-align:right;color:#8a93a6;font-size:13px;padding:0 10px}
+  .keys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+  button{height:52px;border:0;border-radius:12px;background:#f1f3f8;font-size:18px;cursor:pointer}
+  button:hover{background:#e6e9f2}
+  button.op{background:#e8ecff;color:#3b43d0;font-weight:700}
+  button.eq{background:#3b43d0;color:#fff;font-weight:700}
+  button.wide{grid-column:span 2}
+&lt;/style&gt;
+
+&lt;div class="calc"&gt;
+  &lt;div id="hist"&gt;&lt;/div&gt;
+  &lt;div id="out"&gt;0&lt;/div&gt;
+  &lt;div class="keys"&gt;
+    &lt;button data-k="clear"&gt;C&lt;/button&gt;
+    &lt;button data-k="back"&gt;←&lt;/button&gt;
+    &lt;button data-k="%" class="op"&gt;%&lt;/button&gt;
+    &lt;button data-k="/" class="op"&gt;÷&lt;/button&gt;
+    &lt;button data-k="7"&gt;7&lt;/button&gt;&lt;button data-k="8"&gt;8&lt;/button&gt;&lt;button data-k="9"&gt;9&lt;/button&gt;
+    &lt;button data-k="*" class="op"&gt;×&lt;/button&gt;
+    &lt;button data-k="4"&gt;4&lt;/button&gt;&lt;button data-k="5"&gt;5&lt;/button&gt;&lt;button data-k="6"&gt;6&lt;/button&gt;
+    &lt;button data-k="-" class="op"&gt;−&lt;/button&gt;
+    &lt;button data-k="1"&gt;1&lt;/button&gt;&lt;button data-k="2"&gt;2&lt;/button&gt;&lt;button data-k="3"&gt;3&lt;/button&gt;
+    &lt;button data-k="+" class="op"&gt;+&lt;/button&gt;
+    &lt;button data-k="0" class="wide"&gt;0&lt;/button&gt;
+    &lt;button data-k="."&gt;.&lt;/button&gt;
+    &lt;button data-k="=" class="eq"&gt;=&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script type="module" src="./ui.js"&gt;&lt;/script&gt;
+&lt;/html&gt;</code></pre></div>
+      </details>
+
+      <details class="full">
+        <summary>calculator/calc.js — 계산 로직 (다음 시간의 분석 대상)</summary>
+        <div class="code"><span class="lang">calculator/calc.js</span><pre><code>// 계산기의 상태와 규칙만 담는다. 화면은 모른다.
+export function createCalculator() {
+  let current = '0';   // 지금 입력 중인 숫자
+  let stored = null;   // 직전 피연산자
+  let pending = null;  // 대기 중인 연산자
+  let justEvaluated = false;
+
+  const round = (n) =&gt; Math.round((n + Number.EPSILON) * 1e10) / 1e10;
+
+  function apply(a, op, b) {
+    if (op === '+') return a + b;
+    if (op === '-') return a - b;
+    if (op === '*') return a * b;
+    if (op === '/') {
+      if (b === 0) throw new RangeError('0 으로 나눌 수 없습니다');
+      return a / b;
+    }
+    if (op === '%') return (a * b) / 100;
+    throw new Error('알 수 없는 연산자: ' + op);
+  }
+
+  function inputDigit(d) {
+    if (justEvaluated) { current = '0'; justEvaluated = false; }
+    current = current === '0' ? d : current + d;
+  }
+
+  function inputDot() {
+    if (justEvaluated) { current = '0'; justEvaluated = false; }
+    if (!current.includes('.')) current += '.';
+  }
+
+  function inputOperator(op) {
+    if (pending !== null &amp;&amp; !justEvaluated) equals();
+    stored = parseFloat(current);
+    pending = op;
+    justEvaluated = true;   // 다음 숫자 입력 때 새로 시작
+  }
+
+  function equals() {
+    if (pending === null) return current;
+    const result = round(apply(stored, pending, parseFloat(current)));
+    current = String(result);
+    stored = null; pending = null; justEvaluated = true;
+    return current;
+  }
+
+  function backspace() {
+    if (justEvaluated) return;
+    current = current.length &gt; 1 ? current.slice(0, -1) : '0';
+  }
+
+  function clear() { current = '0'; stored = null; pending = null; justEvaluated = false; }
+
+  return {
+    inputDigit, inputDot, inputOperator, equals, backspace, clear,
+    get display() { return current; },
+    get pendingOp() { return pending; },
+  };
+}</code></pre></div>
+      </details>
+
+      <details class="full">
+        <summary>calculator/ui.js — 화면 연결</summary>
+        <div class="code"><span class="lang">calculator/ui.js</span><pre><code>import { createCalculator } from './calc.js';
+
+const calc = createCalculator();
+const out = document.getElementById('out');
+const hist = document.getElementById('hist');
+
+function render(msg) {
+  out.textContent = msg ?? calc.display;
+  hist.textContent = calc.pendingOp ? '연산 대기: ' + calc.pendingOp : '';
+}
+
+function press(key) {
+  try {
+    if (/^[0-9]$/.test(key)) calc.inputDigit(key);
+    else if (key === '.') calc.inputDot();
+    else if (['+', '-', '*', '/', '%'].includes(key)) calc.inputOperator(key);
+    else if (key === '=') calc.equals();
+    else if (key === 'back') calc.backspace();
+    else if (key === 'clear') calc.clear();
+    render();
+  } catch (err) {
+    render(err.message);     // 0 으로 나누기 같은 오류를 화면에 보여 준다
+    calc.clear();
+  }
+}
+
+document.querySelectorAll('button[data-k]').forEach((b) =&gt;
+  b.addEventListener('click', () =&gt; press(b.dataset.k)));
+
+document.addEventListener('keydown', (e) =&gt; {
+  const map = { Enter: '=', '=': '=', Backspace: 'back', Escape: 'clear', Delete: 'clear' };
+  const key = map[e.key] ?? e.key;
+  if (/^[0-9.]$/.test(key) || ['+', '-', '*', '/', '%', '=', 'back', 'clear'].includes(key)) {
+    e.preventDefault();
+    press(key);
+  }
+});
+
+render();</code></pre></div>
+      </details>
+
+      <div class="code term"><span class="lang">터미널 · 로컬 서버로 열기</span><pre><code>cd rea-project
+npx --yes serve .
+# 브라우저에서 http://localhost:3000/calculator/ 를 엽니다</code></pre></div>
+
+      <div class="mission">
+        <div class="mh"><span class="mn">MISSION 1</span><b>직접 손보기</b><span class="tm">40분</span></div>
+        <p>코드를 그대로 쓰지 말고 세 가지를 바꿔 보세요. 다음 시간 분석에서 <b>내가 바꾼 부분이 결과에 어떻게 나타나는지</b> 확인할 것입니다.</p>
+        <ul>
+          <li>부호 바꾸기(±) 버튼 추가</li>
+          <li>계산 기록을 최근 5개까지 화면 위에 표시</li>
+          <li>소수점 자리 반올림 규칙을 10자리에서 다른 값으로 바꿔 보고 차이 관찰</li>
+        </ul>
+      </div>
+
+      <ul class="checks">
+        <li><input type="checkbox"> 계산기가 브라우저에서 동작한다</li>
+        <li><input type="checkbox"> 키보드로도 입력된다</li>
+        <li><input type="checkbox"> 0 으로 나누면 오류 메시지가 뜨고 앱이 멈추지 않는다</li>
+        <li><input type="checkbox"> 내가 고친 기능이 최소 하나 들어 있다</li>
+      </ul>
+    </section>
+
+    <!-- ───────── 2차시 ───────── -->
+    <section id="step2">
+      <div class="sec">Step 2 · 2차시</div>
+      <h2>내 앱 뜯어보기</h2>
+      <p class="lead">정답을 아는 상태에서 분석 결과를 읽어 봅니다. 오늘의 목표는 기능 파악이 아니라 <b>결과를 읽는 눈</b>을 만드는 것입니다.</p>
+
+      <h3>터미널에서 한 번</h3>
+      <div class="code term"><span class="lang">터미널 · 정적 자바스크립트 분석</span><pre><code>npx -y rea-agents@latest analyze-javascript-application /절대/경로/rea-project/calculator --json</code></pre></div>
+      <p>결과에는 모듈 목록과 서로를 어떻게 불러오는지(임포트 관계), 그리고 그 판단의 근거가 들어 있습니다. 우리 앱은 작아서 결과도 단순합니다. 바로 그 점이 처음 읽기에 좋습니다.</p>
+      <div class="ask"><p>결과에 <code>ui.js</code> 가 <code>calc.js</code> 를 부른다는 관계가 보일 것입니다. 그러면 반대 방향, 즉 <code>calc.js</code> 가 화면을 모른다는 사실은 결과의 어디에서 확인할 수 있을까요?</p></div>
+
+      <h3>에이전트에게 묻기</h3>
+      <p>같은 대상을 이번에는 에이전트에게 맡깁니다. 질문을 던질 때는 <b>무엇을 알고 싶은지</b>와 <b>근거를 보여 달라</b>는 요구를 함께 적습니다.</p>
+      <div class="code prompt"><span class="lang">에이전트에게 보낼 프롬프트</span><pre><code>rea-project/calculator 폴더를 조사해 줘.
+1) 계산 로직과 화면 처리가 어느 파일에 나뉘어 있는지
+2) 연산자를 눌렀을 때 내부 상태가 어떻게 바뀌는지
+3) 0 으로 나눌 때 어떤 경로로 오류가 처리되는지
+각 결론마다 파일 이름과 위치를 근거로 들어 줘. 확실하지 않은 부분은 모른다고 표시해 줘.</code></pre></div>
+
+      <h3>근거를 읽는 법</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>결과에서 볼 것</th><th>무슨 뜻인가</th><th>학생이 할 일</th></tr></thead>
+          <tbody>
+            <tr><td>파일과 위치</td><td>그 주장이 나온 자리</td><td>직접 열어 눈으로 확인</td></tr>
+            <tr><td>관계(임포트·호출)</td><td>누가 누구를 쓰는지</td><td>내가 짠 구조와 맞는지 비교</td></tr>
+            <tr><td>확인되지 않음 표시</td><td>도구가 단정하지 못한 부분</td><td>추측으로 메우지 말고 그대로 남기기</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="warn"><p>분석 도구도 에이전트도 <b>틀릴 수 있습니다.</b> 특히 "아마 이럴 것이다" 식 서술은 근거가 붙어 있는지 반드시 확인하세요. 근거 없는 문장은 보고서에서 빼거나 추정이라고 적습니다.</p></div>
+
+      <div class="mission">
+        <div class="mh"><span class="mn">MISSION 2</span><b>틀린 설명 찾아내기</b><span class="tm">50분</span></div>
+        <p>에이전트의 조사 결과를 내 코드와 한 줄씩 맞춰 보세요. 맞는 설명 3개와, <b>틀렸거나 과장된 설명 1개 이상</b>을 찾아 적습니다. 못 찾겠으면 일부러 코드를 조금 바꾼 뒤 다시 물어보세요.</p>
+        <p class="muted">이 미션이 이 과정에서 가장 중요합니다. 도구를 쓰는 사람과 도구에 끌려가는 사람의 차이가 여기서 갈립니다.</p>
+      </div>
+    </section>
+
+    <!-- ───────── 3차시 ───────── -->
+    <section id="step3">
+      <div class="sec">Step 3 · 3차시</div>
+      <h2>그림판 만들기</h2>
+      <p class="lead">두 번째 결과물입니다. 계산기보다 상태가 복잡해서, 5차시에 기능을 옮겨 담기에 좋은 바탕이 됩니다.</p>
+
+      <details class="full">
+        <summary>paint/index.html — 전체 코드</summary>
+        <div class="code"><span class="lang">paint/index.html</span><pre><code>&lt;!doctype html&gt;
+&lt;html lang="ko"&gt;
+&lt;meta charset="utf-8"&gt;
+&lt;title&gt;그림판&lt;/title&gt;
+&lt;style&gt;
+  body{font-family:system-ui,'Malgun Gothic',sans-serif;background:#eef1f6;margin:0;padding:18px}
+  .bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#fff;padding:10px 14px;border-radius:12px;
+       box-shadow:0 4px 16px rgba(0,0,0,.08);max-width:900px;margin:0 auto 12px}
+  .bar button{border:1px solid #dde1ea;background:#f7f8fc;border-radius:9px;padding:7px 12px;cursor:pointer;font-size:14px}
+  .bar button.on{background:#3b43d0;color:#fff;border-color:#3b43d0}
+  canvas{display:block;margin:0 auto;background:#fff;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.1);cursor:crosshair;touch-action:none}
+&lt;/style&gt;
+
+&lt;div class="bar"&gt;
+  &lt;button data-tool="pen" class="on"&gt;✏️ 펜&lt;/button&gt;
+  &lt;button data-tool="eraser"&gt;🧽 지우개&lt;/button&gt;
+  &lt;label&gt;색 &lt;input type="color" id="color" value="#1d2433"&gt;&lt;/label&gt;
+  &lt;label&gt;굵기 &lt;input type="range" id="size" min="1" max="40" value="4"&gt;&lt;/label&gt;
+  &lt;button id="undo"&gt;↩ 되돌리기&lt;/button&gt;
+  &lt;button id="redo"&gt;↪ 다시&lt;/button&gt;
+  &lt;button id="clear"&gt;🗑 전체 지우기&lt;/button&gt;
+  &lt;button id="save"&gt;💾 PNG 저장&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;canvas id="board" width="900" height="560"&gt;&lt;/canvas&gt;
+
+&lt;script type="module" src="./paint.js"&gt;&lt;/script&gt;
+&lt;/html&gt;</code></pre></div>
+      </details>
+
+      <details class="full">
+        <summary>paint/paint.js — 전체 코드</summary>
+        <div class="code"><span class="lang">paint/paint.js</span><pre><code>import { createHistory } from './history.js';
+
+const cv = document.getElementById('board');
+const ctx = cv.getContext('2d');
+const history = createHistory(cv, 20);   // 되돌리기 20단계
+
+let tool = 'pen', drawing = false, last = null;
+const color = document.getElementById('color');
+const size = document.getElementById('size');
+
+ctx.lineCap = 'round';
+ctx.lineJoin = 'round';
+history.push();                           // 빈 화면을 첫 상태로 저장
+
+function pos(e) {
+  const r = cv.getBoundingClientRect();
+  return { x: (e.clientX - r.left) * (cv.width / r.width),
+           y: (e.clientY - r.top) * (cv.height / r.height) };
+}
+
+function start(e) {
+  drawing = true; last = pos(e); cv.setPointerCapture(e.pointerId);
+}
+
+function move(e) {
+  if (!drawing) return;
+  const p = pos(e);
+  ctx.strokeStyle = tool === 'eraser' ? '#ffffff' : color.value;
+  ctx.lineWidth = tool === 'eraser' ? size.value * 2.5 : size.value;
+  ctx.beginPath();
+  ctx.moveTo(last.x, last.y);
+  ctx.lineTo(p.x, p.y);
+  ctx.stroke();
+  last = p;
+}
+
+function end() {
+  if (!drawing) return;
+  drawing = false;
+  history.push();                         // 한 획이 끝날 때마다 상태 저장
+}
+
+cv.addEventListener('pointerdown', start);
+cv.addEventListener('pointermove', move);
+cv.addEventListener('pointerup', end);
+cv.addEventListener('pointerleave', end);
+
+document.querySelectorAll('button[data-tool]').forEach((b) =&gt;
+  b.addEventListener('click', () =&gt; {
+    tool = b.dataset.tool;
+    document.querySelectorAll('button[data-tool]').forEach((x) =&gt; x.classList.toggle('on', x === b));
+  }));
+
+document.getElementById('undo').onclick = () =&gt; history.undo();
+document.getElementById('redo').onclick = () =&gt; history.redo();
+document.getElementById('clear').onclick = () =&gt; {
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  history.push();
+};
+document.getElementById('save').onclick = () =&gt; {
+  const a = document.createElement('a');
+  a.download = 'my-drawing.png';
+  a.href = cv.toDataURL('image/png');
+  a.click();
+};
+
+document.addEventListener('keydown', (e) =&gt; {
+  if (!(e.ctrlKey || e.metaKey)) return;
+  if (e.key === 'z') { e.preventDefault(); e.shiftKey ? history.redo() : history.undo(); }
+  if (e.key === 'y') { e.preventDefault(); history.redo(); }
+  if (e.key === 's') { e.preventDefault(); document.getElementById('save').click(); }
+});</code></pre></div>
+      </details>
+
+      <details class="full">
+        <summary>paint/history.js — 되돌리기 (5차시에 다시 다룹니다)</summary>
+        <div class="code"><span class="lang">paint/history.js</span><pre><code>// 캔버스 상태를 그림 데이터로 쌓아 두는 아주 단순한 되돌리기
+export function createHistory(canvas, limit = 20) {
+  const ctx = canvas.getContext('2d');
+  const stack = [];
+  let index = -1;
+
+  function push() {
+    stack.length = index + 1;                       // 되돌린 뒤 새로 그리면 앞쪽은 버린다
+    stack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+    if (stack.length &gt; limit) stack.shift();
+    index = stack.length - 1;
+  }
+
+  function restore(i) {
+    if (i &lt; 0 || i &gt;= stack.length) return;
+    index = i;
+    ctx.putImageData(stack[index], 0, 0);
+  }
+
+  return {
+    push,
+    undo: () =&gt; restore(index - 1),
+    redo: () =&gt; restore(index + 1),
+    get depth() { return stack.length; },
+    get position() { return index; },
+  };
+}</code></pre></div>
+      </details>
+
+      <div class="ask"><p>이 되돌리기는 화면 전체를 통째로 저장합니다. 900 × 560 캔버스 한 장이 메모리에서 약 2메가바이트입니다. 20단계면 얼마나 될까요? 더 좋은 방법은 무엇일까요? 이 질문의 답이 5차시의 조사 주제가 됩니다.</p></div>
+
+      <div class="mission">
+        <div class="mh"><span class="mn">MISSION 3</span><b>도구 하나 더</b><span class="tm">50분</span></div>
+        <p>직선 그리기, 사각형, 스포이드(색 추출) 중 하나를 골라 추가하세요. 추가한 도구도 되돌리기와 맞물려 동작해야 합니다.</p>
+      </div>
+
+      <ul class="checks">
+        <li><input type="checkbox"> 펜과 지우개, 색과 굵기가 동작한다</li>
+        <li><input type="checkbox"> 되돌리기와 다시 실행이 <kbd>Ctrl</kbd>+<kbd>Z</kbd> 로도 된다</li>
+        <li><input type="checkbox"> PNG 로 저장된다</li>
+        <li><input type="checkbox"> 내가 추가한 도구가 되돌리기와 맞물린다</li>
+      </ul>
+    </section>
+
+    <!-- ───────── 4차시 ───────── -->
+    <section id="step4">
+      <div class="sec">Step 4 · 4차시</div>
+      <h2>남의 앱 조사하기</h2>
+      <p class="lead">이제 내가 만들지 않은 프로그램을 봅니다. 대상은 <b>소스가 공개된 앱</b> 중에서 고릅니다. 분석 결과를 실제 소스와 맞춰 볼 수 있어 공부가 됩니다.</p>
+
+      <h3>대상 고르기</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>유형</th><th>예</th><th>REA 로 보는 것</th></tr></thead>
+          <tbody>
+            <tr><td>오픈소스 웹 그림 도구</td><td>캔버스 기반 드로잉 앱</td><td>브라우저 관찰 + 정적 스크립트 분석</td></tr>
+            <tr><td>오픈소스 Electron 앱</td><td>메모·할 일 관리 앱</td><td>모듈 관계, IPC 경계, 소스 맵</td></tr>
+            <tr><td>내가 빌드한 실행 파일</td><td>직접 컴파일한 C 프로그램</td><td>문자열, 심볼, 의사 코드(네이티브 도구 필요)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="warn"><p>고르기 전에 <b>라이선스와 약관을 확인</b>하세요. 소스가 공개되어 있어도 상표나 에셋에는 다른 조건이 붙을 수 있습니다. 확인한 내용을 보고서 첫 장에 한 줄로 적습니다.</p></div>
+
+      <h3>조사 질문 세우기</h3>
+      <p>막연히 "분석해 줘"라고 하면 쓸모없는 요약만 돌아옵니다. <b>옮기고 싶은 기능 하나</b>로 좁히세요.</p>
+      <div class="cards">
+        <div class="card"><div class="dn">예시 1</div><b>되돌리기</b><span>획 단위로 저장하나, 화면 전체를 저장하나? 단계 수 제한은 어떻게 두었나?</span></div>
+        <div class="card"><div class="dn">예시 2</div><b>자동 저장</b><span>언제 저장하나? 어디에 저장하나? 꺼졌다 켜면 어떻게 복구하나?</span></div>
+        <div class="card"><div class="dn">예시 3</div><b>단축키 처리</b><span>키 입력을 어디서 받아 어떤 표로 연결하나? 입력창에서는 어떻게 막나?</span></div>
+        <div class="card"><div class="dn">예시 4</div><b>색 선택</b><span>색을 어떤 형식으로 저장하고, 최근 색은 몇 개까지 기억하나?</span></div>
+      </div>
+
+      <div class="code prompt"><span class="lang">에이전트에게 보낼 프롬프트 (예: 되돌리기 조사)</span><pre><code>아래 앱에서 "되돌리기" 기능이 어떻게 구현되어 있는지 조사해 줘.
+대상 경로: /절대/경로/대상앱
+알고 싶은 것:
+1) 되돌리기 상태를 무엇으로 저장하는가 (화면 전체 / 명령 / 도형 목록)
+2) 몇 단계까지 보관하고, 넘치면 어떻게 하는가
+3) 되돌린 뒤 새로 그리면 앞쪽 기록을 어떻게 처리하는가
+각 답마다 파일과 위치를 근거로 들어 주고, 확인 못 한 것은 모른다고 적어 줘.
+마지막에 내 그림판(paint/history.js)과 비교해서 다른 점 3가지를 알려 줘.</code></pre></div>
+
+      <h3>브라우저로 관찰하기</h3>
+      <p>정적 분석만으로 모자랄 때는 <button type="button" class="term" data-term="observe">실행 중인 화면</button>을 봅니다. REA 는 크롬 계열 브라우저로 페이지 구조와 스크립트, 네트워크 관찰 결과를 모아 줍니다. 버튼을 눌렀을 때 어떤 요청이 오가는지, 어떤 스크립트가 반응하는지가 보입니다.</p>
+      <div class="tip"><p>관찰은 <b>내 권한으로 실제 프로그램을 실행</b>하는 행위입니다. 수업 대상 외의 사이트나 앱에는 쓰지 마세요.</p></div>
+
+      <div class="mission">
+        <div class="mh"><span class="mn">MISSION 4</span><b>근거 표 만들기</b><span class="tm">80분</span></div>
+        <p>조사 결과를 표로 정리합니다. 한 줄에 하나씩, <b>주장 · 근거(파일과 위치) · 확신 정도</b> 세 칸입니다. 확신 정도는 확인함, 추정, 모름 셋 중 하나로만 적습니다.</p>
+      </div>
+    </section>
+
+    <!-- ───────── 5차시 ───────── -->
+    <section id="step5">
+      <div class="sec">Step 5 · 5차시</div>
+      <h2>기능 옮겨 담기</h2>
+      <p class="lead">조사한 기능을 내 앱에 구현합니다. 코드를 베끼는 것이 아니라 <b>방식을 이해해서 다시 쓰는 것</b>입니다.</p>
+
+      <h3>옮길 때의 세 가지 원칙</h3>
+      <ol>
+        <li><b>복사하지 않는다.</b> 구조를 설명할 수 있으면 직접 쓸 수 있습니다. 설명하지 못하면 아직 이해한 것이 아닙니다.</li>
+        <li><b>출처를 적는다.</b> 어떤 앱의 어떤 방식을 참고했는지 주석과 보고서에 남깁니다. 라이선스가 요구하면 그 조건도 지킵니다.</li>
+        <li><b>내 앱에 맞게 고친다.</b> 그대로 가져오면 대개 과합니다. 우리 그림판에 필요한 만큼만 가져옵니다.</li>
+      </ol>
+
+      <h3>예시: 되돌리기를 화면 저장에서 획 기록으로</h3>
+      <p>3차시의 되돌리기는 화면 전체를 그림 데이터로 쌓습니다. 20단계면 수십 메가바이트가 됩니다. 조사에서 배운 <b>획 단위 기록</b> 방식으로 바꾸면 메모리가 크게 줄고, 되돌리기 단계도 늘릴 수 있습니다.</p>
+      <div class="code"><span class="lang">바꾸는 방향 (설계만, 코드는 직접)</span><pre><code>지금:  [화면 이미지][화면 이미지][화면 이미지] ...        20장 × 약 2MB
+
+바꾼 뒤: [획1: 색·굵기·점들][획2: ...][지우기] ...        한 획당 수 KB
+        되돌리기 = 마지막 획을 빼고 처음부터 다시 그리기
+        느려지면 = 10획마다 화면 스냅샷을 하나씩 끼워 넣기</code></pre></div>
+      <div class="ask"><p>처음부터 다시 그리는 방식은 획이 많아지면 느려집니다. 스냅샷을 몇 획마다 끼우는 것이 좋을까요? 이 선택을 <b>측정해서</b> 정하면 보고서가 훨씬 좋아집니다. 획 100개, 500개일 때 되돌리기에 걸리는 시간을 재 보세요.</p></div>
+
+      <div class="mission">
+        <div class="mh"><span class="mn">MISSION 5</span><b>구현하고 비교하기</b><span class="tm">100분</span></div>
+        <p>조사한 기능을 구현한 뒤, <b>전후를 숫자로 비교</b>하세요. 메모리 사용량, 되돌리기 시간, 코드 줄 수 중 두 가지 이상이면 됩니다. 브라우저 개발자 도구의 성능 탭과 <code>performance.now()</code> 면 충분합니다.</p>
+      </div>
+
+      <ul class="checks">
+        <li><input type="checkbox"> 조사한 기능이 내 앱에서 동작한다</li>
+        <li><input type="checkbox"> 코드에 참고 출처가 주석으로 남아 있다</li>
+        <li><input type="checkbox"> 전후 비교 숫자가 있다</li>
+        <li><input type="checkbox"> 기존 기능이 망가지지 않았다 (되돌리기·저장·단축키)</li>
+      </ul>
+    </section>
+
+    <!-- ───────── 6차시 ───────── -->
+    <section id="step6">
+      <div class="sec">Step 6 · 6차시</div>
+      <h2>보고서와 발표</h2>
+      <p class="lead">이 과정의 진짜 결과물은 앱이 아니라 <b>근거가 붙은 조사 기록</b>입니다.</p>
+
+      <h3>보고서 양식</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>항목</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td>대상과 권한</td><td>무엇을 분석했고, 왜 분석해도 되는 대상인지 (라이선스·출처)</td></tr>
+            <tr><td>조사 질문</td><td>알고 싶었던 것 한 가지</td></tr>
+            <tr><td>방법</td><td>어떤 도구로 무엇을 했는지 (명령어 포함)</td></tr>
+            <tr><td>근거 표</td><td>주장 · 근거 위치 · 확신 정도</td></tr>
+            <tr><td>구현</td><td>내 앱에 어떻게 옮겼는지, 무엇을 바꿨는지</td></tr>
+            <tr><td>측정</td><td>전후 비교 숫자</td></tr>
+            <tr><td>한계</td><td>확인하지 못한 것, 틀렸을 수 있는 부분</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tip"><p>마지막 <b>한계</b> 항목을 성실하게 쓴 보고서가 가장 좋은 점수를 받습니다. 모르는 것을 모른다고 적는 것이 조사자의 기본입니다.</p></div>
+
+      <h3>발표 5분</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>시간</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td>0:00–0:40</td><td>내가 만든 앱 두 개 시연 (계산기 · 그림판)</td></tr>
+            <tr><td>0:40–2:00</td><td>무엇을 조사했고 어떻게 알아냈는지 — 근거 화면을 띄우고</td></tr>
+            <tr><td>2:00–3:30</td><td>옮긴 기능 시연과 전후 비교 숫자</td></tr>
+            <tr><td>3:30–4:30</td><td>에이전트가 틀렸던 부분과 그것을 어떻게 잡았는지</td></tr>
+            <tr><td>4:30–5:00</td><td>확인 못 한 것과 다음에 해 볼 것</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ───────── 평가 ───────── -->
+    <section id="rubric">
+      <div class="sec">Rubric</div>
+      <h2>평가 기준</h2>
+      <p class="lead">만든 양보다 <b>근거의 질</b>을 봅니다. 화려한 앱보다 정확한 조사가 점수가 높습니다.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>항목</th><th>배점</th><th>상</th><th>중</th><th>하</th></tr></thead>
+          <tbody>
+            <tr><td><b>윤리와 권한</b></td><td>15</td><td>대상 선정 근거가 분명하고 보고서에 명시</td><td>허용 범위이나 설명이 부족</td><td>허용 범위를 벗어남 (이 경우 전체 재제출)</td></tr>
+            <tr><td><b>결과물</b></td><td>20</td><td>계산기·그림판이 모두 동작하고 직접 고친 기능이 있음</td><td>둘 다 동작하나 예제 그대로</td><td>하나만 동작</td></tr>
+            <tr><td><b>조사</b></td><td>30</td><td>질문이 좁고 근거가 위치까지 정확</td><td>조사는 했으나 근거가 뭉뚱그려짐</td><td>도구 출력 복사 수준</td></tr>
+            <tr><td><b>이식과 측정</b></td><td>20</td><td>직접 구현하고 전후를 숫자로 비교</td><td>구현했으나 측정 없음</td><td>코드를 그대로 옮김</td></tr>
+            <tr><td><b>검증 태도</b></td><td>15</td><td>에이전트의 오류를 찾아내 기록</td><td>검증 흔적이 약간</td><td>도구 말을 그대로 옮겨 적음</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="ok"><p><b>가산점 (최대 10점)</b> — 네이티브 바이너리까지 분석 · 조사 과정을 재현 가능한 스크립트로 정리 · 같은 기능을 두 앱에서 비교 · 찾은 문제를 원 프로젝트에 제보</p></div>
+    </section>
+
+    <!-- ───────── FAQ ───────── -->
+    <section id="faq">
+      <div class="sec">FAQ</div>
+      <h2>자주 막히는 곳</h2>
+
+      <h3>설정 명령이 중간에 실패합니다</h3>
+      <p>Node.js 버전부터 확인하세요. 22.19 미만의 22.x, 24.11 미만의 24.x 는 지원되지 않습니다. 그다음 에이전트를 완전히 종료하고 다시 실행해 보세요.</p>
+
+      <h3>에이전트 도구 목록에 REA 가 없습니다</h3>
+      <p>설정 후 에이전트를 재시작하지 않은 경우가 대부분입니다. 그래도 없으면 <code>npx rea-agents@latest setup</code> 을 다시 실행해 등록 내용을 갱신하세요.</p>
+
+      <h3>분석 결과가 비어 있습니다</h3>
+      <p>경로를 절대 경로로 넣었는지, 그리고 그 폴더에 실제 스크립트 파일이 있는지 보세요. 빌드 결과물만 있고 소스가 없으면 결과가 단순해집니다. 리눅스에서는 <code>ps</code> 명령이 없을 때도 실패합니다.</p>
+
+      <h3>네이티브 분석을 해 보고 싶습니다</h3>
+      <p>Ghidra 나 Hopper, IDA 중 하나가 필요합니다. 이번 과정의 필수는 아니고 가산점 영역입니다. 먼저 <b>직접 컴파일한 작은 C 프로그램</b>으로 연습하세요. 소스를 알고 있으니 의사 코드가 얼마나 비슷한지 비교할 수 있습니다.</p>
+
+      <h3>에이전트가 자꾸 그럴듯한 소설을 씁니다</h3>
+      <p>질문이 넓으면 그렇게 됩니다. 기능 하나로 좁히고, 근거를 요구하고, 모르는 것은 모른다고 적으라고 명시하세요. 그래도 근거 없는 문장이 나오면 그 자리에서 "이 문장의 근거 위치는?" 하고 되물으면 됩니다.</p>
+
+      <h3>이 기술을 어디에 쓰게 되나요</h3>
+      <p>보안 점검, 장애 분석, 레거시 시스템 유지보수, 상호운용 개발, 악성코드 분석 같은 자리에서 매일 쓰입니다. 공통점은 <b>소스가 없는 대상을 근거를 갖고 설명해야 하는 상황</b>이라는 점입니다.</p>
+    </section>
+  </main>
+</div>
+
+<footer class="wrap">
+  <p>한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과 · REA 리버스 엔지니어링 프로젝트 · 6차시 — <a href="/">강의실 홈</a> · <a href="https://github.com/morluto/rea" target="_blank" rel="noopener">REA 공식 저장소</a></p>
+</footer>
+
+<dialog class="tooltip-modal" id="termDialog" aria-labelledby="tmTitle">
+  <div class="tm-head">
+    <span class="ic" id="tmIcon"></span>
+    <div><h4 id="tmTitle"></h4><p id="tmTag"></p></div>
+    <button class="x" type="button" aria-label="닫기" id="tmClose">×</button>
+  </div>
+  <div class="tm-body" id="tmBody"></div>
+</dialog>
+
+<script>
+  var TERMS = {
+    rea: {
+      icon: '🔎', name: 'REA', tag: 'Reverse Engineer Anything — 분석 도구 모음', match: /REA/, role: '분석 도구',
+      body: '<h5>무엇인가요?</h5><p>바이너리, 애플리케이션, 실행 중인 동작을 조사할 수 있게 해 주는 오픈소스 도구 모음입니다. 에이전트에 <b>MCP</b> 로 붙여 쓰고, 터미널에서 같은 기능을 직접 쓸 수도 있습니다.</p>' +
+            '<h5>이 과정에서 하는 일</h5><p>내가 만든 앱과 오픈소스 앱을 조사하는 데 씁니다. 자바스크립트와 일렉트론, 웹사이트 분석은 추가 도구 없이 바로 됩니다.</p>' +
+            '<h5>중요한 성질</h5><ul><li>분석은 <b>내 컴퓨터에서</b> 돕니다. 대상을 어디로 올리지 않습니다.</li><li>결과에 <b>근거와 한계</b>가 함께 들어옵니다. 단정하지 않은 부분은 그렇게 표시됩니다.</li><li>법을 지키는 연구·교육·상호운용·보존, 그리고 본인이 권한을 가진 대상에 쓰도록 되어 있습니다.</li></ul>' +
+            '<dl class="facts"><dt>설정</dt><dd>npx rea-agents setup</dd><dt>요구 버전</dt><dd>Node.js 22.19+ / 24.11+ / 26+</dd><dt>라이선스</dt><dd>MIT</dd></dl>',
+      link: 'https://github.com/morluto/rea'
+    },
+    mcp: {
+      icon: '🔌', name: 'MCP', tag: 'AI 에이전트가 외부 도구를 쓰게 해 주는 규격', match: /에이전트에 붙여 쓰는 도구/, role: '연결 규격',
+      body: '<h5>무엇인가요?</h5><p>모델 컨텍스트 프로토콜의 줄임말로, 에이전트가 외부 도구를 호출할 수 있게 정해 둔 표준입니다. 규격이 같으니 도구를 꽂으면 바로 쓸 수 있습니다.</p>' +
+            '<h5>이 과정에서</h5><p>REA 가 MCP 서버로 등록되면, 에이전트가 분석이 필요할 때 알아서 REA 의 기능을 불러 씁니다. 사람은 한국어로 질문만 하면 됩니다.</p>',
+      link: ''
+    },
+    agent: {
+      icon: '🤖', name: 'AI 에이전트', tag: '도구를 직접 호출하며 일하는 AI 프로그램', match: /AI 에이전트/, role: '조사 진행자',
+      body: '<h5>무엇인가요?</h5><p>대화만 하는 것이 아니라 파일을 읽고 명령을 실행하고 도구를 호출하는 AI 프로그램입니다. Claude Code, Codex, Cursor, Gemini CLI 등이 있습니다.</p>' +
+            '<h5>이 과정에서</h5><p>질문을 받아 REA 를 호출하고, 결과를 모아 설명하고, 구현까지 도와줍니다. 다만 <b>근거 없이 그럴듯하게 쓰는 일</b>이 있으므로 사람이 확인해야 합니다.</p>',
+      link: ''
+    },
+    evidence: {
+      icon: '🧾', name: '근거 (Evidence)', tag: '결론이 어디에서 나왔는지 가리키는 자료', match: /근거/, role: '조사의 핵심',
+      body: '<h5>무엇인가요?</h5><p>어떤 주장이 나온 자리를 가리키는 정보입니다. 파일 이름, 위치, 호출 관계, 관찰된 요청 같은 것들입니다.</p>' +
+            '<h5>왜 중요한가요?</h5><p>리버스 엔지니어링의 결과는 대개 <b>추론</b>입니다. 근거가 붙어 있어야 다른 사람이 검증할 수 있고, 틀렸을 때 어디가 틀렸는지 찾을 수 있습니다. 이 과정의 평가도 근거의 질을 가장 크게 봅니다.</p>',
+      link: ''
+    },
+    decompile: {
+      icon: '🧩', name: '디컴파일 · 의사 코드', tag: '기계어를 사람이 읽을 수 있는 형태로 되돌린 것', match: /의사 코드/, role: '네이티브 분석',
+      body: '<h5>무엇인가요?</h5><p>컴파일된 기계어를 분석해 C 같은 언어 비슷한 형태로 복원한 것입니다. 원본 소스와 같지는 않습니다. 변수 이름과 주석은 사라졌고, 구조도 달라질 수 있습니다.</p>' +
+            '<h5>이 과정에서</h5><p>필수는 아닙니다. 가산점 과제로 직접 컴파일한 C 프로그램을 분석해 보면, 내가 쓴 소스와 의사 코드가 얼마나 다른지 비교할 수 있어 좋은 공부가 됩니다.</p>' +
+            '<dl class="facts"><dt>필요 도구</dt><dd>Ghidra · Hopper · IDA 중 하나</dd></dl>',
+      link: ''
+    },
+    electron: {
+      icon: '🖥️', name: 'Electron · ASAR', tag: '웹 기술로 만든 데스크톱 앱과 그 포장 형식', match: /Electron 앱/, role: '분석 대상',
+      body: '<h5>무엇인가요?</h5><p>일렉트론은 HTML 과 자바스크립트로 데스크톱 앱을 만드는 틀입니다. 앱 안의 코드는 보통 ASAR 이라는 한 덩어리 파일로 묶여 있습니다.</p>' +
+            '<h5>왜 분석하기 좋은가요?</h5><p>기계어가 아니라 자바스크립트라서 구조를 읽기 쉽습니다. 모듈 관계와 화면·배경 프로세스 사이의 통신 경계를 볼 수 있어, 처음 배우기에 알맞습니다.</p>',
+      link: ''
+    },
+    observe: {
+      icon: '👀', name: '브라우저 관찰', tag: '실행 중인 화면과 오가는 요청을 지켜보기', match: /실행 중인 화면/, role: '동적 분석',
+      body: '<h5>무엇인가요?</h5><p>정적 분석이 파일을 읽는 것이라면, 관찰은 프로그램을 실제로 띄워 놓고 무엇이 일어나는지 보는 것입니다. 페이지 구조, 실행되는 스크립트, 오가는 네트워크 요청을 봅니다.</p>' +
+            '<h5>주의</h5><p>관찰은 내 권한으로 대상을 실행하거나 대상과 주고받는 행위입니다. 수업에서 허용한 대상에만 쓰세요.</p>' +
+            '<dl class="facts"><dt>필요</dt><dd>크롬 계열 브라우저</dd></dl>',
+      link: ''
+    },
+    license: {
+      icon: '⚖️', name: '라이선스와 약관', tag: '무엇을 해도 되는지 정해 둔 문서', match: /라이선스와 약관/, role: '첫 번째 점검',
+      body: '<h5>왜 먼저 보나요?</h5><p>기술적으로 가능한 것과 해도 되는 것은 다릅니다. 오픈소스라도 조건이 있고, 상용 소프트웨어는 약관에서 역분석을 금지하는 경우가 많습니다.</p>' +
+            '<h5>수업 기준</h5><ul><li>내가 만든 것</li><li>소스가 공개된 것 (조건 확인 후)</li><li>강사가 지정하거나 권한자가 허락한 것</li></ul>' +
+            '<p>이 셋 밖의 대상은 다루지 않습니다. 보고서 첫 장에 대상과 그 근거를 적는 것이 규칙입니다.</p>',
+      link: ''
+    },
+    staticjs: {
+      icon: '📜', name: '정적 분석', tag: '실행하지 않고 파일만 읽어 구조를 파악하기', match: /정적 분석/, role: '기본 방법',
+      body: '<h5>무엇인가요?</h5><p>프로그램을 돌리지 않고 소스나 빌드 결과를 읽어 구조를 파악하는 방법입니다. 안전하고, 기록이 남고, 반복하기 쉽습니다.</p>' +
+            '<h5>이 과정에서</h5><p>우리 계산기와 그림판, 그리고 오픈소스 앱을 이 방법으로 먼저 봅니다. 정적으로 알 수 없는 것만 관찰로 넘어갑니다.</p>',
+      link: ''
+    },
+    nodejs: {
+      icon: '🟩', name: 'Node.js', tag: '자바스크립트 실행 환경', match: /Node\.js/, role: '실행 바탕',
+      body: '<h5>무엇인가요?</h5><p>브라우저 밖에서 자바스크립트를 실행하는 환경입니다. REA 는 이 위에서 돕니다.</p>' +
+            '<h5>버전 조건</h5><p>22.19 이상의 22.x, 24.11 이상의 24.x, 또는 26 이상이 필요합니다. 오래된 버전에서는 설정부터 막히니 먼저 확인하세요.</p>' +
+            '<dl class="facts"><dt>확인</dt><dd>node -v</dd></dl>',
+      link: 'https://nodejs.org'
+    }
+  };
+
+  var grid = document.getElementById('toolgrid');
+  Object.keys(TERMS).forEach(function (k) {
+    var t = TERMS[k];
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'toolcard'; b.dataset.term = k;
+    b.innerHTML = '<span class="ic">' + t.icon + '</span><span><span class="role">' + t.role + '</span><b>' + t.name + '</b><small>' + t.tag + '</small></span>';
+    grid.appendChild(b);
+  });
+
+  var SKIP = /^(PRE|CODE|A|BUTTON|H1|H2|H3|H4|SUMMARY|SVG|TEXT|SCRIPT|STYLE|DIALOG)$/;
+  function wrapFirst(root, key, re) {
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        for (var p = n.parentNode; p && p !== root; p = p.parentNode) {
+          if (SKIP.test(p.nodeName.toUpperCase()) || (p.classList && (p.classList.contains('term') || p.classList.contains('toolgrid') || p.classList.contains('code')))) return NodeFilter.FILTER_REJECT;
+        }
+        return re.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+      }
+    });
+    var node = walker.nextNode();
+    if (!node) return;
+    var m = node.nodeValue.match(re);
+    var after = node.splitText(m.index);
+    after.splitText(m[0].length);
+    var btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'term'; btn.dataset.term = key; btn.textContent = m[0];
+    btn.title = TERMS[key].name + ' 설명 보기';
+    after.parentNode.replaceChild(btn, after);
+  }
+  document.querySelectorAll('main section').forEach(function (sec) {
+    Object.keys(TERMS).forEach(function (k) { wrapFirst(sec, k, TERMS[k].match); });
+  });
+
+  var dlg = document.getElementById('termDialog');
+  function openTerm(key) {
+    var t = TERMS[key]; if (!t) return;
+    document.getElementById('tmIcon').textContent = t.icon;
+    document.getElementById('tmTitle').textContent = t.name;
+    document.getElementById('tmTag').textContent = t.tag;
+    document.getElementById('tmBody').innerHTML = t.body +
+      (t.link ? '<a class="go" href="' + t.link + '" target="_blank" rel="noopener">공식 문서 열기 ↗</a>' : '');
+    if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
+  }
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest && e.target.closest('[data-term]');
+    if (el) openTerm(el.dataset.term);
+  });
+  document.getElementById('tmClose').addEventListener('click', function () { dlg.close ? dlg.close() : dlg.removeAttribute('open'); });
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+
+  var tb = document.getElementById('theme');
+  var setLabel = function () { tb.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️ 라이트' : '🌙 다크'; };
+  setLabel();
+  tb.addEventListener('click', function () {
+    var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('rea-theme', next); } catch (e) {}
+    setLabel();
+  });
+
+  document.querySelectorAll('.code').forEach(function (box) {
+    var btn = document.createElement('button');
+    btn.className = 'copy'; btn.type = 'button'; btn.textContent = '복사';
+    btn.addEventListener('click', function () {
+      var text = box.querySelector('code').textContent;
+      if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () {
+        btn.textContent = '복사됨'; setTimeout(function () { btn.textContent = '복사'; }, 1500);
+      }, function () {});
+    });
+    box.appendChild(btn);
+  });
+
+  document.querySelectorAll('.checks input').forEach(function (cb, i) {
+    var key = 'rea-check-' + i;
+    try { cb.checked = localStorage.getItem(key) === '1'; } catch (e) {}
+    cb.addEventListener('change', function () { try { localStorage.setItem(key, cb.checked ? '1' : '0'); } catch (e) {} });
+  });
+
+  var links = document.querySelectorAll('nav.toc a');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) links.forEach(function (a) { a.classList.toggle('on', a.getAttribute('href') === '#' + en.target.id); });
+      });
+    }, { rootMargin: '-30% 0px -60% 0px' });
+    document.querySelectorAll('main section').forEach(function (s) { io.observe(s); });
+  }
+</script>
+</html>
