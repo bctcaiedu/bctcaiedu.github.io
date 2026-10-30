@@ -1102,7 +1102,12 @@ void loop() {
     parts: 'ESP32 DevKitC V4, SSD1306 OLED (I2C)', ask: 'ESP32를 Wokwi-GUEST(비밀번호 없음)에 연결하고 NTP로 한국 시간(UTC+9)을 받아 SSD1306 OLED에 날짜와 시각을 표시하고 싶어',
     ai: '연결이 안 되면 시리얼 로그를 그대로 붙여넣어 원인 후보를 받습니다.',
     checks: ['시리얼에 IP 주소가 출력된다', 'OLED에 한국 시간이 표시된다', '연결 실패 시 메시지를 직접 추가했다'],
-    tn: '아래 Wi-Fi 기본 코드를 먼저 실행해 연결을 확인한 뒤 시계 기능을 요청하게 하면 오류 범위가 좁아집니다.' },
+    tn: '아래 Wi-Fi 기본 코드를 먼저 실행해 연결을 확인한 뒤 시계 기능을 요청하게 하면 오류 범위가 좁아집니다.',
+    videos: [
+      ['0AlATlN95Y0', 'ESP32: WiFi Basics and sync to NTP clock', 'MoThunderz · 영어', 'ESP32를 공유기에 연결하는 기본 코드와 NTP로 시간을 맞추는 과정을 차근차근 설명합니다.'],
+      ['KSubE7GWWNI', 'Real-Time Internet Clock using WiFi and NTP', 'Roboarmy · 영어', 'Wi-Fi와 NTP로 받은 시간을 OLED에 표시하는 인터넷 시계 — 이번 차시 미션과 같은 구성입니다.'],
+      ['_aDfE_9y4bE', 'ESP32 Tutorial — Network Time Protocol', 'EVTV Motor Verks · 영어', 'NTP가 시간 서버와 어떻게 주고받는지(UDP) 원리 쪽을 더 자세히 다룹니다.']
+    ] },
   { n: 29, m: 'm6', env: 'wk', req: 'code', t: 'HTTP와 JSON: 날씨 표시기',
     goals: ['HTTP GET으로 공개 API 데이터를 받을 수 있다', 'JSON에서 필요한 값을 꺼낼 수 있다'],
     concepts: ['HTTP 요청 / 응답, 상태 코드 (200 = 성공)', 'JSON: <code>{"키": 값}</code> 구조 — ArduinoJson으로 파싱', 'API 응답은 먼저 브라우저로 열어 구조를 확인'],
@@ -1110,7 +1115,13 @@ void loop() {
     parts: 'ESP32 DevKitC V4, SSD1306 OLED', ask: 'ESP32에서 Open-Meteo API로 서울(위도 37.57, 경도 126.98)의 현재 기온과 습도를 받아 OLED에 표시하고 싶어. 응답 JSON은 이렇게 생겼어:\n(브라우저에서 복사한 JSON 붙여넣기)',
     ai: '실제 응답 JSON을 함께 주면 AI가 키 이름을 지어내지 않습니다. 주지 않았을 때와 비교해 봅니다.',
     checks: ['응답 JSON 구조를 브라우저로 확인했다', '기온과 습도가 OLED에 표시된다', '10분마다 갱신하도록 직접 바꿨다'],
-    tn: 'API 주소 예: <code>https://api.open-meteo.com/v1/forecast?latitude=37.57&amp;longitude=126.98&amp;current=temperature_2m,relative_humidity_2m</code>' },
+    tn: 'API 주소 예: <code>https://api.open-meteo.com/v1/forecast?latitude=37.57&amp;longitude=126.98&amp;current=temperature_2m,relative_humidity_2m</code>',
+    videos: [
+      ['j0bhm-0Z1Sw', 'ESP32 HTTP GET and HTTP POST with Arduino IDE', 'FLIQTOON · 영어', 'HTTPClient로 GET · POST 요청을 보내고 JSON 응답을 받는 기본기를 정리합니다.'],
+      ['NYP_CxdYzLo', 'Parsing Data From an API using ArduinoJson', 'Brian Lough · 영어', 'API 응답 JSON에서 필요한 값만 꺼내는 ArduinoJson 사용법 — 이번 차시의 핵심입니다.'],
+      ['xUrhLaviBrI', 'GET Weather data with your ESP32 for FREE', 'Kris Kasprzak · 영어', '키 없이 쓰는 무료 날씨 API에서 ESP32로 날씨를 받아 옵니다. Open-Meteo와 같은 방식입니다.'],
+      ['E9hGTlzqxJw', 'Weather Display on OLED by ESP32 using OpenWeatherMap API', 'Engineering Funda · 영어', '받은 날씨를 OLED에 표시하는 완성형 예제. OpenWeatherMap은 API 키가 필요하니 우리는 Open-Meteo로 바꿔 적용합니다.']
+    ] },
   { n: 30, m: 'm6', env: 'wk', req: 'code', mini: 1, t: '미니 미션 ④ 실내·실외 비교 디스플레이',
     goals: ['로컬 센서 데이터와 인터넷 데이터를 결합할 수 있다', 'AI 없이 표시 항목을 추가할 수 있다'],
     concepts: ['DHT22: 온도와 습도를 함께 측정 (DHT sensor library)', '로컬(실내) + 원격(실외) 데이터 결합 = IoT 서비스의 기본형', '(선택) ESP32 웹서버: Wokwi IoT Gateway 설치 필요'],
@@ -4461,6 +4472,9 @@ function pageLesson(l) {
     ${bugSection(l)}
     ${l.extra === 'api' ? apiTable() : ''}
     ${l.code ? `<h3>참고 코드</h3>${codeBlock(CODES[l.code].title, CODES[l.code].tag, CODES[l.code].src)}` : ''}
+    ${l.videos ? `<h3>영상으로 더 알아보기</h3>
+      <p>대부분 영어 영상입니다. 유튜브 플레이어의 <b>⚙ 설정 → 자막 → 자동 번역 → 한국어</b>를 켜고 보세요. 영상은 실제 보드와 집 공유기를 쓰므로, Wokwi에서는 SSID를 <code>Wokwi-GUEST</code>(비밀번호 없음)로 바꿔 적용합니다.</p>
+      ${videoCards(l.videos)}` : ''}
 
     <h2>AI 활용 포인트</h2>
     <div class="callout info"><div class="ct">🤖 이번 차시에 AI에게 맡기는 것과 직접 확인하는 것</div><p>${l.ai}</p></div>
