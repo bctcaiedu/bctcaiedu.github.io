@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI로 배우는 아두이노와 사물인터넷</title>
-  <meta name="description" content="하드웨어 없이 Tinkercad와 Wokwi 시뮬레이터로 아두이노 기초부터 ESP32 사물인터넷 서비스, 로봇 제어까지. AI에게 묻고, 검증하고, 내 말로 설명하며 배우는 55시간 과정.">
+  <meta name="description" content="하드웨어 없이 Tinkercad와 Wokwi 시뮬레이터로 아두이노 기초부터 ESP32 사물인터넷 서비스, 로봇 제어까지. AI에게 묻고, 검증하고, 내 말로 설명하며 배우는 56시간 과정.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔌</text></svg>">
 
   <!-- 글꼴 -->
@@ -1086,6 +1086,15 @@ void loop() {
     ai: 'AI가 정리한 차이표를 Wokwi 부품 핀 정보와 대조합니다. 특히 ADC 범위(1023 → 4095)를 확인합니다.',
     checks: ['ESP32에서 LED가 순서대로 켜진다', '가변저항 값이 0~4095로 나온다', 'UNO와의 차이 3가지를 설명할 수 있다'],
     tn: 'Wokwi는 로그인 없이도 실행되지만 저장하려면 계정이 필요합니다. 차시 시작 프로젝트 링크를 미리 공유하세요.' },
+  { n: 0, m: 'm6', env: 'wk', req: 'code', guide: 'wkboth', t: 'Wokwi로 실습하는 아두이노와 ESP32',
+    goals: ['Wokwi에서 아두이노 UNO 회로를 만들고 실행할 수 있다', '같은 회로와 코드를 ESP32로 옮기고 바뀌는 점을 설명할 수 있다'],
+    concepts: ['Wokwi는 UNO와 ESP32를 모두 지원 — 같은 화면에서 보드만 바꿔 비교', '보드를 바꾸면 바뀌는 것: 핀 이름(D2 → GPIO4), 전압(5V → 3.3V), ADC 범위(1023 → 4095), 시리얼 속도, 서보 라이브러리', '바뀌지 않는 것: <code>setup()</code> · <code>loop()</code>, <code>digitalRead</code> · <code>digitalWrite</code> · <code>analogRead</code> · <code>map()</code> 같은 기본 함수'],
+    mission: 'Wokwi에서 아두이노 UNO로 ① 버튼 토글 LED(디지털 입출력), ② 가변저항 전압 측정(아날로그 입력), ③ 가변저항으로 서보 조종(액추에이터)을 실행합니다. 그다음 같은 회로에서 UNO를 ESP32로 바꾸고, 세 코드를 ESP32용으로 고쳐 똑같이 동작하게 만듭니다.',
+    parts: '아두이노 UNO → ESP32 DevKitC V4, LED, 220Ω 저항, 푸시버튼, 가변저항, 마이크로 서보',
+    ask: '아래는 Wokwi의 아두이노 UNO에서 동작하는 코드야. 버튼 D2 → GPIO4, LED D13 → GPIO16, 가변저항 A0 → GPIO34, 서보 D9 → GPIO18로 바꿔서 Wokwi의 ESP32 DevKitC V4용으로 고쳐줘. 바꾼 줄마다 왜 바꿨는지 주석을 달고, UNO와 달라진 점을 표로 정리해줘.\n(UNO 코드 붙여넣기)',
+    ai: 'AI가 고친 코드에서 핀 번호, <code>analogRead</code> 범위(4095), 전압 계산(3.3V), <code>Serial.begin(115200)</code>, <code>ESP32Servo.h</code> 다섯 곳을 직접 확인합니다. 하나라도 빠졌으면 무엇이 빠졌는지 AI에게 되묻지 말고 직접 고칩니다.',
+    checks: ['UNO에서 실습 ①②③이 모두 동작한다', 'ESP32로 바꾼 뒤에도 ①②③이 똑같이 동작한다', '가변저항 끝 값이 UNO는 1023, ESP32는 4095로 나오는 것을 확인했다', 'UNO → ESP32로 바꿀 때 달라진 점 5가지를 내 말로 설명할 수 있다'],
+    tn: 'Wokwi는 UNO도 시뮬레이션하므로 Tinkercad에서 배운 내용을 같은 화면에서 ESP32와 비교할 수 있습니다. 시간이 부족하면 아래 diagram.json을 붙여넣어 회로 그리기를 건너뛰고, 보드 교체와 코드 비교에 집중하세요.' },
   { n: 28, m: 'm6', env: 'wk', req: 'code', code: 'wifi', t: 'Wi-Fi 연결과 인터넷 시계',
     goals: ['ESP32를 Wi-Fi에 연결할 수 있다', 'NTP로 인터넷 시간을 받아 표시할 수 있다'],
     concepts: ['Wokwi 가상 Wi-Fi: SSID <code>Wokwi-GUEST</code>, 비밀번호 없음', 'IP 주소 · 연결 상태 확인 (<code>WiFi.status()</code>)', 'NTP: 인터넷 시간 서버 — 한국은 UTC+9'],
@@ -1105,7 +1114,7 @@ void loop() {
   { n: 30, m: 'm6', env: 'wk', req: 'code', mini: 1, t: '미니 미션 ④ 실내·실외 비교 디스플레이',
     goals: ['로컬 센서 데이터와 인터넷 데이터를 결합할 수 있다', 'AI 없이 표시 항목을 추가할 수 있다'],
     concepts: ['DHT22: 온도와 습도를 함께 측정 (DHT sensor library)', '로컬(실내) + 원격(실외) 데이터 결합 = IoT 서비스의 기본형', '(선택) ESP32 웹서버: Wokwi IoT Gateway 설치 필요'],
-    mission: 'DHT22로 실내 온습도를 측정하고, 30차시 날씨 API의 실외 값과 함께 OLED에 비교 표시합니다. 온도 차이가 크면 "환기하세요"를 띄웁니다.',
+    mission: 'DHT22로 실내 온습도를 측정하고, 31차시 날씨 API의 실외 값과 함께 OLED에 비교 표시합니다. 온도 차이가 크면 "환기하세요"를 띄웁니다.',
     parts: 'ESP32 DevKitC V4, DHT22, SSD1306 OLED', ask: 'ESP32에 DHT22(15번 핀)와 SSD1306 OLED가 있어. 실내 온습도와 Open-Meteo의 실외 온습도를 함께 표시하고, 온도 차이가 5도 이상이면 "환기하세요"를 표시하고 싶어',
     ai: '구현은 AI와 함께, 마지막 표시 항목 1개는 AI 없이 추가합니다.',
     checks: ['실내 · 실외 값이 함께 표시된다', '환기 알림 조건이 동작한다', 'AI 없이 표시 항목을 하나 추가했다'],
@@ -1209,7 +1218,7 @@ void loop() {
     parts: '스마트폰 1대 (없으면 PC 브라우저의 두 번째 탭), PC 1대', ask: '3D 로봇개 리모컨의 매크로를 만들어줘. 앞으로 2초 걷고, 왼쪽으로 크게 돌면서 반원을 그리고, 앉아서 손을 준 다음 짖고 일어나는 산책 코스야. 각 단계에 무엇을 하는지 한 줄씩 따로 설명해줘',
     ai: 'AI가 없는 명령(예: "run", "turn")이나 범위를 벗어난 값(v 2.0)을 넣지 않았는지 API 명세와 대조합니다. JSON 안에 주석(//)을 넣으면 오류가 나므로 설명은 JSON 밖에 따로 달라고 합니다. 로봇개 화면에 "모르는 명령"이 뜨면 그 로그를 그대로 AI에게 알려 고치게 합니다.',
     checks: ['QR로 스마트폰 리모컨을 연결하고 왕복 시간(ms)을 기록했다', '공 3개를 찾아 집으로 돌아왔다 (미션 성공)', '조이스틱을 놓거나 화면을 끄면 워치독으로 멈추는 것을 확인했다', 'AI가 만든 매크로를 명세와 대조해 고친 뒤 실행했다'],
-    tn: '학교 와이파이가 MQTT(wss 8884)를 막으면 연결이 되지 않습니다. 수업 전에 확인하고, 막혀 있으면 휴대폰 데이터나 PC 두 번째 탭으로 진행하세요. 연결 코드가 학생마다 달라 서로의 로봇개를 조종하지 않습니다. 일부러 짝과 코드를 바꿔 "코드만 알면 남의 로봇을 움직일 수 있다"를 체험하게 하면 37차시 보안과 이어집니다.' },
+    tn: '학교 와이파이가 MQTT(wss 8884)를 막으면 연결이 되지 않습니다. 수업 전에 확인하고, 막혀 있으면 휴대폰 데이터나 PC 두 번째 탭으로 진행하세요. 연결 코드가 학생마다 달라 서로의 로봇개를 조종하지 않습니다. 일부러 짝과 코드를 바꿔 "코드만 알면 남의 로봇을 움직일 수 있다"를 체험하게 하면 38차시 보안과 이어집니다.' },
   { n: 0, m: 'mr2', env: 'rb', req: 'code', sim: 'world=obstacle&mode=code&ex=avoid', t: '장애물 회피: 감지 → 판단 → 동작 루프',
     goals: ['센서 값에 따라 동작을 바꾸는 반응형 제어를 구현할 수 있다', '앞 · 왼쪽 · 오른쪽 거리를 비교해 회전 방향을 정할 수 있다'],
     concepts: ['반응형 제어: <code>loop()</code>마다 센서를 읽고 즉시 동작을 결정', '<code>distance()</code> · <code>distanceLeft()</code> · <code>distanceRight()</code>로 열린 쪽 판단, <code>bumped()</code>로 충돌 감지', '임계값과 속도는 실험으로 조정한다'],
@@ -1257,7 +1266,7 @@ void loop() {
     parts: 'ESP32 DevKitC V4 (Wokwi), 가상 로봇 (📡 ESP32 모드), 스마트폰 또는 PC 브라우저', ask: 'MQTT.js로 wss://broker.hivemq.com:8884/mqtt 에 접속하는 로봇 조종 대시보드(HTML 한 페이지)를 만들어줘. 방향 버튼(전진/후진/좌/우/정지)은 "bctc/kim/robot/remote"에 "F","B","L","R","S"를 보내고, 자율/수동 버튼은 "AUTO","MANUAL"을 보내. "bctc/kim/robot/sensors"를 구독해서 앞 거리를 크게 보여줘. 스마트폰에서 누르기 쉽게 버튼을 크게 만들어줘',
     ai: '대시보드 · ESP32 · 실습실 세 곳의 토픽과 메시지 형식을 표 하나로 정리해 대조합니다. 하나라도 다르면 동작하지 않습니다.',
     checks: ['스마트폰에서 로봇을 조종했다', '자율 · 수동 모드가 전환된다', '수동 모드에서도 벽 앞에서 전진이 막힌다'],
-    tn: '36차시 대시보드를 재사용하면 시간이 절약됩니다. 현재 모드를 대시보드에 표시하는 기능은 AI 없이 직접 추가하게 하세요.' },
+    tn: '37차시 대시보드를 재사용하면 시간이 절약됩니다. 현재 모드를 대시보드에 표시하는 기능은 AI 없이 직접 추가하게 하세요.' },
   { n: 0, m: 'mr2', env: 'rb', req: 'code', mini: 1, sim: 'world=delivery&mode=code', t: '미니 미션 ⑤ 배달 로봇 챌린지',
     goals: ['배운 제어 방법을 조합해 목표 지점까지 자율 주행할 수 있다', '기록을 근거로 알고리즘을 개선할 수 있다'],
     concepts: ['벽 따라가기(오른손 법칙): 미로 탈출의 고전 전략', '성능 지표: 도착 시간 · 충돌 횟수 · 주행 거리', '개선 사이클: 기록 → 원인 분석 → 한 가지만 바꿔 재시험'],
@@ -1974,20 +1983,24 @@ const CIRCUITS = {
          mods: { us: MOD.us, servo: MOD.servo(), lcd: MOD.lcd } }],
   28: [{ board: 'esp32', lines: [ledRow('GPIO16', '빨강'), ledRow('GPIO17', '노랑'), ledRow('GPIO18', '초록'), { pin: 'GPIO34', to: { m: 'pot', p: '가운데 (W)' } }],
          mods: { pot: MOD.pot('3V3') }, note: 'ESP32는 3.3V로 동작합니다. 가변저항도 5V가 아니라 3V3에 연결하고, 아날로그 입력은 ADC1 핀(32~39번)을 씁니다.' }],
-  29: [{ board: 'esp32', lines: [{ pin: 'GPIO21 (SDA)', to: { m: 'oled', p: 'SDA' } }, { pin: 'GPIO22 (SCL)', to: { m: 'oled', p: 'SCL' } }], mods: { oled: MOD.oled },
+  29: [{ title: '① 아두이노 UNO로 만들기', board: 'uno', lines: [btnRow('D2'), ledRow('D13', '빨강'), { pin: 'A0', to: { m: 'pot', p: '가운데 (W)' } }, { pin: 'D9', to: { m: 'servo', p: 'SIG (주황)' } }],
+         mods: { pot: MOD.pot(), servo: MOD.servo() }, note: '실습 ①②③을 모두 이 회로 하나로 합니다. 가변저항은 5V, 서보 전원도 5V에 연결합니다.' },
+       { title: '② 같은 회로를 ESP32로 바꾸기', board: 'esp32', lines: [btnRow('GPIO4'), ledRow('GPIO16', '빨강'), { pin: 'GPIO34', to: { m: 'pot', p: '가운데 (W)' } }, { pin: 'GPIO18', to: { m: 'servo', p: 'SIG (주황)' } }],
+         mods: { pot: MOD.pot('3V3'), servo: MOD.servo('5V') }, note: '부품은 그대로 두고 보드와 핀만 바꿉니다. 가변저항은 3V3으로 옮기고(ESP32 핀은 3.3V까지), 서보 전원은 5V 핀에서 받습니다.' }],
+  30: [{ board: 'esp32', lines: [{ pin: 'GPIO21 (SDA)', to: { m: 'oled', p: 'SDA' } }, { pin: 'GPIO22 (SCL)', to: { m: 'oled', p: 'SCL' } }], mods: { oled: MOD.oled },
          note: 'ESP32 DevKit의 기본 I2C 핀은 GPIO21(SDA)과 GPIO22(SCL)입니다. Wi-Fi는 선 없이 Wokwi-GUEST에 연결됩니다.' }],
-  30: [{ board: 'esp32', lines: [{ pin: 'GPIO21 (SDA)', to: { m: 'oled', p: 'SDA' } }, { pin: 'GPIO22 (SCL)', to: { m: 'oled', p: 'SCL' } }], mods: { oled: MOD.oled } }],
-  31: [{ board: 'esp32', lines: [{ pin: 'GPIO15', to: { m: 'dht', p: 'SDA (데이터)' } }, { pin: 'GPIO21 (SDA)', to: { m: 'oled', p: 'SDA' } }, { pin: 'GPIO22 (SCL)', to: { m: 'oled', p: 'SCL' } }],
+  31: [{ board: 'esp32', lines: [{ pin: 'GPIO21 (SDA)', to: { m: 'oled', p: 'SDA' } }, { pin: 'GPIO22 (SCL)', to: { m: 'oled', p: 'SCL' } }], mods: { oled: MOD.oled } }],
+  32: [{ board: 'esp32', lines: [{ pin: 'GPIO15', to: { m: 'dht', p: 'SDA (데이터)' } }, { pin: 'GPIO21 (SDA)', to: { m: 'oled', p: 'SDA' } }, { pin: 'GPIO22 (SCL)', to: { m: 'oled', p: 'SCL' } }],
          mods: { dht: MOD.dht, oled: MOD.oled } }],
-  34: [{ board: 'esp32', lines: [{ pin: 'GPIO15', to: { m: 'dht', p: 'SDA (데이터)' } }, ledRow('GPIO2', '빨강', '스마트폰 명령 LED')], mods: { dht: MOD.dht },
+  35: [{ board: 'esp32', lines: [{ pin: 'GPIO15', to: { m: 'dht', p: 'SDA (데이터)' } }, ledRow('GPIO2', '빨강', '스마트폰 명령 LED')], mods: { dht: MOD.dht },
          note: 'DHT22 값은 채널 A로 올리고, 스마트폰이 채널 B에 쓴 LED 명령을 읽어 GPIO2의 LED를 켜고 끕니다.' }],
-  35: [{ board: 'esp32', lines: [{ pin: 'GPIO15', to: { m: 'dht', p: 'SDA (데이터)' } }], mods: { dht: MOD.dht } }],
-  36: [{ board: 'esp32', lines: [{ pin: 'GPIO15', to: { m: 'dht', p: 'SDA (데이터)' } }, ledRow('GPIO2', '빨강', '원격 LED'), { pin: 'GPIO18', to: { m: 'servo', p: 'SIG (주황)' } }],
+  36: [{ board: 'esp32', lines: [{ pin: 'GPIO15', to: { m: 'dht', p: 'SDA (데이터)' } }], mods: { dht: MOD.dht } }],
+  37: [{ board: 'esp32', lines: [{ pin: 'GPIO15', to: { m: 'dht', p: 'SDA (데이터)' } }, ledRow('GPIO2', '빨강', '원격 LED'), { pin: 'GPIO18', to: { m: 'servo', p: 'SIG (주황)' } }],
          mods: { dht: MOD.dht, servo: MOD.servo('5V') } }],
-  37: [{ board: 'esp32', lines: [{ pin: 'GPIO15', to: { m: 'dht', p: 'SDA (데이터)' } }, ledRow('GPIO2', '빨강', '경보')], mods: { dht: MOD.dht } }],
-  39: [{ board: 'uno', lines: drv2Rows, mods: { drv: drv2 },
+  38: [{ board: 'esp32', lines: [{ pin: 'GPIO15', to: { m: 'dht', p: 'SDA (데이터)' } }, ledRow('GPIO2', '빨강', '경보')], mods: { dht: MOD.dht } }],
+  40: [{ board: 'uno', lines: drv2Rows, mods: { drv: drv2 },
          note: '모터 전원은 9V 배터리(VCC2)에서, 칩 전원은 아두이노 5V(VCC1)에서 받습니다. 배터리 −와 아두이노 GND는 공통으로 연결합니다.' }],
-  41: [{ board: 'esp32', lines: [
+  42: [{ board: 'esp32', lines: [
          { pin: 'GPIO13', to: { m: 'sv', p: '베이스 SIG' } }, { pin: 'GPIO14', to: { m: 'sv', p: '어깨 SIG' } }, { pin: 'GPIO27', to: { m: 'sv', p: '팔꿈치 SIG' } }, { pin: 'GPIO26', to: { m: 'sv', p: '그리퍼 SIG' } },
          { pin: 'GPIO32', to: { m: 'pot', p: '베이스 W' } }, { pin: 'GPIO33', to: { m: 'pot', p: '어깨 W' } }, { pin: 'GPIO34', to: { m: 'pot', p: '팔꿈치 W' } }, { pin: 'GPIO35', to: { m: 'pot', p: '그리퍼 W' } },
          btnRow('GPIO25', '기록'), btnRow('GPIO4', '재생')],
@@ -2640,7 +2653,7 @@ function circuitFigs(figs) {
 }
 function circuitSection(l) {
   const figs = CIRCUITS[l.n];
-  if (!figs) return '';
+  if (!figs || l.guide === 'wkboth') return '';   // wkboth는 1 · 2단계 안에 직접 넣음
   const env = l.env === 'wk' ? 'Wokwi' : 'Tinkercad';
   return `<h2>배선도와 회로도</h2>
     <p>이 차시에서 ${env}에 만들 회로입니다. 위는 실제로 꽂는 모습(브레드보드 배선도), 아래는 같은 회로를 기호로 나타낸 회로도입니다. 핀 번호는 아래 예시 프롬프트와 같게 맞췄습니다. 핀을 바꾸면 프롬프트의 핀 번호도 함께 바꾸세요.</p>
@@ -2785,7 +2798,7 @@ function unoGuide() {
   ];
   const use = [
     ['LED · 신호등', 'D2 ~ D13', '9 · 10 · 11 · 14차시'], ['버튼', 'D2 · D7 (INPUT_PULLUP)', '12 · 13 · 14 · 21 · 22차시'],
-    ['밝기 · 색 · 속도 조절', '~3 · ~5 · ~6 · ~9', '16 · 17 · 23 · 39차시'], ['센서 값 읽기', 'A0 · A1', '15 · 17 · 18 · 20 · 24차시'],
+    ['밝기 · 색 · 속도 조절', '~3 · ~5 · ~6 · ~9', '16 · 17 · 23 · 40차시'], ['센서 값 읽기', 'A0 · A1', '15 · 17 · 18 · 20 · 24차시'],
     ['LCD (I2C)', 'A4 (SDA) · A5 (SCL)', '24 · 27차시'], ['보드 간 통신', 'D0 (RX) · D1 (TX)', '26차시']
   ];
   return `
@@ -3015,7 +3028,7 @@ function wokwiGuide() {
   const install = [
     ['웹 버전 (이 과정)', '설치 없음', 'wokwi.com 접속만 하면 됩니다. 학교 PC에 권장'],
     ['VS Code 확장', 'VS Code에서 "Wokwi Simulator" 확장 설치', 'PC의 Arduino · PlatformIO 프로젝트를 시뮬레이션. 라이선스 등록이 필요합니다'],
-    ['Wokwi IoT Gateway', '공식 GitHub에서 내려받아 실행', 'ESP32 웹서버에 내 PC 브라우저로 접속할 때만 필요 (31차시 선택 과제)']
+    ['Wokwi IoT Gateway', '공식 GitHub에서 내려받아 실행', 'ESP32 웹서버에 내 PC 브라우저로 접속할 때만 필요 (32차시 선택 과제)']
   ];
   const cmp = [
     ['지원 보드', 'Arduino UNO, micro:bit 등', 'ESP32, Arduino UNO · Nano · Mega, Raspberry Pi Pico 등'],
@@ -3209,8 +3222,8 @@ function esp32Guide() {
     ['⛔ 쓰지 않기', '1(TX), 3(RX), 6~11(CLK · D0~D3 · CMD)', '1 · 3은 USB 시리얼 통신용, 6~11은 내장 플래시용. 쓰면 업로드 · 시리얼 모니터 · 부팅이 망가짐']
   ];
   const use = [
-    ['LED', 'GPIO16 · 17 · 18 · 2', '28 · 34 · 36 · 37차시'], ['가변저항 (아날로그)', 'GPIO34 · 32~35', '28 · 41차시'], ['OLED · I2C', 'GPIO21 (SDA) · 22 (SCL)', '29 · 30 · 31차시'],
-    ['DHT22 온습도', 'GPIO15', '31 · 34 · 35 · 36 · 37차시'], ['서보', 'GPIO18 · 13 · 14 · 27 · 26', '36 · 41차시'], ['버튼', 'GPIO25 · 4 (INPUT_PULLUP)', '41차시']
+    ['LED', 'GPIO16 · 17 · 18 · 2', '28 · 29 · 35 · 37 · 38차시'], ['가변저항 (아날로그)', 'GPIO34 · 32~35', '28 · 29 · 42차시'], ['OLED · I2C', 'GPIO21 (SDA) · 22 (SCL)', '30 · 31 · 32차시'],
+    ['DHT22 온습도', 'GPIO15', '32 · 35 · 36 · 37 · 38차시'], ['서보', 'GPIO18 · 13 · 14 · 27 · 26', '29 · 37 · 42차시'], ['버튼', 'GPIO25 · 4 (INPUT_PULLUP)', '29 · 42차시']
   ];
   return `
     <h2>ESP32 알아보기</h2>
@@ -3251,7 +3264,262 @@ function esp32Guide() {
     ${videoCards(videos)}`;
 }
 
-/* 32 · 33차시: 사물인터넷 이론 */
+/* 29차시: Wokwi로 실습하는 아두이노와 ESP32 — 같은 회로 · 같은 코드를 보드만 바꿔 비교 */
+const WKBOTH = {
+  diagUno: `{
+  "version": 1,
+  "author": "bctcaiedu",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-pushbutton", "id": "btn1", "top": -134, "left": -10, "attrs": { "color": "green" } },
+    { "type": "wokwi-resistor", "id": "r1", "top": -72, "left": 120, "rotate": 90, "attrs": { "value": "220" } },
+    { "type": "wokwi-led", "id": "led1", "top": -160, "left": 130, "attrs": { "color": "red" } },
+    { "type": "wokwi-potentiometer", "id": "pot1", "top": 250, "left": 40, "attrs": {} },
+    { "type": "wokwi-servo", "id": "servo1", "top": -150, "left": 260, "attrs": {} }
+  ],
+  "connections": [
+    [ "btn1:1.l", "uno:2", "green", [] ],
+    [ "btn1:2.l", "uno:GND.1", "black", [] ],
+    [ "uno:13", "r1:1", "orange", [] ],
+    [ "r1:2", "led1:A", "orange", [] ],
+    [ "led1:C", "uno:GND.1", "black", [] ],
+    [ "pot1:SIG", "uno:A0", "blue", [] ],
+    [ "pot1:VCC", "uno:5V", "red", [] ],
+    [ "pot1:GND", "uno:GND.2", "black", [] ],
+    [ "servo1:PWM", "uno:9", "orange", [] ],
+    [ "servo1:V+", "uno:5V", "red", [] ],
+    [ "servo1:GND", "uno:GND.2", "black", [] ]
+  ],
+  "dependencies": {}
+}`,
+  diagEsp: `{
+  "version": 1,
+  "author": "bctcaiedu",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-pushbutton", "id": "btn1", "top": -134, "left": -10, "attrs": { "color": "green" } },
+    { "type": "wokwi-resistor", "id": "r1", "top": -72, "left": 120, "rotate": 90, "attrs": { "value": "220" } },
+    { "type": "wokwi-led", "id": "led1", "top": -160, "left": 130, "attrs": { "color": "red" } },
+    { "type": "wokwi-potentiometer", "id": "pot1", "top": 250, "left": 40, "attrs": {} },
+    { "type": "wokwi-servo", "id": "servo1", "top": -150, "left": 260, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "btn1:1.l", "esp:4", "green", [] ],
+    [ "btn1:2.l", "esp:GND.1", "black", [] ],
+    [ "esp:16", "r1:1", "orange", [] ],
+    [ "r1:2", "led1:A", "orange", [] ],
+    [ "led1:C", "esp:GND.1", "black", [] ],
+    [ "pot1:SIG", "esp:34", "blue", [] ],
+    [ "pot1:VCC", "esp:3V3", "red", [] ],
+    [ "pot1:GND", "esp:GND.2", "black", [] ],
+    [ "servo1:PWM", "esp:18", "orange", [] ],
+    [ "servo1:V+", "esp:5V", "red", [] ],
+    [ "servo1:GND", "esp:GND.2", "black", [] ]
+  ],
+  "dependencies": {}
+}`,
+  labs: [
+    { no: '①', t: '디지털 입출력 — 버튼으로 LED 켜고 끄기', from: '12 · 13차시',
+      desc: '버튼을 한 번 누를 때마다 LED가 켜짐 ↔ 꺼짐으로 바뀌고, 시리얼 모니터에 ON · OFF가 찍힙니다. 버튼은 <code>INPUT_PULLUP</code>이라 누르면 LOW입니다.',
+      uno: `// ① 디지털 입출력: 버튼을 누를 때마다 LED 켜짐 <-> 꺼짐 (아두이노 UNO)
+const int BTN = 2;    // 버튼 (다른 쪽은 GND)
+const int LED = 13;   // LED (220옴 저항을 거쳐 GND)
+
+bool ledOn = false;
+int last = HIGH;      // 직전 버튼 상태 (안 누르면 HIGH)
+
+void setup() {
+  pinMode(BTN, INPUT_PULLUP);
+  pinMode(LED, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int now = digitalRead(BTN);
+  if (last == HIGH && now == LOW) {   // 막 눌린 순간
+    ledOn = !ledOn;
+    digitalWrite(LED, ledOn ? HIGH : LOW);
+    Serial.println(ledOn ? "ON" : "OFF");
+    delay(30);                         // 버튼 떨림(바운싱) 무시
+  }
+  last = now;
+}`,
+      esp: `// ① 디지털 입출력: 버튼을 누를 때마다 LED 켜짐 <-> 꺼짐 (ESP32)
+const int BTN = 4;    // UNO D2  -> ESP32 GPIO4
+const int LED = 16;   // UNO D13 -> ESP32 GPIO16
+
+bool ledOn = false;
+int last = HIGH;
+
+void setup() {
+  pinMode(BTN, INPUT_PULLUP);   // ESP32도 내부 풀업 사용 가능 (34~39번 제외)
+  pinMode(LED, OUTPUT);
+  Serial.begin(115200);         // ESP32는 115200
+}
+
+void loop() {
+  int now = digitalRead(BTN);
+  if (last == HIGH && now == LOW) {
+    ledOn = !ledOn;
+    digitalWrite(LED, ledOn ? HIGH : LOW);
+    Serial.println(ledOn ? "ON" : "OFF");
+    delay(30);
+  }
+  last = now;
+}`,
+      diff: '핀 번호(2 → 4, 13 → 16)와 시리얼 속도만 바뀝니다. 나머지 코드는 한 글자도 바뀌지 않습니다.' },
+    { no: '②', t: '아날로그 입력 — 가변저항 전압 재기', from: '15차시',
+      desc: '가변저항 손잡이를 돌리면서 <code>analogRead</code> 값과 전압을 시리얼 모니터로 확인합니다. 손잡이를 끝까지 돌렸을 때의 최댓값을 꼭 기록하세요.',
+      uno: `// ② 아날로그 입력: 가변저항 값과 전압 (아두이노 UNO)
+const int POT = A0;
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+  int raw = analogRead(POT);          // 0 ~ 1023 (10비트)
+  float volt = raw * 5.0 / 1023;      // 0 ~ 5V
+  Serial.print("raw: ");
+  Serial.print(raw);
+  Serial.print("   volt: ");
+  Serial.println(volt, 2);
+  delay(300);
+}`,
+      esp: `// ② 아날로그 입력: 가변저항 값과 전압 (ESP32)
+const int POT = 34;                   // UNO A0 -> ESP32 GPIO34 (ADC1, 입력 전용)
+
+void setup() {
+  Serial.begin(115200);
+}
+
+void loop() {
+  int raw = analogRead(POT);          // 0 ~ 4095 (12비트)
+  float volt = raw * 3.3 / 4095;      // 0 ~ 3.3V
+  Serial.print("raw: ");
+  Serial.print(raw);
+  Serial.print("   volt: ");
+  Serial.println(volt, 2);
+  delay(300);
+}`,
+      diff: '최댓값이 1023 → <b>4095</b>, 기준 전압이 5V → <b>3.3V</b>로 바뀝니다. 핀 이름도 <code>A0</code>가 아니라 GPIO 번호 <code>34</code>를 씁니다.' },
+    { no: '③', t: '액추에이터 — 가변저항으로 서보 각도 조종', from: '22차시',
+      desc: '가변저항 값을 <code>map()</code>으로 0~180°로 바꿔 서보를 돌립니다. 손잡이와 서보 팔이 함께 움직이면 성공입니다.',
+      uno: `// ③ 액추에이터: 가변저항으로 서보 각도 조종 (아두이노 UNO)
+#include <Servo.h>
+
+const int POT = A0;
+const int SERVO_PIN = 9;
+Servo sv;
+
+void setup() {
+  sv.attach(SERVO_PIN);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int raw = analogRead(POT);                // 0 ~ 1023
+  int angle = map(raw, 0, 1023, 0, 180);    // 0 ~ 180도
+  sv.write(angle);
+  Serial.println(angle);
+  delay(50);
+}`,
+      esp: `// ③ 액추에이터: 가변저항으로 서보 각도 조종 (ESP32)
+// Wokwi 라이브러리 관리자에서 ESP32Servo 추가
+#include <ESP32Servo.h>                     // Servo.h -> ESP32Servo.h
+
+const int POT = 34;                         // A0 -> GPIO34
+const int SERVO_PIN = 18;                   // D9 -> GPIO18
+Servo sv;                                   // 사용법은 Servo.h와 같음
+
+void setup() {
+  sv.attach(SERVO_PIN);
+  Serial.begin(115200);
+}
+
+void loop() {
+  int raw = analogRead(POT);                // 0 ~ 4095
+  int angle = map(raw, 0, 4095, 0, 180);    // 입력 범위도 4095로
+  sv.write(angle);
+  Serial.println(angle);
+  delay(50);
+}`,
+      diff: '라이브러리가 <code>ESP32Servo.h</code>로 바뀌고(라이브러리 관리자에서 추가), <code>map()</code>의 입력 범위가 0~4095가 됩니다. <code>map(raw, 0, 1023, …)</code>을 그대로 두면 손잡이를 4분의 1만 돌려도 서보가 끝까지 가 버립니다.' }
+  ]
+};
+function wokwiBothGuide() {
+  const uno = [
+    ['UNO 프로젝트 만들기', '<a href="https://wokwi.com/projects/new/arduino-uno" target="_blank" rel="noopener">wokwi.com/projects/new/arduino-uno</a>로 들어갑니다. 아두이노 UNO가 놓인 빈 프로젝트가 열립니다.'],
+    ['회로 만들기', '아래 배선도처럼 <b>+</b>로 버튼 · 저항 · LED · 가변저항 · 서보를 추가하고 선을 잇습니다. 시간이 부족하면 아래 <b>UNO diagram.json</b>을 <code>diagram.json</code> 탭에 통째로 붙여넣어도 됩니다.'],
+    ['실습 ①②③ 실행', '<code>sketch.ino</code>에 UNO 코드를 하나씩 붙여넣고 ▶로 실행합니다. 세 실습이 같은 회로를 씁니다.'],
+    ['저장', '로그인 후 <b>Save</b> → 이름을 "29차시 UNO"로 저장합니다.']
+  ];
+  const esp = [
+    ['ESP32 프로젝트 만들기', '<a href="https://wokwi.com/projects/new/esp32" target="_blank" rel="noopener">wokwi.com/projects/new/esp32</a>로 새 프로젝트를 엽니다.'],
+    ['회로 옮기기', 'UNO 프로젝트의 <code>diagram.json</code>을 복사해 ESP32 프로젝트에 붙여넣고, 아래 <b>바꿀 곳 표</b>대로 보드 줄과 연결 핀을 고칩니다. 막히면 <b>ESP32 diagram.json</b>(정답)과 비교합니다.'],
+    ['라이브러리 추가', '실습 ③을 위해 <b>라이브러리 관리자</b>에서 <code>ESP32Servo</code>를 추가합니다.'],
+    ['코드 옮기기', 'UNO 코드를 붙여넣고 ▶ — 동작하지 않는 곳을 찾아 직접 고칩니다. 그다음 아래 ESP32 코드와 비교합니다.'],
+    ['저장', '"29차시 ESP32"로 저장하고 두 프로젝트 링크를 함께 제출합니다.']
+  ];
+  const pins = [
+    ['버튼', '<code>uno:2</code>', '<code>esp:4</code>', 'GPIO4 — 입출력 모두 되는 안전한 핀'],
+    ['LED (저항 쪽)', '<code>uno:13</code>', '<code>esp:16</code>', 'GPIO16'],
+    ['가변저항 가운데 (SIG)', '<code>uno:A0</code>', '<code>esp:34</code>', 'ADC1 입력 전용 핀 — Wi-Fi를 켜도 읽힘'],
+    ['가변저항 VCC', '<code>uno:5V</code>', '<b><code>esp:3V3</code></b>', 'ESP32 핀은 3.3V까지만 — 5V를 넣으면 안 됨'],
+    ['서보 신호 (PWM)', '<code>uno:9</code>', '<code>esp:18</code>', 'GPIO18 — PWM 가능'],
+    ['서보 V+', '<code>uno:5V</code>', '<code>esp:5V</code>', '서보는 전류가 커서 5V 핀에서 받음'],
+    ['GND', '<code>uno:GND.1</code> · <code>GND.2</code>', '<code>esp:GND.1</code> · <code>GND.2</code>', '이름은 같고 위치만 다름'],
+    ['보드 종류 (parts)', '<code>wokwi-arduino-uno</code>', '<code>board-esp32-devkit-c-v4</code>', '<code>"id"</code>도 <code>uno</code> → <code>esp</code>로'],
+    ['시리얼 모니터', '자동 연결', '<code>esp:TX</code> ↔ <code>$serialMonitor:RX</code> 두 줄 추가', '이 두 줄이 없으면 시리얼 모니터에 아무것도 안 나옴']
+  ];
+  const sum = [
+    ['핀 이름', 'D2 · D13 · A0 · D9', 'GPIO 번호 4 · 16 · 34 · 18'],
+    ['동작 전압', '5V', '<b>3.3V</b> (가변저항 VCC를 3V3으로)'],
+    ['아날로그 입력', '0~1023 (10비트)', '<b>0~4095</b> (12비트) — <code>map()</code> · 전압 계산도 함께'],
+    ['시리얼 속도', '9600', '115200'],
+    ['서보 라이브러리', '<code>Servo.h</code> (기본 포함)', '<code>ESP32Servo.h</code> (라이브러리 관리자에서 추가)'],
+    ['바뀌지 않는 것', 'setup() · loop() · pinMode · digitalRead · digitalWrite · analogRead · map · Serial.print', '← 모두 그대로']
+  ];
+  return `
+    <h2>왜 같은 화면에서 두 보드를 비교할까?</h2>
+    <p>지금까지 Tinkercad에서는 아두이노 UNO만, 앞 차시 Wokwi에서는 ESP32만 썼습니다. Wokwi는 <b>UNO와 ESP32를 모두</b> 시뮬레이션하므로, 이번 차시에는 <b>같은 부품 · 같은 회로 · 같은 코드</b>를 두고 보드만 바꿔 봅니다. 이렇게 하면 "보드가 바뀌면 무엇이 달라지고, 무엇은 그대로인지"가 한눈에 보입니다. 앞으로 AI가 UNO용 예제를 주더라도 ESP32용으로 직접 고칠 수 있게 됩니다.</p>
+    <div class="cards">${WKBOTH.labs.map((x) => `<div class="card"><div class="ic">${x.no}</div><b>${x.t.split(' — ')[0]}</b><p>${x.t.split(' — ')[1]} (${x.from}에서 배운 내용)</p></div>`).join('')}</div>
+
+    <h2>1단계 · 아두이노 UNO로 실습하기</h2>
+    <ol class="steps">${uno.map(([t, d]) => `<li><span><b>${t}</b> — ${d}</span></li>`).join('')}</ol>
+    <h3>UNO 배선도와 회로도</h3>
+    ${circuitFigs([{ ...CIRCUITS[29][0], title: '' }])}
+    <details style="margin:4px 0 14px"><summary style="cursor:pointer;font-weight:700;font-size:13.5px;color:var(--accent2)">📄 UNO diagram.json 보기 (회로를 한 번에 붙여넣기)</summary>${codeBlock('diagram.json — 아두이노 UNO', 'JSON', WKBOTH.diagUno)}</details>
+
+    <h2>2단계 · 같은 회로를 ESP32로 바꾸기</h2>
+    <ol class="steps">${esp.map(([t, d]) => `<li><span><b>${t}</b> — ${d}</span></li>`).join('')}</ol>
+    <h3>ESP32 배선도와 회로도</h3>
+    <p>부품의 자리와 종류는 1단계와 같고, <b>보드와 보드 쪽 핀만</b> 바뀝니다. 1단계 그림과 나란히 비교해 보세요.</p>
+    ${circuitFigs([{ ...CIRCUITS[29][1], title: '' }])}
+    <h3>diagram.json에서 바꿀 곳</h3>
+    <div class="table-wrap"><table><tr><th>연결</th><th>UNO</th><th>ESP32</th><th>이유</th></tr>${pins.map(([a, b, c, d]) => `<tr><td><b>${a}</b></td><td>${b}</td><td>${c}</td><td>${d}</td></tr>`).join('')}</table></div>
+    <details style="margin:4px 0 14px"><summary style="cursor:pointer;font-weight:700;font-size:13.5px;color:var(--accent2)">📄 ESP32 diagram.json 보기 (정답 — 먼저 직접 고쳐 본 뒤 비교)</summary>${codeBlock('diagram.json — ESP32 DevKitC V4', 'JSON', WKBOTH.diagEsp)}</details>
+    <div class="callout tip"><div class="ct">💡 Wokwi 화면에서 직접 바꿔도 됩니다</div><p>diagram.json 대신 화면에서 바꾸려면, ESP32 프로젝트에 부품을 같은 자리에 놓고 표의 ESP32 핀으로 선을 다시 잇습니다. 어느 방법이든 끝나면 <code>diagram.json</code>을 열어 표와 같은지 확인하세요.</p></div>
+
+    <h2>3단계 · 실습 ①②③ 코드 비교</h2>
+    <p>먼저 <b>UNO 코드를 그대로</b> ESP32에서 실행해 보고, 무엇이 안 되는지 관찰한 뒤 고칩니다. 그다음 아래 ESP32 코드와 비교하세요. 주석에 <code>-&gt;</code>가 있는 줄이 바뀐 줄입니다.</p>
+    ${WKBOTH.labs.map((x) => `<h3>${x.no} ${x.t}</h3>
+      <p>${x.desc}</p>
+      ${codeBlock(`${x.no} 아두이노 UNO`, 'C++', x.uno)}
+      ${codeBlock(`${x.no} ESP32`, 'C++', x.esp)}
+      <div class="callout info"><div class="ct">🔁 바뀐 점</div><p>${x.diff}</p></div>`).join('')}
+
+    <h2>정리 · UNO에서 ESP32로 옮길 때</h2>
+    <div class="table-wrap"><table><tr><th></th><th>아두이노 UNO</th><th>ESP32</th></tr>${sum.map(([a, b, c]) => `<tr><td><b>${a}</b></td><td>${b}</td><td>${c}</td></tr>`).join('')}</table></div>
+    <div class="callout warn"><div class="ct">⚠ UNO 코드를 그대로 실행하면 생기는 일</div>
+      <p>① 시리얼 모니터 글자가 깨지거나 비어 있음(속도 · 시리얼 연결 줄) ② 가변저항 값이 4095까지 올라가 전압이 5V를 넘게 계산됨 ③ <code>Servo.h</code>를 찾지 못해 컴파일 오류 ④ <code>A0</code>는 ESP32에서 GPIO36이라 가변저항을 34번에 꽂으면 값이 0. 직접 실행해서 이 증상을 하나씩 확인해 보세요.</p></div>`;
+}
+
+/* 33 · 34차시: 사물인터넷 이론 */
 function svgArrowDefs(id, color) { return `<defs><marker id="${id}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${color}"/></marker></defs>`; }
 function iotFlowSVG() {
   const boxes = [['🌡️', '센서 · 액추에이터', 'DHT22 · LED · 서보'], ['📟', '기기 (MCU)', 'ESP32'], ['📡', '게이트웨이', 'Wi-Fi 공유기'], ['🌐', '인터넷', 'IP 통신'], ['☁️', '클라우드 플랫폼', 'MQTT 브로커 · DB'], ['📱', '앱 · 서비스', '대시보드 · 알림']];
@@ -3431,7 +3699,7 @@ function iotArchGuide() {
     <p>JSON은 사람도 읽기 쉽고 거의 모든 언어 · 서비스가 이해합니다. ESP32에서는 <code>ArduinoJson</code>, 웹에서는 <code>JSON.parse()</code>로 다룹니다.</p>`;
 }
 
-/* 34차시: ThingSpeak */
+/* 35차시: ThingSpeak */
 CODES.tsPhone = { title: 'ESP32 ↔ 스마트폰 (ThingSpeak 채널 2개)', tag: 'C++', src:
 `// Wokwi 라이브러리 관리자에서 "DHT sensor library" 추가
 #include <WiFi.h>
@@ -3580,7 +3848,7 @@ function thingspeakGuide() {
       <p>① ThingSpeak는 15초 간격 제한 때문에 <b>즉시 반응하는 제어</b>에는 맞지 않습니다 — 약 20초 늦게 반응합니다. 실시간 제어는 다음 차시의 <b>MQTT</b>로 합니다. ② 휴대폰 기울기 센서는 HTTPS 주소에서만 동작하고, 아이폰은 "기울기 센서 켜기"에서 권한을 허용해야 합니다. ③ API 키는 AI 채팅창에 붙여넣지 않습니다.</p></div>`;
 }
 
-/* 32차시: MQTT 핵심 개념 — 브로커 · 토픽 · 발행 · 구독 */
+/* 33차시: MQTT 핵심 개념 — 브로커 · 토픽 · 발행 · 구독 */
 function mqttFlowSVG() {
   const box = (x, y, w, h, ic, t, d, c) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="var(--card)" stroke="${c}" stroke-width="1.8"/>
     <text x="${x + 12}" y="${y + 24}" font-size="17">${ic}</text><text x="${x + 36}" y="${y + 22}" font-size="12" font-weight="800" fill="var(--fg)">${t}</text>
@@ -3639,7 +3907,7 @@ function mqttConceptSection() {
   const quiz = [
     ['<code>school/room2/temp</code>로 27.1을 발행하면, 위 그림의 구독자 중 누가 받을까?', '에어컨 제어기(<code>school/+/temp</code>)와 기록 서버(<code>school/#</code>). 스마트폰은 room1만 구독해서 받지 못합니다.'],
     ['교실3 온도 센서를 새로 달아 <code>school/room3/temp</code>로 발행하면, 에어컨 제어기의 코드를 고쳐야 할까?', '고칠 필요 없습니다. <code>school/+/temp</code>가 room3도 포함합니다. 이것이 발행-구독 방식의 장점입니다.'],
-    ['스마트폰이 꺼져 있는 동안 발행된 메시지는 어떻게 될까?', '기본 설정(QoS 0)에서는 받지 못하고 사라집니다. 마지막 값을 보관하는 Retain, 전달을 보장하는 QoS 1 · 2는 33차시에서 배웁니다.']
+    ['스마트폰이 꺼져 있는 동안 발행된 메시지는 어떻게 될까?', '기본 설정(QoS 0)에서는 받지 못하고 사라집니다. 마지막 값을 보관하는 Retain, 전달을 보장하는 QoS 1 · 2는 34차시에서 배웁니다.']
   ];
   return `
     <h2>MQTT의 핵심 개념: 브로커 · 토픽 · 발행 · 구독</h2>
@@ -3673,10 +3941,10 @@ function mqttConceptSection() {
 
     <h3>확인 퀴즈</h3>
     ${quiz.map(([q, a], i) => `<details class="callout info" style="cursor:pointer"><summary style="font-weight:800">Q${i + 1}. ${q}</summary><p style="margin-top:6px">${a}</p></details>`).join('')}
-    <div class="callout tip"><div class="ct">🧭 다음 단계</div><p>33차시에서 QoS · Retain · 유언 메시지(LWT) 같은 MQTT 세부 기능과 HTTP와의 차이를, 35차시에서 ESP32로 실제 발행 · 구독을 실습합니다.</p></div>`;
+    <div class="callout tip"><div class="ct">🧭 다음 단계</div><p>34차시에서 QoS · Retain · 유언 메시지(LWT) 같은 MQTT 세부 기능과 HTTP와의 차이를, 36차시에서 ESP32로 실제 발행 · 구독을 실습합니다.</p></div>`;
 }
 
-/* 37차시: IoT 보안 */
+/* 38차시: IoT 보안 */
 function iotAttackSVG() {
   const L = [
     ['응용 (서비스)', '#2e9c49', ['약한 로그인 · 비밀번호 재사용', '관리자 계정 노출']],
@@ -3738,7 +4006,7 @@ function iotSecurityGuide() {
   return `
     <h2>IoT 보안</h2>
     <p>IoT 기기는 카메라 · 도어락 · 자동차 · 의료기기처럼 <b>현실 세계와 바로 연결</b>되어 있어서, 해킹되면 개인정보 유출을 넘어 사생활 침해나 안전 문제로 이어집니다. 또 기기가 많고, 한 번 설치하면 오래 쓰고, 업데이트가 잘 되지 않아 공격 대상이 되기 쉽습니다.</p>
-    <div class="figure">${iotAttackSVG()}<p class="caption">IoT 4계층(33차시)별로 자주 뚫리는 지점</p></div>
+    <div class="figure">${iotAttackSVG()}<p class="caption">IoT 4계층(34차시)별로 자주 뚫리는 지점</p></div>
 
     <h3>실제 사고 사례</h3>
     <p>아래 사례 중 하나 이상의 영상 · 기사를 보고 "무엇이 · 왜 뚫렸는지, 어떻게 막을 수 있었는지"를 정리해 봅니다. 링크는 새 창으로 열립니다.</p>
@@ -3766,7 +4034,7 @@ String url = String("http://api.thingspeak.com/update?api_key=") + TS_WRITE_KEY 
       <p>최종 프로젝트 코드를 (키를 지운 뒤) AI에게 보여 주며 "이 IoT 코드와 구조에서 보안상 위험한 부분을 위 공통 원인 6가지 기준으로 찾아줘"라고 요청해 보세요. AI가 찾은 위험이 실제로 우리 코드에 해당하는지는 직접 확인합니다.</p></div>`;
 }
 
-/* 38차시: 로봇과 사물인터넷 */
+/* 39차시: 로봇과 사물인터넷 */
 function robotIotVennSVG() {
   return `<svg viewBox="0 0 760 330" role="img" aria-label="로봇과 사물인터넷의 공통 영역">
     <text x="20" y="26" font-size="15" font-weight="800" fill="var(--fg)">IoT는 '연결'에, 로봇은 '움직임'에 강하다 — 둘이 만나면 연결된 로봇이 된다</text>
@@ -3847,13 +4115,13 @@ function robotIotGuide() {
 
     <h3>생활 속 연결된 로봇</h3>
     <div class="table-wrap"><table><tr><th>로봇</th><th>주요 센서</th><th>IoT로 하는 일</th></tr>${examples.map(([a, b, c]) => `<tr><td><b>${a}</b></td><td>${b}</td><td>${c}</td></tr>`).join('')}</table></div>
-    <div class="callout warn"><div class="ct">🔒 로봇 보안은 안전 문제</div><p>카메라가 해킹되면 사생활이 새지만, 로봇이 해킹되면 <b>물리적으로 사람이 다칠 수</b> 있습니다(37차시의 지프 원격 해킹 사례). 연결된 로봇은 인증 · 암호화와 함께 "통신이 이상하면 멈춘다"는 안전 설계가 꼭 필요합니다.</p></div>
+    <div class="callout warn"><div class="ct">🔒 로봇 보안은 안전 문제</div><p>카메라가 해킹되면 사생활이 새지만, 로봇이 해킹되면 <b>물리적으로 사람이 다칠 수</b> 있습니다(38차시의 지프 원격 해킹 사례). 연결된 로봇은 인증 · 암호화와 함께 "통신이 이상하면 멈춘다"는 안전 설계가 꼭 필요합니다.</p></div>
 
     <h3>이 과정의 로봇 차시 흐름</h3>
     <div class="table-wrap"><table><tr><th>차시</th><th>내용</th><th>로봇 × IoT 관점</th></tr>${road.map(([a, b, c]) => `<tr class="link" data-go="l${a}"><td><span class="no">${a}</span></td><td><b>${b}</b></td><td>${c}</td></tr>`).join('')}</table></div>`;
 }
 
-/* 39차시: 두 바퀴 로봇 3D · 바퀴와 모터의 연결 */
+/* 40차시: 두 바퀴 로봇 3D · 바퀴와 모터의 연결 */
 function wheelMotorSVG() {
   const lab = (x, y, t, c = 'var(--fg)', a = 'middle') => `<text x="${x}" y="${y}" text-anchor="${a}" font-size="11.5" font-weight="700" fill="${c}">${t}</text>`;
   return `<svg viewBox="0 0 760 300" role="img" aria-label="바퀴, 기어박스, DC 모터, L293D, 아두이노의 연결">${svgArrowDefs('wm-a', 'var(--muted)')}
@@ -3973,7 +4241,7 @@ function robot3dGuide() {
       <p><b>① 한쪽만 거꾸로 돈다</b> — 모터 선 두 가닥이 반대로 꽂힌 것입니다. 선을 바꾸거나 코드에서 그 모터의 HIGH/LOW를 바꿉니다(3D 실습실의 "오른쪽 모터 선을 반대로" 체크로 재현). <b>② 낮은 속도에서 안 움직인다</b> — 마찰 때문에 일정 PWM(데드존) 이하에서는 돌지 않습니다. <b>③ 똑바로 안 간다</b> — 두 모터 성능이 조금씩 달라 같은 PWM에도 휘어집니다. 한쪽 PWM을 살짝 줄여 보정합니다. <b>④ GND 공통</b> — 아두이노와 배터리의 GND를 연결하지 않으면 신호가 전달되지 않습니다.</p></div>`;
 }
 
-/* 41차시: 3D 로봇팔 */
+/* 42차시: 3D 로봇팔 */
 function servoPulseSVG() {
   const row = (y, ms, deg, c) => {
     const w = ms * 60;
@@ -4033,14 +4301,14 @@ function arm3dGuide() {
 
     <h3>서보 모터는 어떻게 각도를 맞출까?</h3>
     <div class="figure">${servoPulseSVG()}<p class="caption">펄스 폭 0.5 ms ≈ 0°, 1.5 ms ≈ 90°, 2.5 ms ≈ 180° (서보마다 조금씩 다름)</p></div>
-    <p>서보 안에는 <b>모터 + 기어 + 위치 센서(가변저항) + 제어 회로</b>가 들어 있습니다. 신호선으로 "몇 도로 가라"는 펄스가 오면 내부 회로가 현재 각도를 재면서 목표 각도까지 모터를 돌립니다. DC 모터(39차시)는 속도를 정하지만, 서보는 <b>위치(각도)</b>를 정한다는 점이 다릅니다.</p>
+    <p>서보 안에는 <b>모터 + 기어 + 위치 센서(가변저항) + 제어 회로</b>가 들어 있습니다. 신호선으로 "몇 도로 가라"는 펄스가 오면 내부 회로가 현재 각도를 재면서 목표 각도까지 모터를 돌립니다. DC 모터(40차시)는 속도를 정하지만, 서보는 <b>위치(각도)</b>를 정한다는 점이 다릅니다.</p>
 
     <h3>티칭 & 플레이백</h3>
     <div class="figure">${teachSVG()}<p class="caption">공장의 산업용 로봇도 사람이 자세를 가르치고(티칭 펜던트) 저장한 자세를 반복 재생한다</p></div>
     <div class="callout warn"><div class="ct">⚠ 왜 1°씩 움직여야 할까?</div><p>저장한 자세로 <code>write()</code>를 한 번에 쓰면 4개 서보가 최고 속도로 동시에 튀어 나가서 팔이 흔들리고, 물건을 떨어뜨리거나 전류가 한꺼번에 몰려 보드가 재부팅되기도 합니다. 3D 실습실의 예제 1 · 3처럼 <b>모든 관절을 1°씩, 짧게 쉬면서</b> 옮기면 부드럽고 안전합니다. 3D 실습실에서는 팔이 책상에 닿으면 빨갛게 바뀌는데, 실제 서보라면 무리한 힘이 걸려 기어가 망가질 수 있습니다.</p></div>`;
 }
 
-/* 43차시: 스마트폰으로 로봇개 제어 */
+/* 44차시: 스마트폰으로 로봇개 제어 */
 function dogFlowSVG() {
   const node = (x, y, w, h, c, ic, t, lines) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="14" fill="var(--card)" stroke="${c}" stroke-width="2"/>
     <text x="${x + w / 2}" y="${y + 34}" text-anchor="middle" font-size="26">${ic}</text>
@@ -4088,7 +4356,7 @@ function dogGuide() {
   ];
   return `
     <h2>스마트폰으로 3D 로봇개 조종하기</h2>
-    <p>요즘 로봇개(4족 보행 로봇)는 대부분 <b>스마트폰 앱이나 무선 컨트롤러</b>로 조종합니다. 이번 차시에서는 PC 화면의 3D 로봇개를 <b>내 스마트폰</b>으로 조종합니다. 둘은 선으로도, 블루투스로도 연결되지 않고 <b>인터넷의 MQTT 브로커</b>를 통해 명령과 상태를 주고받습니다. 32차시에 배운 발행 · 구독이 그대로 쓰입니다.</p>
+    <p>요즘 로봇개(4족 보행 로봇)는 대부분 <b>스마트폰 앱이나 무선 컨트롤러</b>로 조종합니다. 이번 차시에서는 PC 화면의 3D 로봇개를 <b>내 스마트폰</b>으로 조종합니다. 둘은 선으로도, 블루투스로도 연결되지 않고 <b>인터넷의 MQTT 브로커</b>를 통해 명령과 상태를 주고받습니다. 33차시에 배운 발행 · 구독이 그대로 쓰입니다.</p>
     <div class="figure">${dogFlowSVG()}<p class="caption">같은 연결 코드(토픽)를 쓰는 스마트폰과 로봇개끼리만 메시지가 오간다</p></div>
 
     <h3>실습 화면</h3>
@@ -4110,14 +4378,14 @@ function dogGuide() {
 
     <h3>원격 조종의 안전 장치</h3>
     <div class="cards">
-      <div class="card"><div class="ic">⏱</div><b>워치독 (0.7초)</b><p>리모컨은 조이스틱을 잡고 있는 동안 0.1초마다 move를 다시 보냅니다. 휴대폰 화면이 꺼지거나 통신이 끊겨 0.7초 동안 명령이 없으면 로봇개는 <b>스스로 멈춥니다</b>. 38차시의 "통신이 끊기면 안전하게 멈춘다"가 바로 이것입니다.</p></div>
+      <div class="card"><div class="ic">⏱</div><b>워치독 (0.7초)</b><p>리모컨은 조이스틱을 잡고 있는 동안 0.1초마다 move를 다시 보냅니다. 휴대폰 화면이 꺼지거나 통신이 끊겨 0.7초 동안 명령이 없으면 로봇개는 <b>스스로 멈춥니다</b>. 39차시의 "통신이 끊기면 안전하게 멈춘다"가 바로 이것입니다.</p></div>
       <div class="card"><div class="ic">📶</div><b>지연 (왕복 시간)</b><p>명령이 브로커를 거쳐 오가는 데 보통 0.1~0.5초가 걸립니다. 그래서 장애물 바로 앞에서 멈추는 일은 원격 조종에 맡기지 않고 <b>로봇 안에서</b> 처리해야 합니다(${n('장애물 회피')}차시 장애물 회피).</p></div>
-      <div class="card"><div class="ic">🔑</div><b>연결 코드 = 열쇠</b><p>같은 코드를 아는 사람은 누구나 내 로봇개를 조종할 수 있습니다. 공개 브로커는 실습용입니다. 실제 제품은 계정 인증과 암호화로 <b>허락된 리모컨만</b> 명령을 보낼 수 있게 합니다(37차시 IoT 보안).</p></div>
+      <div class="card"><div class="ic">🔑</div><b>연결 코드 = 열쇠</b><p>같은 코드를 아는 사람은 누구나 내 로봇개를 조종할 수 있습니다. 공개 브로커는 실습용입니다. 실제 제품은 계정 인증과 암호화로 <b>허락된 리모컨만</b> 명령을 보낼 수 있게 합니다(38차시 IoT 보안).</p></div>
     </div>
 
     <h3>로봇개는 어떻게 걸을까?</h3>
     <div class="figure">${dogGaitSVG()}<p class="caption">실제 교육용 로봇개는 ESP32 같은 보드가 서보 8~12개를 동시에 제어한다</p></div>
-    <p>두 바퀴 로봇(39차시)은 바퀴 두 개의 속도만 정하면 되지만, 로봇개는 <b>다리마다 관절 각도를 정해진 순서로</b> 바꿔야 걸을 수 있습니다. 41차시 로봇팔의 서보 제어를 다리 네 개에 동시에 하는 셈입니다. 그래서 실제 로봇개는 걸음 계산을 로봇 안의 보드가 맡고, 스마트폰은 "앞으로 · 왼쪽으로 · 앉아" 같은 <b>짧은 명령만</b> 보냅니다.</p>`;
+    <p>두 바퀴 로봇(40차시)은 바퀴 두 개의 속도만 정하면 되지만, 로봇개는 <b>다리마다 관절 각도를 정해진 순서로</b> 바꿔야 걸을 수 있습니다. 42차시 로봇팔의 서보 제어를 다리 네 개에 동시에 하는 셈입니다. 그래서 실제 로봇개는 걸음 계산을 로봇 안의 보드가 맡고, 스마트폰은 "앞으로 · 왼쪽으로 · 앉아" 같은 <b>짧은 명령만</b> 보냅니다.</p>`;
 }
 
 function apiTable() {
@@ -4163,6 +4431,7 @@ function pageLesson(l) {
     ${l.guide === 'uno' ? unoGuide() : ''}
     ${l.guide === 'ide' ? ideGuide() : ''}
     ${l.guide === 'wokwi' ? esp32Guide() + wokwiGuide() : ''}
+    ${l.guide === 'wkboth' ? wokwiBothGuide() : ''}
     ${l.guide === 'iotbasics' ? iotBasicsGuide() + mqttConceptSection() : ''}
     ${l.guide === 'iotarch' ? iotArchGuide() : ''}
     ${l.guide === 'thingspeak' ? thingspeakGuide() : ''}
@@ -4270,7 +4539,7 @@ function pageGuide() {
          'Wokwi 계정 생성 안내, 차시별 시작 프로젝트 링크 준비',
          '학습자가 쓸 AI 도구 결정 및 연령 정책 확인',
          '실습 PC에 Arduino IDE 설치 (8차시) — 설치 권한이 없으면 전산 담당자에게 미리 요청',
-         'ThingSpeak 계정 생성은 33차시 과제로 안내',
+         'ThingSpeak 계정 생성은 34차시 과제로 안내',
          '가상 로봇 실습실(robot/)을 학교망 PC에서 열어 📡 ESP32 모드 연결을 미리 시험',
          '학습 노트 템플릿 배포 (목표 / 프롬프트 / 실행 결과 캡처 / 오류와 해결 / 내 말로 설명)',
          '차시별 모범 답안 회로를 Tinkercad · Wokwi 링크로 준비']
