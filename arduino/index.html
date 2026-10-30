@@ -346,6 +346,15 @@
   .card b { display: block; margin: 4px 0 2px; font-size: 15.5px; }
   .card p { margin: 0; font-size: 14px; color: var(--muted); }
   .card a.btn { margin-top: 10px; }
+  .vcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin: 14px 0; }
+  .vcard { display: block; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); color: inherit; text-decoration: none; }
+  .vcard:hover { border-color: var(--accent); }
+  .vcard .th { position: relative; aspect-ratio: 16 / 9; background: #111 center / cover no-repeat; }
+  .vcard .th::after { content: '▶'; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 46px; height: 32px; border-radius: 8px; background: rgba(220, 0, 0, .9); color: #fff; font-size: 15px; display: grid; place-items: center; }
+  .vcard .vb { padding: 10px 12px; }
+  .vcard b { display: block; font-size: 14.5px; line-height: 1.35; }
+  .vcard .vm { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+  .vcard p { margin: 6px 0 0; font-size: 13.5px; color: var(--muted); }
 
   /* ---------------------------------------------------------------- 오른쪽: AI 프롬프트 빌더 */
   .output { background: var(--term-bg); color: var(--term-fg); display: flex; flex-direction: column; border-left: 1px solid var(--line); overflow: hidden; }
@@ -2928,6 +2937,13 @@ void loop() {
     <div class="table-wrap"><table><tr><th></th><th>Arduino IDE</th><th>Tinkercad</th></tr>${cmp.map(([a, b, c]) => `<tr><td><b>${a}</b></td><td>${b}</td><td>${c}</td></tr>`).join('')}</table></div>`;
 }
 
+/* 유튜브 영상 카드: [영상 ID, 제목, 채널 · 언어, 설명] */
+function videoCards(list) {
+  return `<div class="vcards">${list.map(([id, t, ch, d]) => `<a class="vcard" href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener">
+    <div class="th" style="background-image:url('https://i.ytimg.com/vi/${id}/hqdefault.jpg')"></div>
+    <div class="vb"><b>${t}</b><div class="vm">${ch}</div><p>${d}</p></div></a>`).join('')}</div>`;
+}
+
 /* 28차시: Wokwi 시뮬레이터 */
 function wokwiScreenSVG() {
   const badge = (x, y, n) => `<g><circle cx="${x}" cy="${y}" r="11" fill="var(--accent2)" stroke="var(--card)" stroke-width="2"/><text x="${x}" y="${y + 4}" text-anchor="middle" font-size="11.5" font-weight="800" fill="#fff">${n}</text></g>`;
@@ -3009,6 +3025,34 @@ function wokwiGuide() {
     ['측정 도구', '멀티미터 · 오실로스코프', '로직 분석기, 시리얼 모니터 · 플로터'],
     ['이 과정에서', '1~27차시 · 아두이노 기초', '28차시~ · ESP32 사물인터넷 · 로봇']
   ];
+  const inside = [
+    ['컴파일', '▶를 누르면 <code>sketch.ino</code>와 <code>libraries.txt</code>가 Wokwi 서버로 가서 Arduino IDE와 같은 방식으로 컴파일됩니다. 오류 메시지도 Arduino IDE와 같습니다.'],
+    ['칩 에뮬레이션', '만들어진 펌웨어(실제 보드에 올리는 것과 같은 프로그램)를 브라우저가 <b>ESP32 칩을 흉내 내며</b> 한 명령씩 실행합니다. 그래서 실제 보드와 거의 같은 결과가 나옵니다.'],
+    ['부품 시뮬레이션', '<code>diagram.json</code>의 연결 정보대로 LED · 버튼 · 센서 같은 부품이 핀 신호에 반응합니다.'],
+    ['가상 Wi-Fi → 실제 인터넷', 'ESP32가 <code>Wokwi-GUEST</code>에 접속하면, Wokwi의 게이트웨이가 통신을 <b>실제 인터넷</b>으로 전달합니다. 그래서 날씨 API · NTP · MQTT 브로커에 진짜로 접속됩니다. 반대로 내 PC에서 ESP32로 들어가려면(웹서버) IoT Gateway가 필요합니다.']
+  ];
+  const real = [
+    ['준비물', '브라우저와 인터넷', '보드 · USB 케이블 · 부품, 드라이버 설치'],
+    ['업로드', '▶ 한 번이면 컴파일 + 실행', 'Arduino IDE에서 보드 · 포트를 고르고 업로드'],
+    ['실행 속도', '복잡하면 느려짐 (화면의 % 표시)', '항상 실제 속도'],
+    ['센서 값', '클릭해서 슬라이더로 마음대로 바꿈', '실제 환경 값 (조절하려면 직접 환경을 바꿔야 함)'],
+    ['고장', '배선이 틀려도 부품이 망가지지 않음', '잘못 연결하면 보드 · 부품이 손상될 수 있음'],
+    ['블루투스', '지원하지 않음 (Wi-Fi만)', 'Bluetooth · BLE 사용 가능']
+  ];
+  const trouble = [
+    ['시리얼 모니터 글자가 깨짐', '<code>Serial.begin(115200)</code>인지 확인합니다. ESP32 부팅 메시지와 같은 속도여야 합니다.'],
+    ['<code>fatal error: xxx.h: No such file</code>', '라이브러리 관리자에서 해당 라이브러리를 추가합니다. <code>libraries.txt</code>에 이름이 있어야 합니다.'],
+    ['Wi-Fi가 계속 연결 중 (점만 찍힘)', 'SSID가 정확히 <code>Wokwi-GUEST</code>(대소문자 구분), 비밀번호가 <code>""</code>인지 확인합니다. 채널 6을 넣으면 더 빨리 연결됩니다.'],
+    ['LED가 켜지지 않음', 'LED 방향(긴 다리 A가 GPIO 쪽), 저항 연결, 코드의 GPIO 번호와 회로의 핀이 같은지 확인합니다. 핀에 마우스를 올리면 이름이 보입니다.'],
+    ['가변저항 값이 0 또는 4095에서 안 바뀜', '가운데 핀(SIG)을 ADC1 핀(32~39)에 연결했는지, 양쪽 끝을 3V3과 GND에 연결했는지 확인합니다.'],
+    ['저장 버튼이 없음 · 저장이 안 됨', '로그인해야 저장됩니다. 로그인하지 않고 만든 내용은 창을 닫으면 사라지니, 먼저 로그인하세요.']
+  ];
+  const videos = [
+    ['_S7Amh0lMqY', 'Free ESP32 Simulator — Create IoT Projects without Hardware', 'IoT Frontier · 영어', '하드웨어 없이 Wokwi로 ESP32 IoT 프로젝트를 만드는 전체 흐름을 보여 줍니다.'],
+    ['zuxD4u9vbaM', 'Learn WOKWI — Best Online Simulator for ESP32', 'Botfreaks Robotics · 영어', 'Wokwi 화면 구성과 부품 추가 · 배선 · 실행 방법을 처음부터 따라 해 봅니다.'],
+    ['OfwXJuVIIKg', 'Free Online ESP32 & Arduino Simulator', 'Tech Talkies · 영어', 'Wokwi로 ESP32와 아두이노 회로를 시뮬레이션하는 방법을 소개합니다.'],
+    ['kAKGynbu3Kg', 'How to Send & Receive Serial Data with ESP32 in Wokwi', 'sm Tronics · 영어', 'Wokwi 시리얼 모니터로 값을 출력하고 입력받는 방법 — 디버깅의 기본입니다.']
+  ];
   return `
     <h2>Wokwi 알아보기</h2>
     <p><b>Wokwi</b>(워크위)는 웹 브라우저에서 ESP32 · 아두이노 같은 마이크로컨트롤러를 시뮬레이션하는 서비스입니다. Tinkercad와 비슷하게 부품을 놓고 선을 이어 코드를 실행하지만, <b>ESP32와 Wi-Fi</b>를 지원해서 사물인터넷 실습을 하드웨어 없이 할 수 있습니다. 이번 차시부터 ESP32 단계는 모두 Wokwi에서 진행합니다.</p>
@@ -3032,7 +3076,22 @@ function wokwiGuide() {
       <p>ESP32는 <b>3.3V</b>로 동작하고, 시리얼 속도는 <b>115200</b>입니다. 시뮬레이션 속도가 실제보다 느릴 수 있어(화면의 % 표시) <code>delay()</code> 시간이 길게 느껴질 수 있습니다. 메뉴 이름과 기능은 Wokwi 업데이트에 따라 조금 다를 수 있습니다.</p></div>
 
     <h3>Tinkercad와 Wokwi 비교</h3>
-    <div class="table-wrap"><table><tr><th></th><th>Tinkercad</th><th>Wokwi</th></tr>${cmp.map(([a, b, c]) => `<tr><td><b>${a}</b></td><td>${b}</td><td>${c}</td></tr>`).join('')}</table></div>`;
+    <div class="table-wrap"><table><tr><th></th><th>Tinkercad</th><th>Wokwi</th></tr>${cmp.map(([a, b, c]) => `<tr><td><b>${a}</b></td><td>${b}</td><td>${c}</td></tr>`).join('')}</table></div>
+
+    <h3>Wokwi 안에서는 무슨 일이 일어날까?</h3>
+    <ol class="steps">${inside.map(([t, d]) => `<li><span><b>${t}</b> — ${d}</span></li>`).join('')}</ol>
+
+    <h3>시뮬레이터와 실제 보드는 무엇이 다를까?</h3>
+    <div class="table-wrap"><table><tr><th></th><th>Wokwi (시뮬레이터)</th><th>실제 ESP32 보드</th></tr>${real.map(([a, b, c]) => `<tr><td><b>${a}</b></td><td>${b}</td><td>${c}</td></tr>`).join('')}</table></div>
+    <div class="callout tip"><div class="ct">💡 Wokwi에서 되면 실제로도 될까?</div><p>코드와 핀 연결이 맞는지는 Wokwi에서 거의 그대로 확인됩니다. 다만 Wokwi는 선이 빠지거나 전원이 약한 일, 부품이 타는 일이 없습니다. 나중에 실제 보드로 옮길 때는 <b>전압(3.3V) · 전류 · 전원 공급</b>을 한 번 더 확인하세요.</p></div>
+
+    <h3>자주 겪는 문제</h3>
+    <div class="table-wrap"><table><tr><th>증상</th><th>원인 · 해결</th></tr>${trouble.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table></div>
+    <p class="muted">더 자세한 내용: <a href="https://docs.wokwi.com" target="_blank" rel="noopener">Wokwi 공식 문서 (docs.wokwi.com)</a> · <a href="https://docs.wokwi.com/guides/esp32-wifi" target="_blank" rel="noopener">ESP32 Wi-Fi 안내</a></p>
+
+    <h3>영상으로 보기 — Wokwi</h3>
+    <p>Wokwi 영상은 대부분 영어입니다. 유튜브 플레이어의 <b>⚙ 설정 → 자막 → 자동 번역 → 한국어</b>를 켜고 보세요. 영상 속 화면은 지금의 Wokwi와 조금 다를 수 있습니다.</p>
+    ${videoCards(videos)}`;
 }
 
 /* 28차시: ESP32 소개 · UNO 비교 · 핀맵 */
@@ -3094,6 +3153,34 @@ function esp32Guide() {
     ['아날로그 입력', '12비트 (0~4095), ADC1 8채널 · ADC2 10채널'], ['아날로그 출력', 'PWM: 대부분의 출력 핀 · DAC: GPIO25 · 26'],
     ['통신', 'UART 3개 · I2C 2개 · SPI · 정전식 터치 입력'], ['절전', '딥 슬립 모드로 배터리 장시간 사용 가능']
   ];
+  const where = [
+    ['🏠', '스마트 홈', 'Wi-Fi 스마트 플러그 · 전구 · 스위치 · 센서처럼 앱으로 조종하는 가전 안에 많이 들어 있습니다.'],
+    ['🌱', '측정 · 기록', '온습도 · 미세먼지 · 토양 수분을 재서 인터넷(클라우드)에 올리는 장치. 배터리로 오래 쓰려면 딥 슬립을 씁니다.'],
+    ['🤖', '로봇 · 원격 제어', '스마트폰이나 PC에서 Wi-Fi · 블루투스로 명령을 받아 모터와 서보를 움직입니다. 이 과정의 로봇 단계가 이 구조입니다.']
+  ];
+  const layers = [
+    ['칩 (SoC)', 'ESP32-D0WD', '손톱만 한 칩 하나에 CPU 2개 · 메모리 · Wi-Fi · 블루투스 회로'],
+    ['모듈', 'ESP32-WROOM-32', '칩 + 플래시 메모리 + 안테나를 금속 덮개로 감싼 작은 부품 (전파 인증 완료)'],
+    ['개발 보드', 'ESP32 DevKitC V4', '모듈 + USB-시리얼 변환 칩 + 3.3V 전원 회로 + EN · BOOT 버튼 + 핀 헤더. 브레드보드에 꽂아 바로 씁니다']
+  ];
+  const family = [
+    ['ESP32 (기본)', '듀얼 코어 · Wi-Fi + 클래식 블루투스 + BLE', '이 과정에서 사용. 자료와 예제가 가장 많음'],
+    ['ESP32-S3', '듀얼 코어 · USB 직접 지원 · AI 연산 명령', '카메라 · 음성 인식 · 화면이 있는 기기'],
+    ['ESP32-C3', '싱글 코어 (RISC-V) · Wi-Fi + BLE · 저렴', '작고 값싼 센서 · 스위치'],
+    ['ESP32-C6 · H2', 'Wi-Fi 6 · Zigbee · Thread (Matter 스마트홈 표준)', '최신 스마트홈 기기']
+  ];
+  const bootSteps = [
+    ['부트로더 실행', '칩 안에 미리 들어 있는 프로그램이 먼저 깨어나 플래시 메모리에 저장된 내 프로그램을 찾습니다.'],
+    ['FreeRTOS 시작', 'ESP32는 여러 일을 동시에 하는 작은 운영체제(FreeRTOS) 위에서 돕니다. Wi-Fi 같은 무선 작업은 운영체제가 따로 처리합니다.'],
+    ['setup() → loop()', '그다음 아두이노와 똑같이 <code>setup()</code>을 한 번, <code>loop()</code>를 계속 실행합니다. 그래서 UNO 코드를 거의 그대로 쓸 수 있습니다.'],
+    ['멈추면 재시작', '<code>loop()</code> 안에서 너무 오래 멈춰 있거나 오류가 나면 ESP32가 스스로 다시 부팅합니다(워치독). 시리얼 모니터에 부팅 메시지가 반복되면 이것을 의심합니다.']
+  ];
+  const videos = [
+    ['6TjSI1cgijQ', 'ESP32 For Dummies — Explained in 4 Minutes', 'Rolling Bob · 영어 (자동 번역 자막)', '4분 만에 ESP32가 무엇이고 아두이노와 무엇이 다른지 정리합니다. 가장 먼저 보세요.'],
+    ['iimtsE4EvBk', 'ESP32 아두이노 연결하기', '달콤쌤의 메이커세상 · 한국어', 'ESP-WROOM-32 개발 보드의 사양(클럭 · 메모리 · Wi-Fi · 블루투스)과 Arduino IDE 연결 방법을 소개합니다.'],
+    ['lJeRL-ahYzg', '아두이노처럼 ESP32 개발하기', '친절한코딩 · 한국어', 'Arduino IDE에서 아두이노와 같은 방식으로 ESP32 프로그램을 만드는 과정을 보여 줍니다.'],
+    ['BRgDJq1PlTA', '아두이노에서 ESP32를 사용하기 위한 환경 설정하기', 'MAKIST · 한국어', '실제 보드를 쓸 때 필요한 드라이버 · 보드 패키지 설치와 첫 예제 실행 순서입니다. 집에서 실물 보드를 쓸 때 참고하세요.']
+  ];
   const cmp = [
     ['칩 · 클럭', 'ATmega328P · 16MHz (1코어)', 'ESP32 · 240MHz (2코어)'],
     ['메모리 (변수 / 코드)', '2KB / 32KB', '520KB / 4MB'],
@@ -3127,8 +3214,21 @@ function esp32Guide() {
   ];
   return `
     <h2>ESP32 알아보기</h2>
-    <p><b>ESP32</b>는 중국 Espressif가 만든 마이크로컨트롤러로, <b>Wi-Fi와 블루투스가 칩 안에 들어 있습니다</b>. 아두이노 UNO보다 훨씬 빠르고 메모리도 크면서 값이 싸서 사물인터넷 기기에 가장 많이 쓰입니다. 아두이노와 같은 방식(스케치, <code>setup()</code> · <code>loop()</code>)으로 프로그래밍할 수 있어서, 지금까지 배운 코드를 거의 그대로 쓸 수 있습니다. 이 과정에서는 가장 흔한 <b>ESP32 DevKitC V4 (30핀)</b> 보드를 씁니다.</p>
+    <p><b>ESP32</b>는 중국 Espressif가 만든 마이크로컨트롤러로, <b>Wi-Fi와 블루투스가 칩 안에 들어 있습니다</b>. 아두이노 UNO보다 훨씬 빠르고 메모리도 크면서 값이 싸서 사물인터넷 기기에 가장 많이 쓰입니다. 아두이노와 같은 방식(스케치, <code>setup()</code> · <code>loop()</code>)으로 프로그래밍할 수 있어서, 지금까지 배운 코드를 거의 그대로 쓸 수 있습니다. 이 과정에서는 가장 흔한 <b>ESP32 DevKitC V4 (38핀)</b> 보드를 씁니다.</p>
+    <div class="cards">${where.map(([ic, t, d]) => `<div class="card"><div class="ic">${ic}</div><b>${t}</b><p>${d}</p></div>`).join('')}</div>
     <div class="table-wrap"><table><tr><th>항목</th><th>ESP32 DevKitC V4</th></tr>${spec.map(([a, b]) => `<tr><td><b>${a}</b></td><td>${b}</td></tr>`).join('')}</table></div>
+
+    <h3>칩 · 모듈 · 보드는 어떻게 다를까?</h3>
+    <p>"ESP32"라는 말은 세 가지를 함께 가리킵니다. 부품 가게나 Wokwi에서 이름을 볼 때 헷갈리지 않도록 구분해 둡니다.</p>
+    <div class="table-wrap"><table><tr><th>단계</th><th>이름 (예)</th><th>들어 있는 것</th></tr>${layers.map(([a, b, c]) => `<tr><td><b>${a}</b></td><td>${b}</td><td>${c}</td></tr>`).join('')}</table></div>
+
+    <h3>ESP32 가족</h3>
+    <div class="table-wrap"><table><tr><th>칩</th><th>특징</th><th>주로 쓰는 곳</th></tr>${family.map(([a, b, c]) => `<tr><td><b>${a}</b></td><td>${b}</td><td>${c}</td></tr>`).join('')}</table></div>
+    <p class="muted">이름에 S · C · H가 붙은 칩은 핀 번호와 기능이 조금씩 다릅니다. 이 과정의 코드와 핀맵은 <b>기본 ESP32</b> 기준이므로, 다른 칩을 쓸 때는 그 보드의 핀맵을 따로 확인하세요.</p>
+
+    <h3>전원을 켜면 무슨 일이 일어날까?</h3>
+    <ol class="steps">${bootSteps.map(([t, d]) => `<li><span><b>${t}</b> — ${d}</span></li>`).join('')}</ol>
+    <div class="callout info"><div class="ct">📟 시리얼 모니터의 첫 몇 줄</div><p>Wokwi에서 실행하면 내 코드의 출력보다 먼저 <code>ets Jun 8 2016 …</code>, <code>rst:0x1 (POWERON_RESET)</code> 같은 글자가 나옵니다. 오류가 아니라 ESP32가 부팅하면서 남기는 기록입니다. 프로그램이 계속 다시 시작되면 <code>rst:</code> 뒤의 이유(예: <code>TG1WDT</code> = 너무 오래 멈춤)를 AI에게 그대로 보여 주세요.</p></div>
 
     <h3>아두이노 UNO와 비교</h3>
     <div class="table-wrap"><table><tr><th></th><th>Arduino UNO</th><th>ESP32 DevKitC V4</th></tr>${cmp.map(([a, b, c]) => `<tr><td><b>${a}</b></td><td>${b}</td><td>${c}</td></tr>`).join('')}</table></div>
@@ -3144,7 +3244,11 @@ function esp32Guide() {
       <p>① ESP32 핀은 <b>3.3V</b>입니다. 5V 센서의 출력 신호를 그대로 넣지 않습니다. ② 센서 전원은 3V3에, 서보처럼 전류가 큰 부품은 5V 핀에서 받습니다. ③ 핀당 전류는 약 20mA 이하로 씁니다. ④ 부팅 핀(0 · 2 · 5 · 12 · 15)에 버튼이나 풀업 · 풀다운을 달 때는 부팅이 되는지 확인합니다.</p></div>
     <h3>이 과정에서 쓰는 ESP32 핀</h3>
     <div class="table-wrap"><table><tr><th>용도</th><th>GPIO</th><th>나오는 차시</th></tr>${use.map(([a, b, c]) => `<tr><td>${a}</td><td><b>${b}</b></td><td>${c}</td></tr>`).join('')}</table></div>
-    <div class="callout info"><div class="ct">🤖 AI 코드를 검증할 때</div><p>AI가 UNO 코드를 ESP32로 바꿔 줄 때 자주 틀리는 곳: <code>analogRead</code> 범위(1023 → 4095), 입력 전용 핀(34~39)에 출력이나 INPUT_PULLUP 사용, Wi-Fi를 쓰면서 ADC2 핀으로 아날로그 읽기, <code>Servo.h</code>를 그대로 쓰기. 위 핀맵과 표로 하나씩 확인하세요.</p></div>`;
+    <div class="callout info"><div class="ct">🤖 AI 코드를 검증할 때</div><p>AI가 UNO 코드를 ESP32로 바꿔 줄 때 자주 틀리는 곳: <code>analogRead</code> 범위(1023 → 4095), 입력 전용 핀(34~39)에 출력이나 INPUT_PULLUP 사용, Wi-Fi를 쓰면서 ADC2 핀으로 아날로그 읽기, <code>Servo.h</code>를 그대로 쓰기. 위 핀맵과 표로 하나씩 확인하세요.</p></div>
+
+    <h3>영상으로 보기 — ESP32</h3>
+    <p>실제 ESP32 보드를 Arduino IDE로 쓰는 영상입니다. 이 과정에서는 Wokwi를 쓰므로 드라이버 · 보드 패키지 설치는 건너뛰어도 되지만, 보드가 어떻게 생겼고 UNO와 무엇이 다른지 보는 데 도움이 됩니다.</p>
+    ${videoCards(videos)}`;
 }
 
 /* 32 · 33차시: 사물인터넷 이론 */
