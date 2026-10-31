@@ -1129,7 +1129,30 @@ void loop() {
     parts: 'ESP32 DevKitC V4, DHT22, SSD1306 OLED', ask: 'ESP32에 DHT22(15번 핀)와 SSD1306 OLED가 있어. 실내 온습도와 Open-Meteo의 실외 온습도를 함께 표시하고, 온도 차이가 5도 이상이면 "환기하세요"를 표시하고 싶어',
     ai: '구현은 AI와 함께, 마지막 표시 항목 1개는 AI 없이 추가합니다.',
     checks: ['실내 · 실외 값이 함께 표시된다', '환기 알림 조건이 동작한다', 'AI 없이 표시 항목을 하나 추가했다'],
-    tn: '미니 미션 ④ (평가 6점). 웹서버는 Wokwi IoT Gateway 설치가 필요하므로 빠른 학습자용 선택 과제로만 안내합니다.' },
+    tn: '미니 미션 ④ (평가 6점). 웹서버는 Wokwi IoT Gateway 설치가 필요하므로 빠른 학습자용 선택 과제로만 안내합니다.',
+    more: [
+      { id: 'air', icon: '😷', t: '미세먼지 신호등', req: 'code',
+        mission: 'Open-Meteo 대기질 API(키 불필요)로 서울의 현재 미세먼지(PM10)와 초미세먼지(PM2.5)를 받아 OLED에 표시하고, 환경부 기준 4단계(좋음 · 보통 · 나쁨 · 매우 나쁨)에 맞춰 LED 신호등을 켭니다. 등급표를 먼저 표로 정리한 뒤 요청합니다.',
+        uses: '31차시 HTTP · JSON, 조건문으로 등급 나누기, OLED',
+        up: 'PM10과 PM2.5 중 더 나쁜 등급을 기준으로 표시하기, "나쁨" 이상이면 OLED에 "마스크 챙기세요"와 함께 LED 깜빡이기',
+        parts: 'ESP32 DevKitC V4, SSD1306 OLED (I2C), LED 3개 (초록 · 노랑 · 빨강), 220Ω 저항 3개',
+        ask: 'ESP32에서 https://air-quality-api.open-meteo.com/v1/air-quality?latitude=37.57&longitude=126.98&current=pm10,pm2_5 를 10분마다 불러와 PM10과 PM2.5를 SSD1306 OLED(GPIO21 SDA, GPIO22 SCL)에 표시하고 싶어. PM10 기준 0~30 좋음, 31~80 보통, 81~150 나쁨, 151 이상 매우 나쁨으로 나눠서 좋음은 GPIO16 초록, 보통은 GPIO17 노랑, 나쁨 이상은 GPIO18 빨강 LED를 켜줘. 응답 JSON은 이렇게 생겼어:\n(브라우저에서 복사한 JSON 붙여넣기)',
+        checks: ['API 응답을 브라우저로 먼저 열어 current.pm10 · current.pm2_5 위치를 확인했다', 'OLED에 PM10 · PM2.5 값과 등급이 표시된다', '등급 경계값(30 · 80 · 150)을 코드에서 직접 찾아 설명할 수 있다'] },
+      { id: 'umbrella', icon: '☂️', t: '아침 우산 알리미', req: 'code',
+        mission: 'NTP 시간과 날씨 예보를 함께 씁니다. 버튼을 누르면 오늘의 강수 확률 · 최고 · 최저 기온을 OLED에 보여 주고, 강수 확률이 50% 이상이면 서보 깃발을 올리고 부저를 짧게 울립니다. 매일 아침 7시에는 버튼을 누르지 않아도 자동으로 알려 줍니다.',
+        uses: '30차시 NTP 시간, 31차시 HTTP · JSON(일별 예보), 서보, 피에조',
+        up: '내일 예보도 함께 받아 "내일은 우산 필요" 미리 알리기, 기온이 5°C 이하이면 "목도리" 알림 추가',
+        parts: 'ESP32 DevKitC V4, SSD1306 OLED (I2C), 푸시버튼 1개, 마이크로 서보, 피에조',
+        ask: 'ESP32로 아침 우산 알리미를 만들고 싶어. https://api.open-meteo.com/v1/forecast?latitude=37.57&longitude=126.98&daily=precipitation_probability_max,temperature_2m_max,temperature_2m_min&timezone=Asia/Seoul&forecast_days=1 에서 오늘의 강수 확률과 최고 · 최저 기온을 받아 SSD1306 OLED에 표시해줘. GPIO4 버튼(INPUT_PULLUP)을 누를 때와 NTP 한국 시간으로 매일 아침 7시 정각에 한 번 알려 주고, 강수 확률이 50% 이상이면 GPIO18 서보(ESP32Servo)를 90도로 올리고 GPIO19 피에조를 0.2초 울려줘',
+        checks: ['버튼을 누르면 오늘의 강수 확률 · 최고 · 최저 기온이 표시된다', '강수 확률 50% 이상일 때만 깃발이 올라가고 부저가 울린다', '테스트를 위해 알림 시각을 지금 시각 1분 뒤로 바꿔 자동 알림을 확인했다'] },
+      { id: 'world', icon: '🌏', t: '세계 시계 날씨판', req: 'code',
+        mission: '버튼을 누를 때마다 서울 → 도쿄 → 뉴욕 → 런던으로 도시가 바뀌며, 그 도시의 현재 시각과 기온을 OLED에 표시합니다. 시각은 NTP로 받은 UTC 시간에 API가 알려 주는 시차(utc_offset_seconds)를 더해 계산합니다.',
+        uses: '30차시 NTP, 31차시 HTTP · JSON, 배열로 도시 목록 관리',
+        up: '도시를 2개 더 추가하기(AI 없이), 현지 시각이 밤(18시~6시)이면 OLED에 달 표시, 실내 DHT22 온도와 선택한 도시 기온의 차이 표시',
+        parts: 'ESP32 DevKitC V4, SSD1306 OLED (I2C), 푸시버튼 1개',
+        ask: 'ESP32로 세계 시계 날씨판을 만들고 싶어. 도시 이름, 위도, 경도를 배열로 관리해줘(서울 37.57/126.98, 도쿄 35.68/139.69, 뉴욕 40.71/-74.01, 런던 51.51/-0.13). GPIO4 버튼(INPUT_PULLUP)을 누를 때마다 다음 도시로 바꾸고, https://api.open-meteo.com/v1/forecast?latitude=위도&longitude=경도&current=temperature_2m&timezone=auto 응답의 temperature_2m과 utc_offset_seconds를 읽어줘. NTP로 받은 UTC 시간에 utc_offset_seconds를 더한 현지 시각과 기온을 SSD1306 OLED에 표시해줘',
+        checks: ['버튼을 누를 때마다 도시가 차례로 바뀐다', '뉴욕 · 런던의 현지 시각이 실제 시각(검색으로 확인)과 맞는다', '도시를 하나 더 AI 없이 배열에 추가했다'] }
+    ] },
 
   // ---------------- M7
   { n: 0, m: 'm7', env: 'ai', req: 'explain', guide: 'iotbasics', t: '사물인터넷 기초: 개념과 통신 기술',
@@ -2653,7 +2676,15 @@ const MORE_FIGS = {
       note: 'TX는 상대의 RX로, RX는 상대의 TX로 엇갈려 연결하고 GND는 공통으로 묶습니다. 코드를 올리는 동안에는 TX · RX 선을 잠시 빼 둡니다.' },
     { title: '보드 B (수신): LCD', board: 'uno', boardName: 'UNO 보드 B (수신)', lines: [{ pin: 'A4 (SDA)', to: { m: 'lcd', p: 'SDA' } }, { pin: 'A5 (SCL)', to: { m: 'lcd', p: 'SCL' } }],
       mods: { lcd: MOD.lcd }, note: '보드 B의 LCD는 24차시와 같은 I2C 연결입니다. 보드 A와 잇는 TX · RX · GND 선은 위 그림을 따릅니다.' }
-  ]
+  ],
+  air: { board: 'esp32', lines: [{ pin: 'GPIO21 (SDA)', to: { m: 'oled', p: 'SDA' } }, { pin: 'GPIO22 (SCL)', to: { m: 'oled', p: 'SCL' } },
+         ledRow('GPIO16', '초록', '좋음'), ledRow('GPIO17', '노랑', '보통'), ledRow('GPIO18', '빨강', '나쁨')], mods: { oled: MOD.oled },
+         note: 'OLED는 30차시와 같은 I2C 연결입니다. LED 세 개는 각각 220Ω 저항을 거쳐 GND로 갑니다.' },
+  umbrella: { board: 'esp32', lines: [{ pin: 'GPIO21 (SDA)', to: { m: 'oled', p: 'SDA' } }, { pin: 'GPIO22 (SCL)', to: { m: 'oled', p: 'SCL' } },
+              btnRow('GPIO4', '지금 알려 줘'), { pin: 'GPIO18', to: { m: 'servo', p: 'SIG (주황)' } }, pzRow('GPIO19')], mods: { oled: MOD.oled, servo: MOD.servo('5V') },
+              note: '서보 전원은 5V 핀에서 받고, 라이브러리는 ESP32Servo를 씁니다. 버튼은 INPUT_PULLUP이라 누르면 LOW입니다.' },
+  world: { board: 'esp32', lines: [{ pin: 'GPIO21 (SDA)', to: { m: 'oled', p: 'SDA' } }, { pin: 'GPIO22 (SCL)', to: { m: 'oled', p: 'SCL' } }, btnRow('GPIO4', '도시 바꾸기')],
+           mods: { oled: MOD.oled }, note: '부품은 OLED와 버튼뿐입니다. 도시를 바꿀 때마다 API를 새로 부르므로, 버튼을 연달아 누르지 않도록 1초 간격을 둡니다.' }
 };
 
 function circuitFigs(figs) {
@@ -2693,7 +2724,7 @@ function moreMissions(l) {
   const env = ENV[l.env];
   const chk = app.checks[l.n] || [];
   return `<div class="callout more teacher-only"><div class="ct">🧑‍🏫 미니 미션 2번부터</div>
-      <p>평가(6점)는 미니 미션 1로 합니다. 2번부터는 미션 1을 일찍 끝낸 학생이나 다음 시간 과제로 쓰세요. 미션마다 Tinkercad 1~2시간 분량입니다.</p></div>
+      <p>평가(6점)는 미니 미션 1로 합니다. 2번부터는 미션 1을 일찍 끝낸 학생이나 다음 시간 과제로 쓰세요. 미션마다 ${env.short} 1~2시간 분량입니다.</p></div>
     ${l.more.map((x, k) => `<h2>${x.icon} 미니 미션 ${k + 2} · ${x.t}</h2>
     <div class="practice">
       <div class="practice-head"><b>🛠 미니 미션 ${k + 2}</b><span class="level">${env.short.toUpperCase()}</span></div>
