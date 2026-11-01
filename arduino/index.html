@@ -1187,7 +1187,7 @@ void loop() {
     ai: '내가 설계한 토픽 구조(위치 / 장치 / 값)를 AI에게 리뷰받고, 겹치지 않는 이름 규칙을 정합니다.',
     checks: ['웹 클라이언트에서 실시간 값이 보인다', '토픽 이름에 고유 접두어를 넣었다', '재접속 코드를 확인했다'],
     tn: '반 전체가 같은 토픽을 쓰면 메시지가 섞입니다. 이니셜 규칙을 먼저 정해 주세요.' },
-  { n: 34, m: 'm7', env: 'wk', req: 'code', t: '원격 제어와 웹 대시보드',
+  { n: 34, m: 'm7', env: 'wk', req: 'code', guide: 'mqttctrl', t: '원격 제어와 웹 대시보드',
     goals: ['MQTT 구독으로 ESP32를 원격 제어할 수 있다', 'AI로 웹 대시보드를 만들고 검증할 수 있다'],
     concepts: ['양방향: ESP32가 발행(센서)과 구독(명령)을 동시에', '웹 브라우저는 WebSocket으로 MQTT 접속 (<code>wss://broker.hivemq.com:8884/mqtt</code>)', 'HTML 한 페이지 + MQTT.js = 스마트폰에서도 열리는 대시보드'],
     mission: 'ESP32가 <code>…/led/set</code> 토픽을 구독해 LED와 서보를 제어하게 하고, AI로 온도 표시와 ON / OFF 버튼이 있는 HTML 대시보드를 만들어 스마트폰에서 제어합니다.',
@@ -4096,6 +4096,253 @@ MQTT 접속 시도 (esp32-a3f91c) ... 성공
     <div class="callout tip"><div class="ct">🧭 다음 차시</div><p>오늘은 웹 클라이언트의 Publish 버튼으로 ESP32에 글자를 보냈습니다. 다음 차시에서는 이 버튼을 내가 만든 HTML 대시보드(MQTT.js, 같은 8884 문)로 바꾸고, 받은 메시지로 LED와 서보를 움직입니다.</p></div>`;
 }
 
+/* 원격 제어와 웹 대시보드 차시: 혼자 따라 하기 */
+CODES.mqttCtrl = { title: 'ESP32: 온도 발행 + LED · 서보 원격 제어 (Wokwi)', tag: 'C++', src:
+`// Wokwi 라이브러리 관리자에서 PubSubClient, DHT sensor library, ESP32Servo 추가
+#include <WiFi.h>
+#include <PubSubClient.h>
+#include <ESP32Servo.h>
+#include "DHT.h"
+
+const char* PREFIX = "bctc/kim07";   // ← 36차시와 같은 내 접두어
+const int LED = 2;                   // LED → GPIO2
+DHT dht(15, DHT22);                  // DHT22 데이터 → GPIO15
+Servo servo;                         // 서보 신호 → GPIO18
+WiFiClient net;
+PubSubClient mqtt(net);
+
+String T(const char* tail) { return String(PREFIX) + tail; }   // 접두어 + 뒷부분
+
+// 구독한 토픽에 명령이 오면 실행
+void onMessage(char* topic, byte* payload, unsigned int len) {
+  String t = topic;
+  String msg;
+  for (unsigned int i = 0; i < len; i++) msg += (char)payload[i];
+  msg.trim();
+  Serial.println("[받음] " + t + " : " + msg);
+
+  if (t == T("/room1/led/set")) {                       // LED 명령: ON / OFF
+    bool on = msg.equalsIgnoreCase("ON");
+    digitalWrite(LED, on ? HIGH : LOW);
+    mqtt.publish(T("/room1/led/state").c_str(), on ? "ON" : "OFF", true);   // 실제 상태 알림 (retain)
+  } else if (t == T("/room1/servo/set")) {              // 서보 명령: 0 ~ 180
+    int deg = constrain(msg.toInt(), 0, 180);
+    servo.write(deg);
+    mqtt.publish(T("/room1/servo/state").c_str(), String(deg).c_str(), true);
+  }
+}
+
+void connectMqtt() {
+  while (!mqtt.connected()) {
+    String id = "esp32-" + String(random(0xffffff), HEX);
+    Serial.print("MQTT 접속 시도 ... ");
+    if (mqtt.connect(id.c_str())) {
+      Serial.println("성공");
+      mqtt.subscribe(T("/room1/+/set").c_str());        // led/set, servo/set을 한 번에 구독
+      Serial.println("구독: " + T("/room1/+/set"));
+    } else {
+      Serial.print("실패, state=");
+      Serial.println(mqtt.state());
+      delay(2000);
+    }
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(LED, OUTPUT);
+  servo.attach(18, 500, 2400);
+  servo.write(0);
+  dht.begin();
+  WiFi.begin("Wokwi-GUEST", "", 6);
+  Serial.print("Wi-Fi 연결 중");
+  while (WiFi.status() != WL_CONNECTED) { delay(250); Serial.print("."); }
+  Serial.println(" 연결됨");
+  mqtt.setServer("broker.hivemq.com", 1883);
+  mqtt.setCallback(onMessage);
+}
+
+void loop() {
+  if (!mqtt.connected()) connectMqtt();
+  mqtt.loop();                                  // 명령을 바로 받으려면 자주 불러야 함
+
+  static unsigned long last = 0;
+  if (millis() - last >= 5000) {                // 5초마다 온도 발행
+    last = millis();
+    float t = dht.readTemperature();
+    if (isnan(t)) return;
+    char msg[8];
+    snprintf(msg, sizeof msg, "%.1f", t);
+    mqtt.publish(T("/room1/temp").c_str(), msg);
+    Serial.println("[보냄] " + T("/room1/temp") + " : " + msg);
+  }
+}` };
+
+CODES.mqttDash = { title: 'dashboard.html: 온도 표시 + LED 버튼 + 서보 슬라이더 (MQTT.js)', tag: 'HTML', src:
+`<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>내 IoT 대시보드</title>
+<script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"><\/script>
+<style>
+  body { font-family: sans-serif; max-width: 420px; margin: 20px auto; padding: 0 16px; }
+  .temp { font-size: 64px; font-weight: 800; text-align: center; }
+  button { width: 48%; padding: 18px; font-size: 20px; font-weight: 700; border: 0; border-radius: 12px; }
+  #on { background: #f5c542; }
+  #off { background: #ddd; }
+  input[type=range] { width: 100%; }
+</style>
+</head>
+<body>
+<h2>🌡️ 교실 1</h2>
+<p id="status">연결 중…</p>
+<div class="temp"><span id="temp">--</span> °C</div>
+<p>💡 LED 상태: <b id="led">?</b></p>
+<button id="on">ON</button> <button id="off">OFF</button>
+<p>🦾 서보 각도: <b id="deg">?</b></p>
+<input id="servo" type="range" min="0" max="180" step="10" value="0">
+
+<script>
+const PREFIX = 'bctc/kim07';   // ← ESP32 코드의 PREFIX와 똑같이
+const client = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');   // 브라우저는 8884(wss)
+
+client.on('connect', () => {
+  document.getElementById('status').textContent = '🟢 연결됨';
+  client.subscribe(PREFIX + '/room1/#');          // 온도와 상태를 모두 받기
+});
+client.on('close', () => {
+  document.getElementById('status').textContent = '🔴 끊김 (자동으로 다시 연결)';
+});
+
+client.on('message', (topic, payload) => {
+  const msg = payload.toString();                 // 받은 메시지는 글자로 바꿔서 사용
+  if (topic === PREFIX + '/room1/temp') document.getElementById('temp').textContent = msg;
+  if (topic === PREFIX + '/room1/led/state') document.getElementById('led').textContent = msg;
+  if (topic === PREFIX + '/room1/servo/state') document.getElementById('deg').textContent = msg + '°';
+});
+
+document.getElementById('on').onclick = () => client.publish(PREFIX + '/room1/led/set', 'ON');
+document.getElementById('off').onclick = () => client.publish(PREFIX + '/room1/led/set', 'OFF');
+document.getElementById('servo').onchange = (e) => client.publish(PREFIX + '/room1/servo/set', e.target.value);
+<\/script>
+</body>
+</html>` };
+
+function mqttCtrlFlowSVG() {
+  const box = (x, y, w, h, ic, t, d, c) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="12" fill="var(--card)" stroke="${c}" stroke-width="2"/><text x="${x + w / 2}" y="${y + 30}" text-anchor="middle" font-size="22">${ic}</text><text x="${x + w / 2}" y="${y + 54}" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--fg)">${t}</text><text x="${x + w / 2}" y="${y + 72}" text-anchor="middle" font-size="10.5" fill="var(--muted)">${d}</text>`;
+  const CMD = '#d64541', DATA = '#2f6fd6';
+  const lbl = (x, y, c, t, d) => `<text x="${x}" y="${y}" font-size="11" font-weight="800" fill="${c}">${t}</text><text x="${x}" y="${y + 16}" font-family="JetBrains Mono, monospace" font-size="10.5" fill="var(--fg)">${d}</text>`;
+  return `<svg viewBox="0 0 760 330" role="img" aria-label="대시보드와 ESP32가 브로커를 통해 명령과 상태를 주고받는 구조">${svgArrowDefs('mc-c', CMD)}${svgArrowDefs('mc-d', DATA)}
+    <text x="20" y="26" font-size="15" font-weight="800" fill="var(--fg)">명령(set)은 대시보드 → ESP32, 값과 상태(state)는 ESP32 → 대시보드</text>
+    ${box(20, 120, 190, 92, '📱', '웹 대시보드', 'MQTT.js · wss 8884', '#f08c00')}
+    ${box(285, 120, 190, 92, '📮', 'broker.hivemq.com', '토픽으로 나눠 전달', '#9b51e0')}
+    ${box(550, 120, 190, 92, '📟', 'ESP32 (Wokwi)', 'LED · 서보 · DHT22', 'var(--accent)')}
+    <path d="M210 140 L283 140" stroke="${CMD}" stroke-width="2.2" marker-end="url(#mc-c)"/><path d="M475 140 L548 140" stroke="${CMD}" stroke-width="2.2" marker-end="url(#mc-c)"/>
+    <path d="M548 192 L477 192" stroke="${DATA}" stroke-width="2.2" marker-end="url(#mc-d)"/><path d="M283 192 L212 192" stroke="${DATA}" stroke-width="2.2" marker-end="url(#mc-d)"/>
+    ${lbl(20, 62, CMD, '① 버튼 · 슬라이더 → 발행 (명령)', '…/room1/led/set  "ON"')}<text x="20" y="96" font-family="JetBrains Mono, monospace" font-size="10.5" fill="var(--fg)">…/room1/servo/set  "90"</text>
+    ${lbl(550, 62, CMD, '② 구독 중 → LED · 서보 동작', '구독: …/room1/+/set')}
+    ${lbl(550, 246, DATA, '③ 동작 후 실제 상태 발행', '…/room1/led/state  "ON"')}<text x="550" y="280" font-family="JetBrains Mono, monospace" font-size="10.5" fill="var(--fg)">…/room1/temp  "24.5" (5초마다)</text>
+    ${lbl(20, 246, DATA, '④ 구독 중 → 화면 갱신', '구독: …/room1/#')}
+    <text x="380" y="318" text-anchor="middle" font-size="10.5" fill="var(--muted)">버튼을 누른 것(명령)과 LED가 실제로 켜진 것(상태)을 다른 토픽으로 나눕니다.</text>
+  </svg>`;
+}
+function mqttCtrlGuide() {
+  const P = 'bctc/kim07';
+  const topics = [
+    ['<code>…/room1/temp</code>', 'ESP32 → 대시보드', '5초마다 온도', '<code>24.5</code>'],
+    ['<code>…/room1/led/set</code>', '대시보드 → ESP32', 'LED 명령', '<code>ON</code> · <code>OFF</code>'],
+    ['<code>…/room1/servo/set</code>', '대시보드 → ESP32', '서보 각도 명령', '<code>0</code> ~ <code>180</code>'],
+    ['<code>…/room1/led/state</code>', 'ESP32 → 대시보드', 'LED 실제 상태 (retain)', '<code>ON</code> · <code>OFF</code>'],
+    ['<code>…/room1/servo/state</code>', 'ESP32 → 대시보드', '서보 실제 각도 (retain)', '<code>90</code>']
+  ];
+  const wk = [
+    ['36차시 프로젝트 이어서', 'Wokwi에서 36차시에 저장한 프로젝트를 열고 <b>Save a copy</b>로 복사본을 만듭니다. 저장하지 않았다면 새 ESP32 프로젝트에서 DHT22(GPIO15)부터 다시 연결합니다.'],
+    ['부품 추가', '<b>+</b> → <b>LED</b>와 <b>Resistor</b>(220Ω): GPIO2 → 저항 → LED 긴 다리(A), 짧은 다리(C) → GND. <b>+</b> → <b>Servo</b>: PWM(주황) → <b>GPIO18</b>, V+ → 5V, GND → GND. 아래 배선도와 같게 연결합니다.'],
+    ['라이브러리 추가', 'Library Manager에 <code>PubSubClient</code>, <code>DHT sensor library</code>가 있는지 확인하고 <code>ESP32Servo</code>를 추가합니다.'],
+    ['코드 붙여넣기', '아래 ESP32 코드를 붙여넣고 <code>PREFIX</code>를 내 접두어로 바꿉니다. ▶ 실행 후 시리얼 모니터에 <code>구독: ' + P + '/room1/+/set</code>이 나오면 명령 받을 준비가 된 것입니다.']
+  ];
+  const espKeys = [
+    ['<code>mqtt.subscribe(T("/room1/+/set"))</code>', '<code>+</code>는 한 칸 와일드카드라 <code>led/set</code>과 <code>servo/set</code>을 한 번에 구독합니다. 나중에 <code>fan/set</code>을 추가해도 구독 줄은 그대로입니다.'],
+    ['<code>if (t == T("/room1/led/set"))</code>', '여러 토픽이 같은 <code>onMessage</code>로 들어오므로 <b>토픽 이름으로 어떤 명령인지 구분</b>합니다.'],
+    ['<code>msg += (char)payload[i]</code>', '메시지는 바이트 배열로 옵니다. 한 글자씩 붙여 <code>String</code>으로 만든 뒤 <code>"ON"</code>과 비교하거나 <code>toInt()</code>로 숫자로 바꿉니다.'],
+    ['<code>constrain(msg.toInt(), 0, 180)</code>', '누가 <code>999</code>나 <code>abc</code>를 보내도 서보가 0~180 안에서만 움직이게 막습니다. 원격 명령은 <b>항상 범위를 검사</b>합니다.'],
+    ['<code>publish(…/led/state, "ON", true)</code>', '명령을 실행한 뒤 실제 상태를 알립니다. 마지막 인자 <code>true</code>는 <b>retain</b>: 브로커가 마지막 상태를 기억했다가 대시보드를 새로 열어도 바로 보내 줍니다.']
+  ];
+  const test = [
+    ['웹 클라이언트 열기', '36차시처럼 <a href="https://www.hivemq.com/demos/websocket-client/" target="_blank" rel="noopener">HiveMQ 웹 클라이언트</a>에 접속하고 <code>' + P + '/room1/#</code>을 구독합니다.'],
+    ['LED 켜기', 'Publish의 Topic에 <code>' + P + '/room1/led/set</code>, Message에 <code>ON</code> → <b>Publish</b>. Wokwi의 LED가 켜지고, Messages에 <code>led/state : ON</code>이 돌아오면 성공입니다.'],
+    ['서보 돌리기', 'Topic <code>' + P + '/room1/servo/set</code>, Message <code>90</code> → Publish. 서보 팔이 90°로 돌고 <code>servo/state : 90</code>이 옵니다. <code>999</code>를 보내면 180으로 제한되는지도 확인합니다.']
+  ];
+  const run = [
+    ['파일로 저장', '아래 HTML을 복사해 메모장(또는 VS Code)에 붙여넣고 <code>PREFIX</code>를 내 접두어로 바꿉니다. <b>다른 이름으로 저장</b> → 파일 이름 <code>dashboard.html</code>, 파일 형식 <b>모든 파일</b>, 인코딩 <b>UTF-8</b>로 저장합니다.'],
+    ['브라우저로 열기', '저장한 파일을 더블클릭하면 Chrome · Edge에서 열립니다. "🟢 연결됨"이 나오고 5초 안에 온도가 표시되면 성공입니다.'],
+    ['버튼 · 슬라이더', 'ON을 누르면 Wokwi의 LED가 켜지고 "LED 상태: ON"이 나옵니다. 슬라이더를 움직였다 놓으면 서보가 그 각도로 돌아갑니다.'],
+    ['고치기', '파일을 고친 뒤에는 저장하고 브라우저에서 <b>새로고침</b>(F5)합니다. 화면이 하얗거나 아무 반응이 없으면 <b>F12</b> → Console 탭의 빨간 오류를 AI에게 보여 줍니다.']
+  ];
+  const webKeys = [
+    ['<code>&lt;script src="…mqtt.min.js"&gt;</code>', '브라우저용 MQTT 라이브러리(MQTT.js)를 인터넷에서 불러옵니다. 그래서 인터넷이 연결돼 있어야 합니다.'],
+    ['<code>mqtt.connect(\'wss://broker.hivemq.com:8884/mqtt\')</code>', '브라우저는 1883에 직접 못 들어가므로 암호화 WebSocket 문(8884)과 경로 <code>/mqtt</code>를 씁니다. ESP32와 <b>주소는 같고 문만 다릅니다</b>.'],
+    ['<code>client.subscribe(PREFIX + \'/room1/#\')</code>', '<code>#</code>로 온도와 상태 토픽을 한 번에 받습니다. 접속(<code>connect</code>)될 때마다 실행되므로 끊겼다 다시 붙어도 구독이 유지됩니다.'],
+    ['<code>client.on(\'message\', …)</code>', 'ESP32의 <code>onMessage</code>와 같은 역할입니다. <code>payload.toString()</code>으로 글자로 바꾼 뒤 토픽에 따라 화면의 다른 곳을 고칩니다.'],
+    ['<code>client.publish(토픽, \'ON\')</code>', '버튼을 누르면 명령을 발행합니다. 슬라이더는 <code>onchange</code>(손을 뗄 때)에 보내 명령이 너무 많이 쌓이지 않게 합니다.']
+  ];
+  const phone = [
+    ['강의실 대시보드 (가장 쉬움)', '휴대폰 브라우저로 <a href="mqtt/index.html" target="_blank" rel="noopener">📡 MQTT 원격 제어 대시보드</a>를 엽니다 (주소: <code>https://bctcaiedu.github.io/arduino/mqtt/</code>). 맨 위 칸에 내 접두어(예: <code>' + P + '</code>)를 쓰고 <b>적용</b>을 누르면 위 HTML과 같은 토픽으로 동작합니다. 접두어는 휴대폰에 저장됩니다.'],
+    ['내가 만든 HTML을 휴대폰에서', '<code>dashboard.html</code> 파일은 PC에만 있어서 휴대폰에서 열 수 없습니다. <a href="https://codepen.io/pen/" target="_blank" rel="noopener">CodePen</a>에 HTML을 붙여넣고 저장(로그인 필요)한 뒤 화면 아래 <b>View → Full Page View</b> 주소를 휴대폰으로 열거나, 내 GitHub Pages에 올려 https 주소로 엽니다.'],
+    ['PC와 휴대폰 동시에', 'PC의 dashboard.html과 휴대폰 대시보드를 함께 열고 휴대폰에서 ON을 누릅니다. 두 화면의 LED 상태가 <b>동시에</b> ON으로 바뀝니다. 둘 다 같은 state 토픽을 구독하기 때문입니다.']
+  ];
+  const checks = [
+    ['반응 속도', '버튼을 누르고 LED가 켜질 때까지 얼마나 걸리나요? 35차시 ThingSpeak(약 20초)와 비교합니다. 보통 1초 안쪽입니다.'],
+    ['새로고침해도 상태 유지', '대시보드를 새로고침하면 LED 상태가 바로 다시 나옵니다. retain 덕분입니다. ESP32 코드에서 <code>true</code>를 <code>false</code>로 바꾸면 어떻게 달라지는지 비교해 봅니다.'],
+    ['ESP32 꺼진 상태에서 명령', 'Wokwi를 ■ 정지하고 ON을 누릅니다. 명령은 발행됐지만 상태가 바뀌지 않습니다. "버튼을 눌렀다"와 "실제로 켜졌다"를 나눠 보여 줘야 하는 이유입니다.'],
+    ['짝의 LED 켜 보기', '짝의 접두어로 바꿔 ON을 누르면 짝의 LED가 켜집니다. 공개 브로커에서는 토픽만 알면 누구나 남의 기기를 움직일 수 있습니다. 다음 차시 IoT 보안에서 이 문제를 다룹니다.']
+  ];
+  const trouble = [
+    ['대시보드가 "연결 중…"에서 멈춤', '인터넷 연결과 주소(<code>wss://broker.hivemq.com:8884/mqtt</code>, 끝의 <code>/mqtt</code>까지)를 확인합니다. 학교 네트워크가 8884를 막으면 휴대폰 데이터로 시험합니다.'],
+    ['연결됐는데 온도가 <code>--</code>', 'Wokwi가 실행 중인지, 두 코드의 <code>PREFIX</code>가 한 글자도 다르지 않은지 확인합니다. HiveMQ 웹 클라이언트로 <code>…/room1/#</code>을 구독해 어느 쪽이 틀렸는지 찾습니다.'],
+    ['ON을 눌러도 LED가 안 켜짐', 'Wokwi 시리얼 모니터에 <code>[받음] …/led/set : ON</code>이 나오는지 봅니다. 안 나오면 구독 토픽(<code>+/set</code>) 오타, 나오는데 안 켜지면 LED 배선(GPIO2 · 방향)을 확인합니다.'],
+    ['서보가 안 움직임', '<code>ESP32Servo</code> 라이브러리, 신호선이 GPIO18인지, <code>servo.attach(18, …)</code>를 확인합니다.'],
+    ['한글이 깨져 보임', 'HTML 파일을 <b>UTF-8</b>로 저장했는지, <code>&lt;meta charset="UTF-8"&gt;</code>가 있는지 확인합니다.'],
+    ['AI가 만든 코드가 다르게 생김', '정상입니다. 토픽 5개의 이름과 방향(발행 · 구독), 브로커 주소 · 포트만 위 표와 대조합니다.']
+  ];
+  const steps = (list) => `<ol class="steps">${list.map(([t, d]) => `<li><span><b>${t}</b> — ${d}</span></li>`).join('')}</ol>`;
+  return `
+    <h2>혼자 따라 하기: 웹 대시보드로 ESP32 원격 제어</h2>
+    <p>36차시에는 ESP32가 온도를 <b>발행</b>하고 웹 클라이언트가 <b>구독</b>했습니다. 이번에는 방향을 하나 더 늘립니다. 웹 페이지의 버튼이 명령을 발행하고, ESP32가 그 명령을 구독해 LED와 서보를 움직입니다. 순서는 <b>ESP32 준비 → 웹 클라이언트로 먼저 시험 → 내 대시보드 만들기 → 휴대폰에서 열기</b>입니다.</p>
+    <div class="figure">${mqttCtrlFlowSVG()}<p class="caption">대시보드와 ESP32는 서로를 모르고, 브로커의 토픽으로만 명령과 상태를 주고받습니다.</p></div>
+    <h3>이번 차시의 토픽 (앞에 내 접두어 <code>${P}</code>)</h3>
+    <div class="table-wrap"><table><tr><th>토픽</th><th>방향</th><th>내용</th><th>메시지 예</th></tr>${topics.map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('')}</table></div>
+    <p><code>set</code>(명령)과 <code>state</code>(상태)를 나누는 것은 실제 IoT 제품에서도 쓰는 방식입니다. 버튼을 눌렀다고 LED가 켜졌다는 보장은 없으므로, 화면에는 ESP32가 알려 준 <b>실제 상태</b>를 보여 줍니다.</p>
+
+    <h3>① Wokwi에서 ESP32 준비하기</h3>
+    ${steps(wk)}
+    ${codeBlock(CODES.mqttCtrl.title, CODES.mqttCtrl.tag, CODES.mqttCtrl.src)}
+    <div class="table-wrap"><table><tr><th>ESP32 코드 핵심</th><th>하는 일</th></tr>${espKeys.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table></div>
+
+    <h3>② 대시보드 만들기 전에 웹 클라이언트로 시험하기</h3>
+    <p>대시보드부터 만들면 안 될 때 ESP32 문제인지 웹 문제인지 알 수 없습니다. 먼저 36차시의 HiveMQ 웹 클라이언트로 명령을 직접 보내 <b>ESP32 쪽이 맞는지</b> 확인합니다.</p>
+    ${steps(test)}
+
+    <h3>③ 내 웹 대시보드 만들기</h3>
+    <p>프롬프트 빌더로 AI에게 대시보드를 만들게 하거나, 아래 참고 HTML로 시작합니다. 어느 쪽이든 HTML 파일 하나면 됩니다. 설치할 것은 없습니다.</p>
+    ${steps(run)}
+    ${codeBlock(CODES.mqttDash.title, CODES.mqttDash.tag, CODES.mqttDash.src)}
+    <div class="table-wrap"><table><tr><th>웹 코드 핵심</th><th>하는 일</th></tr>${webKeys.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table></div>
+
+    <h3>④ 휴대폰에서 제어하기</h3>
+    ${steps(phone)}
+
+    <h3>⑤ 확인 실험</h3>
+    ${steps(checks)}
+
+    <h3>문제 해결</h3>
+    <div class="table-wrap"><table><tr><th>증상</th><th>확인할 것</th></tr>${trouble.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table></div>
+    <div class="callout tip"><div class="ct">💡 디버깅 순서</div><p>안 될 때는 가운데(브로커)에서 양쪽을 봅니다. HiveMQ 웹 클라이언트로 <code>${P}/#</code>을 구독해 두면, 대시보드의 명령과 ESP32의 상태가 모두 보입니다. 명령이 안 보이면 대시보드 문제, 명령은 보이는데 상태가 안 오면 ESP32 문제입니다.</p></div>
+    <div class="callout warn"><div class="ct">⚠ 원격 제어의 위험</div><p>지금 대시보드에는 비밀번호가 없어서 토픽을 아는 사람은 누구나 내 LED와 서보를 움직일 수 있습니다. 연습용 LED는 괜찮지만, 문 잠금 · 히터 · 모터처럼 위험한 장치는 공개 브로커로 제어하지 않습니다. 다음 차시에서 IoT 보안을 다룹니다.</p></div>`;
+}
+
 /* 33차시: MQTT 핵심 개념 — 브로커 · 토픽 · 발행 · 구독 */
 function mqttFlowSVG() {
   const box = (x, y, w, h, ic, t, d, c) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="var(--card)" stroke="${c}" stroke-width="1.8"/>
@@ -4684,6 +4931,7 @@ function pageLesson(l) {
     ${l.guide === 'iotarch' ? iotArchGuide() : ''}
     ${l.guide === 'thingspeak' ? thingspeakGuide() : ''}
     ${l.guide === 'mqttlab' ? mqttLabGuide() : ''}
+    ${l.guide === 'mqttctrl' ? mqttCtrlGuide() : ''}
     ${l.guide === 'security' ? iotSecurityGuide() : ''}
     ${l.guide === 'robotiot' ? robotIotGuide() : ''}
     ${l.guide === 'robot3d' ? robot3dGuide() : ''}

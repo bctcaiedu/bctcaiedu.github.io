@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>MQTT 원격 제어 대시보드 · AI로 배우는 아두이노와 사물인터넷</title>
+  <meta name="description" content="broker.hivemq.com에 접속해 ESP32의 온도를 보고 LED와 서보를 원격으로 제어하는 MQTT 대시보드입니다.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
+  <script>try{var t=localStorage.getItem('bctc-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+  <style>
+  :root { --bg:#f4f6f9; --card:#fff; --card2:#f7f9fc; --line:#e1e6ee; --fg:#1d2433; --muted:#6b7587; --accent:#00878f; --accent-soft:#e2f4f4; --accent2:#6a3fd0;
+    --ok:#1f9d55; --ok-soft:#e3f6ec; --danger:#d64541; --danger-soft:#fdeaea; --warn:#c98a00; --shadow:0 1px 2px rgba(20,30,50,.06),0 4px 16px rgba(20,30,50,.06);
+    --sans:'Pretendard Variable',Pretendard,-apple-system,'Segoe UI','Malgun Gothic',sans-serif; --mono:Consolas,monospace; color-scheme:light; }
+  :root[data-theme="dark"] { --bg:#0e1116; --card:#1a2029; --card2:#1f2631; --line:#2a323e; --fg:#e3e8f0; --muted:#8d97a8; --accent:#3cc6cc; --accent-soft:#0f2e31; --accent2:#b69cff;
+    --ok:#4cc983; --ok-soft:#132e20; --danger:#ff6b61; --danger-soft:#3a1a18; --warn:#f2c14e; --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+  button, input { font: inherit; color: inherit; }
+  .top { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: var(--card); border-bottom: 1px solid var(--line); }
+  .top a { color: var(--fg); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+  .logo { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-size: 19px; background: linear-gradient(135deg, #00979d, #6a3fd0); }
+  .top b { display: block; font-size: 15px; line-height: 1.2; } .top small { font-size: 12px; color: var(--muted); }
+  main { max-width: 560px; margin: 0 auto; padding: 14px 16px 60px; display: flex; flex-direction: column; gap: 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); padding: 14px 16px; }
+  .card h2 { margin: 0 0 8px; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+  .muted { color: var(--muted); font-size: 13px; margin: 4px 0; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .big { background: var(--card2); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+  .big .k { font-size: 12px; color: var(--muted); font-weight: 700; }
+  .big .v { font: 800 28px/1.2 var(--sans); }
+  .big .v small { font-size: 13px; color: var(--muted); font-weight: 600; }
+  label.f { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin: 8px 0 3px; }
+  input[type=text], input[type=password] { width: 100%; border: 1px solid var(--line); background: var(--card2); border-radius: 9px; padding: 9px 11px; font-size: 15px; outline: none; }
+  input:focus { border-color: var(--accent); }
+  .btn { border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 10px 14px; font-weight: 700; cursor: pointer; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .switch { width: 100%; padding: 18px; border-radius: 14px; border: 2px solid var(--line); background: var(--card2); font-size: 18px; font-weight: 800; cursor: pointer; }
+  .switch.on { background: #f5c542; border-color: #c99a06; color: #1d2433; box-shadow: 0 0 24px rgba(245,197,66,.6); }
+  .tilt { height: 12px; background: var(--card2); border: 1px solid var(--line); border-radius: 6px; position: relative; overflow: hidden; margin-top: 6px; }
+  .tilt i { position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: var(--accent); transition: left .15s; }
+  .log { font: 12.5px/1.5 var(--mono); background: var(--card2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; max-height: 180px; overflow-y: auto; white-space: pre-wrap; }
+  .ok { color: var(--ok); } .err { color: var(--danger); }
+  details summary { cursor: pointer; font-weight: 800; }
+  .note { font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 8px; margin-top: 8px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--danger); display: inline-block; }
+  .dot.on { background: var(--ok); }
+  .temp { font: 900 56px/1.1 var(--sans); text-align: center; margin: 6px 0; }
+  .temp small { font-size: 20px; color: var(--muted); }
+  input[type=range] { width: 100%; accent-color: var(--accent); height: 32px; }
+  code { font-family: var(--mono); font-size: 12.5px; background: var(--card2); border: 1px solid var(--line); border-radius: 5px; padding: 0 4px; }
+  </style>
+</head>
+<body>
+<header class="top">
+  <a href="../index.html#l37"><span class="logo">📡</span><span><b>MQTT 원격 제어 대시보드</b><small>← 37차시 원격 제어와 웹 대시보드</small></span></a>
+</header>
+<main>
+  <section class="card">
+    <h2><span class="dot" id="dot"></span> <span id="status">연결 중…</span></h2>
+    <label class="f" for="prefix">내 토픽 접두어 (ESP32 코드의 PREFIX와 똑같이)</label>
+    <div class="row" style="flex-wrap:nowrap"><input type="text" id="prefix" placeholder="예: bctc/kim07" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn primary" id="saveBtn">적용</button></div>
+    <p class="muted">브로커: <code>wss://broker.hivemq.com:8884/mqtt</code> · 구독: <code id="subT">-</code></p>
+  </section>
+
+  <section class="card">
+    <h2>🌡️ 교실 1 온도 <span class="muted" id="tTime" style="margin-left:auto"></span></h2>
+    <div class="temp" id="temp">--<small> °C</small></div>
+    <p class="muted" style="text-align:center">ESP32가 5초마다 <code>…/room1/temp</code>로 발행한 값</p>
+  </section>
+
+  <section class="card">
+    <h2>💡 LED</h2>
+    <div class="grid2">
+      <button class="switch" id="onBtn">ON</button>
+      <button class="switch" id="offBtn">OFF</button>
+    </div>
+    <p class="muted">ESP32가 알려 준 실제 상태: <b id="ledState">?</b></p>
+  </section>
+
+  <section class="card">
+    <h2>🦾 서보 각도 <b id="deg" style="margin-left:auto">0°</b></h2>
+    <input type="range" id="servo" min="0" max="180" step="10" value="0">
+    <p class="muted">손을 떼면 각도를 보냅니다. ESP32가 알려 준 실제 각도: <b id="servoState">?</b></p>
+  </section>
+
+  <section class="card">
+    <h2>📝 메시지 기록</h2>
+    <div class="log" id="log"></div>
+    <p class="note">공개 브로커라 같은 접두어를 쓰면 누구나 이 화면과 같은 값을 보고, 같은 명령을 보낼 수 있습니다. 개인정보는 보내지 마세요.</p>
+  </section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const st = {
+  get(k) { try { return localStorage.getItem('ard-mqtt-' + k) || ''; } catch (e) { return ''; } },
+  set(k, v) { try { localStorage.setItem('ard-mqtt-' + k, v); } catch (e) {} }
+};
+function log(t, cls) {
+  const d = new Date().toLocaleTimeString('en-GB');
+  const el = $('log'); el.innerHTML = `<span class="${cls || ''}">${d}  ${t.replace(/</g, '&lt;')}</span>\n` + el.innerHTML;
+}
+let prefix = new URLSearchParams(location.search).get('p') || st.get('prefix') || '';
+const T = (tail) => prefix + '/room1' + tail;
+$('prefix').value = prefix;
+
+const client = mqtt.connect('wss://broker.hivemq.com:8884/mqtt', { clientId: 'dash-' + Math.random().toString(16).slice(2, 10), reconnectPeriod: 2000 });
+function setStatus(on, t) { $('dot').classList.toggle('on', on); $('status').textContent = t; }
+function subscribe() {
+  if (!prefix) { $('subT').textContent = '-'; log('접두어를 입력하고 적용을 누르세요', 'err'); return; }
+  client.subscribe(T('/#'), (err) => err ? log('구독 실패: ' + err.message, 'err') : log('구독: ' + T('/#'), 'ok'));
+  $('subT').textContent = T('/#');
+}
+client.on('connect', () => { setStatus(true, '브로커에 연결됨'); log('broker.hivemq.com 연결됨', 'ok'); subscribe(); });
+client.on('reconnect', () => setStatus(false, '다시 연결하는 중…'));
+client.on('close', () => setStatus(false, '연결 끊김'));
+client.on('error', (e) => log('오류: ' + e.message, 'err'));
+client.on('message', (topic, payload) => {
+  const msg = payload.toString();
+  log('받음 ' + topic + ' : ' + msg);
+  if (topic === T('/temp')) { $('temp').innerHTML = msg + '<small> °C</small>'; $('tTime').textContent = new Date().toLocaleTimeString('en-GB'); }
+  if (topic === T('/led/state')) { $('ledState').textContent = msg; $('onBtn').classList.toggle('on', msg === 'ON'); }
+  if (topic === T('/servo/state')) $('servoState').textContent = msg + '°';
+});
+function send(tail, msg) {
+  if (!prefix) return log('접두어를 먼저 적용하세요', 'err');
+  if (!client.connected) return log('브로커에 연결되지 않았습니다', 'err');
+  client.publish(T(tail), msg);
+  log('보냄 ' + T(tail) + ' : ' + msg, 'ok');
+}
+$('saveBtn').onclick = () => {
+  const p = $('prefix').value.trim().replace(/\/+$/, '');
+  if (/[#+\s]/.test(p)) return log('접두어에는 # · + · 띄어쓰기를 쓸 수 없습니다', 'err');
+  if (prefix && client.connected) client.unsubscribe(T('/#'));
+  prefix = p; st.set('prefix', p);
+  ['ledState', 'servoState'].forEach((id) => $(id).textContent = '?');
+  if (client.connected) subscribe();
+};
+$('onBtn').onclick = () => send('/led/set', 'ON');
+$('offBtn').onclick = () => send('/led/set', 'OFF');
+$('servo').oninput = () => $('deg').textContent = $('servo').value + '°';
+$('servo').onchange = () => send('/servo/set', $('servo').value);
+</script>
+</body>
+</html>
