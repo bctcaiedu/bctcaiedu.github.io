@@ -4028,7 +4028,7 @@ function mqttLabGuide() {
     ['<code>if (!mqtt.connected()) connectMqtt()</code>', '공개 브로커는 가끔 연결이 끊깁니다. 끊기면 자동으로 다시 접속합니다(재접속).']
   ];
   const web = [
-    ['웹 클라이언트 열기', '<a href="https://www.hivemq.com/demos/websocket-client/" target="_blank" rel="noopener">HiveMQ 웹 클라이언트</a>를 새 탭에서 엽니다. 가입은 필요 없습니다. 위쪽 광고(Get your free account)는 무시합니다.'],
+    ['웹 클라이언트 열기', '아래 주소를 새 탭에서 엽니다 (위의 🔗 버튼을 눌러도 됩니다). 가입은 필요 없고, 위쪽 광고(Get your free account)는 무시합니다.<br>주소: <a href="https://www.hivemq.com/demos/websocket-client/" target="_blank" rel="noopener"><code>https://www.hivemq.com/demos/websocket-client/</code></a>'],
     ['① Host', '<code>broker.hivemq.com</code>을 입력합니다. 기본값 <code>mqtt-dashboard.com</code>도 같은 브로커라 그대로 둬도 됩니다.'],
     ['② Port · ③ SSL', 'Port <code>8884</code>, <b>SSL 체크</b>를 그대로 둡니다. 브라우저는 1883에 직접 들어갈 수 없어 암호화된 WebSocket 문(8884)을 씁니다. ClientID는 자동으로 만들어진 값을 그대로 씁니다.'],
     ['④ Connect', '<b>Connect</b>를 누르면 빨간 점이 <b>초록색</b>으로 바뀝니다. 그대로 빨간색이면 아래 문제 해결 표를 봅니다.'],
@@ -4081,6 +4081,7 @@ MQTT 접속 시도 (esp32-a3f91c) ... 성공
 
     <h3>③ HiveMQ 웹 클라이언트로 구독하기</h3>
     <p>ESP32가 보낸 메시지를 확인하려면 누군가 그 토픽을 <b>구독</b>해야 합니다. 앱을 설치하지 않고 브라우저에서 바로 쓸 수 있는 HiveMQ 웹 클라이언트를 씁니다. Wokwi 탭은 시뮬레이션을 켜 둔 채로 두고, <b>새 탭</b>에서 엽니다.</p>
+    <p><a class="btn small" href="https://www.hivemq.com/demos/websocket-client/" target="_blank" rel="noopener">🔗 HiveMQ 웹 클라이언트 열기</a> <code>https://www.hivemq.com/demos/websocket-client/</code></p>
     <div class="figure">${mqttWebClientSVG()}<p class="caption">HiveMQ 웹 클라이언트 화면 (단순화한 그림) — ① Host ② Port ③ SSL ④ Connect ⑤ 구독 추가 ⑥ 받은 메시지 ⑦ 발행</p></div>
     ${steps(web)}
     <div class="callout tip"><div class="ct">💡 Wokwi 탭과 웹 클라이언트 탭을 나란히</div><p>Wokwi 시뮬레이션은 브라우저 탭이 뒤로 가면 느려지거나 멈출 수 있습니다. 창 두 개를 화면 왼쪽 · 오른쪽에 나란히 놓으면(<code>Win</code> + <code>←</code> / <code>→</code>) 두 화면을 함께 보면서 실습할 수 있습니다.</p></div>
@@ -4271,7 +4272,7 @@ function mqttCtrlGuide() {
     ['<code>publish(…/led/state, "ON", true)</code>', '명령을 실행한 뒤 실제 상태를 알립니다. 마지막 인자 <code>true</code>는 <b>retain</b>: 브로커가 마지막 상태를 기억했다가 대시보드를 새로 열어도 바로 보내 줍니다.']
   ];
   const test = [
-    ['웹 클라이언트 열기', '36차시처럼 <a href="https://www.hivemq.com/demos/websocket-client/" target="_blank" rel="noopener">HiveMQ 웹 클라이언트</a>에 접속하고 <code>' + P + '/room1/#</code>을 구독합니다.'],
+    ['웹 클라이언트 열기', '36차시처럼 HiveMQ 웹 클라이언트(<a href="https://www.hivemq.com/demos/websocket-client/" target="_blank" rel="noopener"><code>https://www.hivemq.com/demos/websocket-client/</code></a>)에 접속하고 <code>' + P + '/room1/#</code>을 구독합니다.'],
     ['LED 켜기', 'Publish의 Topic에 <code>' + P + '/room1/led/set</code>, Message에 <code>ON</code> → <b>Publish</b>. Wokwi의 LED가 켜지고, Messages에 <code>led/state : ON</code>이 돌아오면 성공입니다.'],
     ['서보 돌리기', 'Topic <code>' + P + '/room1/servo/set</code>, Message <code>90</code> → Publish. 서보 팔이 90°로 돌고 <code>servo/state : 90</code>이 옵니다. <code>999</code>를 보내면 180으로 제한되는지도 확인합니다.']
   ];
