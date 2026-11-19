@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>폰 IoT 디바이스</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+KR:wght@400;600;700&display=swap">
+<style>
+/* 레이아웃: 휴대폰 한 손 조작용 단일 열 "디바이스 패널". 상단 상태 바, 가상 LED, 센서, 전송 데이터, 설정 순 */
+:root {
+  --bg: #eef1f0;
+  --panel: #ffffff;
+  --ink: #17201e;
+  --muted: #5d6b67;
+  --line: #d5dcda;
+  --accent: #0f6b5c;      /* PCB 솔더마스크 그린 */
+  --accent-ink: #ffffff;
+  --led-off: #c9cfcd;
+  --led-on: #ff3b30;
+  --good: #1f8a4c;
+  --warn: #b7791f;
+  --bad: #c0392b;
+  --code-bg: #f4f6f5;
+  --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Consolas", monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111615; --panel: #1a2120; --ink: #e6ecea; --muted: #94a39e; --line: #2c3634;
+    --accent: #3fb59c; --accent-ink: #0b1311; --led-off: #3a4442; --led-on: #ff5147;
+    --good: #4cc38a; --warn: #e0a84a; --bad: #ef6b5e; --code-bg: #141a19;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.wrap {
+  max-width: 480px; margin: 0 auto; display: grid; gap: 12px;
+  padding-block: 12px 32px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.dev { display: grid; }
+.dev small { color: var(--muted); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
+.dev strong { font-size: 20px; font-family: var(--font-mono); }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--panel); font-size: 13px; white-space: nowrap;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.chip[data-s="on"] .dot { background: var(--good); }
+.chip[data-s="wait"] .dot { background: var(--warn); }
+.chip[data-s="off"] .dot { background: var(--bad); }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 12px; min-width: 0; }
+.panel h2 { margin: 0; font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: .04em; }
+.topic { font-family: var(--font-mono); font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+button {
+  font: inherit; font-weight: 600; border-radius: 10px; padding: 12px 14px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+}
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button:active { transform: translateY(1px); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ledbox { display: flex; align-items: center; gap: 16px; }
+.led {
+  width: 84px; height: 84px; border-radius: 50%; flex: none; background: var(--led-off);
+  border: 3px solid var(--line); transition: background .15s, box-shadow .15s;
+}
+.led.on { background: var(--led-c, var(--led-on)); box-shadow: 0 0 28px 6px var(--led-c, var(--led-on)); border-color: transparent; }
+.ledtxt strong { font-size: 22px; font-family: var(--font-mono); }
+.sens { display: grid; gap: 10px; }
+.s-row { display: grid; grid-template-columns: 72px 1fr 76px; align-items: center; gap: 10px; }
+.s-row label { font-size: 14px; }
+.s-row output { font-family: var(--font-mono); text-align: right; font-variant-numeric: tabular-nums; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+.meter { height: 8px; border-radius: 4px; background: var(--code-bg); border: 1px solid var(--line); overflow: hidden; }
+.meter i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .1s; }
+.note { font-size: 13px; color: var(--muted); margin: 0; }
+pre {
+  margin: 0; padding: 10px; background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px;
+  font-family: var(--font-mono); font-size: 12.5px; overflow-x: auto; white-space: pre;
+}
+.log { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-family: var(--font-mono); font-size: 12px; }
+.log li { color: var(--muted); overflow-wrap: anywhere; }
+.log li b { color: var(--ink); font-weight: 600; }
+details summary { cursor: pointer; font-weight: 600; }
+.form { display: grid; gap: 10px; margin-top: 12px; }
+.form label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+.form input, .form select {
+  font: inherit; font-size: 15px; padding: 10px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--ink); min-width: 0; width: 100%;
+}
+.anom.active { background: var(--warn); color: #1b1300; border-color: var(--warn); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+<script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
+</head>
+<body>
+<main class="wrap">
+
+  <div class="bar">
+    <div class="dev"><small>폰 IoT 디바이스</small><strong id="devName">s01</strong></div>
+    <span class="chip" id="status" data-s="off"><span class="dot"></span><span id="statusTxt">연결 안 됨</span></span>
+  </div>
+
+  <section class="panel" id="startPanel">
+    <p class="note">센서 시작을 누르면 움직임 센서와 마이크 권한을 묻습니다. 소리 명령(BEEP)도 이 버튼을 누른 뒤부터 동작합니다.</p>
+    <div class="row2">
+      <button class="primary" id="btnStart">센서 시작</button>
+      <button id="btnConnect">연결</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>가상 LED</h2>
+    <div class="ledbox">
+      <div class="led" id="led" role="img" aria-label="LED 꺼짐"></div>
+      <div class="ledtxt">
+        <strong id="ledTxt">OFF</strong>
+        <div class="topic">구독: <span id="tLed"></span></div>
+        <div class="topic">구독: <span id="tCmd"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>센서 (가상 DHT22 · 조도 · 실제 가속도 · 실제 소리)</h2>
+    <div class="sens">
+      <div class="s-row"><label for="sTemp">온도</label><input type="range" id="sTemp" min="10" max="40" step="0.1" value="24"><output id="oTemp">24.0 ℃</output></div>
+      <div class="s-row"><label for="sHum">습도</label><input type="range" id="sHum" min="10" max="90" step="1" value="45"><output id="oHum">45 %</output></div>
+      <div class="s-row"><label for="sLight">조도</label><input type="range" id="sLight" min="0" max="4095" step="1" value="1800"><output id="oLight">1800</output></div>
+      <div class="s-row"><span>가속도 x</span><div class="meter"><i id="mAx"></i></div><output id="oAx">–</output></div>
+      <div class="s-row"><span>가속도 y</span><div class="meter"><i id="mAy"></i></div><output id="oAy">–</output></div>
+      <div class="s-row"><span>가속도 z</span><div class="meter"><i id="mAz"></i></div><output id="oAz">–</output></div>
+      <div class="s-row"><span>소리</span><div class="meter"><i id="mSound"></i></div><output id="oSound">–</output></div>
+    </div>
+    <p class="note" id="sensNote">온도·습도·조도는 슬라이더로 정하는 가상 센서이고, 실제 센서처럼 작은 흔들림이 섞여 전송됩니다.</p>
+    <div class="row2">
+      <button id="btnPress">버튼 누르기</button>
+      <button class="anom" id="btnAnom">이상 상황 20초</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>보내는 데이터</h2>
+    <div class="topic">발행: <span id="tSensor"></span> · <span id="sentCount">0</span>회</div>
+    <pre id="payload">{}</pre>
+    <div class="topic" id="tsInfo"></div>
+  </section>
+
+  <section class="panel">
+    <h2>기록</h2>
+    <ul class="log" id="log"></ul>
+  </section>
+
+  <section class="panel">
+    <details id="settings">
+      <summary>설정</summary>
+      <div class="form">
+        <label>브로커 주소 (WebSocket, wss://)
+          <input id="cBroker" type="url" autocomplete="off" spellcheck="false">
+        </label>
+        <div class="row2">
+          <label>토픽 앞부분
+            <input id="cPrefix" type="text" autocomplete="off" spellcheck="false">
+          </label>
+          <label>내 번호
+            <input id="cId" type="text" autocomplete="off" spellcheck="false">
+          </label>
+        </div>
+        <div class="row2">
+          <label>사용자 이름 (선택)
+            <input id="cUser" type="text" autocomplete="off">
+          </label>
+          <label>비밀번호 (선택, 저장 안 됨)
+            <input id="cPass" type="password" autocomplete="off">
+          </label>
+        </div>
+        <div class="row2">
+          <label>전송 간격
+            <select id="cInterval">
+              <option value="1">1초</option>
+              <option value="2">2초</option>
+              <option value="5">5초</option>
+              <option value="10">10초</option>
+            </select>
+          </label>
+          <label>ThingSpeak Write Key (선택)
+            <input id="cTs" type="text" autocomplete="off" spellcheck="false">
+          </label>
+        </div>
+        <button class="primary" id="btnSave">저장하고 다시 연결</button>
+        <p class="note">공개 브로커는 누구나 같은 토픽을 볼 수 있습니다. 토픽 앞부분을 반마다 다르게(예: aiot-kt2611) 정하고, 개인정보는 보내지 마세요.</p>
+      </div>
+    </details>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const KEY = "phoneiot.";
+  const load = (k, d) => { try { const v = localStorage.getItem(KEY + k); return v === null ? d : v; } catch (e) { return d; } };
+  const save = (k, v) => { try { localStorage.setItem(KEY + k, v); } catch (e) {} };
+
+  const cfg = {
+    broker: load("broker", "wss://broker.hivemq.com:8884/mqtt"),
+    prefix: load("prefix", "aiot"),
+    id: load("id", "s01"),
+    user: load("user", ""),
+    pass: "",
+    interval: Number(load("interval", "2")),
+    ts: load("ts", "")
+  };
+
+  const st = { temp: 24, hum: 45, light: 1800, ax: null, ay: null, az: null, sound: null, anomUntil: 0, sent: 0 };
+  let client = null, audioCtx = null, analyser = null, buf = null, pubTimer = null, tsTimer = null, lastShake = 0;
+
+  const topic = (s) => `${cfg.prefix}/${cfg.id}/${s}`;
+  const time = () => new Date().toTimeString().slice(0, 8);
+  function log(msg, strong) {
+    const li = document.createElement("li");
+    li.textContent = time() + " ";
+    if (strong) { const b = document.createElement("b"); b.textContent = strong + " "; li.appendChild(b); }
+    li.appendChild(document.createTextNode(msg));
+    const ul = $("log"); ul.prepend(li);
+    while (ul.children.length > 10) ul.lastChild.remove();
+  }
+  function setStatus(s, txt) { $("status").dataset.s = s; $("statusTxt").textContent = txt; }
+
+  function renderTopics() {
+    $("devName").textContent = cfg.id;
+    $("tLed").textContent = topic("led");
+    $("tCmd").textContent = topic("cmd");
+    $("tSensor").textContent = topic("sensor");
+  }
+
+  // ---------- 가상 LED와 명령 ----------
+  function setLed(on, color) {
+    const led = $("led");
+    if (color) led.style.setProperty("--led-c", color); else led.style.removeProperty("--led-c");
+    led.classList.toggle("on", on);
+    led.setAttribute("aria-label", on ? "LED 켜짐" : "LED 꺼짐");
+    $("ledTxt").textContent = on ? (color ? color.toUpperCase() : "ON") : "OFF";
+  }
+  function beep() {
+    if (!audioCtx) { log("먼저 센서 시작을 누르세요", "BEEP"); return; }
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.frequency.value = 880; g.gain.value = 0.15;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + 0.25);
+  }
+  function onMessage(t, payload) {
+    const msg = payload.toString().trim();
+    if (t === topic("led")) {
+      const up = msg.toUpperCase();
+      if (up === "ON") setLed(true);
+      else if (up === "OFF") setLed(false);
+      else if (up === "TOGGLE") setLed(!$("led").classList.contains("on"));
+      else if (/^#[0-9a-f]{6}$/i.test(msg)) setLed(true, msg);
+      log(msg, "LED");
+    } else if (t === topic("cmd")) {
+      const up = msg.toUpperCase();
+      if (up === "BEEP") beep();
+      else if (up === "VIBRATE") { if (navigator.vibrate) navigator.vibrate(300); }
+      log(msg, "CMD");
+    }
+  }
+
+  // ---------- MQTT ----------
+  function connect() {
+    if (typeof mqtt === "undefined") { setStatus("off", "라이브러리 없음"); log("MQTT 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인하세요."); return; }
+    if (client) { try { client.end(true); } catch (e) {} client = null; }
+    setStatus("wait", "연결 중");
+    const opts = {
+      clientId: "phone-" + cfg.id + "-" + Math.random().toString(16).slice(2, 8),
+      reconnectPeriod: 3000, connectTimeout: 8000, clean: true
+    };
+    if (cfg.user) opts.username = cfg.user;
+    if (cfg.pass) opts.password = cfg.pass;
+    try { client = mqtt.connect(cfg.broker, opts); }
+    catch (e) { setStatus("off", "주소 오류"); log("브로커 주소를 확인하세요: " + e.message); return; }
+    client.on("connect", () => {
+      setStatus("on", "연결됨");
+      client.subscribe([topic("led"), topic("cmd")]);
+      log(cfg.broker, "연결");
+    });
+    client.on("reconnect", () => setStatus("wait", "다시 연결 중"));
+    client.on("offline", () => setStatus("off", "끊김"));
+    client.on("error", (e) => log(e.message, "오류"));
+    client.on("message", onMessage);
+    startPublishing();
+  }
+  function publish(sub, data) {
+    if (client && client.connected) client.publish(topic(sub), data);
+  }
+
+  // ---------- 센서 ----------
+  const noise = (s) => (Math.random() + Math.random() + Math.random() - 1.5) * s;
+  function reading() {
+    const anom = Date.now() < st.anomUntil;
+    const d = {
+      temp: +(st.temp + noise(0.15) + (anom ? 8 : 0)).toFixed(1),
+      hum: +(st.hum + noise(0.6) - (anom ? 15 : 0)).toFixed(1),
+      light: Math.max(0, Math.min(4095, Math.round(st.light + noise(25))))
+    };
+    if (st.ax !== null) { d.ax = +st.ax.toFixed(2); d.ay = +st.ay.toFixed(2); d.az = +st.az.toFixed(2); }
+    if (st.sound !== null) d.sound = st.sound;
+    return d;
+  }
+  function startPublishing() {
+    clearInterval(pubTimer);
+    pubTimer = setInterval(() => {
+      const d = reading();
+      $("payload").textContent = JSON.stringify(d, null, 1);
+      if (client && client.connected) {
+        publish("sensor", JSON.stringify(d));
+        st.sent++; $("sentCount").textContent = st.sent;
+      }
+      if (Date.now() >= st.anomUntil) $("btnAnom").classList.remove("active");
+    }, cfg.interval * 1000);
+
+    clearInterval(tsTimer);
+    $("tsInfo").textContent = cfg.ts ? "ThingSpeak: 20초마다 전송" : "";
+    if (cfg.ts) tsTimer = setInterval(sendThingSpeak, 20000);
+  }
+  async function sendThingSpeak() {
+    const d = reading();
+    const url = "https://api.thingspeak.com/update?api_key=" + encodeURIComponent(cfg.ts) +
+      "&field1=" + d.temp + "&field2=" + d.hum + "&field3=" + d.light;
+    try {
+      const r = await fetch(url);
+      const body = (await r.text()).trim();
+      $("tsInfo").textContent = "ThingSpeak " + time() + ": " + (body === "0" ? "거부됨 (15초 제한 또는 키 오류)" : "저장 번호 " + body);
+    } catch (e) {
+      try { await fetch(url, { mode: "no-cors" }); $("tsInfo").textContent = "ThingSpeak " + time() + ": 전송함 (응답 확인 불가)"; }
+      catch (e2) { $("tsInfo").textContent = "ThingSpeak 전송 실패: " + e2.message; }
+    }
+  }
+
+  function meter(id, v, max) { $(id).style.width = Math.min(100, Math.abs(v) / max * 100) + "%"; }
+  function onMotion(e) {
+    const a = e.accelerationIncludingGravity;
+    if (!a || a.x === null) return;
+    st.ax = a.x; st.ay = a.y; st.az = a.z;
+    const mag = Math.sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
+    if (Math.abs(mag - 9.8) > 8 && Date.now() - lastShake > 1500) {
+      lastShake = Date.now();
+      publish("event", JSON.stringify({ type: "shake", g: +(mag / 9.8).toFixed(1) }));
+      log("흔들림 감지", "EVENT");
+    }
+  }
+  function drawLoop() {
+    if (st.ax !== null) {
+      $("oAx").textContent = st.ax.toFixed(1); meter("mAx", st.ax, 20);
+      $("oAy").textContent = st.ay.toFixed(1); meter("mAy", st.ay, 20);
+      $("oAz").textContent = st.az.toFixed(1); meter("mAz", st.az, 20);
+    }
+    if (analyser) {
+      analyser.getFloatTimeDomainData(buf);
+      let sum = 0; for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+      const rms = Math.sqrt(sum / buf.length);
+      const level = Math.max(0, Math.min(100, Math.round(20 * Math.log10(rms + 1e-6) + 100)));
+      st.sound = level; $("oSound").textContent = level; meter("mSound", level, 100);
+    }
+    requestAnimationFrame(drawLoop);
+  }
+  async function startSensors() {
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === "suspended") await audioCtx.resume();
+    } catch (e) { audioCtx = null; }
+
+    if (!window.isSecureContext) log("https 주소에서 열어야 센서를 쓸 수 있습니다.", "안내");
+
+    // 화면이 꺼지면 전송이 멈추므로 켜진 상태 유지를 요청 (지원 안 되면 무시)
+    try { if (navigator.wakeLock) await navigator.wakeLock.request("screen"); } catch (e) {}
+
+    let motionOk = true;
+    if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
+      try { motionOk = (await DeviceMotionEvent.requestPermission()) === "granted"; } catch (e) { motionOk = false; }
+    }
+    if (motionOk) { window.addEventListener("devicemotion", onMotion); log("움직임 센서 켬", "센서"); }
+    else log("움직임 센서 권한이 거부됐습니다.", "센서");
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const src = audioCtx.createMediaStreamSource(stream);
+      analyser = audioCtx.createAnalyser(); analyser.fftSize = 1024;
+      buf = new Float32Array(analyser.fftSize);
+      src.connect(analyser);
+      log("마이크 켬 (소리 크기만 계산, 녹음 안 함)", "센서");
+    } catch (e) { log("마이크를 쓸 수 없습니다: " + e.message, "센서"); }
+
+    setTimeout(() => { if (st.ax === null) $("sensNote").textContent = "이 기기에서는 가속도 값이 들어오지 않습니다. 컴퓨터라면 정상이며, 휴대폰이라면 https 주소인지 확인하세요."; }, 2000);
+    $("btnStart").textContent = "센서 켜짐";
+    $("btnStart").disabled = true;
+  }
+
+  // ---------- 화면 연결 ----------
+  function bindSlider(id, out, key, fmt) {
+    const el = $(id);
+    const upd = () => { st[key] = Number(el.value); $(out).textContent = fmt(st[key]); };
+    el.addEventListener("input", upd); upd();
+  }
+  bindSlider("sTemp", "oTemp", "temp", (v) => v.toFixed(1) + " ℃");
+  bindSlider("sHum", "oHum", "hum", (v) => v + " %");
+  bindSlider("sLight", "oLight", "light", (v) => String(v));
+
+  $("btnStart").addEventListener("click", startSensors);
+  $("btnConnect").addEventListener("click", connect);
+  $("btnPress").addEventListener("click", () => { publish("button", "PRESSED"); log("PRESSED", "BUTTON"); });
+  $("btnAnom").addEventListener("click", () => {
+    st.anomUntil = Date.now() + 20000;
+    $("btnAnom").classList.add("active");
+    log("온도 +8℃, 습도 -15% (20초)", "이상 상황");
+  });
+
+  function fillForm() {
+    $("cBroker").value = cfg.broker; $("cPrefix").value = cfg.prefix; $("cId").value = cfg.id;
+    $("cUser").value = cfg.user; $("cInterval").value = String(cfg.interval); $("cTs").value = cfg.ts;
+  }
+  $("btnSave").addEventListener("click", () => {
+    cfg.broker = $("cBroker").value.trim() || cfg.broker;
+    cfg.prefix = $("cPrefix").value.trim().replace(/\/+$/, "") || "aiot";
+    cfg.id = $("cId").value.trim() || "s01";
+    cfg.user = $("cUser").value.trim();
+    cfg.pass = $("cPass").value;
+    cfg.interval = Number($("cInterval").value) || 2;
+    cfg.ts = $("cTs").value.trim();
+    ["broker", "prefix", "id", "user", "interval", "ts"].forEach((k) => save(k, String(cfg[k])));
+    renderTopics(); connect();
+    $("settings").open = false;
+  });
+
+  // ?id=s05 처럼 주소로 번호를 넘기면 바로 적용 (QR 코드 배포용)
+  const q = new URLSearchParams(location.search);
+  if (q.get("id")) cfg.id = q.get("id");
+  if (q.get("prefix")) cfg.prefix = q.get("prefix");
+
+  fillForm(); renderTopics(); startPublishing(); drawLoop();
+  $("payload").textContent = JSON.stringify(reading(), null, 1);
+})();
+</script>
+</body>
+</html>
