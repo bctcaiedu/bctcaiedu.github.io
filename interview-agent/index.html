@@ -1,0 +1,1112 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 면접관 — 얼굴 보며 말로 하는 모의 면접</title>
+<style>
+:root{
+  --bg:#0e1320; --panel:#161d2d; --panel2:#1d2639; --line:#2a3550;
+  --text:#e9edf6; --muted:#97a3c0; --accent:#5b8cff; --accent2:#33d29a;
+  --warn:#ffb547; --danger:#ff5d6c;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);
+  font-family:"Pretendard","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+header{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--line)}
+header h1{font-size:18px;margin:0;font-weight:700}
+header .sub{color:var(--muted);font-size:13px}
+header .spacer{flex:1}
+.pill{font-size:12px;padding:4px 10px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);color:var(--muted)}
+.pill.on{color:#bfffe6;border-color:#1f7a5a;background:#123a2e}
+main{max-width:1280px;margin:0 auto;padding:16px}
+
+.stage{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tile{position:relative;background:#0a0e17;border:1px solid var(--line);border-radius:18px;overflow:hidden;aspect-ratio:4/3;transition:box-shadow .25s}
+.tile canvas,.tile video{position:absolute;inset:0;width:100%;height:100%;display:block}
+.tile video{object-fit:cover;transform:scaleX(-1)}
+.tile.speaking{box-shadow:0 0 0 3px var(--accent)}
+.tile.listening{animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 2px var(--accent2)}50%{box-shadow:0 0 0 6px rgba(51,210,154,.35)}}
+.nameTag{position:absolute;left:12px;bottom:12px;background:rgba(0,0,0,.55);padding:5px 11px;border-radius:9px;font-size:13px;backdrop-filter:blur(4px)}
+.stateChip{position:absolute;right:12px;top:12px;background:rgba(0,0,0,.55);padding:5px 11px;border-radius:999px;font-size:12px;color:var(--muted)}
+.camOff{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;text-align:center;padding:20px}
+
+/* setup panel lives in the right tile before the interview */
+.setup{position:absolute;inset:0;overflow:auto;padding:18px 20px;background:var(--panel)}
+.setup h2{margin:0 0 4px;font-size:17px}
+.setup p.hint{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.5}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.field label{font-size:12px;color:var(--muted)}
+.field input[type=text],.field input[type=password],.field select,.field textarea{
+  background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px;outline:none;width:100%}
+.field textarea{min-height:58px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.check{display:flex;gap:7px;align-items:flex-start;font-size:13px;color:var(--muted);margin:4px 0}
+.check input{margin-top:3px}
+.note{font-size:12px;color:var(--muted);line-height:1.5;background:var(--bg);border:1px dashed var(--line);border-radius:9px;padding:8px 10px;margin:6px 0 12px}
+.note.warn{color:#ffd99a;border-color:#6a5222}
+
+.btn{border:1px solid var(--line);background:var(--panel2);border-radius:11px;padding:9px 15px;cursor:pointer;font-size:14px}
+.btn:hover{border-color:#41507a}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.btn.green{background:#1c8f66;border-color:#1c8f66;color:#fff;font-weight:700}
+.btn.danger{background:transparent;border-color:#6b2a33;color:#ff9aa5}
+.btn.big{padding:12px 20px;font-size:15px;width:100%}
+
+.caption{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px 18px;min-height:84px}
+.caption .who{font-size:12px;color:var(--muted);margin-bottom:4px}
+.caption .txt{font-size:20px;line-height:1.55}
+.caption .txt .interim{color:var(--muted)}
+.controls{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center}
+.controls .typeBox{flex:1;min-width:220px;display:flex;gap:8px}
+.controls .typeBox input{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 12px;outline:none}
+.meta{color:var(--muted);font-size:13px;margin-left:auto}
+
+details.log{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 16px}
+details.log summary{cursor:pointer;color:var(--muted);font-size:14px}
+.logList{max-height:280px;overflow:auto;margin-top:8px}
+.msg{padding:7px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.5}
+.msg b{color:var(--accent)}
+.msg.me b{color:var(--accent2)}
+.msg small{color:var(--muted)}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#2b1b22;border:1px solid #6b2a33;color:#ffd0d6;padding:10px 16px;border-radius:11px;font-size:14px;display:none;max-width:90vw;z-index:50}
+
+/* report */
+.overlay{position:fixed;inset:0;background:rgba(5,8,14,.82);display:none;align-items:flex-start;justify-content:center;overflow:auto;padding:30px 14px;z-index:40}
+.report{background:var(--panel);border:1px solid var(--line);border-radius:18px;max-width:860px;width:100%;padding:24px}
+.report h2{margin:0 0 6px}
+.scoreRow{display:flex;gap:20px;align-items:center;margin:14px 0 6px;flex-wrap:wrap}
+.ring{width:118px;height:118px;border-radius:50%;display:grid;place-items:center;font-size:32px;font-weight:800;flex:none}
+.ring span{background:var(--panel);width:94px;height:94px;border-radius:50%;display:grid;place-items:center}
+.report h3{font-size:15px;margin:20px 0 8px;color:var(--muted)}
+.report ul{margin:0;padding-left:20px;line-height:1.6}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stat{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.stat .v{font-size:20px;font-weight:700}
+.stat .k{font-size:12px;color:var(--muted)}
+.qcard{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;line-height:1.55;font-size:14px}
+.qcard .q{font-weight:700;margin-bottom:4px}
+.qcard .sc{float:right;color:var(--accent);font-weight:700}
+.qcard .lbl{color:var(--muted);font-size:12px;margin-top:6px}
+.loading{color:var(--muted);padding:30px 0;text-align:center}
+
+footer{color:var(--muted);font-size:12px;text-align:center;padding:18px;line-height:1.6}
+
+@media (max-width:860px){
+  .stage{grid-template-columns:1fr}
+  .tile.setupMode{aspect-ratio:auto}
+  .tile.setupMode .setup{position:static}
+  .grid2{grid-template-columns:1fr}
+  .caption .txt{font-size:17px}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎙️ AI 면접관</h1>
+  <span class="sub">얼굴을 마주 보고 말로 주고받는 모의 면접</span>
+  <span class="spacer"></span>
+  <span class="pill" id="modePill">연습 모드</span>
+  <span class="pill" id="progressPill" style="display:none">진행 0</span>
+</header>
+
+<main>
+  <section class="stage">
+    <!-- AI interviewer -->
+    <div class="tile" id="aiTile">
+      <canvas id="avatar"></canvas>
+      <div class="nameTag" id="aiName">면접관 한서윤</div>
+      <div class="stateChip" id="aiState">대기 중</div>
+    </div>
+
+    <!-- Candidate: setup form first, then webcam -->
+    <div class="tile setupMode" id="meTile">
+      <video id="cam" autoplay playsinline muted style="display:none"></video>
+      <div class="camOff" id="camOff" style="display:none">카메라를 사용할 수 없어요.<br>음성과 텍스트로 계속 진행합니다.</div>
+      <div class="nameTag" id="meName" style="display:none">나 (지원자)</div>
+      <div class="stateChip" id="meState" style="display:none">-</div>
+
+      <div class="setup" id="setup">
+        <h2>면접 준비</h2>
+        <p class="hint">정보를 입력하고 <b>면접 시작</b>을 누르세요. 면접관이 먼저 인사하고, 말이 끝나면 마이크가 켜져 바로 대답할 수 있어요.</p>
+
+        <div class="grid2">
+          <div class="field"><label>지원 직무</label><input type="text" id="fRole" value="백엔드 개발자"></div>
+          <div class="field"><label>회사 · 기관 (선택)</label><input type="text" id="fCompany" placeholder="예: 한빛소프트"></div>
+          <div class="field"><label>경력 수준</label>
+            <select id="fLevel"><option>신입</option><option>경력 1~3년</option><option>경력 3년 이상</option></select></div>
+          <div class="field"><label>면접 스타일</label>
+            <select id="fStyle"><option value="friendly">친근하게</option><option value="standard" selected>표준</option><option value="pressure">압박 면접</option></select></div>
+          <div class="field"><label>주요 질문 수</label>
+            <select id="fCount"><option value="3">3개 (약 5분)</option><option value="5" selected>5개 (약 10분)</option><option value="7">7개 (약 15분)</option></select></div>
+          <div class="field"><label>면접관</label>
+            <select id="fAvatar"><option value="female">한서윤 (여성)</option><option value="male">박준호 (남성)</option></select></div>
+        </div>
+        <div class="field"><label>자기소개서 · 이력 요약 (선택 — 넣으면 맞춤 질문을 해요)</label>
+          <textarea id="fResume" placeholder="예: 컴퓨터공학 전공, Spring Boot로 쇼핑몰 API 개발 프로젝트 2건, 정보처리기사 취득"></textarea></div>
+
+        <div class="grid2">
+          <div class="field"><label>면접관 목소리</label><select id="fVoice"></select></div>
+          <div class="field"><label>말하기 속도 <span id="rateVal">1.0</span>×</label>
+            <input type="range" id="fRate" min="0.7" max="1.4" step="0.05" value="1"></div>
+          <div class="field"><label>답변 자동 제출</label>
+            <select id="fSilence"><option value="0">끄기 (답변 완료 버튼)</option><option value="2000">2초 침묵 후</option><option value="3000" selected>3초 침묵 후</option><option value="4500">4.5초 침묵 후</option></select></div>
+          <div class="field"><label>&nbsp;</label><button class="btn" id="btnTestVoice">🔊 목소리 · 입 모양 테스트</button></div>
+        </div>
+        <div class="note warn" id="voiceWarn" style="display:none"></div>
+
+        <div class="field"><label>Claude API 키 (선택 — 비워 두면 기본 질문으로 진행하는 연습 모드)</label>
+          <input type="password" id="fKey" placeholder="sk-ant-..." autocomplete="off"></div>
+        <label class="check"><input type="checkbox" id="fSaveKey"> 이 브라우저에 키 저장 (공용 PC에서는 체크하지 마세요)</label>
+        <label class="check"><input type="checkbox" id="fSnap"> 답변할 때 웹캠 사진을 면접관에게 보여 주기 (표정 · 자세 · 시선 피드백, API 모드 전용)</label>
+        <div class="note">API 모드에서는 브라우저가 Anthropic API를 직접 호출해요. 키는 이 PC에만 머물고 이 사이트 서버로는 전송되지 않지만, 화면 공유 중에는 입력하지 마세요. 음성 인식은 <b>Chrome 또는 Edge</b>에서 동작합니다.</div>
+        <div class="note warn" id="srWarn" style="display:none">이 브라우저는 음성 인식을 지원하지 않아요. 아래 입력창에 글로 답할 수 있어요. (Chrome · Edge 권장)</div>
+
+        <button class="btn primary big" id="btnStart">면접 시작</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="caption">
+    <div class="who" id="capWho">안내</div>
+    <div class="txt" id="capTxt">오른쪽에서 면접 정보를 정하고 시작하세요. 목소리 테스트로 입 모양이 말과 맞는지 먼저 확인해 볼 수 있어요.</div>
+  </section>
+
+  <section class="controls" id="controls" style="display:none">
+    <button class="btn green" id="btnDone" disabled>✅ 답변 완료</button>
+    <button class="btn" id="btnMic" disabled>🎤 마이크 끄기</button>
+    <button class="btn" id="btnSkip" disabled>⏭ 면접관 말 넘기기</button>
+    <div class="typeBox">
+      <input type="text" id="typeInput" placeholder="말 대신 글로 답하기 (Enter)">
+      <button class="btn" id="btnSend">보내기</button>
+    </div>
+    <button class="btn danger" id="btnEnd">면접 종료</button>
+  </section>
+
+  <details class="log" id="logBox">
+    <summary>대화 기록 보기</summary>
+    <div class="logList" id="logList"></div>
+  </details>
+</main>
+
+<div class="overlay" id="overlay"><div class="report" id="report"></div></div>
+<div class="toast" id="toast"></div>
+
+<footer>
+  얼굴은 캔버스로 직접 그린 그래픽이고, 입 모양은 한글 음절의 모음(ㅏ·ㅗ·ㅜ·ㅣ…)과 받침(ㅁ·ㅂ)을 분석해 음성 합성과 맞춰 움직입니다.<br>
+  음성 인식 · 합성은 브라우저 기능(Web Speech API)을 쓰며, 질문 생성과 평가는 Claude(API 모드) 또는 기본 질문 은행(연습 모드)이 맡습니다.
+</footer>
+
+<script type="module">
+/* =========================================================
+ * 1. 한글 → 입 모양 타임라인 (립싱크)
+ * ========================================================= */
+// [벌림, 가로 폭, 오므림]
+const VOW = {
+  a:[.95,.55,0], ae:[.62,.78,0], eo:[.66,.42,.2], e:[.5,.78,0],
+  o:[.46,.16,.92], u:[.28,.1,1], eu:[.2,.74,0], i:[.22,.9,0], oe:[.4,.3,.62]
+};
+// 중성 21개: ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ (이중모음은 [시작, 끝])
+const JUNG = [['a'],['ae'],['i','a'],['i','ae'],['eo'],['e'],['i','eo'],['i','e'],['o'],['o','a'],['o','ae'],['oe'],
+  ['i','o'],['u'],['u','eo'],['u','e'],['u','i'],['i','u'],['eu'],['eu','i'],['i']];
+const CHO_LIPS = new Set([6,7,8,17]);            // ㅁ ㅂ ㅃ ㅍ : 입술이 닫혔다 열림
+const JONG_LIPS = new Set([10,14,16,17,18,26]);  // ㄻ ㄿ ㅁ ㅂ ㅄ ㅍ 받침 : 끝에 입술 닫힘
+const BASE_SYL_PER_SEC = 6.2;                    // 속도 1.0일 때 대략적인 한국어 TTS 음절 속도
+
+function buildTimeline(text){
+  const segs = [], charUnit = new Array(text.length + 1);
+  let u = 0;
+  for (let i = 0; i < text.length; i++){
+    charUnit[i] = u;
+    const ch = text[i], code = ch.charCodeAt(0);
+    if (code >= 0xAC00 && code <= 0xD7A3){
+      const s = code - 0xAC00;
+      segs.push({u0:u, u1:u+1, cho:Math.floor(s/588), jung:Math.floor((s%588)/28), jong:s%28, amp:.82+Math.random()*.3});
+      u += 1;
+    } else if (/[0-9]/.test(ch)){ segs.push({u0:u, u1:u+1.4, gen:true, amp:.9}); u += 1.4; }
+    else if (/[A-Za-z]/.test(ch)){ segs.push({u0:u, u1:u+.55, gen:true, amp:.85}); u += .55; }
+    else if (/\s/.test(ch)) u += .25;
+    else if (/[,·]/.test(ch)) u += 1.2;
+    else if (/[.!?…]/.test(ch)) u += 1.8;
+    else u += .2;
+  }
+  charUnit[text.length] = u;
+  return {text, segs, charUnit, total:u};
+}
+
+function mix(a, b, k){ return [a[0]+(b[0]-a[0])*k, a[1]+(b[1]-a[1])*k, a[2]+(b[2]-a[2])*k]; }
+const CLOSED = [0, .45, .18];
+
+function shapeAt(tl, pos){
+  const segs = tl.segs;
+  let lo = 0, hi = segs.length - 1, seg = null;
+  while (lo <= hi){ const mid = (lo+hi) >> 1; const s = segs[mid];
+    if (pos < s.u0) hi = mid - 1; else if (pos >= s.u1) lo = mid + 1; else { seg = s; break; } }
+  if (!seg) return null;
+  const f = (pos - seg.u0) / (seg.u1 - seg.u0);
+  if (seg.gen){ const v = [.5, .5, .1]; v[0] *= seg.amp * (.55 + .45*Math.sin(Math.PI*f)); return v; }
+  const vw = JUNG[seg.jung];
+  const a = VOW[vw[0]], b = VOW[vw[1] || vw[0]];
+  let v = vw[1] ? mix(a, b, Math.min(1, Math.max(0, (f-.12)/.45))) : a.slice();
+  v[0] *= seg.amp * (.62 + .38*Math.sin(Math.PI*Math.min(1, f*1.15)));
+  if (CHO_LIPS.has(seg.cho) && f < .22) v = mix(CLOSED, v, f/.22*.4);
+  if (seg.jong){
+    if (JONG_LIPS.has(seg.jong) && f > .7) v = mix(v, CLOSED, Math.min(1, (f-.7)/.12));
+    else if (f > .74) v[0] *= .5;
+  }
+  return v;
+}
+
+class LipSync{
+  constructor(tl, rate){
+    this.tl = tl; this.ups = BASE_SYL_PER_SEC * rate;
+    this.base = 0; this.tBase = performance.now(); this.cap = Infinity; this.first = null;
+  }
+  // TTS의 단어 경계 이벤트가 오면 실제 발화 위치로 다시 맞춘다
+  boundary(ci){
+    const u = this.tl.charUnit[ci]; if (u == null) return;
+    const now = performance.now();
+    if (!this.first) this.first = {u, t:now};
+    else {
+      const du = u - this.first.u, dt = (now - this.first.t) / 1000;
+      if (dt > .4 && du > 1) this.ups = this.ups*.6 + (du/dt)*.4;
+    }
+    this.base = u; this.tBase = now;
+    let j = ci; const tx = this.tl.text;
+    while (j < tx.length && !/\s/.test(tx[j])) j++;
+    this.cap = this.tl.charUnit[j];   // 다음 경계 이벤트 전까지 이 단어 끝을 넘지 않음
+  }
+  shape(now){
+    let p = this.base + (now - this.tBase) / 1000 * this.ups;
+    if (p > this.cap) p = this.cap;
+    return shapeAt(this.tl, p);
+  }
+}
+
+/* =========================================================
+ * 2. 얼굴 그래픽 (Canvas 2D)
+ * ========================================================= */
+const LOOKS = {
+  female:{ skin:'#f3d1bc', skin2:'#e2ad94', hair:'#2b1c17', hairHi:'rgba(255,220,200,.10)', suit:'#2b3a5e', suit2:'#223050', inner:'#f3eee6', lip:'#c4636c', lipDark:'#8f3b45', browW:5.5, iris:'#5a3a28' },
+  male:  { skin:'#eec4a6', skin2:'#d9a283', hair:'#1d1918', hairHi:'rgba(255,255,255,.07)', suit:'#2f3744', suit2:'#252c37', inner:'#f6f6f4', lip:'#b86a6a', lipDark:'#86454a', browW:8.5, iris:'#3e2a1e', tie:'#7d2f3c' }
+};
+
+class Avatar{
+  constructor(cv){
+    this.cv = cv; this.ctx = cv.getContext('2d'); this.look = 'female';
+    this.m = {open:0, wide:.5, round:0, smile:.3};
+    this.mode = 'idle'; this.lip = null; this.question = false;
+    this.blinkT = -1; this.nextBlink = performance.now() + 1500;
+    this.gaze = {x:0,y:0}; this.gazeT = {x:0,y:0}; this.nextSac = 0;
+    this.brow = 0; this.browBoost = 0; this.nodT = 99;
+    this.bokeh = Array.from({length:16}, () => ({x:Math.random(), y:Math.random()*.65, r:12+Math.random()*46, a:.035+Math.random()*.07, hue:Math.random()<.5?'255,214,160':'160,190,255'}));
+    this.last = performance.now();
+    new ResizeObserver(() => this.resize()).observe(cv); this.resize();
+    const loop = (t) => { this.frame(t); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+  }
+  resize(){ const d = devicePixelRatio || 1; this.cv.width = Math.max(1, Math.round(this.cv.clientWidth*d)); this.cv.height = Math.max(1, Math.round(this.cv.clientHeight*d)); }
+  nod(){ this.nodT = 0; }
+  setMode(m){ this.mode = m; this.nextSac = 0; }
+
+  frame(now){
+    const dt = Math.min(.05, (now - this.last) / 1000); this.last = now;
+    this.update(dt, now); this.draw(now / 1000);
+  }
+  update(dt, now){
+    let tgt = [0, .5, 0];
+    const sh = this.lip ? this.lip.shape(now) : null;
+    if (sh) tgt = sh;
+    const baseSmile = {idle:.32, listening:.42, thinking:.12, speaking:.16}[this.mode] ?? .3;
+    const k = 1 - Math.exp(-dt*24), ks = 1 - Math.exp(-dt*4);
+    this.m.open += (tgt[0] - this.m.open) * k;
+    this.m.wide += (tgt[1] - this.m.wide) * k;
+    this.m.round += (tgt[2] - this.m.round) * k;
+    this.m.smile += (baseSmile - this.m.smile) * ks;
+
+    if (this.blinkT < 0 && now > this.nextBlink) this.blinkT = 0;
+    if (this.blinkT >= 0){ this.blinkT += dt;
+      if (this.blinkT > .16){ this.blinkT = -1; this.nextBlink = now + (Math.random() < .15 ? 160 : 1800 + Math.random()*3600); } }
+
+    if (now > this.nextSac){
+      this.gazeT = this.mode === 'thinking'
+        ? {x:-.55 + Math.random()*.2, y:-.65}
+        : {x:(Math.random()-.5)*.32, y:(Math.random()-.5)*.22};
+      this.nextSac = now + (this.mode === 'thinking' ? 1500 : 600) + Math.random()*2200;
+    }
+    const kg = 1 - Math.exp(-dt*20);
+    this.gaze.x += (this.gazeT.x - this.gaze.x) * kg; this.gaze.y += (this.gazeT.y - this.gaze.y) * kg;
+
+    let bt = this.mode === 'thinking' ? .45 : this.mode === 'listening' ? .18 : 0;
+    if (this.mode === 'speaking' && this.question) bt = .6;
+    if (this.mode === 'speaking' && this.m.open > .78 && Math.random() < dt*.9) this.browBoost = .35;
+    this.browBoost *= Math.exp(-dt*3);
+    this.brow += (bt + this.browBoost - this.brow) * (1 - Math.exp(-dt*6));
+    this.nodT += dt;
+  }
+  get blinkOpen(){ if (this.blinkT < 0) return 1; const p = this.blinkT / .16; return Math.abs(1 - 2*p); }
+
+  draw(t){
+    const ctx = this.ctx, W = this.cv.width, H = this.cv.height, L = LOOKS[this.look];
+    // 배경
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#2c3754'); g.addColorStop(1, '#141a2a');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    for (const b of this.bokeh){
+      const rg = ctx.createRadialGradient(b.x*W, b.y*H, 0, b.x*W, b.y*H, b.r*W/800);
+      rg.addColorStop(0, `rgba(${b.hue},${b.a})`); rg.addColorStop(1, `rgba(${b.hue},0)`);
+      ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
+    }
+    const s = Math.min(W/800, H/600);
+    ctx.save(); ctx.translate(W/2 - 400*s, H - 600*s); ctx.scale(s, s);
+
+    const breath = Math.sin(t*1.6) * 1.6;
+    const talk = this.mode === 'speaking' ? 1.25 : .8;
+    const yaw = (Math.sin(t*.37)*.6 + Math.sin(t*.93)*.3) * talk;
+    const roll = Math.sin(t*.29)*.025 + (this.mode === 'thinking' ? .045 : 0) + (this.mode === 'listening' ? -.02 : 0);
+    const nod = this.nodT < 1.6 ? Math.sin(this.nodT*Math.PI*2.6) * 7 * Math.exp(-this.nodT*2.2) : 0;
+    const hx = 400 + yaw*6, hy = 255 + nod + breath*.5 + this.m.open*1.5;
+
+    // 뒷머리
+    ctx.save(); ctx.translate(hx, hy); ctx.rotate(roll); this.backHair(ctx, L); ctx.restore();
+    // 목 · 몸
+    ctx.save(); ctx.translate(0, breath*.6); this.body(ctx, L); ctx.restore();
+    // 머리
+    ctx.save(); ctx.translate(hx, hy); ctx.rotate(roll);
+    this.head(ctx, L, yaw);
+    ctx.restore();
+    ctx.restore();
+  }
+
+  backHair(ctx, L){
+    ctx.fillStyle = L.hair; ctx.beginPath();
+    if (this.look === 'female'){
+      ctx.moveTo(-130,-40); ctx.bezierCurveTo(-145,-235,145,-235,130,-40);
+      ctx.bezierCurveTo(142,40,152,130,130,178); ctx.quadraticCurveTo(0,198,-130,178);
+      ctx.bezierCurveTo(-152,130,-142,40,-130,-40);
+    } else {
+      ctx.moveTo(-126,-10); ctx.bezierCurveTo(-140,-232,140,-232,126,-10); ctx.closePath();
+    }
+    ctx.fill();
+  }
+
+  body(ctx, L){
+    // 목
+    const ng = ctx.createLinearGradient(0, 330, 0, 460);
+    ng.addColorStop(0, L.skin2); ng.addColorStop(.35, L.skin); ng.addColorStop(1, L.skin);
+    ctx.fillStyle = ng; ctx.beginPath();
+    ctx.moveTo(366,320); ctx.lineTo(366,440); ctx.quadraticCurveTo(400,470,434,440); ctx.lineTo(434,320); ctx.closePath(); ctx.fill();
+    // 재킷
+    const jg = ctx.createLinearGradient(0, 440, 0, 600);
+    jg.addColorStop(0, L.suit); jg.addColorStop(1, L.suit2);
+    ctx.fillStyle = jg; ctx.beginPath();
+    ctx.moveTo(84,600); ctx.bezierCurveTo(96,505,190,462,336,440); ctx.lineTo(464,440);
+    ctx.bezierCurveTo(610,462,704,505,716,600); ctx.closePath(); ctx.fill();
+    // 셔츠/블라우스
+    ctx.fillStyle = L.inner; ctx.beginPath();
+    if (this.look === 'male'){ ctx.moveTo(344,438); ctx.lineTo(400,572); ctx.lineTo(456,438); }
+    else { ctx.moveTo(350,440); ctx.quadraticCurveTo(400,515,450,440); ctx.lineTo(430,560); ctx.lineTo(370,560); }
+    ctx.closePath(); ctx.fill();
+    if (this.look === 'male'){
+      // 칼라
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.moveTo(366,428); ctx.lineTo(344,446); ctx.lineTo(392,470); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(434,428); ctx.lineTo(456,446); ctx.lineTo(408,470); ctx.closePath(); ctx.fill();
+      // 넥타이
+      ctx.fillStyle = L.tie;
+      ctx.beginPath(); ctx.moveTo(390,452); ctx.lineTo(410,452); ctx.lineTo(406,470); ctx.lineTo(394,470); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(394,470); ctx.lineTo(406,470); ctx.lineTo(416,566); ctx.lineTo(400,586); ctx.lineTo(384,566); ctx.closePath(); ctx.fill();
+    } else {
+      // 목걸이
+      ctx.strokeStyle = 'rgba(240,220,170,.8)'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(372,440); ctx.quadraticCurveTo(400,482,428,440); ctx.stroke();
+      ctx.fillStyle = '#f5e2b0'; ctx.beginPath(); ctx.arc(400,467,3.2,0,Math.PI*2); ctx.fill();
+    }
+    // 라펠
+    ctx.fillStyle = 'rgba(0,0,0,.22)';
+    ctx.beginPath(); ctx.moveTo(330,444); ctx.lineTo(346,438); ctx.lineTo(400,578); ctx.lineTo(388,600); ctx.lineTo(352,520); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(470,444); ctx.lineTo(454,438); ctx.lineTo(400,578); ctx.lineTo(412,600); ctx.lineTo(448,520); ctx.closePath(); ctx.fill();
+  }
+
+  head(ctx, L, yaw){
+    const fx = yaw * 7;  // 고개 돌림에 따라 이목구비가 살짝 이동
+    // 귀
+    ctx.fillStyle = L.skin2;
+    for (const sx of [-1, 1]){ ctx.beginPath(); ctx.ellipse(sx*121 + fx*.3, -4, 14, 25, 0, 0, Math.PI*2); ctx.fill(); }
+    // 얼굴
+    const fg = ctx.createRadialGradient(fx*.5, -20, 20, 0, 0, 175);
+    fg.addColorStop(0, L.skin); fg.addColorStop(.75, L.skin); fg.addColorStop(1, L.skin2);
+    ctx.fillStyle = fg; ctx.beginPath();
+    ctx.moveTo(0,-150);
+    ctx.bezierCurveTo(70,-150,120,-108,120,-30);
+    ctx.bezierCurveTo(120,40,100,95,60,130);
+    ctx.bezierCurveTo(35,152,-35,152,-60,130);
+    ctx.bezierCurveTo(-100,95,-120,40,-120,-30);
+    ctx.bezierCurveTo(-120,-108,-70,-150,0,-150);
+    ctx.fill();
+    // 볼 홍조
+    for (const sx of [-1, 1]){
+      const cg = ctx.createRadialGradient(sx*64 + fx, 42, 0, sx*64 + fx, 42, 34);
+      cg.addColorStop(0, `rgba(235,120,120,${.16 + this.m.smile*.18})`); cg.addColorStop(1, 'rgba(235,120,120,0)');
+      ctx.fillStyle = cg; ctx.beginPath(); ctx.arc(sx*64 + fx, 42, 34, 0, Math.PI*2); ctx.fill();
+    }
+    // 눈 · 눈썹
+    this.eye(ctx, L, -46 + fx, -16, -1);
+    this.eye(ctx, L,  46 + fx, -16,  1);
+    this.brows(ctx, L, fx);
+    // 코
+    ctx.strokeStyle = 'rgba(150,85,65,.42)'; ctx.lineWidth = 2.6; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(4 + fx*1.1, -6); ctx.quadraticCurveTo(12 + fx*1.2, 22, 11 + fx*1.2, 34); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-11 + fx*1.2, 43); ctx.quadraticCurveTo(0 + fx*1.2, 49, 11 + fx*1.2, 43); ctx.stroke();
+    // 입
+    ctx.save(); ctx.translate(fx*1.1, 0); this.mouth(ctx, L); ctx.restore();
+    // 앞머리
+    this.frontHair(ctx, L);
+  }
+
+  eye(ctx, L, cx, cy, side){
+    const w = 25, open = this.blinkOpen * (1 - this.m.smile*.18);
+    if (open < .1){
+      ctx.strokeStyle = '#2a1a16'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(cx-w, cy); ctx.quadraticCurveTo(cx, cy+6, cx+w, cy); ctx.stroke(); return;
+    }
+    const up = 17*open, dn = 10*open;
+    const path = () => { ctx.beginPath(); ctx.moveTo(cx-w, cy+1);
+      ctx.bezierCurveTo(cx-w*.5, cy-up, cx+w*.5, cy-up, cx+w, cy+1*side*0);
+      ctx.bezierCurveTo(cx+w*.5, cy+dn, cx-w*.5, cy+dn, cx-w, cy+1); };
+    ctx.save(); path(); ctx.fillStyle = '#f8f5f2'; ctx.fill(); ctx.clip();
+    const ix = cx + this.gaze.x*8, iy = cy - 2 + this.gaze.y*5;
+    const ig = ctx.createRadialGradient(ix, iy, 2, ix, iy, 11);
+    ig.addColorStop(0, '#1b100b'); ig.addColorStop(.45, L.iris); ig.addColorStop(1, '#170d09');
+    ctx.fillStyle = ig; ctx.beginPath(); ctx.arc(ix, iy, 11, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#060303'; ctx.beginPath(); ctx.arc(ix, iy, 4.6, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.beginPath(); ctx.arc(ix+3.5, iy-3.5, 2.6, 0, Math.PI*2); ctx.fill();
+    const sg = ctx.createLinearGradient(0, cy-up*.8, 0, cy);
+    sg.addColorStop(0, 'rgba(60,30,20,.35)'); sg.addColorStop(1, 'rgba(60,30,20,0)');
+    ctx.fillStyle = sg; ctx.fillRect(cx-w, cy-up, w*2, up);
+    ctx.restore();
+    // 윗눈꺼풀 선
+    ctx.strokeStyle = '#1e1310'; ctx.lineWidth = 3.4; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(cx-w, cy+1); ctx.bezierCurveTo(cx-w*.5, cy-up, cx+w*.5, cy-up, cx+w, cy); ctx.stroke();
+    if (this.look === 'female'){
+      const ox = cx + side*w;
+      ctx.lineWidth = 2.4; ctx.beginPath(); ctx.moveTo(ox, cy); ctx.lineTo(ox + side*6, cy-5); ctx.stroke();
+    }
+    // 쌍꺼풀 주름
+    ctx.strokeStyle = 'rgba(120,70,55,.35)'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(cx-w*.8, cy-up*.62); ctx.quadraticCurveTo(cx, cy-up*1.25, cx+w*.85, cy-up*.55); ctx.stroke();
+  }
+
+  brows(ctx, L, fx){
+    const by = -54 - this.brow*8;
+    ctx.strokeStyle = L.hair; ctx.lineWidth = L.browW; ctx.lineCap = 'round';
+    for (const sx of [-1, 1]){
+      const inner = this.mode === 'thinking' ? 3 : 0;  // 생각할 때 미간이 살짝 모임
+      ctx.beginPath();
+      ctx.moveTo(sx*20 + fx, by + 4 + inner);
+      ctx.quadraticCurveTo(sx*44 + fx, by - 9, sx*70 + fx, by + 3);
+      ctx.stroke();
+    }
+  }
+
+  mouth(ctx, L){
+    const {open:o, wide:w, round:r, smile:sm} = this.m;
+    const cy = 84;
+    const hw = 31 * (.82 + .32*w - .38*r);
+    const cY = cy - sm*6 + o*2;
+    const opH = Math.max(0, o*25*(1 - .12*w));
+    const upIn = cy - opH*.25 - .6, loIn = cy + opH*.75 + .6;
+    const upT = 7 + r*3, loT = 9 + r*3;
+    const ik = .6 - .25*r;   // 오므릴수록 입 안 모양이 동그래짐
+    const innerUp = () => ctx.bezierCurveTo(hw*ik, upIn - 1, -hw*ik, upIn - 1, -hw*.92, cY);
+    if (opH > 1.2){
+      ctx.save(); ctx.beginPath(); ctx.moveTo(-hw*.92, cY);
+      ctx.bezierCurveTo(-hw*ik, upIn - 1, hw*ik, upIn - 1, hw*.92, cY);
+      ctx.bezierCurveTo(hw*(ik+.1), loIn + 1, -hw*(ik+.1), loIn + 1, -hw*.92, cY);
+      ctx.fillStyle = '#3a1116'; ctx.fill(); ctx.clip();
+      ctx.fillStyle = '#f3efe7'; ctx.fillRect(-hw*.62, upIn - 6, hw*1.24, 6 + Math.min(7, opH*.32));
+      ctx.fillStyle = '#c45a66'; ctx.beginPath(); ctx.ellipse(0, loIn + 1, hw*.55, opH*.38, 0, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+    // 윗입술
+    ctx.fillStyle = L.lip; ctx.beginPath(); ctx.moveTo(-hw, cY);
+    ctx.bezierCurveTo(-hw*.6, upIn - upT - 1, -hw*.25, upIn - upT - 2, 0, upIn - upT + 2.2);
+    ctx.bezierCurveTo(hw*.25, upIn - upT - 2, hw*.6, upIn - upT - 1, hw, cY);
+    ctx.lineTo(hw*.92, cY); innerUp(); ctx.closePath(); ctx.fill();
+    // 아랫입술
+    ctx.beginPath(); ctx.moveTo(-hw*.92, cY);
+    ctx.bezierCurveTo(-hw*(ik+.1), loIn + 1, hw*(ik+.1), loIn + 1, hw*.92, cY);
+    ctx.lineTo(hw, cY);
+    ctx.bezierCurveTo(hw*.6, loIn + loT + 2, -hw*.6, loIn + loT + 2, -hw, cY);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.16)'; ctx.beginPath(); ctx.ellipse(0, loIn + loT*.45, hw*.32, 2.6, 0, 0, Math.PI*2); ctx.fill();
+    // 입술 사이 선 (다물었을 때)
+    if (opH <= 1.2){
+      ctx.strokeStyle = L.lipDark; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.moveTo(-hw*.95, cY);
+      ctx.bezierCurveTo(-hw*ik, cy, hw*ik, cy, hw*.95, cY); ctx.stroke();
+    }
+    // 입꼬리
+    ctx.strokeStyle = 'rgba(140,70,60,.35)'; ctx.lineWidth = 1.6;
+    for (const sx of [-1, 1]){ ctx.beginPath(); ctx.moveTo(sx*hw, cY); ctx.quadraticCurveTo(sx*(hw+5), cY - 2 - sm*3, sx*(hw+6), cY - 5 - sm*4); ctx.stroke(); }
+  }
+
+  frontHair(ctx, L){
+    ctx.fillStyle = L.hair; ctx.beginPath();
+    if (this.look === 'female'){
+      ctx.moveTo(-127,-5); ctx.bezierCurveTo(-142,-235,142,-240,128,-5);
+      ctx.bezierCurveTo(122,-72,88,-110,30,-116);
+      ctx.bezierCurveTo(-20,-120,-58,-98,-84,-70);
+      ctx.bezierCurveTo(-104,-48,-112,-24,-113,8);
+      ctx.closePath(); ctx.fill();
+      // 옆머리
+      for (const sx of [-1, 1]){
+        ctx.beginPath(); ctx.moveTo(sx*129,-25); ctx.bezierCurveTo(sx*134,40,sx*128,100,sx*114,152);
+        ctx.lineTo(sx*101,150); ctx.bezierCurveTo(sx*113,92,sx*116,30,sx*110,-12); ctx.closePath(); ctx.fill();
+      }
+    } else {
+      ctx.moveTo(-124,-30); ctx.bezierCurveTo(-138,-232,138,-238,124,-30);
+      ctx.bezierCurveTo(120,-80,95,-108,50,-112);
+      ctx.bezierCurveTo(10,-116,-30,-104,-60,-108);
+      ctx.bezierCurveTo(-95,-112,-112,-80,-116,-25);
+      ctx.closePath(); ctx.fill();
+    }
+    ctx.strokeStyle = L.hairHi; ctx.lineWidth = 6;
+    ctx.beginPath(); ctx.arc(-10, -40, 128, Math.PI*1.18, Math.PI*1.5); ctx.stroke();
+  }
+}
+
+/* =========================================================
+ * 3. 말하기 (TTS 큐 + 립싱크 연결)
+ * ========================================================= */
+const synth = window.speechSynthesis;
+class Speaker{
+  constructor(avatar){ this.avatar = avatar; this.queue = []; this.busy = false; this.waiters = []; this.voice = null; this.rate = 1; this.onSentence = null; }
+  say(text){ text = cleanSpeech(text); if (!text) return; this.queue.push(text); this.next(); }
+  next(){
+    if (this.busy) return;
+    const text = this.queue.shift();
+    if (text === undefined){ this.avatar.lip = null; this.waiters.splice(0).forEach(f => f()); return; }
+    this.busy = true;
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ko-KR'; if (this.voice) u.voice = this.voice; u.rate = this.rate;
+    const tl = buildTimeline(text);
+    let started = false;
+    const finish = () => { if (!this.busy) return; this.busy = false; this.avatar.lip = null; clearTimeout(this.guard); this.next(); };
+    u.onstart = () => { started = true; this.avatar.lip = new LipSync(tl, this.rate); this.avatar.question = /\?\s*$/.test(text); this.onSentence?.(text); };
+    u.onboundary = (e) => { if (this.avatar.lip && e.charIndex != null) this.avatar.lip.boundary(e.charIndex); };
+    u.onend = finish; u.onerror = finish;
+    // 일부 브라우저에서 onend가 오지 않는 경우를 대비한 안전장치
+    this.guard = setTimeout(() => { if (!started) { synth.cancel(); finish(); } }, 4000 + text.length * 50);
+    synth.speak(u);
+    if (!synth.speaking && !synth.pending) setTimeout(() => { if (!started) finish(); }, 1500);
+  }
+  idle(){ return (!this.busy && !this.queue.length) ? Promise.resolve() : new Promise(r => this.waiters.push(r)); }
+  stop(){ this.queue = []; synth.cancel(); if (this.busy){ this.busy = false; this.avatar.lip = null; clearTimeout(this.guard); } this.waiters.splice(0).forEach(f => f()); }
+}
+function cleanSpeech(s){
+  return s.replace(/\[면접종료\]/g, '').replace(/[*#_`>~]/g, '').replace(/\s+/g, ' ').trim();
+}
+
+/* =========================================================
+ * 4. 듣기 (음성 인식)
+ * ========================================================= */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+class Listener{
+  constructor(){ this.on = false; this.finalText = ''; this.interim = ''; this.onUpdate = null; this.onSilence = null; this.silenceMs = 3000; this.timer = null; this.firstAt = 0; }
+  start(){
+    if (!SR) return false;
+    this.on = true; this.finalText = ''; this.interim = ''; this.firstAt = 0; this.startedAt = performance.now();
+    this.spawn(); return true;
+  }
+  spawn(){
+    const rec = new SR(); this.rec = rec;
+    rec.lang = 'ko-KR'; rec.continuous = true; rec.interimResults = true;
+    rec.onresult = (e) => {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++){
+        const r = e.results[i];
+        if (r.isFinal) this.finalText += (this.finalText ? ' ' : '') + r[0].transcript.trim();
+        else interim += r[0].transcript;
+      }
+      this.interim = interim.trim();
+      if (!this.firstAt && (this.finalText || this.interim)) this.firstAt = performance.now();
+      this.onUpdate?.(this.finalText, this.interim);
+      clearTimeout(this.timer);
+      if (this.silenceMs > 0) this.timer = setTimeout(() => { if (this.on && this.text()) this.onSilence?.(); }, this.silenceMs);
+    };
+    rec.onerror = (e) => {
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed'){ this.on = false; toast('마이크 권한이 거부됐어요. 주소창의 🔒 아이콘에서 마이크를 허용하거나 글로 답해 주세요.'); }
+    };
+    rec.onend = () => {
+      if (this.on){
+        // 인식된 미완성 문장은 보존하고 다시 듣기 시작
+        if (this.interim){ this.finalText += (this.finalText ? ' ' : '') + this.interim; this.interim = ''; }
+        try { this.spawn(); } catch {}
+      }
+    };
+    try { rec.start(); } catch {}
+  }
+  text(){ return (this.finalText + ' ' + this.interim).trim(); }
+  stop(){ this.on = false; clearTimeout(this.timer); try { this.rec?.stop(); } catch {} }
+}
+
+/* =========================================================
+ * 5. 면접 진행 (Claude API 모드 / 연습 모드)
+ * ========================================================= */
+const $ = (id) => document.getElementById(id);
+const avatar = new Avatar($('avatar'));
+const speaker = new Speaker(avatar);
+const listener = new Listener();
+const MODEL = 'claude-opus-5-5';
+const SDK_URL = 'https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@1.11.0/+esm';
+const NAMES = {female:'한서윤', male:'박준호'};
+
+const S = { running:false, ended:false, cfg:null, client:null, messages:[], transcript:[], answers:0, phase:'idle', offline:null, ttsMark:0 };
+
+function setPhase(p){
+  S.phase = p;
+  const aiTile = $('aiTile'), meTile = $('meTile');
+  aiTile.classList.toggle('speaking', p === 'speaking');
+  meTile.classList.toggle('listening', p === 'listening');
+  avatar.setMode(p === 'speaking' ? 'speaking' : p === 'listening' ? 'listening' : p === 'thinking' ? 'thinking' : 'idle');
+  $('aiState').textContent = {speaking:'말하는 중', thinking:'생각 중…', listening:'듣는 중', idle:'대기 중'}[p] || '대기 중';
+  $('meState').textContent = p === 'listening' ? (listener.on ? '🎤 말씀하세요' : '✍️ 입력 대기') : '-';
+  $('btnDone').disabled = p !== 'listening';
+  $('btnMic').disabled = p !== 'listening' || !SR;
+  $('btnSkip').disabled = p !== 'speaking';
+  $('btnSend').disabled = p !== 'listening';
+}
+function caption(who, html){ $('capWho').textContent = who; $('capTxt').innerHTML = html; }
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg, ms = 5000){ const t = $('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', ms); }
+function addLog(who, text, extra = ''){
+  const d = document.createElement('div'); d.className = 'msg' + (who === 'me' ? ' me' : '');
+  d.innerHTML = `<b>${who === 'me' ? '나' : esc(NAMES[S.cfg?.look || 'female'])}</b> ${esc(text)} ${extra ? `<small>${extra}</small>` : ''}`;
+  $('logList').appendChild(d); $('logList').scrollTop = 1e9;
+}
+
+function systemPrompt(c){
+  const style = {
+    friendly:'따뜻하고 격려하는 말투. 긴장을 풀어 주면서도 핵심은 정확히 묻는다.',
+    standard:'정중하고 전문적인 말투. 일반적인 실무 면접처럼 진행한다.',
+    pressure:'정중하지만 날카롭게. 답변의 근거, 수치, 본인 기여도를 집요하게 파고드는 꼬리질문을 한다.'
+  }[c.style];
+  return `당신은 ${c.company || '우리 회사'}의 ${c.role} 채용 면접관 "${NAMES[c.look]}"입니다. 지금 화상으로 지원자와 얼굴을 마주 보고 음성으로 대화하고 있습니다. 당신이 쓴 문장은 음성 합성으로 그대로 읽히고, 화면 속 당신의 입이 함께 움직입니다.
+
+면접 정보
+- 지원 직무: ${c.role}
+- 지원자 경력 수준: ${c.level}
+- 면접 스타일: ${style}
+- 주요 질문 수: ${c.count}개 (꼬리질문은 개수에 넣지 않음)
+- 지원자가 제출한 자료: ${c.resume || '없음'}
+
+말하기 규칙
+- 실제 사람 면접관처럼 자연스러운 구어체 한국어로 말합니다.
+- 한 번에 1~3문장, 질문은 한 번에 하나만 합니다.
+- 마크다운, 목록, 이모지, 괄호 속 지문, 따옴표 강조를 쓰지 않습니다. 소리 내어 읽을 문장만 씁니다. 숫자는 읽기 쉽게 씁니다.
+- 지원자의 답을 한 문장 이내로 짧게 받아 준 뒤 꼬리질문이나 다음 질문으로 넘어갑니다. 답을 길게 요약하거나 점수를 매기지 않습니다.
+- 답이 모호하거나 짧으면 구체적인 상황, 본인의 역할, 결과를 묻는 꼬리질문을 합니다. 한 주제에 꼬리질문은 최대 두 번입니다.
+- 지원자 답변은 음성 인식 결과라 오타나 띄어쓰기 오류가 있을 수 있습니다. 의미를 추론해서 이해하고, 인식 오류를 지적하지 않습니다.
+- 웹캠 사진이 함께 오면 표정, 자세, 시선만 참고합니다. 외모나 신체 특징은 절대 언급하지 않습니다. 많이 긴장해 보이면 가볍게 안심시키는 정도만 합니다.
+
+진행
+- 첫 순서에는 짧은 인사와 본인 소개 후 자기소개를 요청합니다.
+- 직무 역량, 경험, 협업, 문제 해결, 동기를 고르게 다루고, 제출 자료가 있으면 그 내용을 근거로 질문합니다.
+- 주요 질문 ${c.count}개를 마치면 마지막으로 궁금한 점이 있는지 묻고, 그 답에 짧게 응답한 뒤 마무리 인사를 하고 맨 끝에 [면접종료] 를 붙입니다.
+- 지원자가 그만하고 싶다고 하면 정중히 마무리하고 맨 끝에 [면접종료] 를 붙입니다.`;
+}
+
+async function aiTurn(userContent){
+  S.skip = false;
+  setPhase('thinking');
+  caption(NAMES[S.cfg.look], '<span class="interim">…</span>');
+  let reply = '';
+  try {
+    if (S.client) reply = await claudeTurn(userContent);
+    else { await new Promise(r => setTimeout(r, 700 + Math.random()*600)); reply = offlineTurn(userContent); speakChunks(reply, true); }
+  } catch (err) {
+    console.error(err);
+    if (S.messages.at(-1)?.role === 'user') S.messages.pop();
+    const st = err?.status;
+    toast(st === 401 ? 'API 키가 올바르지 않아요. 키를 확인해 주세요.' : st === 429 ? '요청이 많아 잠시 막혔어요. 잠시 후 다시 답해 주세요.' : '면접관 응답을 받지 못했어요: ' + (err?.message || err));
+    speaker.stop(); startListening(); return;
+  }
+  await speaker.idle();
+  if (!S.running) return;
+  const clean = cleanSpeech(reply);
+  if (clean){ S.transcript.push({who:'ai', text:clean}); addLog('ai', clean); }
+  if (/\[면접종료\]/.test(reply)) S.ended = true;
+  if (S.ended) return finishInterview();
+  startListening();
+}
+
+// 문장 단위로 잘라서 순서대로 읽기 → 응답이 다 오기 전에 말하기 시작
+let pending = '';
+function speakChunks(text, flush){
+  pending += text;
+  while (true){
+    const m = pending.match(/[.!?…。]+["'”’)]*(?=\s)|\n/);
+    if (!m) break;
+    const end = m.index + m[0].length;
+    const sent = pending.slice(0, end).trim(); pending = pending.slice(end);
+    if (cleanSpeech(sent) && !S.skip){ if (S.phase !== 'speaking') setPhase('speaking'); speaker.say(sent); }
+  }
+  if (S.skip){ if (flush) pending = ''; return; }
+  if (flush && pending.trim()){ const rest = pending.trim(); pending = ''; if (cleanSpeech(rest)){ if (S.phase !== 'speaking') setPhase('speaking'); speaker.say(rest); } }
+  if (flush) pending = '';
+}
+
+async function claudeTurn(userContent){
+  S.messages.push({role:'user', content:userContent});
+  const stream = S.client.beta.messages.stream({
+    model: MODEL,
+    max_tokens: 16000,
+    betas: ['server-side-fallback-2026-07-01'],
+    fallbacks: 'default',
+    output_config: { effort: 'low' },   // 대화 반응 속도를 위해 낮은 effort
+    system: systemPrompt(S.cfg),
+    messages: S.messages,
+  });
+  S.stream = stream;
+  let full = '';
+  for await (const ev of stream){
+    if (ev.type === 'content_block_delta' && ev.delta.type === 'text_delta'){
+      full += ev.delta.text; speakChunks(ev.delta.text, false);
+    }
+  }
+  speakChunks('', true);
+  const msg = await stream.finalMessage();
+  S.stream = null;
+  if (msg.stop_reason === 'refusal'){
+    S.messages.pop();
+    const fallback = '죄송합니다. 그 부분은 넘어가고 다음 이야기를 해 볼까요?';
+    speakChunks(fallback, true); return fallback;
+  }
+  S.messages.push({role:'assistant', content:msg.content});
+  return full;
+}
+
+/* ---------- 연습 모드 (API 키 없이) ---------- */
+function offlineInit(c){
+  const role = c.role || '지원 직무';
+  const mid = [
+    `${c.company ? c.company + '에' : '저희 회사에'} 지원하신 동기가 무엇인가요?`,
+    '본인의 가장 큰 강점과, 앞으로 보완하고 싶은 점을 하나씩 말씀해 주세요.',
+    '팀으로 일하면서 의견 충돌이 있었던 경험과, 그것을 어떻게 해결했는지 이야기해 주세요.',
+    '가장 아쉬웠던 실패 경험과 그 경험에서 배운 점은 무엇인가요?',
+    `${role}에게 가장 중요한 역량은 무엇이라고 생각하고, 그 역량을 키우려고 어떤 노력을 해 오셨나요?`,
+    '최근에 새롭게 배운 것이 있다면 무엇이고, 어떻게 공부하셨나요?',
+    '입사하고 오 년 뒤에는 어떤 모습이 되어 있고 싶으신가요?',
+    '스트레스를 크게 받을 때 본인은 어떻게 관리하시나요?'
+  ].sort(() => Math.random() - .5);
+  const qs = ['먼저 간단하게 자기소개 부탁드립니다.', ...mid.slice(0, Math.max(0, c.count - 1)), '마지막으로 하고 싶은 말이나 궁금한 점이 있으신가요?'];
+  return {qs, i:-1, followed:false};
+}
+function offlineTurn(answer){
+  const O = S.offline, name = NAMES[S.cfg.look];
+  if (O.i < 0){ O.i = 0; return `안녕하세요, 오늘 ${S.cfg.role} 면접을 맡은 ${name}입니다. 긴장 푸시고 편하게 말씀해 주세요. ${O.qs[0]}`; }
+  const shortAns = answer.replace(/\s/g, '').length < 40;
+  if (shortAns && !O.followed && O.i < O.qs.length - 1){ O.followed = true; return '조금 더 구체적인 경험이나 예시를 들어서 설명해 주시겠어요?'; }
+  O.followed = false; O.i++;
+  if (O.i >= O.qs.length) return '네, 오늘 면접은 여기까지입니다. 성실하게 답변해 주셔서 감사합니다. 수고 많으셨습니다. [면접종료]';
+  const ack = ['네, 잘 들었습니다.', '좋습니다, 감사합니다.', '네, 그렇군요.', '말씀 잘 들었습니다.'][Math.floor(Math.random()*4)];
+  return `${ack} ${O.qs[O.i]}`;
+}
+
+/* ---------- 듣기 / 답변 처리 ---------- */
+function startListening(){
+  if (!S.running) return;
+  setPhase('listening');
+  const ok = listener.start();
+  caption('나', ok ? '<span class="interim">말씀하세요… (끝나면 잠시 멈추거나 “답변 완료”)</span>' : '<span class="interim">아래 입력창에 답을 적어 주세요.</span>');
+  setPhase('listening');
+  $('btnMic').textContent = '🎤 마이크 끄기';
+  $('typeInput').focus({preventScroll:true});
+}
+listener.onUpdate = (fin, interim) => {
+  caption('나', `${esc(fin)} <span class="interim">${esc(interim)}</span>`);
+  if (Math.random() < .12) avatar.nod();  // 듣는 동안 가끔 고개 끄덕임
+};
+listener.onSilence = () => submitAnswer();
+
+function fillerCount(t){ return (t.match(/(^|\s)(음+|어+|그+|아+|뭐|약간|이제|그니까|그러니까)(?=[\s,.]|$)/g) || []).length; }
+
+function submitAnswer(typed){
+  if (S.phase !== 'listening') return;
+  const startedAt = listener.startedAt || performance.now(), firstAt = listener.firstAt;
+  const text = (typed ?? listener.text()).trim();
+  if (!text){ toast('아직 들린 답변이 없어요. 말하거나 입력해 주세요.', 2500); return; }
+  listener.stop();
+  const now = performance.now();
+  const speakSec = typed ? 0 : Math.max(1, (now - (firstAt || startedAt)) / 1000 - (S.cfg.silence/1000 || 0));
+  const m = { chars:text.replace(/\s/g, '').length, sec:Math.round(speakSec), think: typed ? null : firstAt ? +((firstAt - startedAt)/1000).toFixed(1) : null, fillers:fillerCount(text), typed:!!typed };
+  S.transcript.push({who:'me', text, m});
+  S.answers++; $('progressPill').textContent = `답변 ${S.answers}`;
+  addLog('me', text, typed ? '(입력)' : `(${m.sec}초 · 군말 ${m.fillers})`);
+  avatar.nod();
+  caption('나', esc(text));
+
+  let content = `[지원자 답변] ${text}`;
+  if (S.client && S.cfg.snap && camStream){
+    const img = snapshot();
+    if (img) content = [{type:'image', source:{type:'base64', media_type:'image/jpeg', data:img}}, {type:'text', text:`[웹캠 사진 첨부]\n${content}`}];
+  }
+  aiTurn(content);
+}
+
+/* ---------- 카메라 ---------- */
+let camStream = null;
+async function startCamera(){
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({video:{width:{ideal:960}, height:{ideal:720}, facingMode:'user'}, audio:false});
+    $('cam').srcObject = camStream; $('cam').style.display = 'block'; $('camOff').style.display = 'none';
+  } catch (e){ camStream = null; $('cam').style.display = 'none'; $('camOff').style.display = 'flex'; }
+}
+function snapshot(){
+  const v = $('cam'); if (!v.videoWidth) return null;
+  const c = document.createElement('canvas'); c.width = 384; c.height = Math.round(384 * v.videoHeight / v.videoWidth);
+  c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', .72).split(',')[1];
+}
+
+/* ---------- 시작 / 종료 ---------- */
+function readCfg(){
+  return {
+    role: $('fRole').value.trim() || '신입 사원', company: $('fCompany').value.trim(), level: $('fLevel').value,
+    style: $('fStyle').value, count: +$('fCount').value, look: $('fAvatar').value, resume: $('fResume').value.trim(),
+    key: $('fKey').value.trim(), snap: $('fSnap').checked, silence: +$('fSilence').value
+  };
+}
+
+async function startInterview(){
+  const c = readCfg(); S.cfg = c;
+  try { if ($('fSaveKey').checked && c.key) localStorage.setItem('aiInterviewKey', c.key); else localStorage.removeItem('aiInterviewKey'); } catch {}
+  $('btnStart').disabled = true; $('btnStart').textContent = '준비 중…';
+  S.client = null;
+  if (c.key){
+    try {
+      const mod = await import(SDK_URL);
+      const Anthropic = mod.default || mod.Anthropic;
+      S.client = new Anthropic({ apiKey:c.key, dangerouslyAllowBrowser:true });
+    } catch (e){ toast('Claude SDK를 불러오지 못해 연습 모드로 진행합니다.'); S.client = null; }
+  }
+  $('modePill').textContent = S.client ? 'Claude 면접관' : '연습 모드';
+  $('modePill').classList.toggle('on', !!S.client);
+  listener.silenceMs = c.silence;
+  S.messages = []; S.transcript = []; S.answers = 0; S.ended = false; S.running = true;
+  S.offline = offlineInit(c);
+  $('logList').innerHTML = '';
+  // 화면 전환: 준비 패널 → 내 웹캠
+  $('setup').style.display = 'none'; $('meTile').classList.remove('setupMode');
+  $('meName').style.display = ''; $('meState').style.display = '';
+  $('controls').style.display = ''; $('progressPill').style.display = ''; $('progressPill').textContent = '답변 0';
+  await startCamera();
+  synth.cancel();
+  aiTurn('(지원자가 면접실에 입장했습니다. 인사와 함께 면접을 시작해 주세요.)');
+}
+
+async function finishInterview(){
+  S.running = false; listener.stop(); speaker.stop(); try { S.stream?.abort(); } catch {}
+  setPhase('idle');
+  caption('안내', '면접이 끝났어요. 결과 리포트를 만드는 중입니다…');
+  $('overlay').style.display = 'flex';
+  $('report').innerHTML = '<div class="loading">📝 답변을 분석해서 리포트를 만들고 있어요…</div>';
+  const stats = computeStats();
+  let ev = null;
+  if (S.client && S.transcript.some(t => t.who === 'me')){
+    try { ev = await evaluateWithClaude(); } catch (e){ console.error(e); toast('AI 평가를 받지 못해 기본 리포트를 보여 드려요.'); }
+  }
+  if (!ev) ev = offlineEvaluate(stats);
+  renderReport(ev, stats);
+}
+
+function computeStats(){
+  const ans = S.transcript.filter(t => t.who === 'me');
+  const spoken = ans.filter(a => !a.m.typed);
+  const totalSec = spoken.reduce((a, b) => a + b.m.sec, 0), totalChars = spoken.reduce((a, b) => a + b.m.chars, 0);
+  const thinks = spoken.map(a => a.m.think).filter(x => x != null);
+  return {
+    n: ans.length,
+    avgSec: spoken.length ? Math.round(totalSec / spoken.length) : 0,
+    cpm: totalSec ? Math.round(totalChars / totalSec * 60) : 0,
+    fillers: ans.reduce((a, b) => a + b.m.fillers, 0),
+    avgThink: thinks.length ? +(thinks.reduce((a, b) => a + b, 0) / thinks.length).toFixed(1) : null,
+    avgChars: ans.length ? Math.round(ans.reduce((a, b) => a + b.m.chars, 0) / ans.length) : 0
+  };
+}
+
+const EVAL_SCHEMA = {
+  type:'object', additionalProperties:false,
+  required:['overall_score','one_line','strengths','improvements','questions','next_tips'],
+  properties:{
+    overall_score:{type:'integer', description:'0~100 종합 점수'},
+    one_line:{type:'string'},
+    strengths:{type:'array', items:{type:'string'}},
+    improvements:{type:'array', items:{type:'string'}},
+    questions:{type:'array', items:{type:'object', additionalProperties:false,
+      required:['question','answer_summary','score','feedback','better_answer'],
+      properties:{ question:{type:'string'}, answer_summary:{type:'string'}, score:{type:'integer', description:'0~10'},
+        feedback:{type:'string'}, better_answer:{type:'string', description:'지원자 답을 살려 다듬은 모범 답변 예시 (2~4문장)'} }}},
+    next_tips:{type:'array', items:{type:'string'}}
+  }
+};
+
+async function evaluateWithClaude(){
+  const c = S.cfg, st = computeStats();
+  const log = S.transcript.map(t => (t.who === 'ai' ? '면접관: ' : '지원자: ') + t.text).join('\n');
+  const resp = await S.client.beta.messages.create({
+    model: MODEL, max_tokens: 16000,
+    betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default',
+    output_config: { effort: 'medium', format: { type: 'json_schema', schema: EVAL_SCHEMA } },
+    system: '당신은 채용 면접 코치입니다. 모의 면접 기록을 읽고 지원자에게 도움이 되는 구체적이고 따뜻한 피드백을 한국어로 줍니다. 답변 내용(구체성, 논리 구조, 직무 적합성, 본인 기여 설명)을 중심으로 평가하고, 음성 인식 오타는 감점하지 않습니다. 외모는 평가하지 않습니다.',
+    messages: [{ role:'user', content:
+`지원 직무: ${c.role} / 회사: ${c.company || '미정'} / 경력: ${c.level} / 스타일: ${c.style}
+말하기 지표: 평균 답변 ${st.avgSec}초, 말 속도 분당 ${st.cpm}자, 군말 ${st.fillers}회, 답변 시작까지 평균 ${st.avgThink ?? '-'}초
+
+면접 기록:
+${log}
+
+질문별(꼬리질문은 본 질문에 묶어서) 평가와 종합 평가를 작성해 주세요.` }]
+  });
+  if (resp.stop_reason === 'refusal') return null;
+  const tb = resp.content.find(b => b.type === 'text');
+  return tb ? JSON.parse(tb.text) : null;
+}
+
+function offlineEvaluate(st){
+  let score = 70; const strengths = [], improvements = [];
+  if (st.avgChars >= 120){ score += 8; strengths.push('답변 분량이 충분해서 경험을 설명하려는 노력이 보였어요.'); }
+  else { score -= 8; improvements.push('답변이 짧은 편이에요. 상황 → 내 행동 → 결과 순서(STAR)로 1분 내외로 말해 보세요.'); }
+  if (st.fillers <= Math.max(1, st.n)){ score += 6; strengths.push('“음, 어” 같은 군말이 적어 깔끔하게 들렸어요.'); }
+  else { score -= 6; improvements.push(`군말이 ${st.fillers}회 나왔어요. 말을 시작하기 전에 1초 쉬고 첫 문장을 정해 두면 줄어들어요.`); }
+  if (st.cpm){ if (st.cpm > 380){ score -= 4; improvements.push('말이 조금 빨라요. 핵심 문장 뒤에 짧게 쉬어 주세요.'); }
+    else if (st.cpm < 180){ score -= 3; improvements.push('말 속도가 느린 편이에요. 조금 더 자신 있게 이어 말해 보세요.'); }
+    else { score += 4; strengths.push('말하는 속도가 듣기 편안했어요.'); } }
+  if (st.avgThink != null && st.avgThink <= 3) strengths.push('질문을 받고 바로 답을 시작했어요.');
+  if (!strengths.length) strengths.push('끝까지 면접을 완주했어요!');
+  return { overall_score: Math.max(30, Math.min(95, score)),
+    one_line: '연습 모드 리포트예요. 답변 내용까지 평가받으려면 Claude API 키를 넣고 다시 해 보세요.',
+    strengths, improvements, questions: [],
+    next_tips: ['답변마다 숫자나 구체적인 결과를 하나씩 넣어 보세요.', '자기소개는 40초 안에 직무와 연결된 경험 두 가지로 정리해 보세요.', '웹캠 렌즈를 보며 말하면 면접관과 눈을 맞추는 효과가 나요.'] };
+}
+
+function renderReport(ev, st){
+  const sc = Math.max(0, Math.min(100, ev.overall_score | 0));
+  const col = sc >= 80 ? 'var(--accent2)' : sc >= 60 ? 'var(--accent)' : 'var(--warn)';
+  const list = (a) => a.length ? `<ul>${a.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : '<p class="hint">-</p>';
+  $('report').innerHTML = `
+    <h2>면접 결과 리포트</h2>
+    <div class="hint" style="color:var(--muted);font-size:13px">${esc(S.cfg.role)}${S.cfg.company ? ' · ' + esc(S.cfg.company) : ''} · ${esc(S.cfg.level)} · ${S.client ? 'Claude 평가' : '연습 모드'}</div>
+    <div class="scoreRow">
+      <div class="ring" style="background:conic-gradient(${col} ${sc*3.6}deg, var(--line) 0)"><span>${sc}</span></div>
+      <div style="flex:1;min-width:220px;font-size:17px;line-height:1.6">${esc(ev.one_line)}</div>
+    </div>
+    <h3>말하기 지표</h3>
+    <div class="stats">
+      <div class="stat"><div class="v">${st.n}회</div><div class="k">답변 수</div></div>
+      <div class="stat"><div class="v">${st.avgSec ? st.avgSec + '초' : '-'}</div><div class="k">평균 답변 길이</div></div>
+      <div class="stat"><div class="v">${st.cpm || '-'}</div><div class="k">말 속도 (글자/분, 250~350 적당)</div></div>
+      <div class="stat"><div class="v">${st.fillers}회</div><div class="k">군말 (음 · 어 · 그 · 약간…)</div></div>
+      <div class="stat"><div class="v">${st.avgThink ?? '-'}초</div><div class="k">답변 시작까지</div></div>
+    </div>
+    <h3>잘한 점</h3>${list(ev.strengths)}
+    <h3>보완할 점</h3>${list(ev.improvements)}
+    ${ev.questions.length ? '<h3>질문별 피드백</h3>' + ev.questions.map(q => `
+      <div class="qcard"><span class="sc">${q.score}/10</span><div class="q">Q. ${esc(q.question)}</div>
+        <div class="lbl">내 답변 요약</div>${esc(q.answer_summary)}
+        <div class="lbl">피드백</div>${esc(q.feedback)}
+        <div class="lbl">이렇게 말해 보세요</div>${esc(q.better_answer)}</div>`).join('') : ''}
+    <h3>다음 연습 팁</h3>${list(ev.next_tips)}
+    <div class="row" style="margin-top:20px">
+      <button class="btn primary" id="btnAgain">다시 면접 보기</button>
+      <button class="btn" id="btnSave">기록 저장 (.txt)</button>
+      <button class="btn" id="btnClose">닫기</button>
+    </div>`;
+  $('btnAgain').onclick = () => location.reload();
+  $('btnClose').onclick = () => $('overlay').style.display = 'none';
+  $('btnSave').onclick = () => {
+    const lines = [`AI 모의 면접 기록 — ${new Date().toLocaleString('ko-KR')}`, `직무: ${S.cfg.role} / 점수: ${sc}`, '',
+      ...S.transcript.map(t => (t.who === 'ai' ? '면접관: ' : '나: ') + t.text), '', '[잘한 점]', ...ev.strengths, '', '[보완할 점]', ...ev.improvements,
+      ...ev.questions.flatMap(q => ['', `Q. ${q.question} (${q.score}/10)`, `피드백: ${q.feedback}`, `모범 답변: ${q.better_answer}`])];
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'}));
+    a.download = `모의면접_${S.cfg.role}_${new Date().toISOString().slice(0,10)}.txt`; a.click();
+  };
+  caption('안내', '리포트를 확인하세요. “다시 면접 보기”로 새로 시작할 수 있어요.');
+}
+
+/* =========================================================
+ * 6. 화면 연결
+ * ========================================================= */
+speaker.onSentence = (text) => {
+  if (S.phase !== 'speaking' && (S.running || !S.cfg)) setPhase('speaking');
+  caption(NAMES[(S.cfg || readCfg()).look], esc(text));
+};
+
+function koVoices(){ return synth ? synth.getVoices().filter(v => /^ko/i.test(v.lang)) : []; }
+function voiceScore(v, look){
+  const n = v.name;
+  let s = /Natural|Online|Neural/i.test(n) ? 10 : 0;
+  const female = /SunHi|Heami|Yuna|JiMin|SeoHyeon|Sora|Female|여성|Google/i.test(n);
+  const male = /InJoon|Hyunsu|BongJin|GookMin|Male|남성/i.test(n);
+  if (look === 'female' && female) s += 5; if (look === 'male' && male) s += 5;
+  if (look === 'female' && male) s -= 5; if (look === 'male' && female) s -= 3;
+  return s;
+}
+function fillVoices(){
+  const vs = koVoices(), sel = $('fVoice'), keep = sel.value;
+  sel.innerHTML = vs.map(v => `<option value="${esc(v.name)}">${esc(v.name.replace(/^Microsoft /, ''))}</option>`).join('') || '<option value="">(기본 음성)</option>';
+  if (keep && vs.some(v => v.name === keep)) sel.value = keep; else pickVoiceFor($('fAvatar').value);
+  $('voiceWarn').style.display = vs.length ? 'none' : '';
+  $('voiceWarn').textContent = '한국어 음성이 보이지 않아요. Windows 설정 → 시간 및 언어 → 음성 → “음성 추가”에서 한국어를 설치하거나 Edge 브라우저를 사용하면 자연스러운 음성을 쓸 수 있어요.';
+  applyVoice();
+}
+function pickVoiceFor(look){
+  const vs = koVoices(); if (!vs.length) return;
+  const best = vs.slice().sort((a, b) => voiceScore(b, look) - voiceScore(a, look))[0];
+  $('fVoice').value = best.name;
+}
+function applyVoice(){
+  speaker.voice = koVoices().find(v => v.name === $('fVoice').value) || null;
+  speaker.rate = +$('fRate').value;
+}
+if (synth){ fillVoices(); synth.onvoiceschanged = fillVoices; }
+
+$('fAvatar').onchange = () => {
+  avatar.look = $('fAvatar').value; $('aiName').textContent = '면접관 ' + NAMES[avatar.look];
+  pickVoiceFor(avatar.look); applyVoice();
+};
+$('fVoice').onchange = applyVoice;
+$('fRate').oninput = () => { $('rateVal').textContent = (+$('fRate').value).toFixed(2).replace(/0$/, ''); applyVoice(); };
+$('btnTestVoice').onclick = async () => {
+  speaker.stop(); applyVoice();
+  const n = NAMES[$('fAvatar').value];
+  setPhase('speaking');
+  speaker.say(`안녕하세요, 오늘 면접을 맡은 ${n}입니다.`);
+  speaker.say('제 목소리와 입 모양이 잘 맞는지 확인해 보세요. 아, 에, 이, 오, 우. 반갑습니다!');
+  await speaker.idle(); if (!S.running) setPhase('idle');
+};
+$('btnStart').onclick = startInterview;
+$('btnDone').onclick = () => submitAnswer();
+$('btnSend').onclick = () => { const v = $('typeInput').value.trim(); if (!v) return; $('typeInput').value = ''; submitAnswer(v); };
+$('typeInput').onkeydown = (e) => { if (e.key === 'Enter' && !e.isComposing){ e.preventDefault(); $('btnSend').click(); } };
+$('btnMic').onclick = () => {
+  if (listener.on){ listener.stop(); $('btnMic').textContent = '🎤 마이크 켜기'; $('meState').textContent = '✍️ 입력 대기'; }
+  else { const keep = listener.finalText; listener.start(); listener.finalText = keep; $('btnMic').textContent = '🎤 마이크 끄기'; $('meState').textContent = '🎤 말씀하세요'; }
+};
+$('btnSkip').onclick = () => { S.skip = true; speaker.stop(); };
+$('btnEnd').onclick = () => { if (confirm('면접을 종료하고 결과 리포트를 볼까요?')) finishInterview(); };
+
+if (!SR) $('srWarn').style.display = '';
+try { const k = localStorage.getItem('aiInterviewKey'); if (k){ $('fKey').value = k; $('fSaveKey').checked = true; } } catch {}
+$('fKey').oninput = () => { $('modePill').textContent = $('fKey').value.trim() ? 'Claude 면접관' : '연습 모드'; };
+if ($('fKey').value.trim()) $('modePill').textContent = 'Claude 면접관';
+</script>
+</body>
+</html>
