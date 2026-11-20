@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI 면접관 — 얼굴 보며 말로 하는 모의 면접</title>
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.min.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
+  "@pixiv/three-vrm":"https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@3.5.5/lib/three-vrm.module.min.js"
+}}
+</script>
 <style>
 :root{
   --bg:#0e1320; --panel:#161d2d; --panel2:#1d2639; --line:#2a3550;
@@ -27,6 +34,8 @@ main{max-width:1280px;margin:0 auto;padding:16px}
 .tile canvas,.tile video{position:absolute;inset:0;width:100%;height:100%;display:block}
 .tile video{object-fit:cover;transform:scaleX(-1)}
 .tile.speaking{box-shadow:0 0 0 3px var(--accent)}
+#avatar3d{background:radial-gradient(ellipse at 50% 30%,#3a4768 0%,#232c44 55%,#141a2a 100%)}
+.loadBar{position:absolute;left:12px;right:12px;top:12px;font-size:12px;color:var(--muted);display:none}
 .tile.listening{animation:pulse 1.6s infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 2px var(--accent2)}50%{box-shadow:0 0 0 6px rgba(51,210,154,.35)}}
 .nameTag{position:absolute;left:12px;bottom:12px;background:rgba(0,0,0,.55);padding:5px 11px;border-radius:9px;font-size:13px;backdrop-filter:blur(4px)}
@@ -130,6 +139,7 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:18px;line-hei
     <!-- AI interviewer -->
     <div class="tile" id="aiTile">
       <canvas id="avatar"></canvas>
+      <canvas id="avatar3d" style="display:none"></canvas>
       <div class="nameTag" id="aiName">면접관 한서윤</div>
       <div class="stateChip" id="aiState">대기 중</div>
     </div>
@@ -167,6 +177,10 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:18px;line-hei
             <select id="fCount"><option value="3">3개 (약 5분)</option><option value="5" selected>5개 (약 10분)</option><option value="7">7개 (약 15분)</option><option value="10">10개 (약 25분)</option></select></div>
           <div class="field"><label>면접관</label>
             <select id="fAvatar"><option value="female">한서윤 (여성)</option><option value="male">박준호 (남성)</option></select></div>
+          <div class="field"><label>면접관 얼굴 표시</label>
+            <select id="fRender"><option value="3d">3D 아바타 (VRM · 권장)</option><option value="2d">2D 그래픽 (가벼움 · 저사양 PC)</option></select></div>
+          <div class="field"><label>내 VRM 모델 (선택 — VRoid Studio에서 만든 .vrm)</label>
+            <div class="row"><label class="btn small fileBtn">🧍 VRM 불러오기<input type="file" id="fileVrm" accept=".vrm,.glb" hidden></label><span class="fileInfo" id="infoVrm"></span></div></div>
         </div>
         <div class="field"><label>자기소개서 · 이력서 (선택 — 붙여 넣거나 파일 불러오기: PDF · DOCX · TXT · MD)</label>
           <textarea id="fResume" placeholder="자기소개서나 이력서 내용을 붙여 넣으세요. 면접관이 내용을 분석해서 경험 검증 질문을 합니다."></textarea>
@@ -236,7 +250,7 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:18px;line-hei
 <div class="toast" id="toast"></div>
 
 <footer>
-  얼굴은 캔버스로 직접 그린 그래픽이고, 입 모양은 한글 음절의 모음(ㅏ·ㅗ·ㅜ·ㅣ…)과 받침(ㅁ·ㅂ)을 분석해 음성 합성과 맞춰 움직입니다.<br>
+  면접관 얼굴은 VRM 3D 아바타(three.js · three-vrm, 기본 모델: VRoid 공식 CC0 샘플) 또는 캔버스 2D 그래픽이고, 입 모양은 한글 음절의 모음(ㅏ·ㅗ·ㅜ·ㅣ…)과 받침(ㅁ·ㅂ)을 분석해 음성 합성과 맞춰 움직입니다.<br>
   음성 인식 · 합성은 브라우저 기능(Web Speech API)을 쓰며, 질문 생성과 평가는 Claude · Gemini · ChatGPT 중 선택한 AI(API 모드) 또는 기본 질문 은행(연습 모드)이 맡습니다. 직무 목록은 <a href="https://roadmap.sh/" target="_blank" rel="noopener" style="color:var(--accent)">roadmap.sh</a>를 참고했습니다.
 </footer>
 
@@ -354,7 +368,9 @@ class Avatar{
 
   frame(now){
     const dt = Math.min(.05, (now - this.last) / 1000); this.last = now;
-    this.update(dt, now); this.draw(now / 1000);
+    this.update(dt, now);
+    if (this.view3d?.ready) this.view3d.render(this, now / 1000, dt, now);   // 3D 아바타
+    else this.draw(now / 1000);                                             // 2D 그래픽
   }
   update(dt, now){
     let tgt = [0, .5, 0];
@@ -616,6 +632,129 @@ class Avatar{
     ctx.strokeStyle = L.hairHi; ctx.lineWidth = 6;
     ctx.beginPath(); ctx.arc(-10, -40, 128, Math.PI*1.18, Math.PI*1.5); ctx.stroke();
   }
+}
+
+/* =========================================================
+ * 2-1. 3D 아바타 (VRM · three.js + three-vrm)
+ *   - 입 모양: 위 립싱크 값 [벌림, 가로 폭, 오므림] → VRM 표정 aa · ih · ou · ee · oh
+ *   - 눈 깜빡임 · 시선 · 고개 끄덕임 · 숨쉬기도 2D와 같은 상태값을 그대로 사용
+ * ========================================================= */
+const VRM_MODELS = { female:'models/interviewer_female.vrm', male:'models/interviewer_male.vrm' };
+const clamp01 = (x) => x < 0 ? 0 : x > 1 ? 1 : x;
+
+class VRMView{
+  constructor(cv){ this.cv = cv; this.ready = false; this.vrm = null; this.lastRender = 0; this.fps = 30; this.url = ''; }
+  async init(){
+    if (this.T) return;
+    const [T, addon, V] = await Promise.all([import('three'), import('three/addons/loaders/GLTFLoader.js'), import('@pixiv/three-vrm')]);
+    this.T = T; this.V = V; this.GLTFLoader = addon.GLTFLoader;
+    const r = this.renderer = new T.WebGLRenderer({canvas:this.cv, antialias:true, alpha:true, powerPreference:'low-power'});
+    r.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));   // 고해상도 화면에서 GPU 부담 줄이기
+    r.outputColorSpace = T.SRGBColorSpace;
+    this.scene = new T.Scene();
+    this.camera = new T.PerspectiveCamera(20, 4/3, .05, 20);
+    const key = new T.DirectionalLight(0xfff4ea, 2.0); key.position.set(.7, 1.4, 1.6); this.scene.add(key);
+    const fill = new T.DirectionalLight(0xc8d6ff, .7); fill.position.set(-1.2, .8, 1); this.scene.add(fill);
+    this.scene.add(new T.AmbientLight(0xffffff, .55));
+    this.lookTarget = new T.Object3D(); this.scene.add(this.lookTarget);
+    this.tmp = new T.Vector3();
+    new ResizeObserver(() => this.resize()).observe(this.cv);
+  }
+  resize(){
+    const w = this.cv.clientWidth, h = this.cv.clientHeight;
+    if (!w || !h || !this.renderer) return;
+    this.renderer.setSize(w, h, false);
+    this.camera.aspect = w / h; this.camera.updateProjectionMatrix();
+    this.frameCamera();
+  }
+  async load(url, onProgress){
+    await this.init();
+    const T = this.T, V = this.V;
+    const loader = new this.GLTFLoader();
+    loader.register((parser) => new V.VRMLoaderPlugin(parser));
+    const gltf = await loader.loadAsync(url, (e) => { if (e.total) onProgress?.(e.loaded / e.total); });
+    const vrm = gltf.userData.vrm;
+    if (!vrm) throw new Error('VRM 파일이 아니에요');
+    V.VRMUtils.removeUnnecessaryVertices(gltf.scene);
+    V.VRMUtils.combineSkeletons?.(gltf.scene);
+    V.VRMUtils.rotateVRM0(vrm);                       // VRM 0.x 모델도 카메라를 보게 돌리기
+    vrm.scene.traverse((o) => { o.frustumCulled = false; });
+    if (this.vrm){ this.scene.remove(this.vrm.scene); V.VRMUtils.deepDispose(this.vrm.scene); }
+    this.vrm = vrm; this.url = url; this.scene.add(vrm.scene);
+    const h = vrm.humanoid, b = (n) => h.getNormalizedBoneNode(n);
+    this.bones = { head:b('head'), neck:b('neck'), chest:b('upperChest') || b('chest'), spine:b('spine'),
+      lUA:b('leftUpperArm'), rUA:b('rightUpperArm'), lLA:b('leftLowerArm'), rLA:b('rightLowerArm'), lH:b('leftHand'), rH:b('rightHand') };
+    // 팔 내리는 방향은 모델(VRM 0.x / 1.0)에 따라 반대일 수 있어 손 위치로 확인
+    this.armSign = 1; this.restPose(); vrm.update(0);
+    const hand = new T.Vector3(), sh = new T.Vector3();
+    if (this.bones.lH && this.bones.lUA){
+      this.bones.lH.getWorldPosition(hand); this.bones.lUA.getWorldPosition(sh);
+      if (hand.y > sh.y){ this.armSign = -1; this.restPose(); vrm.update(0); }
+    }
+    this.headPos = new T.Vector3(); this.bones.head.getWorldPosition(this.headPos);
+    if (vrm.lookAt) vrm.lookAt.target = this.lookTarget;
+    this.has = new Set((vrm.expressionManager?.expressions || []).map(e => e.expressionName));
+    this.resize(); this.frameCamera();
+    this.ready = true;
+  }
+  restPose(){
+    const B = this.bones;
+    // T자 포즈 → 팔을 자연스럽게 내리고 손을 앞으로 살짝 모음 (책상 앞 면접관 자세)
+    const g = this.armSign;
+    if (B.lUA){ B.lUA.rotation.set(0, 0, -1.22 * g); }
+    if (B.rUA){ B.rUA.rotation.set(0, 0, 1.22 * g); }
+    if (B.lLA){ B.lLA.rotation.set(0, -.35 * g, -.12 * g); }
+    if (B.rLA){ B.rLA.rotation.set(0, .35 * g, .12 * g); }
+  }
+  frameCamera(){
+    if (!this.headPos) return;
+    const hy = this.headPos.y, a = this.camera.aspect || 4/3;
+    // 머리 위 ~ 가슴까지 보이도록 (화면 비율에 맞춰 거리 조정)
+    const viewH = a < 1 ? .8 : .66, dist = (viewH / 2) / Math.tan(this.T.MathUtils.degToRad(this.camera.fov / 2));
+    this.camera.position.set(0, hy - .03, dist);
+    this.camera.lookAt(0, hy - .1, 0);
+  }
+  setExpr(name, v){ if (this.has.has(name)) this.vrm.expressionManager.setValue(name, v); }
+  render(av, t, dt, now){
+    if (now - this.lastRender < 1000 / this.fps - 2) return;     // 30fps로 제한해서 GPU · 배터리 절약
+    const step = (now - (this.lastRender || now)) / 1000; this.lastRender = now;
+    const vrm = this.vrm, B = this.bones;
+
+    // 입 모양
+    const o = av.m.open, w = av.m.wide, r = av.m.round;
+    let aa = clamp01(o * 1.2) * (1 - r) * (1 - clamp01((w - .62) * 2.2));
+    let ee = clamp01((w - .55) * 3) * clamp01(o * 2.2) * (1 - r);
+    let ih = clamp01((w - .72) * 4) * clamp01(1 - o * 1.4) * (1 - r);
+    let oh = r * clamp01(o * 2.2);
+    let ou = r * clamp01(1 - o * 1.5);
+    const sum = aa + ee + ih + oh + ou, cap = clamp01(o * 1.8 + r * .4) * .9;
+    if (sum > cap && sum > 0){ const k = cap / sum; aa *= k; ee *= k; ih *= k; oh *= k; ou *= k; }
+    this.setExpr('aa', aa); this.setExpr('ee', ee); this.setExpr('ih', ih); this.setExpr('oh', oh); this.setExpr('ou', ou);
+    // 눈 깜빡임 · 미소
+    this.setExpr('blink', 1 - av.blinkOpen);
+    this.setExpr('relaxed', clamp01((av.m.smile - .14) * .55));
+
+    // 머리 · 몸 움직임 (2D와 같은 공식)
+    const talk = av.mode === 'speaking' ? 1.25 : .8;
+    const yaw = (Math.sin(t*.37)*.6 + Math.sin(t*.93)*.3) * talk;
+    const roll = Math.sin(t*.29)*.025 + (av.mode === 'thinking' ? .045 : 0) + (av.mode === 'listening' ? -.02 : 0);
+    const nod = av.nodT < 1.6 ? Math.sin(av.nodT*Math.PI*2.6) * Math.exp(-av.nodT*2.2) : 0;
+    const breath = Math.sin(t*1.6);
+    if (B.head) B.head.rotation.set(nod * .11 + av.brow * -.03 + o * .02, yaw * .07, -roll);
+    if (B.neck) B.neck.rotation.set(nod * .05, yaw * .035, -roll * .5);
+    if (B.chest) B.chest.rotation.set(breath * .012, yaw * .015, 0);
+    if (B.spine) B.spine.rotation.set(breath * .006, 0, 0);
+    if (B.lUA) B.lUA.rotation.z = (-1.22 + breath * .01) * this.armSign;
+    if (B.rUA) B.rUA.rotation.z = (1.22 - breath * .01) * this.armSign;
+
+    // 시선: 카메라(지원자) 쪽을 보다가 가끔 이동, 생각할 땐 위쪽
+    const c = this.camera.position;
+    this.lookTarget.position.set(c.x + av.gaze.x * .45, c.y - av.gaze.y * .35, c.z);
+
+    vrm.update(Math.min(.1, step || dt));
+    this.renderer.render(this.scene, this.camera);
+  }
+  dispose(){ this.ready = false; }
 }
 
 /* =========================================================
@@ -1509,7 +1648,7 @@ if (synth){ fillVoices(); synth.onvoiceschanged = fillVoices; }
 
 $('fAvatar').onchange = () => {
   avatar.look = $('fAvatar').value; $('aiName').textContent = '면접관 ' + NAMES[avatar.look];
-  pickVoiceFor(avatar.look); applyVoice();
+  pickVoiceFor(avatar.look); applyVoice(); applyRender();
 };
 $('fVoice').onchange = applyVoice;
 $('fRate').oninput = () => { $('rateVal').textContent = (+$('fRate').value).toFixed(2).replace(/0$/, ''); applyVoice(); };
@@ -1533,6 +1672,51 @@ $('btnSkip').onclick = () => { S.skip = true; speaker.stop(); };
 $('btnEnd').onclick = () => { if (confirm('면접을 종료하고 결과 리포트를 볼까요?')) finishInterview(); };
 
 if (!SR) $('srWarn').style.display = '';
+// 3D 아바타 (VRM)
+const view3d = new VRMView($('avatar3d'));
+const customVrm = {female:null, male:null};
+let vrmSeq = 0;
+function show2D(){ avatar.view3d = null; $('avatar3d').style.display = 'none'; $('avatar').style.display = ''; }
+function show3D(){ $('avatar3d').style.display = ''; $('avatar3d').style.visibility = ''; $('avatar').style.display = 'none'; avatar.view3d = view3d; }
+async function applyRender(){
+  const mode = $('fRender').value; LS.set('aiInterviewRender', mode);
+  if (mode !== '3d') return show2D();
+  const look = $('fAvatar').value, url = customVrm[look] || VRM_MODELS[look];
+  if (view3d.ready && view3d.url === url) return show3D();
+  const seq = ++vrmSeq, chip = $('aiState');
+  // 크기 계산을 위해 캔버스는 배치하되 다 불러올 때까지 숨김
+  $('avatar3d').style.display = ''; if (!view3d.ready) $('avatar3d').style.visibility = 'hidden';
+  chip.textContent = '3D 모델 불러오는 중…';
+  try {
+    await view3d.load(url, (f) => { if (seq === vrmSeq) chip.textContent = `3D 모델 불러오는 중 ${Math.round(f*100)}%`; });
+    if (seq !== vrmSeq) return;
+    show3D();
+  } catch (e){
+    console.error(e);
+    if (seq !== vrmSeq) return;
+    toast('3D 아바타를 불러오지 못해 2D 그래픽으로 보여 드려요. (' + (e.message || e) + ')', 6000);
+    if (customVrm[look] === url){ customVrm[look] = null; $('infoVrm').textContent = '⚠️ 불러오지 못했어요'; }
+    else { $('fRender').value = '2d'; }
+    if (view3d.ready && !customVrm[look]) return applyRender();
+    show2D();
+  } finally {
+    if (seq === vrmSeq && !S.running) chip.textContent = '대기 중';
+  }
+}
+const hasWebGL = (() => { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch { return false; } })();
+$('fRender').value = hasWebGL ? (LS.get('aiInterviewRender') || '3d') : '2d';
+if (!hasWebGL) $('fRender').querySelector('option[value="3d"]').disabled = true;
+$('fRender').onchange = applyRender;
+$('fileVrm').onchange = (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  const look = $('fAvatar').value;
+  if (customVrm[look]) URL.revokeObjectURL(customVrm[look]);
+  customVrm[look] = URL.createObjectURL(f);
+  $('infoVrm').textContent = `✅ ${f.name} (${NAMES[look]} 얼굴로 사용)`;
+  $('fRender').value = '3d'; applyRender(); e.target.value = '';
+};
+applyRender();
+
 // 직무 선택
 fillRoles(); showRoleTopics();
 $('fRoleSel').onchange = showRoleTopics;
