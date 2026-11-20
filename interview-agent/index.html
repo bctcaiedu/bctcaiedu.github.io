@@ -34,6 +34,7 @@ main{max-width:1280px;margin:0 auto;padding:16px}
 .tile canvas,.tile video{position:absolute;inset:0;width:100%;height:100%;display:block}
 .tile video{object-fit:cover;transform:scaleX(-1)}
 .tile.speaking{box-shadow:0 0 0 3px var(--accent)}
+.tile video.realv{transform:none;object-fit:cover;background:#141a2a;transition:opacity .12s}
 #avatar3d{background:radial-gradient(ellipse at 50% 30%,#3a4768 0%,#232c44 55%,#141a2a 100%)}
 .loadBar{position:absolute;left:12px;right:12px;top:12px;font-size:12px;color:var(--muted);display:none}
 .tile.listening{animation:pulse 1.6s infinite}
@@ -140,6 +141,8 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:18px;line-hei
     <div class="tile" id="aiTile">
       <canvas id="avatar"></canvas>
       <canvas id="avatar3d" style="display:none"></canvas>
+      <video id="realIdle" class="realv" muted loop playsinline style="display:none"></video>
+      <video id="realTalk" class="realv" playsinline style="display:none;opacity:0"></video>
       <div class="nameTag" id="aiName">면접관 한서윤</div>
       <div class="stateChip" id="aiState">대기 중</div>
     </div>
@@ -178,9 +181,11 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:18px;line-hei
           <div class="field"><label>면접관</label>
             <select id="fAvatar"><option value="female">한서윤 (여성)</option><option value="male">박준호 (남성)</option></select></div>
           <div class="field"><label>면접관 얼굴 표시</label>
-            <select id="fRender"><option value="3d">3D 아바타 (VRM · 권장)</option><option value="2d">2D 그래픽 (가벼움 · 저사양 PC)</option></select></div>
+            <select id="fRender"><option value="auto">자동 (PC 사양 검사 · 권장)</option><option value="real">AI 실사 얼굴 (GPU 서버 필요)</option><option value="3d">3D 아바타 (VRM)</option><option value="2d">2D 그래픽 (가벼움 · 저사양 PC)</option></select></div>
           <div class="field"><label>내 VRM 모델 (선택 — VRoid Studio에서 만든 .vrm)</label>
             <div class="row"><label class="btn small fileBtn">🧍 VRM 불러오기<input type="file" id="fileVrm" accept=".vrm,.glb" hidden></label><span class="fileInfo" id="infoVrm"></span></div></div>
+          <div class="field" id="realBox"><label>실사 얼굴 서버 주소 <small>(MuseTalk · <a href="https://github.com/bctcaiedu/bctcaiedu.github.io/tree/main/interview-agent/realface-server" target="_blank" style="color:var(--accent)">설치 방법</a>)</small></label>
+            <div class="row" style="flex-wrap:nowrap"><input type="text" id="fRealUrl" placeholder="http://127.0.0.1:8765" style="flex:1;min-width:0"><button class="btn small" id="btnRealCheck">연결 확인</button></div></div>
         </div>
         <div class="field"><label>자기소개서 · 이력서 (선택 — 붙여 넣거나 파일 불러오기: PDF · DOCX · TXT · MD)</label>
           <textarea id="fResume" placeholder="자기소개서나 이력서 내용을 붙여 넣으세요. 면접관이 내용을 분석해서 경험 검증 질문을 합니다."></textarea>
@@ -203,6 +208,7 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:18px;line-hei
             <select id="fSilence"><option value="0">끄기 (답변 완료 버튼)</option><option value="2000">2초 침묵 후</option><option value="3000" selected>3초 침묵 후</option><option value="4500">4.5초 침묵 후</option></select></div>
           <div class="field"><label>&nbsp;</label><button class="btn" id="btnTestVoice">🔊 목소리 · 입 모양 테스트</button></div>
         </div>
+        <div class="note" id="specNote">PC 사양을 확인하는 중…</div>
         <div class="note warn" id="voiceWarn" style="display:none"></div>
 
         <div class="grid2">
@@ -250,7 +256,7 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:18px;line-hei
 <div class="toast" id="toast"></div>
 
 <footer>
-  면접관 얼굴은 VRM 3D 아바타(three.js · three-vrm, 기본 모델: VRoid 공식 CC0 샘플) 또는 캔버스 2D 그래픽이고, 입 모양은 한글 음절의 모음(ㅏ·ㅗ·ㅜ·ㅣ…)과 받침(ㅁ·ㅂ)을 분석해 음성 합성과 맞춰 움직입니다.<br>
+  면접관 얼굴은 AI 실사 얼굴(MuseTalk 서버), VRM 3D 아바타(three.js · three-vrm, 기본 모델: VRoid 공식 CC0 샘플), 캔버스 2D 그래픽 중 PC 사양에 맞춰 고르고, 입 모양은 한글 음절의 모음(ㅏ·ㅗ·ㅜ·ㅣ…)과 받침(ㅁ·ㅂ)을 분석해 음성 합성과 맞춰 움직입니다.<br>
   음성 인식 · 합성은 브라우저 기능(Web Speech API)을 쓰며, 질문 생성과 평가는 Claude · Gemini · ChatGPT 중 선택한 AI(API 모드) 또는 기본 질문 은행(연습 모드)이 맡습니다. 직무 목록은 <a href="https://roadmap.sh/" target="_blank" rel="noopener" style="color:var(--accent)">roadmap.sh</a>를 참고했습니다.
 </footer>
 
@@ -369,7 +375,16 @@ class Avatar{
   frame(now){
     const dt = Math.min(.05, (now - this.last) / 1000); this.last = now;
     this.update(dt, now);
-    if (this.view3d?.ready) this.view3d.render(this, now / 1000, dt, now);   // 3D 아바타
+    if (this.realActive) return;                                             // 실사 영상이 대신 보임
+    if (this.view3d?.ready){
+      this.view3d.render(this, now / 1000, dt, now);                         // 3D 아바타
+      // 자동 모드: 화면이 계속 끊기면(초당 18프레임 미만이 4초) 2D로 낮춤
+      if (this.onSlow && !document.hidden){
+        const gap = now - (this.prevT || now); this.prevT = now;
+        this.slowMs = gap > 55 && gap < 1000 ? (this.slowMs || 0) + gap : Math.max(0, (this.slowMs || 0) - gap * 2);
+        if (this.slowMs > 4000){ this.slowMs = 0; this.onSlow(); }
+      }
+    }
     else this.draw(now / 1000);                                             // 2D 그래픽
   }
   update(dt, now){
@@ -758,17 +773,126 @@ class VRMView{
 }
 
 /* =========================================================
+ * 2-2. AI 실사 얼굴 (MuseTalk 서버) + PC 사양 검사
+ *   - 서버가 문장마다 "음성 + 입 모양 영상(mp4)"을 만들어 주면 그대로 재생
+ *   - 말하지 않을 때는 서버가 준 대기 영상을 반복 재생
+ * ========================================================= */
+const REAL_DEFAULT_URL = 'http://127.0.0.1:8765';
+class RealFace{
+  constructor(idle, talk){ this.idleV = idle; this.talkV = talk; this.active = false; this.base = ''; this.look = 'female'; this.info = null; this.fails = 0; this.ac = new AbortController(); this.idleUrl = ''; }
+  static normalize(u){ u = (u || '').trim().replace(/\/+$/, ''); if (u && !/^https?:\/\//i.test(u)) u = 'http://' + u; return u; }
+  async health(base, ms = 2500){
+    const r = await fetch(RealFace.normalize(base) + '/health', {signal:AbortSignal.timeout(ms), cache:'no-store'});
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    if (j.service !== 'interview-realface') throw new Error('면접관 실사 서버가 아니에요');
+    return j;
+  }
+  async activate(base, look){
+    base = RealFace.normalize(base);
+    const info = await this.health(base);
+    const av = info.avatars?.[look];
+    if (!av) throw new Error(`서버에 '${look}' 얼굴이 없어요 (avatars 폴더에 ${look}.mp4 필요)`);
+    if (!av.ready) throw new Error(av.preparing ? `'${look}' 얼굴을 준비하는 중이에요. 잠시 후 다시 시도하세요` : `'${look}' 얼굴 준비 실패: ${av.error || ''}`);
+    const r = await fetch(`${base}/avatar/${look}/idle.mp4`, {signal:AbortSignal.timeout(20000)});
+    if (!r.ok) throw new Error('대기 영상을 받지 못했어요');
+    if (this.idleUrl) URL.revokeObjectURL(this.idleUrl);
+    this.idleUrl = URL.createObjectURL(await r.blob());
+    this.idleV.src = this.idleUrl; this.idleV.muted = true; this.idleV.loop = true;
+    try { await this.idleV.play(); } catch {}
+    this.base = base; this.look = look; this.info = info; this.fails = 0; this.active = true;
+    this.ac = new AbortController();
+    return info;
+  }
+  deactivate(){ this.active = false; this.abort(); this.idleV.pause(); this.talkV.pause(); this.talkV.style.opacity = 0; }
+  abort(){ try { this.ac.abort(); } catch {} this.ac = new AbortController(); }
+  // 문장 하나 → mp4 Blob URL (서버는 순서대로 하나씩 처리하므로 미리 요청해 두면 끊김이 줄어든다)
+  clip(text, rate){
+    const sig = this.ac.signal;
+    return fetch(this.base + '/speak', {method:'POST', headers:{'content-type':'application/json'}, signal:sig,
+      body:JSON.stringify({text, avatar:this.look, rate})})
+      .then(async (r) => { if (!r.ok){ let m = r.statusText; try { m = (await r.json()).detail || m; } catch {} throw new Error(m); } return URL.createObjectURL(await r.blob()); });
+  }
+  play(url, onStart){
+    return new Promise((resolve) => {
+      const v = this.talkV;
+      let done = false;
+      const end = () => { if (done) return; done = true; v.style.opacity = 0; v.onended = v.onerror = v.onplaying = null; URL.revokeObjectURL(url); resolve(); };
+      v.onplaying = () => { v.style.opacity = 1; onStart?.(); };
+      v.onended = end; v.onerror = end;
+      this.stopPlay = end;
+      v.src = url; v.muted = false;
+      v.play().catch(() => { v.muted = true; v.play().catch(end); });   // 자동재생이 막히면 소리 없이라도
+    });
+  }
+  stop(){ this.abort(); try { this.talkV.pause(); } catch {} this.stopPlay?.(); }
+}
+
+/* ---------- PC 사양 검사 ---------- */
+function detectSpecs(){
+  let gpu = '', webgl = false;
+  try {
+    const c = document.createElement('canvas');
+    const gl = c.getContext('webgl2') || c.getContext('webgl');
+    if (gl){
+      webgl = true;
+      const ext = gl.getExtension('WEBGL_debug_renderer_info');
+      gpu = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER) || '');
+      gl.getExtension('WEBGL_lose_context')?.loseContext();
+    }
+  } catch {}
+  const g = gpu.replace(/^ANGLE \(|\)$/g, '').replace(/Direct3D.*|vs_\d.*|OpenGL.*|\(0x[0-9a-f]+\)/gi, '').replace(/\s+/g, ' ').replace(/,\s*$/, '').trim();
+  let tier = 2, kind = '내장 그래픽';
+  if (!webgl){ tier = 0; kind = 'WebGL 없음'; }
+  else if (/swiftshader|llvmpipe|software|basic render/i.test(gpu)){ tier = 0; kind = '소프트웨어 렌더링 (GPU 가속 꺼짐)'; }
+  else if (/nvidia|geforce|rtx|gtx|quadro|radeon\s*(rx|pro)|\brx\s*\d{3,4}|arc\s*a\d|apple m\d/i.test(gpu)){ tier = 3; kind = '고성능 GPU'; }
+  else if (/iris|radeon|vega|apple|adreno|mali/i.test(gpu)){ tier = 2; kind = '내장 그래픽 (중급)'; }
+  else if (/intel.*hd graphics|uhd graphics [56]\d\d|hd graphics/i.test(gpu)){ tier = 1; kind = '구형 내장 그래픽'; }
+  const cores = navigator.hardwareConcurrency || 0, mem = navigator.deviceMemory || null;
+  const nvidiaRtx = /nvidia|geforce/i.test(gpu) && /rtx|titan/i.test(gpu);
+  return {gpu:g || '알 수 없음', tier, kind, webgl, cores, mem, nvidiaRtx};
+}
+function pickMode(sp, real){
+  if (real?.ok) return {mode:'real', why:`실사 서버 연결됨 (${real.gpu})`};
+  if (sp.tier >= 3) return {mode:'3d', why:sp.kind};
+  if (sp.tier === 2 && sp.cores >= 4 && (sp.mem == null || sp.mem >= 4)) return {mode:'3d', why:sp.kind};
+  if (sp.tier === 1 && sp.cores >= 4) return {mode:'3d', why:'구형 내장 그래픽 — 느리면 자동으로 2D로 바뀜'};
+  return {mode:'2d', why: sp.tier === 0 ? sp.kind : 'CPU · 메모리가 낮은 편'};
+}
+
+/* =========================================================
  * 3. 말하기 (TTS 큐 + 립싱크 연결)
  * ========================================================= */
 const synth = window.speechSynthesis;
 class Speaker{
-  constructor(avatar){ this.avatar = avatar; this.queue = []; this.busy = false; this.waiters = []; this.voice = null; this.rate = 1; this.onSentence = null; }
-  say(text){ text = cleanSpeech(text); if (!text) return; this.queue.push(text); this.next(); }
+  constructor(avatar){ this.avatar = avatar; this.queue = []; this.busy = false; this.waiters = []; this.voice = null; this.rate = 1; this.onSentence = null; this.real = null; this.gen = 0; this.onRealFail = null; }
+  say(text){
+    text = cleanSpeech(text); if (!text) return;
+    const item = {text};
+    // 실사 모드: 문장이 들어오자마자 서버에 영상을 요청해 둔다 (앞 문장이 재생되는 동안 다음 문장 생성)
+    if (this.real?.active){ item.clip = this.real.clip(text, this.rate); item.clip.catch(() => {}); }
+    this.queue.push(item); this.next();
+  }
   next(){
     if (this.busy) return;
-    const text = this.queue.shift();
-    if (text === undefined){ this.avatar.lip = null; this.waiters.splice(0).forEach(f => f()); return; }
+    const item = this.queue.shift();
+    if (item === undefined){ this.avatar.lip = null; this.waiters.splice(0).forEach(f => f()); return; }
     this.busy = true;
+    if (item.clip) return this.playReal(item);
+    this.speakTTS(item.text);
+  }
+  async playReal(item){
+    const gen = this.gen;
+    let url = null;
+    try { url = await item.clip; } catch (e){ if (gen !== this.gen) return; console.warn('실사 영상 실패', e); this.real.fails++; this.onRealFail?.(e, this.real.fails); }
+    if (gen !== this.gen){ if (url) URL.revokeObjectURL(url); return; }
+    if (!url) return this.speakTTS(item.text);          // 실패한 문장은 브라우저 음성으로라도 읽기
+    this.real.fails = 0;
+    await this.real.play(url, () => { this.avatar.question = /\?\s*$/.test(item.text); this.onSentence?.(item.text); });
+    if (gen !== this.gen) return;
+    this.busy = false; this.next();
+  }
+  speakTTS(text){
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'ko-KR'; if (this.voice) u.voice = this.voice; u.rate = this.rate;
     const tl = buildTimeline(text);
@@ -783,7 +907,7 @@ class Speaker{
     if (!synth.speaking && !synth.pending) setTimeout(() => { if (!started) finish(); }, 1500);
   }
   idle(){ return (!this.busy && !this.queue.length) ? Promise.resolve() : new Promise(r => this.waiters.push(r)); }
-  stop(){ this.queue = []; synth.cancel(); if (this.busy){ this.busy = false; this.avatar.lip = null; clearTimeout(this.guard); } this.waiters.splice(0).forEach(f => f()); }
+  stop(){ this.gen++; this.queue = []; synth.cancel(); this.real?.stop(); if (this.busy){ this.busy = false; this.avatar.lip = null; clearTimeout(this.guard); } this.waiters.splice(0).forEach(f => f()); }
 }
 function cleanSpeech(s){
   return s.replace(/\[면접종료\]/g, '').replace(/[*#_`>~]/g, '').replace(/\s+/g, ' ').trim();
@@ -1672,48 +1796,147 @@ $('btnSkip').onclick = () => { S.skip = true; speaker.stop(); };
 $('btnEnd').onclick = () => { if (confirm('면접을 종료하고 결과 리포트를 볼까요?')) finishInterview(); };
 
 if (!SR) $('srWarn').style.display = '';
-// 3D 아바타 (VRM)
+// 면접관 얼굴 표시: 자동(PC 사양 검사) / AI 실사 / 3D / 2D
 const view3d = new VRMView($('avatar3d'));
+const real = new RealFace($('realIdle'), $('realTalk'));
+speaker.real = real;
 const customVrm = {female:null, male:null};
-let vrmSeq = 0;
-function show2D(){ avatar.view3d = null; $('avatar3d').style.display = 'none'; $('avatar').style.display = ''; }
-function show3D(){ $('avatar3d').style.display = ''; $('avatar3d').style.visibility = ''; $('avatar').style.display = 'none'; avatar.view3d = view3d; }
-async function applyRender(){
-  const mode = $('fRender').value; LS.set('aiInterviewRender', mode);
-  if (mode !== '3d') return show2D();
+const SPEC = detectSpecs();
+const MODE_NAMES = {real:'AI 실사 얼굴', '3d':'3D 아바타', '2d':'2D 그래픽'};
+let renderSeq = 0, forced2d = false, realDisabled = false;
+
+function hideReal(){ if (real.active) real.deactivate(); avatar.realActive = false; $('realIdle').style.display = 'none'; $('realTalk').style.display = 'none'; }
+function showReal(){ $('realIdle').style.display = ''; $('realTalk').style.display = ''; $('avatar').style.display = 'none'; $('avatar3d').style.display = 'none'; avatar.view3d = null; avatar.realActive = true; }
+function show2D(){ hideReal(); avatar.view3d = null; $('avatar3d').style.display = 'none'; $('avatar').style.display = ''; }
+function show3D(){ hideReal(); $('avatar3d').style.display = ''; $('avatar3d').style.visibility = ''; $('avatar').style.display = 'none'; avatar.view3d = view3d; }
+const realUrl = () => RealFace.normalize($('fRealUrl').value) || REAL_DEFAULT_URL;
+// https 페이지에서 다른 PC의 http 주소는 브라우저가 막는다 (이 PC의 localhost만 예외)
+const blockedUrl = (u) => location.protocol === 'https:' && /^http:/i.test(u) && !/^http:\/\/(127\.0\.0\.1|localhost|\[::1\])(:|\/|$)/i.test(u);
+
+async function load3D(seq){
   const look = $('fAvatar').value, url = customVrm[look] || VRM_MODELS[look];
-  if (view3d.ready && view3d.url === url) return show3D();
-  const seq = ++vrmSeq, chip = $('aiState');
-  // 크기 계산을 위해 캔버스는 배치하되 다 불러올 때까지 숨김
-  $('avatar3d').style.display = ''; if (!view3d.ready) $('avatar3d').style.visibility = 'hidden';
+  if (view3d.ready && view3d.url === url){ show3D(); return true; }
+  const chip = $('aiState');
+  if (!view3d.ready){ $('avatar3d').style.display = ''; $('avatar3d').style.visibility = 'hidden'; }  // 크기 계산용으로 배치만
   chip.textContent = '3D 모델 불러오는 중…';
   try {
-    await view3d.load(url, (f) => { if (seq === vrmSeq) chip.textContent = `3D 모델 불러오는 중 ${Math.round(f*100)}%`; });
-    if (seq !== vrmSeq) return;
-    show3D();
+    await view3d.load(url, (f) => { if (seq === renderSeq) chip.textContent = `3D 모델 불러오는 중 ${Math.round(f*100)}%`; });
+    if (seq !== renderSeq) return false;
+    show3D(); return true;
   } catch (e){
     console.error(e);
-    if (seq !== vrmSeq) return;
-    toast('3D 아바타를 불러오지 못해 2D 그래픽으로 보여 드려요. (' + (e.message || e) + ')', 6000);
     if (customVrm[look] === url){ customVrm[look] = null; $('infoVrm').textContent = '⚠️ 불러오지 못했어요'; }
-    else { $('fRender').value = '2d'; }
-    if (view3d.ready && !customVrm[look]) return applyRender();
-    show2D();
+    if (seq === renderSeq) toast('3D 아바타를 불러오지 못했어요: ' + (e.message || e), 6000);
+    return false;
   } finally {
-    if (seq === vrmSeq && !S.running) chip.textContent = '대기 중';
+    if (seq === renderSeq && !S.running) chip.textContent = '대기 중';
   }
 }
-const hasWebGL = (() => { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch { return false; } })();
-$('fRender').value = hasWebGL ? (LS.get('aiInterviewRender') || '3d') : '2d';
-if (!hasWebGL) $('fRender').querySelector('option[value="3d"]').disabled = true;
-$('fRender').onchange = applyRender;
+
+async function tryReal(seq, quiet){
+  const u = realUrl();
+  if (blockedUrl(u)){ if (!quiet) toast('이 페이지(https)에서는 다른 PC의 http 서버에 접속할 수 없어요. 서버에 https 주소가 필요해요 — 설치 방법의 "학과 서버로 공유" 참고.', 9000); return false; }
+  $('aiState').textContent = '실사 얼굴 서버 연결 중…';
+  try {
+    const info = await real.activate(u, $('fAvatar').value);
+    if (seq !== renderSeq){ real.deactivate(); return false; }
+    LS.set('aiInterviewRealUrl', u); LS.set('aiInterviewRealOk', '1');
+    S.realInfo = info; showReal(); return true;
+  } catch (e){
+    if (!quiet && seq === renderSeq) toast('실사 얼굴 서버를 쓸 수 없어요: ' + (e.message || e), 8000);
+    return false;
+  } finally {
+    if (seq === renderSeq && !S.running) $('aiState').textContent = '대기 중';
+  }
+}
+
+async function applyRender(){
+  const mode = $('fRender').value; LS.set('aiInterviewRender', mode);
+  $('realBox').style.display = (mode === 'real' || mode === 'auto') ? '' : 'none';
+  const seq = ++renderSeq; avatar.onSlow = null;
+  let target = mode, why = '';
+  if (mode === 'auto'){
+    // 실사 서버는 한 번이라도 연결에 성공한 적이 있을 때만 찾아본다 (다른 PC에서 불필요한 권한 창 방지)
+    let rs = null;
+    if (LS.get('aiInterviewRealOk') && !realDisabled && !blockedUrl(realUrl())){
+      try {
+        const h = await real.health(realUrl(), 1500);
+        const av = h.avatars?.[$('fAvatar').value], fast = h.realtime_factor == null || h.realtime_factor >= .8;
+        rs = {ok:!!av?.ready && fast, gpu:h.gpu, slow:!fast, missing:!av?.ready};
+      } catch {}
+      if (seq !== renderSeq) return;
+    }
+    const pk = pickMode(SPEC, rs);
+    target = (forced2d && pk.mode === '3d') ? '2d' : pk.mode;
+    why = forced2d && pk.mode === '3d' ? '3D가 끊겨서 2D로 낮춤' : pk.why;
+    if (rs?.slow) why += ' · 실사 서버가 실시간보다 느려서 제외';
+    else if (rs?.missing) why += ' · 실사 서버에 이 면접관 얼굴이 아직 없음';
+  }
+  if (target === 'real'){
+    if (!realDisabled && await tryReal(seq, mode === 'auto')) return updateSpecNote(mode, 'real', why);
+    if (seq !== renderSeq) return;
+    const pk = pickMode(SPEC, null);
+    target = forced2d && pk.mode === '3d' ? '2d' : pk.mode;
+    why = (realDisabled ? '면접 중 실사 서버 오류' : '실사 서버 연결 실패') + ' → ' + pk.why;
+  }
+  if (target === '3d'){
+    if (await load3D(seq)){ if (mode === 'auto') avatar.onSlow = onSlow3D; return updateSpecNote(mode, '3d', why); }
+    if (seq !== renderSeq) return;
+    why = '3D 모델을 불러오지 못함';
+  }
+  show2D(); updateSpecNote(mode, '2d', why);
+}
+function onSlow3D(){
+  avatar.onSlow = null; forced2d = true;
+  toast('이 PC에서는 3D 화면이 끊겨서 가벼운 2D 그래픽으로 바꿨어요.', 6000);
+  applyRender();
+}
+function updateSpecNote(mode, eff, why){
+  const sp = SPEC;
+  let h = `<b>이 PC</b> · GPU ${esc(sp.gpu)} (${esc(sp.kind)}) · CPU ${sp.cores || '?'}코어${sp.mem ? ` · 메모리 ${sp.mem >= 8 ? '8GB 이상' : sp.mem + 'GB'}` : ''}<br>`;
+  h += `<b>${mode === 'auto' ? '자동 선택' : '현재 표시'}</b> → ${MODE_NAMES[eff]}${why ? ` <span style="opacity:.8">(${esc(why)})</span>` : ''}`;
+  if (eff === 'real' && S.realInfo){
+    const r = S.realInfo;
+    h += `<br>실사 서버 · ${esc(r.gpu)} · 생성 속도 ${r.gen_fps ?? '측정 전'}${r.gen_fps ? 'fps' : ''} (실시간 ${r.fps}fps)`;
+  } else if (sp.nvidiaRtx){
+    h += '<br>💡 이 PC에는 RTX GPU가 있어서 <b>AI 실사 얼굴</b>도 쓸 수 있어요. 실사 서버를 설치 · 실행한 뒤 <b>연결 확인</b>을 누르세요.';
+  }
+  $('specNote').innerHTML = h;
+}
+
+$('fRealUrl').value = LS.get('aiInterviewRealUrl') || REAL_DEFAULT_URL;
+$('fRender').value = LS.get('aiInterviewRender') || 'auto';
+if (!$('fRender').value) $('fRender').value = 'auto';
+if (!SPEC.webgl) $('fRender').querySelector('option[value="3d"]').disabled = true;
+$('fRender').onchange = () => { forced2d = false; applyRender(); };
+$('btnRealCheck').onclick = async () => {
+  const u = realUrl(), b = $('btnRealCheck');
+  if (blockedUrl(u)){ toast('https 페이지에서는 다른 PC의 http 주소에 접속할 수 없어요. 서버를 https 주소로 열어 주세요 (설치 방법 참고).', 9000); return; }
+  b.disabled = true; b.textContent = '확인 중…';
+  try {
+    const h = await real.health(u, 4000);
+    const av = Object.entries(h.avatars || {}).map(([k, v]) => `${k}${v.ready ? '✅' : v.preparing ? '⏳' : '❌'}`).join(' ') || '없음';
+    toast(`연결 성공 · ${h.gpu} (${h.vram_gb}GB) · 얼굴: ${av} · 생성 ${h.gen_fps ?? '측정 전'}fps`, 7000);
+    LS.set('aiInterviewRealUrl', u); LS.set('aiInterviewRealOk', '1'); realDisabled = false;
+    if ($('fRender').value !== '3d' && $('fRender').value !== '2d') applyRender();
+  } catch (e){
+    toast(`연결 실패: ${e.name === 'TimeoutError' ? '응답이 없어요' : (e.message || e)}. 서버(start_server.bat)가 켜져 있는지, 주소가 맞는지 확인하세요.`, 8000);
+  } finally { b.disabled = false; b.textContent = '연결 확인'; }
+};
+// 면접 도중 실사 서버가 연달아 실패하면 3D/2D로 바꾸고 계속 진행
+speaker.onRealFail = (e, n) => {
+  if (n < 2 || realDisabled) return;
+  realDisabled = true;
+  toast('실사 얼굴 서버 응답이 없어 3D/2D 얼굴과 브라우저 음성으로 이어서 진행해요.', 7000);
+  applyRender();
+};
 $('fileVrm').onchange = (e) => {
   const f = e.target.files[0]; if (!f) return;
   const look = $('fAvatar').value;
   if (customVrm[look]) URL.revokeObjectURL(customVrm[look]);
   customVrm[look] = URL.createObjectURL(f);
   $('infoVrm').textContent = `✅ ${f.name} (${NAMES[look]} 얼굴로 사용)`;
-  $('fRender').value = '3d'; applyRender(); e.target.value = '';
+  $('fRender').value = '3d'; forced2d = false; applyRender(); e.target.value = '';
 };
 applyRender();
 

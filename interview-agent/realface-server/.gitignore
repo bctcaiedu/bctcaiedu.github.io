@@ -1,0 +1,6 @@
+MuseTalk/
+venv/
+cache/
+avatars/*
+!avatars/.gitkeep
+__pycache__/
