@@ -115,6 +115,32 @@ details.log summary{cursor:pointer;color:var(--muted);font-size:14px}
 .qcard .lbl{color:var(--muted);font-size:12px;margin-top:6px}
 .loading{color:var(--muted);padding:30px 0;text-align:center}
 
+/* 언제든 누를 수 있는 시작 버튼 */
+header{position:sticky;top:0;z-index:20;background:rgba(14,19,32,.92);backdrop-filter:blur(6px);flex-wrap:wrap}
+header a.btn{text-decoration:none;color:var(--text)}
+body.running .startAny{display:none}
+.startBar{position:sticky;bottom:-18px;margin:8px -20px -18px;padding:10px 20px 14px;background:linear-gradient(to bottom,rgba(22,29,45,.75),var(--panel) 35%);z-index:3}
+.tileBtn{position:absolute;right:12px;bottom:12px;z-index:4;width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.45);color:#fff;font-size:18px;cursor:pointer;backdrop-filter:blur(4px)}
+.tileBtn:hover{background:rgba(0,0,0,.7)}
+
+/* 면접관 전체 화면 */
+.fsBar{display:none}
+body.focus{overflow:hidden}
+body.focus header,body.focus footer,body.focus details.log{display:none}
+body.focus .stage{position:fixed;inset:0;z-index:30;display:block;background:#000}
+body.focus #aiTile{position:absolute;inset:0;border:0;border-radius:0;aspect-ratio:auto;box-shadow:none}
+body.focus #meTile{position:absolute;right:18px;top:18px;width:min(24vw,320px);aspect-ratio:4/3;z-index:2;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+body.focus #meTile.setupMode{display:none}
+body.focus #btnFullTile{display:none}
+body.focus .caption{position:fixed;left:50%;transform:translateX(-50%);bottom:86px;width:min(1000px,94vw);z-index:31;margin:0;background:rgba(10,14,23,.72);border-color:rgba(255,255,255,.12);backdrop-filter:blur(6px)}
+body.focus:not(.running) .caption{bottom:24px}
+body.focus .controls{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;width:min(1000px,94vw);z-index:31;margin:0;padding:8px 10px;background:rgba(10,14,23,.72);border:1px solid rgba(255,255,255,.12);border-radius:14px;backdrop-filter:blur(6px)}
+body.focus #aiState{right:auto;left:50%;top:18px;transform:translateX(-50%)}
+body.focus .toast{bottom:auto;top:70px}
+body.focus .fsBar{display:flex;gap:8px;position:fixed;left:18px;top:18px;z-index:32}
+body.focus .fsBar .btn:not(.primary){background:rgba(0,0,0,.5);border-color:rgba(255,255,255,.2);color:#fff}
+@media (max-width:860px){ body.focus #meTile{width:34vw} body.focus .caption{bottom:120px} header .sub{display:none} }
+
 footer{color:var(--muted);font-size:12px;text-align:center;padding:18px;line-height:1.6}
 
 @media (max-width:860px){
@@ -128,12 +154,21 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:18px;line-hei
 </head>
 <body>
 <header>
+  <a class="btn small" href="/" title="강의실 홈으로">🏠 강의실 홈</a>
   <h1>🎙️ AI 면접관</h1>
   <span class="sub">얼굴을 마주 보고 말로 주고받는 모의 면접</span>
   <span class="spacer"></span>
   <span class="pill" id="modePill">연습 모드</span>
   <span class="pill" id="progressPill" style="display:none">진행 0</span>
+  <button class="btn small" id="btnFull" title="면접관 전체 화면 (단축키 F)">⛶ 전체 화면</button>
+  <button class="btn primary small startAny" id="btnStartTop">▶ 면접 시작</button>
 </header>
+
+<!-- 전체 화면일 때만 보이는 버튼 -->
+<div class="fsBar">
+  <button class="btn small" id="btnFullExit" title="전체 화면 끝내기 (Esc)">✕ 전체 화면 끝내기</button>
+  <button class="btn primary small startAny" id="btnStartFs">▶ 면접 시작</button>
+</div>
 
 <main>
   <section class="stage">
@@ -145,6 +180,7 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:18px;line-hei
       <video id="realTalk" class="realv" playsinline style="display:none;opacity:0"></video>
       <div class="nameTag" id="aiName">면접관 한서윤</div>
       <div class="stateChip" id="aiState">대기 중</div>
+      <button class="tileBtn" id="btnFullTile" title="면접관 전체 화면">⛶</button>
     </div>
 
     <!-- Candidate: setup form first, then webcam -->
@@ -225,7 +261,7 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:18px;line-hei
         <div class="note">API 모드에서는 브라우저가 선택한 AI 회사(Anthropic · Google · OpenAI)의 API를 직접 호출해요. 키는 이 PC에만 머물고 이 사이트 서버로는 전송되지 않지만, 화면 공유 중에는 입력하지 마세요. 회사 홈페이지와 포트폴리오 링크는 각 AI의 웹 검색 · 웹 읽기 기능으로 분석합니다. 음성 인식은 <b>Chrome 또는 Edge</b>에서 동작합니다.</div>
         <div class="note warn" id="srWarn" style="display:none">이 브라우저는 음성 인식을 지원하지 않아요. 아래 입력창에 글로 답할 수 있어요. (Chrome · Edge 권장)</div>
 
-        <button class="btn primary big" id="btnStart">면접 시작</button>
+        <div class="startBar"><button class="btn primary big" id="btnStart">▶ 면접 시작</button></div>
       </div>
     </div>
   </section>
@@ -1583,14 +1619,14 @@ async function startInterview(){
     try { const b = await analyzeMaterials(c); S.brief = b; S.briefSig = briefSignature(c); }
     catch (e){
       console.error(e); S.brief = null;
-      if (e.status === 401 || e.status === 403){ toast('API 키가 올바르지 않아요. 키를 확인해 주세요.'); $('btnStart').disabled = false; $('btnStart').textContent = '면접 시작'; avatar.setMode('idle'); return; }
+      if (e.status === 401 || e.status === 403){ toast('API 키가 올바르지 않아요. 키를 확인해 주세요.'); $('btnStart').disabled = false; $('btnStart').textContent = '▶ 면접 시작'; avatar.setMode('idle'); return; }
       toast('사전 분석을 못 해서 입력 자료만 보고 진행할게요.');
     }
     avatar.setMode('idle');
   }
   if (!hasMaterials(c)) S.brief = null;
   listener.silenceMs = c.silence;
-  S.messages = []; S.transcript = []; S.answers = 0; S.ended = false; S.running = true;
+  S.messages = []; S.transcript = []; S.answers = 0; S.ended = false; S.running = true; document.body.classList.add('running');
   S.offline = offlineInit(c);
   $('logList').innerHTML = '';
   // 화면 전환: 준비 패널 → 내 웹캠
@@ -1603,6 +1639,7 @@ async function startInterview(){
 }
 
 async function finishInterview(){
+  document.body.classList.remove('running'); setFocus(false);
   S.running = false; listener.stop(); speaker.stop(); try { S.abort?.abort(); } catch {}
   setPhase('idle');
   caption('안내', '면접이 끝났어요. 결과 리포트를 만드는 중입니다…');
@@ -1785,6 +1822,25 @@ $('btnTestVoice').onclick = async () => {
   await speaker.idle(); if (!S.running) setPhase('idle');
 };
 $('btnStart').onclick = startInterview;
+// 위쪽 · 전체 화면의 시작 버튼은 아래 준비 패널의 시작 버튼과 같은 동작
+document.querySelectorAll('.startAny').forEach(b => b.onclick = () => { if (!$('btnStart').disabled) $('btnStart').click(); });
+
+// 면접관 전체 화면
+function setFocus(on){
+  document.body.classList.toggle('focus', on);
+  $('btnFull').textContent = on ? '✕ 전체 화면 끝내기' : '⛶ 전체 화면';
+  try {
+    if (on && !document.fullscreenElement) document.documentElement.requestFullscreen?.({navigationUI:'hide'})?.catch(() => {});
+    else if (!on && document.fullscreenElement) document.exitFullscreen?.()?.catch(() => {});
+  } catch {}
+}
+const toggleFocus = () => setFocus(!document.body.classList.contains('focus'));
+$('btnFull').onclick = toggleFocus; $('btnFullTile').onclick = toggleFocus; $('btnFullExit').onclick = () => setFocus(false);
+document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && document.body.classList.contains('focus')) setFocus(false); });
+document.addEventListener('keydown', (e) => {
+  if ((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.metaKey && !e.altKey && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName)) { e.preventDefault(); toggleFocus(); }
+  else if (e.key === 'Escape' && document.body.classList.contains('focus') && !document.fullscreenElement) setFocus(false);
+});
 $('btnDone').onclick = () => submitAnswer();
 $('btnSend').onclick = () => { const v = $('typeInput').value.trim(); if (!v) return; $('typeInput').value = ''; submitAnswer(v); };
 $('typeInput').onkeydown = (e) => { if (e.key === 'Enter' && !e.isComposing){ e.preventDefault(); $('btnSend').click(); } };
