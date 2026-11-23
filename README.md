@@ -13,4 +13,4 @@
 - [소프트웨어 복제 AI 로 너무 쉽게 하는 REA 사용법](rea/) — 프로젝트 교안 · 6차시 18시간
 - [Git · GitHub 실습](git/) — 브라우저 가상 터미널 실습판 · 22강 + 프로젝트 5 (L22 Pages 심화, 부록: TortoiseGit · VS Code, [교수용 슬라이드](git/slides/))
 - [Docker 쉽게 배우기](docker/) — 브라우저 가상 터미널 실습판 · 17장 + AIoT 프로젝트 적용 2장 (Compose · GitHub Actions · GHCR)
-- [AIoT 프로젝트](aiot/) — 프로젝트 교안 · 실습 6개 + 팀 프로젝트 ([스마트폰 IoT 시뮬레이터](aiot/phone/))
+- [AIoT 프로젝트](aiot/) — 프로젝트 교안 · LAB 0(팀 저장소 · Git · GitHub · Docker) + 실습 6개 + 팀 프로젝트 ([스마트폰 IoT 시뮬레이터](aiot/phone/))

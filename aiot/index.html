@@ -107,6 +107,12 @@
   .ask{border-left-color:var(--more);background:var(--more-soft)}
   .ask::before{content:"❓ 생각해 볼 것";color:var(--more)}
   .ok p,.warn p,.tip p,.ask p{margin:4px 0}
+  .gitbox{border-radius:var(--radius);padding:12px 16px;margin:18px 0 4px;border:1px solid var(--line);border-left:5px solid #f05133;background:#fff5f0;font-size:15px}
+  .gitbox::before{content:"🌱 Git · Docker 체크포인트";display:block;font-weight:800;color:#c2410c;margin-bottom:2px}
+  .gitbox p{margin:6px 0}
+  .gitbox .code{margin:10px 0}
+  :root[data-theme="dark"] .gitbox{background:#2a1a12}
+  :root[data-theme="dark"] .gitbox::before{color:#ff9d6c}
   .muted{color:var(--muted);font-size:13px}
 
   .checks{list-style:none;padding:0}
@@ -162,7 +168,7 @@
     <div class="eyebrow">한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과</div>
     <h1>AIoT 프로젝트<br>모으고, 쌓고, 판단하는 사물인터넷</h1>
     <p>센서가 데이터를 <b>모으고</b>, 클라우드가 <b>쌓고</b>, AI가 <b>판단</b>해 다시 기기를 움직입니다. 보드가 없어도 스마트폰을 IoT 디바이스로 바꾸는 시뮬레이터로 바로 시작하고, MQTT · 클라우드 · 이상 탐지 · 영상 AI · LLM을 하나의 시스템으로 엮어 팀 프로젝트로 완성합니다.</p>
-    <div class="meta"><span>스마트폰 + PC면 시작</span><span>3~4인 팀 프로젝트</span><span>무료 클라우드</span><span>Python · MQTT</span><span>실습 6개 + ESP32 실습 2개 + 프로젝트</span></div>
+    <div class="meta"><span>스마트폰 + PC면 시작</span><span>3~4인 팀 프로젝트</span><span>무료 클라우드</span><span>Python · MQTT</span><span>실습 6개 + ESP32 실습 2개 + 프로젝트</span><span>Git · GitHub · Docker</span></div>
     <div class="cup">📡</div>
   </div>
 </header>
@@ -174,6 +180,7 @@
     <a href="#basics"><small>BASICS</small>IoT 기본 개념</a>
     <a href="#protocol"><small>ARCHITECTURE</small>통신 방식: HTTP와 MQTT</a>
     <a href="#mqtt"><small>PROTOCOL</small>MQTT 핵심 개념</a>
+    <a href="#lab0"><small>LAB 0 · REPO</small>팀 저장소와 개발 환경</a>
     <a href="#device"><small>DEVICE</small>스마트폰 IoT 시뮬레이터</a>
     <a href="#lab1"><small>LAB 1</small>휴대폰을 IoT 디바이스로</a>
     <a href="#lab2"><small>LAB 2</small>MQTT 송수신과 자동화</a>
@@ -212,7 +219,9 @@
         <li>클라우드 IoT 서비스에 데이터를 저장하고 대시보드와 알림을 만들 수 있다.</li>
         <li>IoT 데이터에 이상 탐지, 예측, 영상 AI, 생성형 AI를 적용할 수 있다.</li>
         <li>팀 프로젝트를 기획하고 IoT · 클라우드 · AI를 하나의 시스템으로 엮을 수 있다.</li>
+        <li>팀 저장소에서 Git · GitHub(이슈 · 풀 리퀘스트 · Actions · Pages)로 협업하고, Docker로 시스템을 어디서든 같은 방식으로 실행 · 배포할 수 있다.</li>
       </ol>
+      <div class="tip"><p><b>이 과정은 처음부터 끝까지 하나의 팀 저장소로 진행합니다.</b> LAB 마다 결과를 브랜치에서 커밋하고 풀 리퀘스트로 합치며(🌱 체크포인트), 마지막 시연은 처음 보는 PC 에서 <code>git clone</code> → <code>docker compose up</code> 으로 시작합니다. 시작은 <a href="#lab0">LAB 0</a>.</p></div>
 
       <h3>이 과정에서 만드는 시스템</h3>
       <figure>
@@ -249,6 +258,7 @@
           <tbody>
             <tr><td>스마트폰 + IoT 시뮬레이터</td><td>1인 1대 (본인 것)</td><td>센서와 LED 역할을 하는 디바이스</td></tr>
             <tr><td>PC (Python, 브라우저)</td><td>1인 1대</td><td>MQTT 클라이언트, Colab, 영상 AI, LLM 호출</td></tr>
+            <tr><td>GitHub 계정 + Docker Desktop</td><td>1인 1개 · PC 마다</td><td>팀 저장소 · 협업 · 배포, 브로커와 앱을 컨테이너로 실행 (<a href="#lab0">LAB 0</a>)</td></tr>
             <tr><td>웹카메라</td><td>1인 또는 2인 1개</td><td>LAB 5 관절 추출</td></tr>
             <tr><td>ESP32 + 센서 키트 (DHT22, 조도, LED)</td><td>있는 만큼 (없으면 Wokwi)</td><td>LAB 2-A · 2-B, 심화 과제, 실제 센서와 비교</td></tr>
             <tr><td>라즈베리파이</td><td>팀당 1대 (선택)</td><td>프로젝트, 인터넷이 막힌 곳의 로컬 브로커</td></tr>
@@ -262,6 +272,9 @@
         <li><input type="checkbox" aria-label="완료">Python 3.11과 패키지: <code>pip install "paho-mqtt>=2.0" mediapipe opencv-python anthropic</code></li>
         <li><input type="checkbox" aria-label="완료"><a href="https://mqtt-explorer.com/" target="_blank" rel="noopener">MQTT Explorer</a> — 브로커에 오가는 메시지를 눈으로 보는 프로그램</li>
         <li><input type="checkbox" aria-label="완료">Google 계정(Colab), ThingSpeak 계정</li>
+        <li><input type="checkbox" aria-label="완료"><a href="https://git-scm.com/downloads" target="_blank" rel="noopener">Git</a>(Windows 는 Git Bash 포함), <a href="https://cli.github.com/" target="_blank" rel="noopener">GitHub CLI(gh)</a>, GitHub 계정 — 연습은 <a href="../git/">Git · GitHub 실습</a></li>
+        <li><input type="checkbox" aria-label="완료"><a href="https://www.docker.com/products/docker-desktop/" target="_blank" rel="noopener">Docker Desktop</a> — <code>docker version</code> 이 Server 까지 보이면 준비 완료. 연습은 <a href="../docker/">Docker 쉽게 배우기</a></li>
+        <li><input type="checkbox" aria-label="완료">VS Code (선택) — 저장소 폴더를 열고 커밋 · 브랜치를 버튼으로 다룰 수 있음</li>
         <li><input type="checkbox" aria-label="완료">설치 없이 브라우저로: <a href="https://wokwi.com/projects/new/esp32" target="_blank" rel="noopener">Wokwi</a>(ESP32 시뮬레이터), <a href="https://www.hivemq.com/demos/websocket-client/" target="_blank" rel="noopener">HiveMQ 웹 클라이언트</a> — LAB 2-A · 2-B</li>
         <li><input type="checkbox" aria-label="완료">(실제 ESP32 보드를 쓰면) Arduino IDE 2.x, ESP32 보드 패키지, CP210x/CH340 드라이버</li>
       </ul>
@@ -629,6 +642,141 @@
       <div class="warn"><p>공개 브로커에는 <b>개인정보를 보내지 마세요.</b> 이름, 전화번호, 위치는 토픽에도 메시지에도 넣지 않습니다. 실제 서비스라면 사용자 인증과 TLS가 있는 전용 브로커를 씁니다.</p></div>
     </section>
 
+    <!-- ───────── LAB 0 · 팀 저장소 ───────── -->
+    <section id="lab0">
+      <div class="sec">Lab 0 · Repo</div>
+      <h2>팀 저장소와 개발 환경 — Git · GitHub · Docker</h2>
+      <p class="lead">이 과정의 모든 실습 결과는 <b>팀 GitHub 저장소 하나</b>에 쌓입니다. 코드는 Git 으로 기록하고, GitHub 에서 이슈 · 풀 리퀘스트로 함께 일하고, Docker 로 묶어 누구의 PC 에서든 같은 시스템을 띄웁니다. 마지막 시연은 <code>git clone</code> 과 <code>docker compose up</code> 으로 시작합니다.</p>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>도구</th><th>이 과정에서 맡는 일</th><th>먼저 볼 곳</th></tr></thead>
+          <tbody>
+            <tr><td><b>Git</b></td><td>LAB 마다 코드 · 노트북 · 펌웨어의 변경을 커밋으로 남기고, 브랜치에서 따로 작업</td><td><a href="../git/#l02">Git 실습 L02~L08</a></td></tr>
+            <tr><td><b>GitHub</b></td><td>팀 저장소, 이슈로 할 일 관리, 풀 리퀘스트 리뷰, Actions 로 이미지 빌드 · 대시보드 배포(Pages)</td><td><a href="../git/#l14">L14~L16</a> · <a href="../git/#l22">L22 Pages 심화</a></td></tr>
+            <tr><td><b>Docker</b></td><td>MQTT 브로커 · 자동화 앱 · LLM 리포트 · 대시보드를 이미지로 포장, <code>compose.yaml</code> 한 장으로 실행</td><td><a href="../docker/#ch17">Docker 17 · 18장</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <figure>
+        <div class="diagram">
+          <svg viewBox="0 0 760 230" role="img" aria-label="LAB 마다 브랜치에서 커밋하고 풀 리퀘스트로 main 에 합치면, GitHub Actions 가 이미지를 GHCR 에 올리고 대시보드를 Pages 로 배포하며, 팀원과 시연 PC 는 compose 로 실행합니다">
+            <defs><marker id="ah7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="ah" d="M0 0L10 5L0 10z"/></marker></defs>
+            <rect class="bx" x="20" y="40" width="160" height="64" rx="8"/><text class="t" x="100" y="66">LAB 브랜치</text><text class="s" x="100" y="88">lab2-auto-led · 커밋</text>
+            <rect class="bx" x="214" y="40" width="160" height="64" rx="8"/><text class="t" x="294" y="66">풀 리퀘스트</text><text class="s" x="294" y="88">리뷰 1명 → main</text>
+            <rect class="bx main" x="408" y="40" width="160" height="64" rx="8"/><text class="t" x="488" y="66">GitHub Actions</text><text class="s" x="488" y="88">빌드 · 배포</text>
+            <rect class="bx" x="602" y="14" width="140" height="52" rx="8"/><text class="t" x="672" y="36">GHCR 이미지</text><text class="s" x="672" y="55">app · 브로커 설정</text>
+            <rect class="bx" x="602" y="80" width="140" height="52" rx="8"/><text class="t" x="672" y="102">GitHub Pages</text><text class="s" x="672" y="121">팀 대시보드</text>
+            <rect class="bx" x="214" y="150" width="360" height="56" rx="8"/><text class="t" x="394" y="174">팀원 PC · 강의실 서버 · 라즈베리파이</text><text class="s" x="394" y="194">git clone → .env → docker compose up -d</text>
+            <path class="ln" d="M180 72H210" marker-end="url(#ah7)"/>
+            <path class="ln" d="M374 72H404" marker-end="url(#ah7)"/>
+            <path class="ln" d="M568 64L598 44" marker-end="url(#ah7)"/>
+            <path class="ln" d="M568 80L598 100" marker-end="url(#ah7)"/>
+            <path class="ln" d="M742 106V178H578" marker-end="url(#ah7)"/>
+            <text class="e" x="652" y="196">pull · 열기</text>
+          </svg>
+        </div>
+        <figcaption>코드는 브랜치 → 풀 리퀘스트 → main. main 에 들어간 것만 Actions 가 이미지와 대시보드로 내보내고, 어느 PC 든 같은 이미지로 실행합니다.</figcaption>
+      </figure>
+
+      <h3>팀 저장소 구조</h3>
+      <p>LAB 이 끝날 때마다 아래 폴더에 결과가 하나씩 들어갑니다. 처음에는 빈 폴더와 README 만 만들어 둡니다.</p>
+      <div class="code"><span class="lang">팀 저장소 · aiot-team3 (예)</span><pre><code>aiot-team3/
+├─ README.md             ← 기획서 · 실행 방법 (PROJECT)
+├─ docs/log.md           ← 주간 기록, LAB 스크린샷 · 영상 링크
+├─ app/                  ← Python 앱 + Dockerfile (LAB 2 자동화, LAB 6 리포트)
+├─ ai/                   ← Colab 노트북 · 영상 AI (LAB 4 · LAB 5)
+├─ firmware/             ← ESP32 스케치 · diagram.json (LAB 2-A · 2-B)
+├─ dashboard/            ← 웹 대시보드 (LAB 2-B) → GitHub Pages
+├─ mosquitto/config/     ← 로컬 MQTT 브로커 설정
+├─ compose.yaml          ← 시스템 전체를 한 번에 실행
+├─ .env.example          ← 설정 예시 (진짜 .env 는 올리지 않음)
+├─ .gitignore
+└─ .github/workflows/    ← 이미지 빌드 · 대시보드 배포</code></pre></div>
+
+      <div class="mission">
+        <div class="mh"><span class="mn">STEPS</span><b>팀 저장소 만들고 첫 커밋 올리기</b></div>
+        <ol>
+          <li><b>팀장</b>이 저장소를 만들고 팀원을 초대합니다. GitHub 웹 → Settings → Collaborators → Add people.</li>
+          <li><b>모든 팀원</b>이 복제하고, 이름 · 메일을 설정합니다(처음 한 번).</li>
+          <li><b>팀장</b>이 뼈대 파일(아래)을 만들어 첫 커밋을 올립니다.</li>
+          <li>Settings → Branches 에서 <code>main</code> 에 보호 규칙을 겁니다: 풀 리퀘스트 필수, 승인 1명.</li>
+          <li>Issues 에 LAB 1~6 을 이슈로 하나씩 만들고, 각자 맡을 사람을 정합니다.</li>
+        </ol>
+      </div>
+      <div class="code term"><span class="lang">터미널 · 팀장 (Windows 는 Git Bash)</span><pre><code>gh repo create aiot-team3 --public --clone --description "AIoT 팀 프로젝트"
+cd aiot-team3
+mkdir -p docs app ai firmware dashboard mosquitto/config
+# 빈 폴더는 Git 에 올라가지 않으므로 폴더마다 README 를 하나씩
+for d in app ai firmware dashboard mosquitto/config; do echo "# $d" &gt; $d/README.md; done
+echo "# 주간 기록" &gt; docs/log.md
+# 아래 .gitignore 와 .env.example 을 만든 뒤
+git add .
+git commit -m "LAB0: 저장소 뼈대"
+git push -u origin main</code></pre></div>
+      <div class="code"><span class="lang">.gitignore</span><pre><code># 비밀과 개인 설정 — 절대 올리지 않음
+.env
+firmware/**/secrets.h
+# 파이썬 · 노트북 찌꺼기
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+# 큰 데이터 · 영상 (링크만 docs/log.md 에)
+*.mp4
+data/raw/</code></pre></div>
+      <div class="code"><span class="lang">.env.example — 복사해서 .env 로 쓰기 (주석은 줄 맨 앞에만: docker run --env-file 은 줄 끝 주석을 값으로 읽습니다)</span><pre><code># 반 코드와 내 번호 (Wokwi ESP32 는 s01w)
+PREFIX=aiot-kt2611
+ME=s01
+# 공개 브로커. compose 의 로컬 브로커를 쓰면 mqtt
+BROKER=broker.hivemq.com
+THRESHOLD=28
+# LAB 3 ThingSpeak 키
+TS_WRITE_KEY=
+TS_READ_KEY=
+# LAB 6 LLM 키
+ANTHROPIC_API_KEY=</code></pre></div>
+      <div class="tip"><p>git 이 처음이면 Git 실습 강좌의 <a href="../git/#l02">L02 첫 커밋</a>, <a href="../git/#l11">L11 GitHub 시작하기</a>부터 하세요. 브라우저 가상 터미널이라 설치 없이 연습할 수 있습니다.</p></div>
+
+      <h3>팀 규칙</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>규칙</th><th>예</th><th>배운 곳</th></tr></thead>
+          <tbody>
+            <tr><td>이슈 하나에 브랜치 하나</td><td>이슈 #3 "LAB 2 자동화" → 브랜치 <code>lab2-auto-led</code></td><td>Git L06 · L14</td></tr>
+            <tr><td>커밋 메시지는 LAB 이름으로 시작</td><td><code>LAB2: 온도 기준을 환경 변수로</code></td><td>Git L03</td></tr>
+            <tr><td>main 에는 풀 리퀘스트로만, 리뷰 1명</td><td>본문에 <code>Closes #3</code></td><td>Git L15 · L16</td></tr>
+            <tr><td>비밀 값은 .env 에만</td><td>ThingSpeak · API 키, Wi-Fi 비밀번호</td><td>Git L21 · <a href="#security">IoT 보안</a></td></tr>
+            <tr><td>결과물 증빙은 docs/log.md 에</td><td>스크린샷 · 10초 영상 링크, 한 것 · 막힌 것 · 다음 할 것</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Docker 준비</h3>
+      <p>PC 에 Docker Desktop 을 설치하고 아래 두 줄이 버전을 보여 주면 준비가 끝납니다. LAB 2 부터 Python 코드를 컨테이너로도 돌려 봅니다.</p>
+      <div class="code term"><span class="lang">터미널</span><pre><code>docker version
+docker compose version</code></pre></div>
+      <div class="tip"><p>설치가 막히는 PC(가상화 꺼짐, WSL2 미설치)라면 <a href="../docker/#ch01">Docker 1장</a>의 문제 해결을 보고, 그동안은 Docker 강좌의 브라우저 가상 터미널로 명령을 익힙니다. Docker 없이도 LAB 은 모두 진행할 수 있고, 체크포인트의 Docker 부분만 나중에 합니다.</p></div>
+
+      <h3>LAB 별 체크포인트 한눈에</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>LAB</th><th>저장소에 남길 것</th><th>Docker</th></tr></thead>
+          <tbody>
+            <tr><td>LAB 1</td><td><code>docs/log.md</code> 에 센서 JSON 예시 · 스크린샷</td><td>—</td></tr>
+            <tr><td>LAB 2</td><td><code>app/auto_led.py</code> · <code>requirements.txt</code> · <code>Dockerfile</code></td><td>자동화 앱 이미지 빌드 · 실행</td></tr>
+            <tr><td>LAB 2-A · 2-B</td><td><code>firmware/</code> 스케치 · <code>diagram.json</code>, <code>dashboard/index.html</code></td><td>대시보드 nginx · Pages 배포</td></tr>
+            <tr><td>LAB 3</td><td>키는 <code>.env</code>, 작은 샘플 CSV 는 <code>data/</code></td><td>—</td></tr>
+            <tr><td>LAB 4 · 5</td><td><code>ai/</code> 노트북 · 스크립트</td><td>LAB 5 는 웹카메라 때문에 PC 에서 직접</td></tr>
+            <tr><td>LAB 6</td><td><code>app/llm_report.py</code></td><td>같은 이미지 · <code>compose run report</code></td></tr>
+            <tr><td>PROJECT</td><td>README · <code>compose.yaml</code> · Actions · 릴리스 <code>v1.0.0</code></td><td>clone → up 한 줄로 시연</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="ok"><p>팀원 모두가 저장소를 복제했고, <code>main</code> 보호 규칙과 LAB 이슈가 있고, <code>docker version</code> 이 동작하면 LAB 0 완료입니다.</p></div>
+    </section>
+
     <!-- ───────── 시뮬레이터 ───────── -->
     <section id="device">
       <div class="sec">Device</div>
@@ -725,6 +873,16 @@ void loop() {
 }</code></pre></div>
         </div>
       </details>
+      <div class="gitbox">
+        <p><b>브랜치</b> <code>lab1-sensor</code> · <b>남길 것</b> <code>docs/log.md</code> 에 내 센서 JSON 한 줄과 화면 스크린샷 링크, 각 값의 뜻을 한 줄씩.</p>
+        <div class="code term"><span class="lang">터미널</span><pre><code>git switch -c lab1-sensor
+# docs/log.md 를 고친 뒤
+git add docs/log.md
+git commit -m "LAB1: 센서 JSON 정리"
+git push -u origin lab1-sensor
+gh pr create --fill --body "Closes #1"</code></pre></div>
+        <p>팀원 한 명이 리뷰하고 병합합니다. 병합한 뒤에는 모두 <code>git switch main</code> → <code>git pull</code>. 이 흐름을 LAB 마다 되풀이합니다.</p>
+      </div>
     </section>
 
     <!-- ───────── LAB 2 ───────── -->
@@ -850,6 +1008,51 @@ void loop() {
 }</code></pre></div>
         </div>
       </details>
+      <div class="gitbox">
+        <p><b>브랜치</b> <code>lab2-auto-led</code> · <b>남길 것</b> <code>app/auto_led.py</code>, <code>app/requirements.txt</code>, <code>app/Dockerfile</code></p>
+        <p>위 코드는 브로커 주소와 번호가 코드에 박혀 있습니다. 팀 저장소에는 <b>환경 변수로 설정을 받는 버전</b>을 올립니다. 그래야 팀원마다 코드를 고치지 않고 <code>.env</code> 만 바꿔 씁니다.</p>
+        <div class="code"><span class="lang">Python · app/auto_led.py (팀 저장소용)</span><pre><code>import json, os
+import paho.mqtt.client as mqtt
+
+BROKER = os.getenv("BROKER", "broker.hivemq.com")
+PREFIX = os.getenv("PREFIX", "aiot-kt2611")
+ME = os.getenv("ME", "s01")
+THRESHOLD = float(os.getenv("THRESHOLD", "28"))
+
+def on_connect(c, userdata, flags, reason_code, properties):
+    c.subscribe(f"{PREFIX}/{ME}/sensor")          # 다시 연결돼도 구독
+
+def on_message(c, userdata, msg):
+    try:
+        data = json.loads(msg.payload)
+    except json.JSONDecodeError:
+        return
+    led = "ON" if data.get("temp", 0) &gt; THRESHOLD else "OFF"
+    print(data, "-&gt;", led, flush=True)
+    c.publish(f"{PREFIX}/{ME}/led", led)
+
+client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+client.on_connect = on_connect
+client.on_message = on_message
+client.connect(BROKER, 1883)
+client.loop_forever()</code></pre></div>
+        <div class="code"><span class="lang">app/requirements.txt · app/Dockerfile</span><pre><code># requirements.txt — 버전을 고정해 "제 PC 에서는 되는데요" 를 막기
+paho-mqtt==2.1.0
+
+# Dockerfile
+FROM python:3.12-slim
+ENV PYTHONUNBUFFERED=1
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY *.py .
+RUN useradd --create-home app
+USER app
+CMD ["python", "auto_led.py"]</code></pre></div>
+        <div class="code term"><span class="lang">터미널 · Python 없이 컨테이너로 같은 결과</span><pre><code>docker build -t aiot-app ./app
+docker run --rm -e PREFIX=aiot-kt2611 -e ME=s01 aiot-app</code></pre></div>
+        <p>휴대폰 온도를 28℃ 위로 올리면 LED 가 켜져야 합니다. Python 을 설치하지 않은 팀원도 똑같이 실행됩니다. 자세한 설명은 <a href="../docker/#ch17">Docker 17장 ②</a>.</p>
+      </div>
     </section>
 
     <!-- ───────── LAB 2-A · Wokwi ESP32 ───────── -->
@@ -1037,6 +1240,10 @@ MQTT 접속 시도 (esp32-a3f91c) ... 성공
         </table>
       </div>
       <p class="muted">더 자세한 그림 설명은 아두이노 과정 <a href="../arduino/#l36">36차시 MQTT 발행과 구독</a>에 있습니다. 실제 ESP32 보드로 하려면 LAB 2의 "심화 과제" 코드처럼 Wi-Fi 이름과 비밀번호만 강의실 것으로 바꿉니다.</p>
+      <div class="gitbox">
+        <p><b>브랜치</b> <code>lab2a-esp32</code> · <b>남길 것</b> <code>firmware/lab2a_pubsub/sketch.ino</code> 와 <code>diagram.json</code>(Wokwi 의 두 탭 내용), README 에 Wokwi 공유 링크.</p>
+        <p>실제 보드에 올릴 때 Wi-Fi 이름 · 비밀번호는 <code>firmware/lab2a_pubsub/secrets.h</code> 에 두고 <code>#include "secrets.h"</code> 로 읽습니다. <code>.gitignore</code> 에 <code>firmware/**/secrets.h</code> 가 있어서 올라가지 않습니다. 대신 값이 빈 <code>secrets.example.h</code> 를 올립니다.</p>
+      </div>
     </section>
 
     <!-- ───────── LAB 2-B · 원격 제어 대시보드 ───────── -->
@@ -1339,6 +1546,43 @@ $('servo').onchange = (e) =&gt; client.publish(T('servo'), e.target.value);   //
       </ul>
       <div class="tip"><p>안 될 때는 가운데(브로커)에서 양쪽을 봅니다. 웹 클라이언트나 MQTT Explorer로 <code>aiot-kt2611/s01w/#</code>을 구독해 두면 명령과 상태가 모두 보입니다. 명령이 안 보이면 대시보드 문제, 명령은 보이는데 상태가 안 오면 ESP32 문제입니다.</p></div>
       <div class="warn"><p>지금 대시보드에는 비밀번호가 없어서 토픽을 아는 사람은 누구나 내 LED와 서보를 움직일 수 있습니다. 문 잠금 · 히터 · 모터처럼 위험한 장치는 공개 브로커로 제어하지 않습니다. 바로 아래 IoT 보안에서 이 문제를 다룹니다.</p></div>
+      <div class="gitbox">
+        <p><b>브랜치</b> <code>lab2b-dashboard</code> · <b>남길 것</b> <code>firmware/lab2b_remote/</code> 스케치 · <code>diagram.json</code>, 팀이 만든 <code>dashboard/index.html</code></p>
+        <p><b>팀 대시보드를 GitHub Pages 로 공개</b> — <code>dashboard/</code> 폴더를 배포하는 워크플로를 올리면, main 에 병합할 때마다 팀 대시보드 주소가 갱신됩니다. Settings → Pages → Source 를 <b>GitHub Actions</b> 로 바꿔 둡니다.</p>
+        <div class="code"><span class="lang">.github/workflows/pages.yml</span><pre><code>name: dashboard
+on:
+  push:
+    branches: [main]
+    paths: ["dashboard/**"]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: test -f dashboard/index.html       # 첫 화면이 없으면 배포 안 함
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dashboard
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4</code></pre></div>
+        <p>주소는 <code>https://팀계정.github.io/aiot-team3/?prefix=aiot-kt2611&amp;id=s01w</code>. Pages 는 https 라서 브로커는 <code>wss://broker.hivemq.com:8884/mqtt</code> 를 씁니다. 워크플로 읽는 법은 <a href="../git/#l22">Git L22</a>.</p>
+      </div>
     </section>
 
     <!-- ───────── IoT 보안 ───────── -->
@@ -1382,6 +1626,10 @@ $('servo').onchange = (e) =&gt; client.publish(T('servo'), e.target.value);   //
 // ...
 WiFi.begin(WIFI_SSID, WIFI_PASS, 6);</code></pre></div>
       <div class="ask"><p>팀 프로젝트 구조(디바이스 · 브로커 · 클라우드 · AI)에서 위 6가지 원인 중 해당하는 것은 무엇인가요? 키를 지운 코드와 구조도를 AI에게 보여 주며 보안 점검을 받고, AI가 찾은 위험이 실제로 우리 코드에 해당하는지 직접 확인해 기획서에 적습니다.</p></div>
+      <div class="gitbox">
+        <p><b>팀 저장소 점검</b> — <code>git ls-files | grep -i -E "env|secret|key"</code> 로 비밀 파일이 올라가 있지 않은지 봅니다. GitHub 저장소 Settings → Code security 에서 <b>Secret scanning</b> 과 <b>Push protection</b> 을 켜 두면 키가 든 커밋을 push 할 때 GitHub 이 막아 줍니다.</p>
+        <p>이미 올렸다면 <b>키부터 재발급</b>하고, <code>git rm --cached .env</code> 로 추적에서 뺍니다. 커밋을 지워도 이미 복제한 사람에게는 남습니다(<a href="../git/#l21">Git L21</a>). Actions 에서 쓰는 키는 파일이 아니라 저장소 Settings → Secrets 에 넣습니다.</p>
+      </div>
     </section>
 
     <!-- ───────── 클라우드 ───────── -->
@@ -1507,6 +1755,10 @@ void sendThingSpeak(float t, float h, int l) {
 //    sendThingSpeak(t, h, l);
 //  }</code></pre></div>
       </details>
+      <div class="gitbox">
+        <p><b>브랜치</b> <code>lab3-thingspeak</code> · <b>남길 것</b> 채널 설계(필드 · 위젯 · React 조건)를 <code>docs/log.md</code> 에, LAB 4 에서 쓸 <b>작은 샘플 CSV</b>(수백 줄)를 <code>data/sample.csv</code> 로.</p>
+        <p>Write · Read API 키는 <code>.env</code> 의 <code>TS_WRITE_KEY</code> · <code>TS_READ_KEY</code> 에만 둡니다. ESP32 코드에서는 <code>secrets.h</code> 로 분리합니다.</p>
+      </div>
     </section>
 
     <!-- ───────── DATA × AI ───────── -->
@@ -1601,6 +1853,11 @@ pred = lr.predict(test[X_cols])
 print("AI 예측 오차(MAE):", mean_absolute_error(test["target"], pred))
 print("'지금 값 그대로' 오차:", mean_absolute_error(test["target"], test["lag0"]))</code></pre></div>
       <div class="ok"><p>두 번째 줄은 "10분 뒤도 지금과 같다"고 찍는 기준선입니다. AI의 오차가 이보다 작아야 모델이 쓸모가 있습니다. 이 비교 방식은 팀 프로젝트의 성능 평가에도 그대로 씁니다.</p></div>
+      <div class="gitbox">
+        <p><b>브랜치</b> <code>lab4-anomaly</code> · <b>남길 것</b> <code>ai/lab4_anomaly.ipynb</code></p>
+        <p>Colab 메뉴 <b>파일 → GitHub에 사본 저장</b>으로 팀 저장소의 <code>ai/</code> 폴더에 바로 커밋할 수 있습니다(처음 한 번 GitHub 권한 허용). 브랜치를 <code>lab4-anomaly</code> 로 고르고 커밋한 뒤, GitHub 에서 풀 리퀘스트를 엽니다. 노트북의 <code>READ_KEY</code> 칸은 비워 두고 저장합니다.</p>
+        <p>재현할 수 있게 노트북 첫 셀에서 ThingSpeak 대신 <code>data/sample.csv</code> 를 읽는 경로도 남겨 둡니다. 다른 팀원이 키 없이 같은 그래프를 다시 그릴 수 있습니다.</p>
+      </div>
     </section>
 
     <!-- ───────── LAB 5 ───────── -->
@@ -1680,6 +1937,10 @@ cv2.destroyAllWindows()</code></pre></div>
       <div class="code prompt"><span class="lang">AI 코딩 도구에 요청</span><pre>위 코드를 고쳐서 무릎 각도(골반 24, 무릎 26, 발목 28)로 스쿼트 횟수를 세 줘.
 각도가 90도 아래로 내려갔다가 160도 위로 올라오면 1회로 세고,
 횟수가 바뀔 때마다 aiot-kt2611/s01/ai 토픽에 {"squat": 횟수}를 보내 줘.</pre></div>
+      <div class="gitbox">
+        <p><b>브랜치</b> <code>lab5-pose</code> · <b>남길 것</b> <code>ai/pose/lab5_pose.py</code> 와 <code>ai/pose/requirements.txt</code> (<code>mediapipe</code> · <code>opencv-python</code> · <code>paho-mqtt</code> 버전 고정)</p>
+        <p>이 코드는 <b>컨테이너로 돌리지 않습니다</b>. Windows · macOS 의 Docker 는 PC 웹카메라를 컨테이너에 넘기기 어렵기 때문입니다. 대신 가상 환경으로 버전을 맞춥니다: <code>python -m venv .venv</code> → <code>pip install -r ai/pose/requirements.txt</code>. 카메라 옆에서 도는 엣지 AI 와, 서버에서 도는 컨테이너를 구분하는 기준이 됩니다.</p>
+      </div>
     </section>
 
     <!-- ───────── Kinect ───────── -->
@@ -1808,6 +2069,12 @@ else:
             print(block.text)</code></pre></div>
       <p class="muted">비용을 줄이려면 <code>model</code>을 <code>claude-haiku-5-5</code>로 바꾸고, <code>betas</code>와 <code>fallbacks</code> 두 줄을 지운 뒤 <code>client.messages.create</code>를 쓰세요.</p>
       <div class="ask"><p>LLM의 판단을 그대로 믿고 기기를 제어해도 될까요? 사람이 확인해야 하는 지점은 어디일까요?</p></div>
+      <div class="gitbox">
+        <p><b>브랜치</b> <code>lab6-llm-report</code> · <b>남길 것</b> <code>app/llm_report.py</code> (위 코드에서 <code>BROKER</code> · <code>PREFIX</code> 를 <code>os.getenv</code> 로 읽게 고친 것), <code>requirements.txt</code> 에 <code>anthropic</code> 추가</p>
+        <p>LAB 2 와 <b>같은 이미지</b>에 들어가므로 명령만 바꿔 실행합니다. 키는 <code>.env</code> 의 <code>ANTHROPIC_API_KEY</code> 에서 컨테이너로 넘어갑니다. 이미지 안에도, 저장소에도 키가 남지 않습니다.</p>
+        <div class="code term"><span class="lang">터미널</span><pre><code>docker build -t aiot-app ./app
+docker run --rm --env-file .env aiot-app python llm_report.py</code></pre></div>
+      </div>
     </section>
 
     <!-- ───────── 프로젝트 ───────── -->
@@ -1822,7 +2089,53 @@ else:
         <li>팀마다 토픽 앞부분을 따로 정합니다(예: <code>aiot-kt2611-team3</code>). 최종 시연 때 모든 팀의 데이터를 한 화면에 모아 보여 줍니다.</li>
         <li>Kinect, Go2, tiki-mini처럼 반출이 어려운 장비를 쓰는 팀은 기관 실습 일정을 기획서에 적습니다.</li>
         <li>성능은 반드시 숫자로 말합니다. "잘 된다"가 아니라 "20번 중 18번 인식", "기준선보다 오차 30% 감소"처럼.</li>
+        <li><b>모든 작업은 팀 저장소에서</b> 이슈 → 브랜치 → 풀 리퀘스트 → 리뷰 → 병합으로 합니다. 시연 전날 몰아서 올린 커밋 하나는 인정하지 않습니다.</li>
+        <li><b>시스템은 Docker 로 실행합니다.</b> 처음 보는 PC 에서 아래 "실행 세 줄"만으로 동작해야 합니다. 웹카메라 · Kinect 처럼 PC 장치가 필요한 부분만 예외입니다.</li>
       </ul>
+
+      <h3>개발 · 배포 요구사항</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>항목</th><th>요구 사항</th><th>확인 방법</th></tr></thead>
+          <tbody>
+            <tr><td><b>Git</b></td><td>팀원마다 커밋이 고르게 있고, 메시지가 무엇을 했는지 말한다</td><td><code>git shortlog -sn</code> · <code>git log --oneline</code></td></tr>
+            <tr><td><b>GitHub 협업</b></td><td>할 일은 이슈로, main 은 보호 규칙, 모든 변경은 리뷰를 거친 풀 리퀘스트로</td><td>Issues · Pull requests 탭</td></tr>
+            <tr><td><b>Docker</b></td><td><code>compose.yaml</code> 로 브로커 · 앱 · 대시보드가 한 번에 뜬다. 앱 이미지는 버전 고정 · non-root</td><td><code>docker compose ps</code></td></tr>
+            <tr><td><b>Actions</b></td><td>main 에 병합되면 앱 이미지가 GHCR 로, 대시보드가 Pages 로 배포된다</td><td>Actions 탭이 초록색</td></tr>
+            <tr><td><b>비밀 관리</b></td><td>키는 <code>.env</code> · Secrets 에만. 저장소에는 <code>.env.example</code></td><td>Secret scanning 경고 없음</td></tr>
+            <tr><td><b>릴리스</b></td><td>시연 버전에 태그 <code>v1.0.0</code> 과 GitHub 릴리스, 시연은 그 태그의 이미지로</td><td>Releases · Packages</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>팀 저장소의 <code>compose.yaml</code> 은 LAB 결과를 서비스로 모은 것입니다. 전체 설명은 <a href="../docker/#ch18">Docker 18장</a>에 있습니다.</p>
+      <div class="code"><span class="lang">compose.yaml (팀 저장소 뼈대)</span><pre><code>services:
+  mqtt:                              # 로컬 브로커 (인터넷이 막혔을 때 · 시연 PC)
+    image: eclipse-mosquitto:2
+    ports: ["1883:1883", "9001:9001"]
+    volumes:
+      - ./mosquitto/config:/mosquitto/config:ro
+    profiles: ["local"]
+
+  auto-led:                          # LAB 2 자동화 (팀 프로젝트의 판단 로직으로 바꿔 감)
+    build: ./app
+    image: ${IMAGE:-aiot-app}:${TAG:-dev}
+    env_file: .env
+    restart: unless-stopped
+
+  report:                            # LAB 6 LLM 리포트 — docker compose run --rm report
+    image: ${IMAGE:-aiot-app}:${TAG:-dev}
+    command: ["python", "llm_report.py"]
+    env_file: .env
+    profiles: ["tools"]
+
+  dashboard:                         # LAB 2-B 대시보드 — http://localhost:8080
+    image: nginx:1.27-alpine
+    ports: ["8080:80"]
+    volumes:
+      - ./dashboard:/usr/share/nginx/html:ro</code></pre></div>
+      <div class="code term"><span class="lang">실행 세 줄 (README 맨 위에)</span><pre><code>git clone https://github.com/팀계정/aiot-team3.git &amp;&amp; cd aiot-team3
+cp .env.example .env              # PREFIX · ME · 키 채우기
+docker compose up -d --build      # 인터넷이 막혔으면 --profile local 을 붙이고 BROKER=mqtt</code></pre></div>
 
       <h3>주제 후보</h3>
       <div class="tbl">
@@ -1894,11 +2207,20 @@ else:
 | 마일스톤 | 날짜 | 목표 |
 
 ## 7. 성공 기준
-- 최종 시연에서 무엇이 되면 성공인가? (측정 가능한 숫자로)</code></pre></div>
+- 최종 시연에서 무엇이 되면 성공인가? (측정 가능한 숫자로)
+
+## 8. 저장소와 실행 방법
+- 저장소 주소, 대시보드(Pages) 주소, 이미지(GHCR) 이름
+- 실행 세 줄: git clone → cp .env.example .env → docker compose up -d
+- 필요한 키 목록 (값은 적지 않음)
+
+## 9. 이슈 · 브랜치 계획
+| 이슈 | 브랜치 | 담당 | 마일스톤 |</code></pre></div>
 
       <h3>저장소와 기록</h3>
       <ul>
-        <li>팀마다 GitHub 저장소를 하나 만들고 <code>README.md</code>(기획), <code>docs/log.md</code>(주간 기록), <code>firmware/</code>, <code>ai/</code>, <code>dashboard/</code> 폴더를 둡니다.</li>
+        <li>저장소는 <a href="#lab0">LAB 0</a>에서 만든 팀 저장소를 그대로 씁니다. <code>README.md</code>(기획 · 실행 방법), <code>docs/log.md</code>(주간 기록), <code>app/</code> · <code>ai/</code> · <code>firmware/</code> · <code>dashboard/</code>, <code>compose.yaml</code>.</li>
+        <li>마일스톤(중간 점검 · 최종 시연)을 만들고 이슈를 묶어 진행률을 봅니다. 시연 날에는 <code>v1.0.0</code> 태그와 릴리스를 남깁니다.</li>
         <li>매주 팀원별로 "한 것, 막힌 것, 다음에 할 것"을 한 줄씩 남깁니다.</li>
         <li>결과물 사진, 영상, 코드를 계속 쌓으면 그대로 취업용 포트폴리오가 됩니다.</li>
         <li>브로커 · 자동화 앱 · 대시보드를 <b>Docker</b>로 묶으면 팀원 누구나 <code>docker compose up</code> 한 줄로 같은 시스템을 띄웁니다. <a href="../docker/#ch17">Docker 쉽게 배우기 17 · 18장</a>(AIoT 프로젝트 적용)과 <a href="../git/">Git · GitHub 실습</a>을 함께 보세요.</li>
@@ -1909,23 +2231,28 @@ else:
     <section id="check">
       <div class="sec">Check</div>
       <h2>실습 체크리스트</h2>
-      <p class="lead">각 실습을 마쳤다는 증빙입니다. 스크린샷과 영상은 팀 저장소에 함께 올립니다.</p>
+      <p class="lead">각 실습을 마쳤다는 증빙입니다. 스크린샷과 영상은 팀 저장소에 함께 올립니다. LAB 은 <b>풀 리퀘스트가 main 에 병합되어야</b> 완료입니다.</p>
       <ul class="checks">
+        <li><input type="checkbox" aria-label="완료"><b>LAB 0</b> 팀 저장소 · main 보호 규칙 · LAB 이슈를 만들고, 팀원 모두 복제했고, <code>docker version</code> 이 동작한다 — 저장소 주소</li>
         <li><input type="checkbox" aria-label="완료"><b>BASICS</b> 주변 IoT 서비스 3개의 구성 요소와 통신 기술을 표로 정리하고, AI 답변의 수치를 자료와 대조했다 — 표</li>
         <li><input type="checkbox" aria-label="완료"><b>ARCHITECTURE</b> 4계층과 HTTP · MQTT 비교를 내 말로 정리해 AI 검토를 받고, 응용 아이디어 하나의 4계층 구조도를 그렸다 — 정리 노트</li>
         <li><input type="checkbox" aria-label="완료"><b>MQTT</b> 확인 퀴즈 3문제를 풀고, 와일드카드 구독이 어떤 메시지를 받는지 설명할 수 있다</li>
         <li><input type="checkbox" aria-label="완료"><b>LAB 1</b> 시뮬레이터(또는 ESP32)로 센서값과 JSON을 확인했다 — 화면 스크린샷</li>
         <li><input type="checkbox" aria-label="완료"><b>LAB 2</b> MQTT Explorer에서 반 전체 센서값을 봤다 — 스크린샷</li>
         <li><input type="checkbox" aria-label="완료"><b>LAB 2</b> 온도를 올리면 Python 코드가 내 LED를 켠다 — 10초 영상</li>
+        <li><input type="checkbox" aria-label="완료"><b>LAB 2 · Docker</b> <code>aiot-app</code> 이미지로 같은 동작을 했고, 코드 · Dockerfile 이 PR 로 병합됐다 — PR 링크</li>
         <li><input type="checkbox" aria-label="완료"><b>LAB 2-A</b> Wokwi ESP32의 센서값을 HiveMQ 웹 클라이언트에서 받고, 웹에서 보낸 글자를 시리얼 모니터에서 봤다 — 스크린샷 2장</li>
         <li><input type="checkbox" aria-label="완료"><b>LAB 2-B</b> 웹 대시보드(휴대폰)로 ESP32의 LED와 서보를 움직이고 실제 상태가 표시된다 — 10초 영상</li>
+        <li><input type="checkbox" aria-label="완료"><b>LAB 2-B · Pages</b> 팀 대시보드가 GitHub Pages 주소에서 열린다 — Pages 주소</li>
         <li><input type="checkbox" aria-label="완료"><b>SECURITY</b> 우리 팀 프로젝트의 보안 위험 2가지와 대책을 기획서에 적었다</li>
         <li><input type="checkbox" aria-label="완료"><b>LAB 3</b> ThingSpeak에 데이터가 쌓이고 대시보드가 보인다 — 스크린샷</li>
         <li><input type="checkbox" aria-label="완료"><b>LAB 4</b> 일부러 만든 이상 상황을 이상 탐지로 찾았다 — Colab 그래프</li>
         <li><input type="checkbox" aria-label="완료"><b>LAB 4</b> 예측 모델의 오차를 기준선과 비교했다 — Colab 출력</li>
+        <li><input type="checkbox" aria-label="완료"><b>LAB 4 · Git</b> 노트북이 <code>ai/</code> 에 키 없이 커밋돼 있고 <code>data/sample.csv</code> 로 다시 그릴 수 있다 — 노트북 링크</li>
         <li><input type="checkbox" aria-label="완료"><b>LAB 5</b> 팔꿈치 각도로 LED를 제어했다 — 10초 영상</li>
         <li><input type="checkbox" aria-label="완료"><b>LAB 6</b> LLM 리포트를 받고 프롬프트를 바꿔 봤다 — 출력 결과 2개</li>
         <li><input type="checkbox" aria-label="완료"><b>PROJECT</b> 팀 기획서를 작성하고 발표했다 — 기획서</li>
+        <li><input type="checkbox" aria-label="완료"><b>PROJECT · 배포</b> 처음 보는 PC 에서 실행 세 줄로 시스템이 뜨고, Actions 가 초록색, <code>v1.0.0</code> 릴리스가 있다 — 저장소 · 릴리스 주소</li>
       </ul>
     </section>
 
@@ -1951,6 +2278,13 @@ else:
             <tr><td>(ESP32) 업로드 중 멈춤</td><td>부트 모드 진입 실패</td><td>BOOT 버튼을 누른 채 업로드 시작</td></tr>
             <tr><td>(ESP32) DHT22가 <code>nan</code></td><td>배선 오류, 너무 자주 읽음</td><td>핀과 전원 확인, 2초 간격 유지</td></tr>
             <tr><td>(ESP32) Wi-Fi 연결 안 됨</td><td>5GHz 전용 공유기</td><td>ESP32는 2.4GHz만 지원. 2.4GHz SSID 사용</td></tr>
+            <tr><td>(Git) push 가 <code>! [rejected]</code></td><td>팀원이 먼저 올린 커밋을 받지 않음</td><td><code>git pull</code> 로 받아 합친 뒤 다시 push (<a href="../git/#l13">Git L13</a>)</td></tr>
+            <tr><td>(Git) main 에 push 가 막힘 (<code>GH006</code>)</td><td>main 보호 규칙</td><td>정상입니다. 브랜치로 올리고 풀 리퀘스트로 병합 (<a href="../git/#l16">Git L16</a>)</td></tr>
+            <tr><td>(Git) <code>.env</code> 가 올라감</td><td>.gitignore 를 만들기 전에 커밋</td><td>키부터 재발급, <code>git rm --cached .env</code> 후 커밋 (<a href="../git/#l21">Git L21</a>)</td></tr>
+            <tr><td>(Docker) <code>Cannot connect to the Docker daemon</code></td><td>Docker Desktop 이 꺼져 있음</td><td>Docker Desktop 을 켜고 고래 아이콘이 멈출 때까지 기다림</td></tr>
+            <tr><td>(Docker) 컨테이너 앱이 브로커에 못 붙음</td><td><code>BROKER=localhost</code> — 컨테이너 안의 localhost 는 자기 자신</td><td>compose 의 로컬 브로커는 <code>mqtt</code>, 공개 브로커는 <code>broker.hivemq.com</code></td></tr>
+            <tr><td>(Docker) <code>--env-file</code> 값이 이상함</td><td>.env 줄 끝에 주석</td><td>주석은 줄 맨 앞 <code>#</code> 로만</td></tr>
+            <tr><td>(Pages) 배포 단계 실패</td><td>Pages Source 가 브랜치 방식</td><td>Settings → Pages → Source 를 GitHub Actions 로 (<a href="../git/#l22">Git L22</a>)</td></tr>
           </tbody>
         </table>
       </div>
@@ -1961,6 +2295,7 @@ else:
 printf "listener 1883\nallow_anonymous true\n" | sudo tee /etc/mosquitto/conf.d/class.conf
 sudo systemctl restart mosquitto</code></pre></div>
       <p class="muted"><code>allow_anonymous true</code>는 강의실 내부망 실습용 설정입니다. 외부에 공개되는 서버에서는 사용자 인증을 켭니다.</p>
+      <p>Docker 가 있다면 설치 대신 팀 저장소의 <code>compose.yaml</code> 로 브로커를 띄웁니다: <code>.env</code> 에 <code>BROKER=mqtt</code> 를 적고 <code>docker compose --profile local up -d</code>. 라즈베리파이에서도 같은 명령입니다(<a href="../docker/#ch18">Docker 18장</a>).</p>
     </section>
 
     <footer>한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과 · <a href="/">강의실 홈</a></footer>

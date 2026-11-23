@@ -205,6 +205,34 @@
   </aside>
 </section>
 
+<section class="slide" data-part="시작">
+  <div class="sec">LAB 0 · 개발 방식</div>
+  <h2>팀 저장소 하나로: Git · GitHub · Docker</h2>
+  <div class="body">
+    <div class="cols3">
+      <div class="card" style="border-color:#f05133"><div class="dn">🌱 GIT</div><b>LAB 마다 커밋</b><span>이슈 하나 = 브랜치 하나 (<code>lab2-auto-led</code>), 메시지는 <code>LAB2: …</code></span></div>
+      <div class="card" style="border-color:#7c3aed"><div class="dn">🐙 GITHUB</div><b>PR · 리뷰 · 배포</b><span>main 보호 + 리뷰 1명, Actions 로 이미지(GHCR) · 대시보드(Pages)</span></div>
+      <div class="card" style="border-color:#1d63ed"><div class="dn">🐳 DOCKER</div><b>어디서든 같은 실행</b><span>브로커 · 자동화 앱 · LLM 리포트 · 대시보드를 compose.yaml 한 장으로</span></div>
+    </div>
+    <table class="tight" style="margin-top:14px">
+      <tbody>
+        <tr><td style="width:22%"><b>LAB 2</b></td><td><code>app/auto_led.py</code> 환경 변수 버전 + Dockerfile → <code>docker run --rm -e ME=s01 aiot-app</code></td></tr>
+        <tr><td><b>LAB 2-B</b></td><td><code>dashboard/</code> → Actions 로 GitHub Pages 배포 (브로커는 wss://)</td></tr>
+        <tr><td><b>LAB 4 · 5</b></td><td>Colab "GitHub에 사본 저장" → <code>ai/</code> · 웹카메라 코드는 venv 로 PC 에서</td></tr>
+        <tr><td><b>PROJECT</b></td><td>git clone → cp .env.example .env → docker compose up -d · 릴리스 v1.0.0</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트</h4>
+    <ul>
+      <li>교안의 <b>LAB 0</b>(팀 저장소 만들기 · main 보호 · LAB 이슈 · docker version)을 첫 실습 시간에 끝내 두면, 이후 LAB 마다 🌱 체크포인트로 PR 을 올리는 리듬이 잡힙니다.</li>
+      <li>git 이 처음인 반은 Git · GitHub 실습 L02 · L11 · L15, Docker 는 1 · 17 · 18장을 먼저 보게 합니다.</li>
+      <li>평가: "처음 보는 PC 에서 실행 세 줄로 뜨는가" + PR · 리뷰 기록 + Actions 초록색.</li>
+    </ul>
+  </aside>
+</section>
+
 <!-- ════════════════════ 1. IoT 기본 개념 ════════════════════ -->
 <section class="slide part" data-part="1. IoT 기본 개념">
   <div class="eyebrow">1차시 · BASICS</div>
