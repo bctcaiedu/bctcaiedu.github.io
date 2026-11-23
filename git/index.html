@@ -865,6 +865,7 @@ pre, code, .mono, .t-body, textarea { word-break: normal; }
       <nav id="navTree" class="nav-tree"></nav>
       <div class="side-foot">
         <button class="ghost-btn" id="themeBtn" title="밝게 / 어둡게">테마</button>
+        <a class="ghost-btn" href="slides/" title="교수용 발표 슬라이드">슬라이드</a>
         <a class="ghost-btn" href="https://git-scm.com/book/ko/v2" target="_blank" rel="noopener">Pro Git 책</a>
         <a class="ghost-btn" href="https://docs.github.com/ko" target="_blank" rel="noopener">GitHub 문서</a>
       </div>
@@ -18237,6 +18238,336 @@ Course.lesson({
       ['Choose a License', 'https://choosealicense.com/'],
       ['이슈 템플릿 문서', 'https://docs.github.com/ko/communities/using-templates-to-encourage-useful-issues-and-pull-requests'],
       ['저장소에서 민감한 데이터 제거', 'https://docs.github.com/ko/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository']
+    ]
+  });
+})();
+
+</script>
+  <script data-src="lessons/l22.js">
+/* L22 — GitHub Pages 심화: Actions 로 배포하기와 내 주소 */
+(function () {
+  const README = '# git-practice\n\nGit · GitHub 실습용 저장소입니다.\n';
+
+  const SITE_INDEX = [
+    '<!DOCTYPE html>',
+    '<html lang="ko">',
+    '<head>',
+    '  <meta charset="utf-8">',
+    '  <meta name="viewport" content="width=device-width, initial-scale=1">',
+    '  <title>L22 우리 팀 사이트</title>',
+    '  <link rel="stylesheet" href="style.css">',
+    '</head>',
+    '<body>',
+    '  <main class="l22-card">',
+    '    <h1>우리 팀 사이트</h1>',
+    '    <p>이 사이트는 GitHub Actions 가 site 폴더를 배포해서 만들어졌습니다.</p>',
+    '  </main>',
+    '</body>',
+    '</html>',
+    ''
+  ].join('\n');
+
+  const SITE_CSS = [
+    'body { margin: 0; padding: 40px 16px; font-family: sans-serif; background: #eef4fb; }',
+    '.l22-card { max-width: 640px; margin: 0 auto; padding: 28px; background: #fff; border-radius: 12px; }',
+    'h1 { margin-top: 0; color: #1d63ed; }',
+    ''
+  ].join('\n');
+
+  /* 본문과 미션 1 의 워크플로 */
+  const WF = [
+    'name: L22 Pages',
+    'on:',
+    '  push:',
+    '    branches: [main]',
+    '  workflow_dispatch:',
+    '',
+    'permissions:',
+    '  contents: read',
+    '  pages: write',
+    '  id-token: write',
+    '',
+    'concurrency:',
+    '  group: pages',
+    '  cancel-in-progress: false',
+    '',
+    'jobs:',
+    '  build:',
+    '    runs-on: ubuntu-latest',
+    '    steps:',
+    '      - uses: actions/checkout@v4',
+    '      - name: 첫 화면이 있는지 검사',
+    '        run: test -f site/index.html',
+    '      - uses: actions/configure-pages@v5',
+    '      - uses: actions/upload-pages-artifact@v3',
+    '        with:',
+    '          path: site',
+    '',
+    '  deploy:',
+    '    needs: build',
+    '    runs-on: ubuntu-latest',
+    '    environment:',
+    '      name: github-pages',
+    '      url: ${{ steps.deployment.outputs.page_url }}',
+    '    steps:',
+    '      - id: deployment',
+    '        uses: actions/deploy-pages@v4',
+    ''
+  ].join('\n');
+
+  /* 미션 2: 권한이 빠진 워크플로 */
+  const WF_NOPERM = WF.replace('  pages: write\n  id-token: write\n', '');
+
+  const PATH = '.github/workflows/l22-pages.yml';
+  const latest = (runs, path) => runs.find(r => r.path === path);
+  const WAIT = '워크플로가 아직 실행 중입니다. 잠시 뒤 채점을 다시 누르세요';
+  const runOk = async (g) => {
+    const run = latest(await g.runs(), PATH);
+    if (!run) return '워크플로가 아직 실행되지 않았습니다. main 에 push 했는지 확인하세요';
+    if (run.status !== 'completed') return WAIT;
+    if (run.conclusion !== 'success') return '가장 최근 실행이 ' + run.conclusion + ' 로 끝났습니다. gh run view --log-failed 로 까닭을 확인하세요';
+    return true;
+  };
+
+  Course.lesson({
+    id: 'l22', no: '22', part: 5, track: 'auto',
+    title: 'GitHub Pages 심화 — Actions 배포와 내 주소',
+    subtitle: '워크플로로 원하는 폴더를 검사한 뒤 배포하고, 사용자 사이트 · 내 도메인 · 팀 대시보드까지 Pages 로 공개합니다.',
+    time: '60분',
+    tags: ['actions/deploy-pages', 'upload-pages-artifact', 'gh run watch', 'CNAME', '{user}.github.io'],
+    repo: 'git-practice',
+    goals: [
+      '브랜치에서 내보내기와 GitHub Actions 로 내보내기의 차이를 설명하고 상황에 맞게 고를 수 있다',
+      'Pages 배포 워크플로의 권한 · 잡 · 아티팩트를 읽고 직접 올릴 수 있다',
+      '배포 전에 검사를 넣어 망가진 사이트가 배포되지 않게 할 수 있다',
+      '사용자 사이트와 내 도메인을 연결하는 순서를 설명할 수 있다',
+      'AIoT 팀 대시보드처럼 브라우저에서 도는 앱을 Pages 로 공개할 수 있다'
+    ],
+    start: {
+      title: '실습 준비',
+      desc: '실습 저장소를 준비하고 홈 폴더에 복제합니다. 복제한 폴더 안에서 시작합니다.',
+      steps: [
+        k => k.practice({ files: { 'README.md': README } })
+      ]
+    },
+    body: [
+      { h2: '두 가지 게시 방식' },
+      'L19 에서는 설정에서 브랜치와 폴더를 골라 Pages 를 켰습니다. 이 방식은 간단하지만 폴더를 <code>/ (root)</code> 와 <code>/docs</code> 중에서만 고를 수 있고, 올리기 전에 아무것도 검사하지 않습니다. GitHub 은 두 번째 방식으로 <b>GitHub Actions 로 내보내기</b>를 줍니다. 워크플로가 사이트를 만들고 검사한 뒤 배포합니다.',
+      { table: { head: ['', '브랜치에서 내보내기 (L19)', 'GitHub Actions 로 내보내기 (이 강의)'], rows: [
+        ['설정 (실제 GitHub)', 'Source: <b>Deploy from a branch</b>', 'Source: <b>GitHub Actions</b>'],
+        ['내보내는 폴더', '<code>/ (root)</code> 또는 <code>/docs</code>', '아무 폴더나 (<code>site</code>, <code>dist</code>, <code>public</code> …)'],
+        ['배포 전 검사', '없음', '워크플로에 검사 단계를 넣을 수 있음'],
+        ['빌드', '없음 (Jekyll 만 자동)', 'Vite · Hugo · 파이썬 스크립트 등 무엇이든 돌린 뒤 결과만 배포'],
+        ['배포 기록', '<code>pages build and deployment</code>', '내 워크플로 실행 기록 + <code>github-pages</code> 환경 기록'],
+        ['알맞은 경우', 'HTML 몇 장짜리 소개 사이트', '팀 프로젝트, 빌드가 필요한 앱, 검사가 필요한 사이트']
+      ] }, caption: '사이트 주소 규칙(https://{user}.github.io/{repo}/)과 상대 경로 규칙은 두 방식이 같습니다' },
+      { flow: {
+        nodes: [
+          { n: 1, t: 'push', s: 'main 에 올림' },
+          { n: 2, t: 'build 잡', s: '검사 → 묶기', hot: true },
+          { n: 3, t: 'deploy 잡', s: '배포', hot: true },
+          { n: 4, t: 'Pages 사이트', s: '주소로 공개' }
+        ],
+        arrows: [{ to: '워크플로 시작' }, { to: 'needs: build' }, { to: 'github-pages 환경' }]
+      }, caption: 'build 가 실패하면 deploy 는 건너뜁니다. 망가진 사이트는 나가지 않습니다' },
+
+      { h2: '배포 워크플로 읽기' },
+      '사이트 파일은 <code>site</code> 폴더에 두고, 아래 워크플로가 그 폴더만 배포하게 합니다. 파일 두 개와 워크플로를 <b>파일로 저장</b>합니다.',
+      { file: { path: '~/{repo}/site/index.html', content: SITE_INDEX } },
+      { file: { path: '~/{repo}/site/style.css', content: SITE_CSS } },
+      { file: { path: '~/{repo}/' + PATH, content: WF } },
+      { table: { head: ['부분', '뜻'], rows: [
+        ['<code>permissions: pages: write</code>', '이 워크플로가 Pages 에 배포해도 된다는 허락입니다. 없으면 배포 단계가 거절됩니다.'],
+        ['<code>permissions: id-token: write</code>', '배포할 때 "정말 이 저장소의 워크플로" 임을 증명하는 토큰을 받게 합니다. 이것도 꼭 필요합니다.'],
+        ['<code>concurrency: group: pages</code>', '배포가 겹치면 하나씩 차례로 합니다. 반쯤 배포된 사이트가 나가지 않게 합니다.'],
+        ['<code>run: test -f site/index.html</code>', '배포 전 검사. 첫 화면이 없으면 여기서 실패하고 배포를 멈춥니다.'],
+        ['<code>upload-pages-artifact</code> · <code>path: site</code>', '<code>site</code> 폴더를 묶어 "Pages 아티팩트" 로 올립니다. 이 폴더가 사이트의 맨 위가 됩니다.'],
+        ['<code>needs: build</code>', 'build 잡이 성공해야 deploy 잡이 시작합니다.'],
+        ['<code>environment: github-pages</code>', '배포 기록이 저장소의 Environments 에 남고, <code>url</code> 에 사이트 주소가 찍힙니다.'],
+        ['<code>actions/deploy-pages</code>', '올린 아티팩트를 실제 사이트로 내보냅니다.']
+      ] } },
+      { callout: 'info', title: 'site/index.html 이 사이트의 첫 화면입니다', body: '<code>path: site</code> 로 묶었기 때문에 주소에 <code>site</code> 가 붙지 않습니다. <code>site/index.html</code> 이 <code>https://{user}.github.io/{repo}/</code> 에서, <code>site/style.css</code> 가 <code>…/{repo}/style.css</code> 에서 열립니다.' },
+      { safety: true, callout: 'safety', title: '실제 GitHub 에 연결했다면 먼저 설정을 바꿉니다', body: 'github.com 의 저장소에서 <b>Settings → Pages → Build and deployment → Source</b> 를 <b>GitHub Actions</b> 로 바꾸어 두세요. 브랜치 방식으로 켜져 있으면 deploy 단계가 실패합니다. 이 사이트의 가상 GitHub 에서는 바꾸지 않아도 됩니다.' },
+      { code: 'git add site ' + PATH + '\ngit commit -m "L22: Actions 로 Pages 배포"\ngit push\ngh run watch', real: true },
+      { code: 'gh run list --limit 3' },
+      { callout: 'tip', title: '실행 기록에서 주소 찾기', body: '실제 GitHub 의 Actions 탭에서 실행을 열면 deploy 잡 상자 아래에 사이트 주소가 링크로 나옵니다. 저장소 첫 화면 오른쪽의 <b>Deployments → github-pages</b> 에서도 배포 기록과 주소를 봅니다.' },
+      { mission: 'm1' },
+
+      { h2: '배포 전에 검사하기' },
+      '브랜치 방식에서는 <code>index.html</code> 을 실수로 지우거나 이름을 바꾸어도 그대로 배포되어 404 가 납니다. Actions 방식에서는 build 잡의 검사가 실패하면 deploy 잡이 <b>건너뛰어지고</b>, 사이트는 마지막으로 성공한 상태 그대로 남습니다.',
+      { table: { head: ['넣을 만한 검사', '단계'], rows: [
+        ['첫 화면이 있다', '<code>run: test -f site/index.html</code>'],
+        ['꾸밈 파일이 있다', '<code>run: test -f site/style.css</code>'],
+        ['빌드가 성공한다 (Vite 사이트)', '<code>run: npm ci &amp;&amp; npm run build</code> 다음 <code>path: dist</code>']
+      ] }, caption: '검사는 build 잡 안, upload 단계보다 앞에 둡니다' },
+      { callout: 'info', title: 'L18 과 같은 원리입니다', body: '검사가 실패하면 실행이 빨간색이 되고 <code>gh run view --log-failed</code> 로 까닭을 봅니다. 브랜치 보호(L16)에 이 검사를 "필수 검사" 로 걸어 두면, 검사를 통과한 풀 리퀘스트만 main 에 들어가고 그것만 배포됩니다.' },
+      { mission: 'm2' },
+      { mission: 'm3' },
+
+      { h2: '사용자 사이트 — {user}.github.io' },
+      '저장소 이름을 <code>{user}.github.io</code> 로 만들면 주소에 저장소 이름이 붙지 않는 <b>사용자 사이트</b>가 됩니다. 계정마다 하나뿐이라 자기소개 · 포트폴리오 첫 화면에 알맞습니다. 이 강의실 사이트도 <code>bctcaiedu.github.io</code> 라는 사용자 사이트입니다.',
+      { steps: [
+        { t: '저장소 만들기', d: 'github.com 에서 New repository → 이름을 정확히 <code>{user}.github.io</code> 로(계정 이름과 같아야 합니다), Public.' },
+        { t: '첫 화면 올리기', d: '<code>index.html</code> 을 만들어 push 합니다. 브랜치 방식이면 main · / (root), Actions 방식이면 이 강의의 워크플로를 그대로 씁니다.' },
+        { t: '주소 확인', d: '<code>https://{user}.github.io/</code> 가 열립니다. 다른 저장소의 프로젝트 사이트는 <code>https://{user}.github.io/저장소/</code> 로 그 아래에 붙습니다.' }
+      ] },
+      { callout: 'tip', title: '포트폴리오는 이렇게 잇습니다', body: '사용자 사이트 첫 화면에 프로젝트 사이트로 가는 링크를 모아 두면, 주소 하나로 내가 만든 것을 모두 보여 줄 수 있습니다. 프로젝트 1(P1)의 포트폴리오를 사용자 사이트로 옮겨 보세요.' },
+
+      { h2: '내 도메인 연결하기' },
+      '<code>myteam.kr</code> 같은 도메인을 샀다면 Pages 사이트에 연결할 수 있습니다. 실제 GitHub 과 도메인 업체 화면에서 하는 일이라 이 사이트에서는 실습하지 않고 순서만 익힙니다.',
+      { table: { head: ['어디서', '무엇을'], rows: [
+        ['GitHub · 저장소 Settings → Pages', '<b>Custom domain</b> 에 <code>www.myteam.kr</code> 를 적고 Save'],
+        ['도메인 업체 DNS · www 주소', '<code>CNAME</code> 레코드: <code>www</code> → <code>{user}.github.io</code>'],
+        ['도메인 업체 DNS · 맨 앞 주소(myteam.kr)', '<code>A</code> 레코드 넷: <code>185.199.108.153</code> · <code>185.199.109.153</code> · <code>185.199.110.153</code> · <code>185.199.111.153</code>'],
+        ['GitHub · 저장소 Settings → Pages', 'DNS 확인이 끝나면 <b>Enforce HTTPS</b> 체크']
+      ] }, caption: 'DNS 가 퍼지는 데 몇 분에서 하루까지 걸립니다' },
+      { table: { head: ['게시 방식', '도메인 정보가 저장되는 곳'], rows: [
+        ['브랜치에서 내보내기', '저장소의 <code>CNAME</code> 파일 (Settings 에 적으면 GitHub 이 자동으로 커밋합니다)'],
+        ['GitHub Actions 로 내보내기', 'Settings 에만 저장됩니다. <code>CNAME</code> 파일은 쓰이지 않습니다']
+      ] } },
+      { callout: 'warn', title: '도메인을 가로채이지 않게', body: '도메인을 Pages 에 연결해 둔 채 저장소를 지우거나 Pages 를 끄면, 다른 사람이 그 도메인을 자기 Pages 에 연결할 수 있습니다. 계정 Settings → Pages 에서 <b>도메인 확인(Verify)</b>을 해 두면 내 계정만 쓸 수 있습니다.' },
+
+      { h2: '팀 대시보드를 Pages 로 공개하기' },
+      'Pages 는 서버 프로그램을 돌리지 못하지만, <b>브라우저에서 도는 앱</b>은 그대로 올릴 수 있습니다. AIoT 프로젝트의 웹 대시보드가 좋은 예입니다. 브라우저가 MQTT 브로커에 직접 접속하기 때문에 서버가 필요 없습니다.',
+      { steps: [
+        { t: '대시보드 파일을 site 폴더에', d: '<a href="../aiot/dashboard/" target="_blank" rel="noopener">AIoT 대시보드</a>의 <code>index.html</code> 을 받아 <code>site/index.html</code> 로 두거나, 팀이 AI 와 만든 대시보드 HTML 을 넣습니다.' },
+        { t: 'push 하면 배포', d: '이 강의의 워크플로가 그대로 배포합니다. 주소에 <code>?prefix=반코드&amp;id=s01</code> 을 붙여 팀원에게 나눠 줍니다.' },
+        { t: '브로커는 wss:// 로', d: 'Pages 는 <b>https</b> 사이트라 암호화된 <code>wss://</code> 브로커에만 접속할 수 있습니다. 공개 브로커 <code>wss://broker.hivemq.com:8884/mqtt</code> 는 됩니다. 강의실 PC 의 <code>ws://</code> 브로커에는 붙지 않습니다.' }
+      ] },
+      { callout: 'warn', title: '키는 Pages 에 올리지 않습니다', body: 'Pages 에 올린 파일은 누구나 내려받아 읽습니다. ThingSpeak 쓰기 키 · AI API 키를 HTML · JavaScript 에 적으면 그대로 공개됩니다(L21). 키가 필요한 기능은 서버(예: Docker 로 띄운 앱) 쪽에 둡니다.' },
+
+      { h2: 'Actions 방식에서 막힐 때' },
+      { table: { head: ['증상', '까닭과 해결'], rows: [
+        ['deploy 단계 실패: <code>Ensure GitHub Pages has been enabled</code>', 'Settings → Pages 의 Source 가 GitHub Actions 가 아닙니다. 바꾸고 다시 실행합니다.'],
+        ['deploy 단계 실패: 권한 · 토큰 오류', '<code>permissions</code> 에 <code>pages: write</code> 와 <code>id-token: write</code> 가 있는지 봅니다.'],
+        ['<code>Branch "…" is not allowed to deploy to github-pages</code>', 'github-pages 환경의 배포 규칙이 main 만 허락합니다. 다른 브랜치에서는 배포하지 않거나 Settings → Environments 에서 규칙을 바꿉니다.'],
+        ['배포는 성공했는데 404 · 빈 화면', '<code>path:</code> 가 가리키는 폴더에 <code>index.html</code> 이 있는지, 폴더 이름이 맞는지 봅니다.'],
+        ['deploy 잡이 skipped', 'build 잡이 실패했습니다. build 잡의 로그부터 봅니다.']
+      ] } }
+    ],
+    missions: [
+      {
+        id: 'm1', title: 'Actions 로 site 폴더 배포하기',
+        desc: '<p>작업 폴더에 <code>site/index.html</code>, <code>site/style.css</code> 와 배포 워크플로 <code>' + PATH + '</code> 가 만들어져 있습니다. 아직 커밋하지 않았습니다.</p><p>세 파일을 커밋해서 <code>main</code> 에 올리고, 워크플로가 <b>성공</b>으로 끝나게 하세요.</p><p class="muted">실제 GitHub 에 연결했다면 먼저 Settings → Pages 의 Source 를 GitHub Actions 로 바꾸세요.</p>',
+        remote: true,
+        setup: [
+          k => k.practice({ files: { 'README.md': README } }),
+          k => {
+            k.write(k.repoName() + '/site/index.html', SITE_INDEX);
+            k.write(k.repoName() + '/site/style.css', SITE_CSS);
+            k.write(k.repoName() + '/' + PATH, WF);
+          }
+        ],
+        hints: [
+          '<code>git status</code> 로 새 파일을 확인하세요. 폴더 두 개(site, .github)가 보입니다',
+          '<code>git add site .github</code> → <code>git commit -m "..."</code> → <code>git push</code>',
+          '<code>gh run watch</code> 로 끝날 때까지 기다린 다음 채점하세요'
+        ],
+        answer: ['git add site .github', 'git commit -m "L22: Actions 로 Pages 배포"', 'git push', 'gh run watch'],
+        check: async k => {
+          const g = k.gh();
+          if ((await g.file(PATH)) == null) return 'GitHub 의 main 에 ' + PATH + ' 이 없습니다';
+          if ((await g.file('site/index.html')) == null) return 'GitHub 의 main 에 site/index.html 이 없습니다';
+          if ((await g.file('site/style.css')) == null) return 'site/style.css 가 올라가지 않았습니다';
+          return runOk(g);
+        }
+      },
+      {
+        id: 'm2', title: '빠진 권한 채우기',
+        desc: '<p>팀원이 올린 배포 워크플로 <code>' + PATH + '</code> 의 <code>permissions</code> 에 <code>contents: read</code> 만 있습니다. 실제 GitHub 에서는 deploy 단계가 권한 오류로 실패합니다.</p><p>배포에 꼭 필요한 권한 두 가지를 넣어 <code>main</code> 에 올리고, 워크플로가 성공으로 끝나게 하세요.</p>',
+        remote: true, touchesRemote: true,
+        setup: [
+          k => k.practice({ files: { 'README.md': README } }),
+          k => {
+            k.write(k.repoName() + '/site/index.html', SITE_INDEX);
+            k.write(k.repoName() + '/site/style.css', SITE_CSS);
+            k.write(k.repoName() + '/' + PATH, WF_NOPERM);
+          },
+          'git add site .github',
+          'git commit -m "L22: 배포 워크플로 (권한 빠짐)"',
+          'git push'
+        ],
+        hints: [
+          '<code>cat ' + PATH + '</code> 로 <code>permissions:</code> 아래를 보세요',
+          '배포에는 Pages 에 쓸 권한과, 신분을 증명하는 토큰 권한이 필요합니다',
+          '편집기에서 <code>contents: read</code> 아래에 <code>pages: write</code> 와 <code>id-token: write</code> 를 같은 들여쓰기로 넣고 커밋 · push 하세요'
+        ],
+        answer: [
+          "printf '" + WF.replace(/\\/g, '\\\\').replace(/'/g, "'\\''").replace(/\n/g, '\\n').replace(/%/g, '%%') + "' > " + PATH,
+          'git add ' + PATH,
+          'git commit -m "L22: Pages 배포 권한 추가"',
+          'git push',
+          'gh run watch'
+        ],
+        check: async k => {
+          const g = k.gh();
+          const wf = await g.file(PATH);
+          if (wf == null) return 'GitHub 의 main 에 ' + PATH + ' 이 없습니다. 미션을 다시 시작하세요';
+          if (!/^\s+pages:\s*write\s*$/m.test(wf)) return 'permissions 에 pages: write 가 없습니다';
+          if (!/^\s+id-token:\s*write\s*$/m.test(wf)) return 'permissions 에 id-token: write 가 없습니다';
+          if (!/actions\/deploy-pages/.test(wf)) return '배포 단계(actions/deploy-pages)가 사라졌습니다. 권한만 더하세요';
+          return runOk(g);
+        }
+      },
+      {
+        id: 'm3', title: '검사에 걸린 배포 살리기',
+        desc: '<p>사이트 첫 화면의 이름이 <code>site/home.html</code> 로 잘못 바뀐 채 올라갔습니다. 배포 워크플로의 검사(<code>test -f site/index.html</code>)가 실패해서 deploy 잡이 건너뛰어졌습니다.</p><p>실행 기록으로 까닭을 확인하고, 첫 화면 이름을 바로잡아 <code>main</code> 에 올린 뒤 워크플로가 성공으로 끝나게 하세요.</p>',
+        remote: true, touchesRemote: true,
+        setup: [
+          k => k.practice({ files: { 'README.md': README } }),
+          k => {
+            k.write(k.repoName() + '/site/home.html', SITE_INDEX);
+            k.write(k.repoName() + '/site/style.css', SITE_CSS);
+            k.write(k.repoName() + '/' + PATH, WF);
+          },
+          'git add site .github',
+          'git commit -m "L22: 사이트 (첫 화면 이름 잘못됨)"',
+          'git push'
+        ],
+        hints: [
+          '<code>gh run list</code> 다음 <code>gh run view --log-failed</code> 로 어느 단계가 실패했는지 보세요',
+          '첫 화면은 이름이 <code>index.html</code> 이어야 합니다. <code>git mv site/home.html site/index.html</code> 로 바꾸면 이력이 이어집니다',
+          '커밋하고 push 한 다음 <code>gh run watch</code>'
+        ],
+        answer: ['gh run list --limit 2', 'git mv site/home.html site/index.html', 'git commit -m "L22: 첫 화면 이름을 index.html 로"', 'git push', 'gh run watch'],
+        check: async k => {
+          const g = k.gh();
+          if ((await g.file('site/index.html')) == null) return 'GitHub 의 main 에 site/index.html 이 없습니다. 이름을 바꾼 뒤 push 했는지 확인하세요';
+          if ((await g.file('site/home.html')) != null) return 'site/home.html 이 아직 남아 있습니다. 복사가 아니라 이름을 바꾸세요';
+          const wf = await g.file(PATH);
+          if (wf == null || !/test -f site\/index\.html/.test(wf)) return '워크플로의 검사 단계를 지우면 안 됩니다. 파일 이름을 바로잡으세요';
+          return runOk(g);
+        }
+      }
+    ],
+    summary: [
+      'Pages 는 "브랜치에서 내보내기" 와 "GitHub Actions 로 내보내기" 두 방식이 있습니다. Actions 방식은 아무 폴더나, 검사와 빌드를 거쳐 배포합니다',
+      '배포 워크플로에는 <code>pages: write</code> 와 <code>id-token: write</code> 권한, <code>upload-pages-artifact</code>(path) 와 <code>deploy-pages</code> 가 필요합니다',
+      'build 잡에 검사를 넣으면 실패할 때 deploy 잡이 건너뛰어져, 망가진 사이트가 나가지 않습니다',
+      '실제 GitHub 에서는 Settings → Pages 의 Source 를 GitHub Actions 로 바꿔야 합니다',
+      '<code>{user}.github.io</code> 저장소는 사용자 사이트가 되고, 내 도메인은 Settings 의 Custom domain 과 DNS(CNAME · A 레코드)로 연결합니다',
+      'Pages 는 https 정적 사이트라 브라우저 앱(대시보드)은 올릴 수 있지만, 키는 올리지 않고 브로커는 wss:// 를 씁니다'
+    ],
+    terms: [
+      ['GitHub Actions 로 내보내기', 'Pages 의 게시 방식 하나. 워크플로가 만든 아티팩트를 배포합니다. Settings → Pages → Source 에서 고릅니다'],
+      ['Pages 아티팩트', 'upload-pages-artifact 가 폴더를 묶어 올린 배포용 꾸러미. deploy-pages 가 이것을 사이트로 내보냅니다'],
+      ['github-pages 환경', 'Pages 배포가 기록되는 Environment. 어느 브랜치가 배포할 수 있는지 규칙을 둘 수 있습니다'],
+      ['id-token: write', '워크플로가 자기 신분을 증명하는 토큰(OIDC)을 받을 수 있게 하는 권한. Pages 배포에 필요합니다'],
+      ['사용자 사이트', '<code>{user}.github.io</code> 저장소로 만드는, 계정에 하나뿐인 사이트'],
+      ['사용자 지정 도메인', 'Pages 사이트에 연결한 내 도메인. DNS 의 CNAME · A 레코드와 Settings 의 Custom domain 으로 연결합니다'],
+      ['CNAME 레코드', '"이 이름은 저 이름과 같다" 는 DNS 설정. www.myteam.kr → {user}.github.io']
+    ],
+    quiz: [
+      { q: '사이트 파일이 <code>dist</code> 폴더에 만들어지는 프로젝트를 Pages 로 배포하려 합니다. 알맞은 방식은?', options: ['브랜치에서 내보내기 · /dist 폴더', 'GitHub Actions 로 내보내기 · upload-pages-artifact 의 path 를 dist 로', 'dist 폴더를 지우고 README 만 둔다'], answer: 1, why: '브랜치 방식은 / (root) 와 /docs 만 고를 수 있습니다. Actions 방식은 path 로 아무 폴더나 배포합니다.' },
+      { q: 'Pages 배포 워크플로의 permissions 에 꼭 있어야 하는 두 가지는?', options: ['contents: write 와 issues: write', 'pages: write 와 id-token: write', 'actions: write 와 packages: write'], answer: 1, why: 'Pages 에 쓸 권한과, 배포할 때 신분을 증명하는 토큰 권한이 필요합니다.' },
+      { q: 'build 잡의 <code>test -f site/index.html</code> 이 실패했습니다. 사이트는 어떻게 될까요?', options: ['빈 사이트로 배포된다', 'deploy 잡이 건너뛰어져 마지막으로 성공한 사이트가 그대로 남는다', 'Pages 가 꺼진다'], answer: 1, why: 'deploy 잡은 needs: build 라서 build 가 실패하면 실행되지 않습니다.' },
+      { q: '<code>hong</code> 계정이 <code>hong.github.io</code> 저장소를 만들어 Pages 를 켰습니다. 주소는?', options: ['https://hong.github.io/hong.github.io/', 'https://hong.github.io/', 'https://github.com/hong/pages'], answer: 1, why: '사용자 사이트는 주소에 저장소 이름이 붙지 않습니다.' },
+      { q: 'Pages 에 올린 AIoT 대시보드가 강의실 PC 의 <code>ws://192.168.0.10:9001</code> 브로커에 접속하지 못합니다. 까닭은?', options: ['Pages 는 JavaScript 를 막아서', 'https 페이지는 암호화되지 않은 ws:// 에 접속할 수 없어서', '9001 포트는 GitHub 이 막아서'], answer: 1, why: 'https 사이트에서는 브라우저가 암호화되지 않은 연결(ws://)을 막습니다. wss:// 브로커를 씁니다.' }
+    ],
+    links: [
+      ['사용자 지정 GitHub Actions 워크플로로 게시', 'https://docs.github.com/ko/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages'],
+      ['GitHub Pages 사용자 지정 도메인 관리', 'https://docs.github.com/ko/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site'],
+      ['사용자 지정 도메인 확인', 'https://docs.github.com/ko/pages/configuring-a-custom-domain-for-your-github-pages-site/verifying-your-custom-domain-for-github-pages']
     ]
   });
 })();

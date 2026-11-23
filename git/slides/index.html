@@ -1,0 +1,929 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Git · GitHub 실습 · 교수용 슬라이드</title>
+<meta name="description" content="Git · GitHub 실습 강좌 22강과 응용 프로젝트 5개(Git 기초 · 브랜치 · 원격 · 협업 · Actions · Pages · 릴리스)의 교수용 발표 슬라이드">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
+<style>
+  :root{
+    --bg:#1b2230;--card:#fff;--card2:#f5f8fb;--line:#dde3ec;--line2:#aab5c5;--fg:#1d2433;--muted:#5f6b7e;
+    --accent:#d9480f;--accent-soft:#fff0e6;--accent2:#6d28d9;--accent2-soft:#efe9fd;
+    --ok:#1f9d55;--ok-soft:#e3f6ec;--danger:#d64541;--danger-soft:#fdeaea;--more:#7b4fd1;--more-soft:#f1ebfd;
+    --mono:'JetBrains Mono','D2Coding',Consolas,monospace;
+    --sans:'Pretendard Variable',Pretendard,-apple-system,'Segoe UI','Malgun Gothic',sans-serif;
+    --notes-h:0px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);font-family:var(--sans);color:var(--fg);overflow:hidden}
+  html,code,pre{font-variant-ligatures:none}
+
+  /* ── 상단 메뉴 ── */
+  .bar{position:fixed;top:0;left:0;right:0;height:46px;display:flex;align-items:center;gap:6px;padding:0 12px;background:#121823;color:#dfe6f0;z-index:20;font-size:13.5px;transition:transform .2s}
+  .bar b{font-size:14px;margin-right:6px;white-space:nowrap}
+  .bar .sp{flex:1}
+  .bar button,.bar a,.bar select{font:inherit;color:#dfe6f0;background:#212b3a;border:1px solid #334155;border-radius:7px;padding:5px 10px;cursor:pointer;text-decoration:none;white-space:nowrap}
+  .bar button:hover,.bar a:hover{border-color:#4fd1e8}
+  .bar button.on{background:#d9480f;border-color:#d9480f}
+  .bar .cnt{font:600 13px var(--mono);min-width:72px;text-align:center}
+  .bar .timer{font:600 13px var(--mono);min-width:58px;text-align:center}
+  @media (max-width:1180px){.bar b,.bar .timer,#bTimer{display:none} .bar{gap:4px} .bar button,.bar a,.bar select{padding:5px 7px}}
+  body.present .bar{transform:translateY(-100%)}
+  body.present .bar:hover,body.present .bar.peek{transform:none}
+  .prog{position:fixed;left:0;top:46px;height:3px;background:linear-gradient(90deg,#f05133,#24292f);z-index:21;transition:width .2s}
+  body.present .prog{top:0}
+
+  /* ── 무대 ── */
+  #view{position:fixed;left:0;right:0;top:49px;bottom:var(--notes-h)}
+  body.present #view{top:0}
+  .slide{position:absolute;left:0;top:0;width:1280px;height:720px;background:var(--card);color:var(--fg);transform-origin:0 0;overflow:hidden;
+    display:none;flex-direction:column;padding:46px 64px 40px;box-shadow:0 10px 40px rgba(0,0,0,.35)}
+  .slide.cur{display:flex}
+  .slide .sec{font:700 15px var(--mono);color:var(--accent);letter-spacing:.06em;margin-bottom:4px}
+  .slide h2{font-size:40px;line-height:1.25;margin:0 0 18px;letter-spacing:-.02em;padding-bottom:12px;border-bottom:3px solid var(--line)}
+  .slide .body{flex:1;min-height:0;font-size:24px;line-height:1.55}
+  .slide .foot{position:absolute;left:64px;right:64px;bottom:14px;display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+  .slide p{margin:8px 0}
+  .slide ul,.slide ol{margin:6px 0;padding-left:34px}
+  .slide li{margin:7px 0}
+  .slide li::marker{color:var(--accent);font-weight:700}
+  .slide b{color:inherit}
+  .hl{color:var(--accent);font-weight:800}
+  .hl2{color:var(--accent2);font-weight:800}
+  .small{font-size:19px}
+  .muted{color:var(--muted)}
+  :not(pre)>code{font-family:var(--mono);background:var(--card2);border:1px solid var(--line);border-radius:6px;padding:0 6px;font-size:.84em;color:#953800}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+  .cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .card{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:16px 20px}
+  .card .dn{font:700 14px var(--mono);color:var(--accent)}
+  .card b{display:block;font-size:24px;margin:4px 0}
+  .card span{display:block;font-size:19px;color:var(--muted);line-height:1.45}
+  table{border-collapse:collapse;width:100%;font-size:19px;line-height:1.4}
+  th,td{border:1px solid var(--line);padding:8px 12px;text-align:left;vertical-align:top}
+  th{background:var(--card2);font-weight:700}
+  table.tight{font-size:17px} table.tight th,table.tight td{padding:6px 10px}
+  pre{margin:0;background:#0f1419;color:#d7dde8;border-radius:12px;padding:14px 18px;font:500 16px/1.5 var(--mono);white-space:pre;overflow:hidden}
+  pre .c{color:#7f8ea3} pre .k{color:#ff9e64} pre .s{color:#9ece6a}
+  .box{border-radius:12px;padding:12px 18px;border-left:6px solid;font-size:20px;margin:12px 0}
+  .box.tip{border-color:var(--accent);background:var(--accent-soft)}
+  .box.warn{border-color:var(--danger);background:var(--danger-soft)}
+  .box.ask{border-color:var(--more);background:var(--more-soft)}
+  .box.ok{border-color:var(--ok);background:var(--ok-soft)}
+  .box>b:first-child{display:block;margin-bottom:2px}
+  .prompt{border:2px dashed var(--more);border-radius:12px;padding:12px 18px;font-size:19px;background:#fbf9ff}
+  .prompt::before{content:'AI에게 물어보기';display:block;font:700 13px var(--mono);color:var(--more);margin-bottom:4px}
+  .diagram{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:10px}
+  .diagram svg{display:block;width:100%;height:auto}
+  svg .bx{fill:#fff;stroke:var(--line2);stroke-width:1.4}
+  svg .bx.main{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2.2}
+  svg .ln{fill:none;stroke:#8592a6;stroke-width:1.8}
+  svg .ln.a{stroke:var(--accent)} svg .ln.p{stroke:var(--accent2)}
+  svg .t{fill:var(--fg);font-weight:700;font-size:15px;text-anchor:middle;font-family:var(--sans)}
+  svg .s{fill:var(--muted);font-size:12.5px;text-anchor:middle;font-family:var(--sans)}
+  svg .e{fill:var(--muted);font-size:13px;font-family:var(--sans)}
+  svg .m{font-family:var(--mono);font-size:12px;fill:var(--fg)}
+  svg .ah{fill:#8592a6}
+  .steps{counter-reset:s;list-style:none;padding:0}
+  .steps li{counter-increment:s;position:relative;padding-left:52px;margin:12px 0}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:0;width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;display:grid;place-items:center;font-size:19px}
+  .quiz .ans{visibility:hidden;color:var(--ok);font-weight:700}
+  .quiz.show .ans{visibility:visible}
+  .quiz li{cursor:pointer}
+  .tag{display:inline-block;font:700 14px var(--mono);border-radius:6px;padding:1px 8px;background:var(--accent2-soft);color:var(--accent2);vertical-align:middle}
+
+  /* 제목 · 구분 슬라이드 */
+  .slide.title,.slide.part{color:#fff;background:radial-gradient(circle at 85% 20%,rgba(255,255,255,.18),transparent 40%),linear-gradient(135deg,#24292f 0%,#9c2f14 50%,#f05133 100%);justify-content:center}
+  .slide.title h1{font-size:62px;line-height:1.2;margin:14px 0 18px;letter-spacing:-.03em}
+  .slide.title .eyebrow,.slide.part .eyebrow{font:600 17px var(--mono);letter-spacing:.08em;opacity:.9}
+  .slide.title p{font-size:24px;opacity:.95;max-width:880px;margin:6px 0}
+  .slide.title .meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+  .slide.title .meta span{background:rgba(255,255,255,.95);color:#1d2433;border-radius:9px;padding:6px 14px;font-size:18px;font-weight:700}
+  .slide.part h1{font-size:58px;margin:10px 0 14px;letter-spacing:-.02em}
+  .slide.part p{font-size:25px;opacity:.95;max-width:900px}
+  .slide.part .big{position:absolute;right:60px;bottom:-30px;font-size:260px;opacity:.16}
+  .slide.title .foot,.slide.part .foot{color:rgba(255,255,255,.75)}
+  .slide aside.notes{display:none}
+
+  /* ── 교수 노트 ── */
+  #notes{position:fixed;left:0;right:0;bottom:0;height:var(--notes-h);background:#fffdf4;border-top:3px solid #c98a00;overflow:auto;padding:12px 22px;font-size:16px;line-height:1.6;display:none;z-index:15}
+  body.notes #notes{display:block}
+  #notes h4{margin:0 0 4px;font-size:14px;color:#9a6a00;font-family:var(--mono)}
+  #notes ul{margin:4px 0;padding-left:22px}
+
+  /* ── 전체 보기 ── */
+  #grid{position:fixed;inset:46px 0 0 0;background:var(--bg);overflow:auto;display:none;z-index:18;padding:20px;grid-template-columns:repeat(auto-fill,minmax(256px,1fr));gap:16px}
+  body.grid #grid{display:grid}
+  #grid .th{cursor:pointer;color:#dfe6f0;font-size:13px}
+  #grid .th .mini{width:100%;aspect-ratio:16/9;position:relative;overflow:hidden;border-radius:6px;border:2px solid transparent;background:#fff}
+  #grid .th.cur .mini{border-color:#4fd1e8}
+  #grid .th .mini .slide{display:flex;box-shadow:none;pointer-events:none}
+
+  /* ── 발표자 창 ── */
+  body.presenter .bar,body.presenter .prog,body.presenter #view{display:none}
+  #pv{display:none}
+  body.presenter #pv{display:grid;position:fixed;inset:0;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:14px;padding:14px;color:#dfe6f0}
+  #pv .top{grid-column:1/3;display:flex;gap:20px;align-items:center;font:600 18px var(--mono)}
+  #pv .top .clock{font-size:30px;color:#4fd1e8}
+  #pv .pcur,#pv .pnxt{position:relative;overflow:hidden;background:#fff;border-radius:8px}
+  #pv .left{display:flex;flex-direction:column;gap:10px;min-height:0;min-width:0}
+  #pv .pnxt{width:60%;opacity:.85}
+  #pv .lbl{font-size:13px;color:#93a1b5}
+  #pv .pnotes{background:#fffdf4;color:#1d2433;border-radius:8px;padding:14px 20px;overflow:auto;font-size:19px;line-height:1.6}
+  #pv .pnotes ul{padding-left:22px}
+
+  @media print{
+    @page{size:13.333in 7.5in;margin:0}
+    html,body{overflow:visible;height:auto;background:#fff}
+    .bar,.prog,#notes,#grid,#pv{display:none!important}
+    #view{position:static}
+    .slide{display:flex!important;position:relative;transform:none!important;box-shadow:none;break-after:page;page-break-after:always}
+    .quiz .ans{visibility:visible}
+    body.print-notes .slide aside.notes{display:block;position:absolute;left:0;right:0;bottom:0;max-height:200px;background:#fffdf4;border-top:2px solid #c98a00;font-size:13px;padding:6px 20px;overflow:hidden}
+  }
+</style>
+
+<div class="bar" id="bar">
+  <b>🌱 Git · 교수용 슬라이드</b>
+  <button id="bPrev" title="이전 (←)">◀</button>
+  <span class="cnt" id="cnt">1 / 1</span>
+  <button id="bNext" title="다음 (→, Space)">▶</button>
+  <select id="jump" title="단원으로 이동"></select>
+  <span class="sp"></span>
+  <button id="bNotes" title="교수 노트 (N)">📝 노트</button>
+  <button id="bGrid" title="전체 보기 (G)">🔲 전체</button>
+  <button id="bPresenter" title="발표자 창 (P)">🧑‍🏫 발표자 창</button>
+  <button id="bTimer" title="수업 타이머 시작 · 멈춤 (T)">⏱</button><span class="timer" id="timer">00:00</span>
+  <button id="bFull" title="전체 화면 발표 (F)">⛶ 발표</button>
+  <button id="bPrint" title="PDF로 저장 · 인쇄">🖨 PDF</button>
+  <a href="../" title="강좌로 돌아가기">📖 강좌</a>
+</div>
+<div class="prog" id="prog"></div>
+<div id="view">
+
+<!-- ════════════════════ 시작 ════════════════════ -->
+<section class="slide title" data-part="시작">
+  <div class="eyebrow">AI응용소프트웨어과 · Git · GitHub 실습 · 교수용</div>
+  <h1>Git · GitHub 실습<br>커밋 하나부터 Pages 배포까지</h1>
+  <p>Git 기초 → 브랜치 → GitHub 와 원격 저장소 → 협업 → Actions · Pages · 릴리스 → 응용 프로젝트 5</p>
+  <div class="meta"><span>22강 + 프로젝트 5 · 약 26시간</span><span>브라우저 가상 터미널</span><span>미션 121개</span><span>실제 GitHub 연결</span></div>
+  <aside class="notes">
+    <h4>교수 노트</h4>
+    <ul>
+      <li>이 슬라이드는 강좌 <code>git/</code>의 강의별 핵심을 수업용으로 줄인 것입니다. 명령 실습은 강좌 오른쪽의 가상 터미널과 미션 탭에서 합니다.</li>
+      <li>강좌는 가상 GitHub 으로 시작하고, 학생이 원하면 자기 GitHub 계정을 연결해 실습 저장소(<code>git-practice</code>)에 실제로 반영합니다. 연결 전에는 토큰을 화면 공유하지 않도록 먼저 안내하세요.</li>
+      <li>단축키: ← → 이동, N 노트, G 전체 보기, P 발표자 창, F 전체 화면, T 타이머.</li>
+    </ul>
+  </aside>
+</section>
+
+<section class="slide" data-part="시작">
+  <div class="sec">ROADMAP</div>
+  <h2>수업 흐름</h2>
+  <div class="body">
+    <table class="tight">
+      <thead><tr><th style="width:26%">부</th><th>강의</th><th style="width:12%">시간</th><th style="width:30%">끝나면 할 수 있는 것</th></tr></thead>
+      <tbody>
+        <tr><td><b>1부</b> Git 기초</td><td>L01~L05 버전 관리 · 첫 커밋 · diff · 되돌리기 · .gitignore</td><td>약 3.7시간</td><td>내 컴퓨터에서 이력을 남기고 되돌린다</td></tr>
+        <tr><td><b>2부</b> 브랜치</td><td>L06~L10 브랜치 · 병합 · 충돌 · rebase · stash · tag</td><td>약 4.3시간</td><td>갈라졌다 합치고 충돌을 푼다</td></tr>
+        <tr><td><b>3부</b> GitHub 와 원격</td><td>L11~L13 push · clone · fetch · pull · 거절 해결</td><td>약 2.7시간</td><td>GitHub 과 주고받는다</td></tr>
+        <tr><td><b>4부</b> 협업</td><td>L14~L17 이슈 · 풀 리퀘스트 · 리뷰 · 포크</td><td>약 3.8시간</td><td>팀으로 일한다</td></tr>
+        <tr style="background:var(--accent-soft)"><td><b>5부</b> 자동화와 배포</td><td>L18~L22 Actions · <b>Pages · Pages 심화</b> · 릴리스 · 보안</td><td>약 4.7시간</td><td>검사하고 사이트로 공개한다</td></tr>
+        <tr><td><b>6부</b> 응용 프로젝트</td><td>P1~P5 포트폴리오 · 팀 · 오픈소스 · 검사 · 사고 복구</td><td>약 6.7시간</td><td>처음부터 끝까지 혼자 해 본다</td></tr>
+      </tbody>
+    </table>
+    <div class="box tip"><b>부록</b>A 명령어 모음 · B 용어 사전 · C TortoiseGit · D VS Code — 명령과 GUI 메뉴를 짝지어 봅니다.</div>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트</h4>
+    <ul>
+      <li>시간은 강좌 각 강의에 적힌 시간을 더한 값입니다(합계 약 26시간).</li>
+      <li>AIoT · Docker 과정과 함께 운영한다면 1~4부 → L18 · L19 · L21 · L22 → P2 순서를 추천합니다. 팀 저장소 · Actions · Pages 가 그 과정들의 바탕이 됩니다.</li>
+    </ul>
+  </aside>
+</section>
+
+<!-- ════════════════════ 1부 ════════════════════ -->
+<section class="slide part" data-part="1부 · Git 기초">
+  <div class="eyebrow">1부 · L01~L05</div>
+  <h1>Git 기초</h1>
+  <p>버전 관리가 무엇인지, 커밋 하나가 만들어지기까지. 그리고 실수했을 때 되돌리는 법.</p>
+  <div class="big">🌱</div>
+  <aside class="notes"><h4>교수 노트</h4><ul><li>1부의 목표는 "막히면 <code>git status</code> 부터" 라는 습관입니다. 출력의 괄호 안 안내를 소리 내어 읽게 하세요.</li></ul></aside>
+</section>
+
+<section class="slide" data-part="1부 · Git 기초">
+  <div class="sec">L01 · L02 · 버전 관리와 첫 커밋</div>
+  <h2>작업 폴더 → 스테이징 → 저장소</h2>
+  <div class="body cols">
+    <div>
+      <ul class="small" style="margin-top:0">
+        <li><b>Git</b> 은 내 컴퓨터의 프로그램, <b>GitHub</b> 은 저장소를 올려 두는 웹 서비스</li>
+        <li>분산 방식 — 모든 이력이 내 컴퓨터에, 인터넷 없이도 커밋</li>
+        <li>커밋 = 그 순간의 <span class="hl">스냅숏</span>, 커밋 ID = 내용으로 계산한 해시</li>
+        <li>처음 한 번: <code>git config --global user.name</code> · <code>user.email</code></li>
+      </ul>
+    </div>
+    <div>
+      <pre>git init
+git status
+git add index.html        <span class="c"># 담기 (스테이징)</span>
+git commit -m "첫 커밋"    <span class="c"># 남기기</span>
+git log --oneline</pre>
+      <div class="box tip" style="font-size:17px"><b>스테이징은 장바구니</b>고친 것 중 이번 커밋에 넣을 것만 골라 담습니다.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트 · 80분</h4>
+    <ul>
+      <li>미션 "커밋이 거절된 까닭 찾기"는 이름 · 메일 설정을 안 했을 때의 오류입니다. 실제 PC 에서도 가장 먼저 만나는 오류입니다.</li>
+      <li>"두 파일 가운데 하나만 커밋하기"로 스테이징이 왜 있는지 직접 느끼게 합니다.</li>
+    </ul>
+  </aside>
+</section>
+
+<section class="slide" data-part="1부 · Git 기초">
+  <div class="sec">L03 · 변경 살펴보기</div>
+  <h2>diff · log · show · blame</h2>
+  <div class="body cols">
+    <table class="tight">
+      <tbody>
+        <tr><td><code>git diff</code></td><td>add 하지 않은 변경</td></tr>
+        <tr><td><code>git diff --staged</code></td><td>커밋에 들어갈 변경</td></tr>
+        <tr><td><code>git diff HEAD</code></td><td>마지막 커밋 뒤 모든 변경</td></tr>
+        <tr><td><code>git log --oneline -n 5 --stat</code></td><td>이력 찾기 (<code>--author</code> · <code>--grep</code> · 경로)</td></tr>
+        <tr><td><code>git show</code> · <code>git blame</code></td><td>커밋 하나 · 줄마다의 내력</td></tr>
+      </tbody>
+    </table>
+    <div>
+      <div class="card" style="margin-bottom:12px"><div class="dn">좋은 커밋 메시지</div><b>제목 = 무엇을, 본문 = 왜</b><span>제목은 50자 안쪽. "수정" 대신 "영업 시간을 9시로 바꿈"</span></div>
+      <div class="card"><div class="dn">작은 커밋</div><b>일 하나에 커밋 하나</b><span>섞인 변경은 <code>git add -p</code> 나 파일별 add 로 둘로 나눕니다</span></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트 · 45분</h4>
+    <ul><li>diff 의 <code>-</code> · <code>+</code> · <code>@@</code> 를 화면에서 손가락으로 짚어 가며 읽어 줍니다. 미션 "잘못된 영업 시간이 들어온 커밋 찾기"는 log -p · blame 연습입니다.</li></ul>
+  </aside>
+</section>
+
+<section class="slide" data-part="1부 · Git 기초">
+  <div class="sec">L04 · 되돌리기</div>
+  <h2>실수가 어디까지 갔나로 고른다</h2>
+  <div class="body">
+    <table class="tight">
+      <thead><tr><th style="width:26%">실수가 있는 곳</th><th style="width:36%">명령</th><th>결과</th></tr></thead>
+      <tbody>
+        <tr><td>작업 폴더</td><td><code>git restore 파일</code></td><td>고친 것을 버림 (되찾을 수 없음)</td></tr>
+        <tr><td>스테이징</td><td><code>git restore --staged 파일</code></td><td>담은 것만 취소</td></tr>
+        <tr><td>방금 커밋 (push 전)</td><td><code>git commit --amend</code></td><td>마지막 커밋을 새 커밋으로 (ID 바뀜)</td></tr>
+        <tr><td>여러 커밋 (push 전)</td><td><code>git reset --soft / --mixed / --hard</code></td><td>커밋만 / 스테이징까지 / 작업 폴더까지</td></tr>
+        <tr style="background:var(--accent-soft)"><td><b>이미 push 함</b></td><td><code>git revert 커밋</code></td><td>취소하는 커밋을 새로 만듦</td></tr>
+      </tbody>
+    </table>
+    <div class="box ok"><b>구명조끼 — git reflog</b>커밋한 적이 있는 것은 reset --hard 로 날려도 reflog 에서 되찾습니다. 커밋하지 않고 버린 것은 못 찾습니다.</div>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트 · 50분</h4>
+    <ul><li>가장 중요한 원칙: <b>공유한 커밋은 revert, 공유하지 않은 커밋은 reset/amend</b>. P5 사고 복구 훈련에서 다시 나옵니다.</li></ul>
+  </aside>
+</section>
+
+<section class="slide" data-part="1부 · Git 기초">
+  <div class="sec">L05 · 파일 관리와 .gitignore</div>
+  <h2>올리지 않을 파일 정하기</h2>
+  <div class="body cols">
+    <pre><span class="c"># .gitignore</span>
+.env              <span class="c"># 비밀 값</span>
+*.log             <span class="c"># 확장자</span>
+build/            <span class="c"># 폴더</span>
+node_modules/
+!keep.log         <span class="c"># 예외</span>
+/temp.txt         <span class="c"># 맨 위 폴더만</span>
+**/cache/         <span class="c"># 모든 깊이</span></pre>
+    <div>
+      <ul class="small" style="margin-top:0">
+        <li><code>git rm</code> · <code>git mv</code> — 지우고 옮기면서 스테이징까지</li>
+        <li>이미 추적 중인 파일은 <code>git rm --cached</code> 로 먼저 빼야 무시됨</li>
+        <li><code>git clean -n</code> 으로 확인 → <code>-f</code> 로 지움 (되찾을 수 없음)</li>
+      </ul>
+      <div class="box warn" style="font-size:17px"><b>비밀 값을 올렸다면</b>파일을 지워도 이력에 남습니다. <b>키부터 바꿉니다</b> (L21).</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트 · 45분</h4>
+    <ul><li>미션 "실수로 커밋한 .env 를 추적에서 빼고 무시하기"는 AIoT · Docker 과정의 .env 관리와 똑같습니다.</li></ul>
+  </aside>
+</section>
+
+<!-- ════════════════════ 2부 ════════════════════ -->
+<section class="slide part" data-part="2부 · 브랜치">
+  <div class="eyebrow">2부 · L06~L10</div>
+  <h1>브랜치</h1>
+  <p>갈라졌다 합치기, 충돌 풀기, 이력 다듬기, 하던 일 치워 두기와 버전 이름표.</p>
+  <div class="big">🌿</div>
+  <aside class="notes"><h4>교수 노트</h4><ul><li>강좌의 커밋 그래프 그림을 계속 띄워 두고 "이름표가 어디로 움직였나"만 묻습니다. 브랜치 = 이름표라는 그림이 잡히면 2부가 쉬워집니다.</li></ul></aside>
+</section>
+
+<section class="slide" data-part="2부 · 브랜치">
+  <div class="sec">L06 · L07 · 브랜치와 병합</div>
+  <h2>브랜치는 이름표, 병합은 줄기 합치기</h2>
+  <div class="body cols">
+    <div>
+      <ul class="small" style="margin-top:0">
+        <li>브랜치 = 커밋 하나를 가리키는 <span class="hl">이름표</span>. 만들어도 커밋은 늘지 않음</li>
+        <li><b>HEAD</b> = 지금 서 있는 브랜치. 새 커밋은 그 브랜치에</li>
+        <li><code>git switch -c 이름</code> 만들며 옮기기, <code>branch -d</code> / <code>-D</code></li>
+        <li>분리된 HEAD 의 커밋은 <code>switch -c</code> 로 이름표를 붙여 지킴</li>
+      </ul>
+    </div>
+    <div>
+      <table class="tight">
+        <thead><tr><th>병합</th><th>언제 · 결과</th></tr></thead>
+        <tbody>
+          <tr><td>빨리 감기</td><td>받는 쪽에 새 커밋 없음 → 이름표만 이동</td></tr>
+          <tr><td>3-way</td><td>양쪽에 새 커밋 → 부모 둘인 병합 커밋</td></tr>
+          <tr><td><code>--no-ff</code></td><td>늘 병합 커밋 남기기</td></tr>
+          <tr><td><code>--squash</code></td><td>커밋 하나로 뭉쳐 가져오기</td></tr>
+          <tr><td><code>--abort</code></td><td>병합 시작 전으로</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트 · 100분</h4>
+    <ul><li>병합은 <b>받는 쪽에 서서</b> <code>git merge 가져올브랜치</code>. 반대로 서서 병합하는 실수가 가장 많습니다.</li></ul>
+  </aside>
+</section>
+
+<section class="slide" data-part="2부 · 브랜치">
+  <div class="sec">L08 · 충돌 해결</div>
+  <h2>충돌은 고장이 아니라 질문</h2>
+  <div class="body cols">
+    <pre>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+영업 시간: 오전 9시   <span class="c"># 내 쪽</span>
+=======
+영업 시간: 오전 10시  <span class="c"># 가져오는 쪽</span>
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature</pre>
+    <div>
+      <ol class="steps small" style="margin-top:0">
+        <li>표시 줄을 지우고 남길 내용으로 고치기</li>
+        <li><code>git add 파일</code> (해결 표시)</li>
+        <li><code>git commit</code> 으로 병합 끝내기</li>
+      </ol>
+      <p class="small"><code>checkout --ours / --theirs</code> 한쪽 통째로 · 수정/삭제 충돌은 <code>add</code>(남김) 또는 <code>rm</code>(지움)</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트 · 50분</h4>
+    <ul><li>미션 "충돌 표시가 든 채 커밋된 파일 바로잡기"는 실제로 자주 일어납니다. <code>grep -n "&lt;&lt;&lt;&lt;&lt;&lt;&lt;"</code> 로 찾는 습관을 알려 줍니다.</li></ul>
+  </aside>
+</section>
+
+<section class="slide" data-part="2부 · 브랜치">
+  <div class="sec">L09 · L10 · rebase · stash · tag</div>
+  <h2>이력 다듬기와 버전 이름표</h2>
+  <div class="body">
+    <div class="cols3">
+      <div class="card"><div class="dn">rebase</div><b>새 밑동 위에 다시 쌓기</b><span>이력이 한 줄, 커밋 ID 가 바뀜. <b>공유한 커밋은 rebase 금지</b>. <code>-i</code> 로 pick · squash · fixup · drop</span></div>
+      <div class="card"><div class="dn">stash</div><b>하던 일 선반에 올리기</b><span>급한 수정: stash → main 에서 수정 → 병합 → 돌아와 <code>pop</code>. <code>-u</code> 새 파일까지</span></div>
+      <div class="card"><div class="dn">tag</div><b>움직이지 않는 이름표</b><span>배포 판은 <code>git tag -a v1.0.0 -m "…"</code>, 올리기는 따로 <code>git push origin v1.0.0</code></span></div>
+    </div>
+    <p class="small" style="margin-top:14px"><code>git cherry-pick 커밋</code> 커밋 하나만 가져오기 · 버전은 MAJOR.MINOR.PATCH · <code>git describe</code> 가장 가까운 태그로 설명</p>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트 · 110분</h4>
+    <ul><li>rebase 중 충돌: 고치기 → add → <code>git rebase --continue</code> (commit 이 아님). 그만두려면 <code>--abort</code>.</li></ul>
+  </aside>
+</section>
+
+<!-- ════════════════════ 3부 ════════════════════ -->
+<section class="slide part" data-part="3부 · GitHub 와 원격">
+  <div class="eyebrow">3부 · L11~L13</div>
+  <h1>GitHub 와 원격 저장소</h1>
+  <p>내 컴퓨터의 저장소를 GitHub 과 주고받기. push 가 거절될 때 당황하지 않기.</p>
+  <div class="big">🐙</div>
+  <aside class="notes"><h4>교수 노트</h4><ul><li>여기서부터 실제 GitHub 연결을 권합니다. 토큰은 실습 저장소 권한만, 짧은 만료로 만들고 수업 뒤 삭제하게 합니다(L11 · L21).</li></ul></aside>
+</section>
+
+<section class="slide" data-part="3부 · GitHub 와 원격">
+  <div class="sec">L11 · L12 · push · clone · fetch · pull</div>
+  <h2>origin 과 origin/main</h2>
+  <div class="body cols">
+    <div>
+      <pre>git remote add origin https://github.com/나/repo.git
+git push -u origin main   <span class="c"># -u: 업스트림 정하기</span>
+git push                  <span class="c"># 그다음부터</span>
+
+<span class="c"># 한 번에</span>
+gh repo create repo --public --source=. --push</pre>
+      <p class="small"><code>origin</code> = 원격 주소의 별명, <code>git remote -v</code> 로 확인</p>
+    </div>
+    <div>
+      <table class="tight">
+        <tbody>
+          <tr><td><code>git clone 주소</code></td><td>이력 전체 + origin 등록 + 업스트림</td></tr>
+          <tr><td><code>git fetch</code></td><td>받아 오기만 (origin/main 이동)</td></tr>
+          <tr><td><code>git pull</code></td><td>fetch + 병합</td></tr>
+          <tr><td><code>ahead</code> · <code>behind</code></td><td>올릴 커밋 · 받을 커밋 수</td></tr>
+          <tr><td><code>git log main..origin/main</code></td><td>합치기 전에 받을 커밋 보기</td></tr>
+          <tr><td><code>git fetch --prune</code></td><td>지워진 원격 브랜치 표시 정리</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트 · 100분</h4>
+    <ul><li><code>origin/main</code> 은 "마지막으로 확인한 원격 main" 이지 원격 그 자체가 아니라는 점 — fetch 해야 움직입니다.</li></ul>
+  </aside>
+</section>
+
+<section class="slide" data-part="3부 · GitHub 와 원격">
+  <div class="sec">L13 · 함께 쓰는 원격 저장소</div>
+  <h2>push 가 거절될 때</h2>
+  <div class="body"><div class="cols">
+    <pre> ! [rejected]  main -&gt; main (fetch first)
+error: failed to push some refs</pre>
+    <div>
+      <ol class="steps small" style="margin-top:0">
+        <li>원격에 내가 합치지 않은 커밋이 있다는 뜻</li>
+        <li><code>git pull</code> — 갈라졌으면 <code>--no-rebase</code> · <code>--rebase</code> · <code>--ff-only</code> 중 고르기</li>
+        <li>충돌은 병합 충돌과 똑같이 풀기</li>
+        <li>다시 <code>git push</code></li>
+      </ol>
+    </div>
+  </div>
+  <div class="box warn" style="font-size:18px"><b>공유 브랜치에 강제 push 금지</b>혼자 쓰는 브랜치에서 꼭 필요하면 <code>--force-with-lease</code>. 새 브랜치는 <code>push -u origin 브랜치</code>, 지우기는 <code>push origin --delete 브랜치</code>.</div></div>
+  <aside class="notes">
+    <h4>교수 노트 · 60분</h4>
+    <ul><li>두 학생이 같은 저장소에 동시에 push 하게 해서 거절을 직접 만들어 보면 이해가 빠릅니다(실제 GitHub 연결 시).</li></ul>
+  </aside>
+</section>
+
+<!-- ════════════════════ 4부 ════════════════════ -->
+<section class="slide part" data-part="4부 · 협업">
+  <div class="eyebrow">4부 · L14~L17</div>
+  <h1>GitHub 로 협업하기</h1>
+  <p>이슈로 할 일을 적고, 브랜치에서 일하고, 풀 리퀘스트로 보여 주고, 리뷰를 거쳐 합칩니다.</p>
+  <div class="big">🤝</div>
+  <aside class="notes"><h4>교수 노트</h4><ul><li>4부는 gh CLI 를 많이 씁니다. GitHub 웹 화면과 같은 일을 명령으로 한다는 점을 짝지어 보여 주세요.</li></ul></aside>
+</section>
+
+<section class="slide" data-part="4부 · 협업">
+  <div class="sec">L14 · L15 · 이슈와 풀 리퀘스트</div>
+  <h2>GitHub Flow</h2>
+  <div class="body">
+    <ol class="steps small" style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px 22px;margin-top:0">
+      <li>이슈 만들기 <code>gh issue create</code></li>
+      <li>브랜치 <code>switch -c fix-hours</code></li>
+      <li>커밋 · push</li>
+      <li>PR 열기 <code>gh pr create</code></li>
+      <li>리뷰 · 토론 · 갱신</li>
+      <li>병합 · 브랜치 삭제</li>
+    </ol>
+    <table class="tight" style="margin-top:12px">
+      <tbody>
+        <tr><td style="width:30%"><code>Fixes #3</code> · <code>Closes #3</code></td><td>기본 브랜치에 들어갈 때 이슈가 닫힘</td></tr>
+        <tr><td>병합 방식</td><td>병합 커밋(--merge) · 스쿼시(--squash) · 리베이스(--rebase) — 이력 모양이 다름</td></tr>
+        <tr><td>PR 갱신</td><td>같은 브랜치에 push 하면 PR 이 따라서 바뀜</td></tr>
+        <tr><td>초안</td><td><code>--draft</code> 로 열고 준비되면 <code>gh pr ready</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트 · 110분</h4>
+    <ul><li>좋은 이슈 = 분명한 제목 · 재현 방법 · 기대 결과 · 실제 결과. AIoT 팀 프로젝트의 할 일도 이 형식으로 이슈에 적게 합니다.</li></ul>
+  </aside>
+</section>
+
+<section class="slide" data-part="4부 · 협업">
+  <div class="sec">L16 · L17 · 리뷰 · 보호 · 포크</div>
+  <h2>main 을 지키고, 남의 저장소에 기여하기</h2>
+  <div class="body cols">
+    <div>
+      <ul class="small" style="margin-top:0">
+        <li>리뷰 세 가지: <b>Comment</b> · <b>Approve</b> · <b>Request changes</b> (자기 PR 은 승인 불가)</li>
+        <li><code>gh pr checkout 번호</code> 로 받아 직접 확인</li>
+        <li>PR 의 충돌은 내 브랜치에서 main 을 병합해 풀고 push</li>
+        <li><b>브랜치 보호</b> — 직접 push 금지, 승인 · 검사 필수. 어기면 <code>GH006</code></li>
+      </ul>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:12px"><div class="dn">포크</div><b>origin = 내 포크, upstream = 원본</b><span>포크 → 복제 → 브랜치 → 커밋 → 내 포크에 push → 원본에 PR</span></div>
+      <pre style="font-size:15px">git fetch upstream
+git merge upstream/main
+git push origin main   <span class="c"># 포크를 원본과 맞추기</span></pre>
+    </div>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트 · 115분</h4>
+    <ul><li>권한 없는 저장소에 push 하면 403 — "포크가 답"이라는 흐름을 미션 "포크 없이 복제한 저장소에서 한 작업 살리기"로 확인합니다.</li></ul>
+  </aside>
+</section>
+
+<!-- ════════════════════ 5부 ════════════════════ -->
+<section class="slide part" data-part="5부 · 자동화와 배포">
+  <div class="eyebrow">5부 · L18~L22</div>
+  <h1>자동화와 배포</h1>
+  <p>push 할 때마다 검사하고, 사이트로 공개하고, 버전을 내보내고, 비밀을 지킵니다.</p>
+  <div class="big">🚀</div>
+  <aside class="notes"><h4>교수 노트</h4><ul><li>Pages 는 L19(브랜치 방식)와 새로 추가한 L22(Actions 방식 · 사용자 사이트 · 도메인 · 대시보드 공개)로 나뉩니다. AIoT · Docker 과정과 직접 이어지는 부분입니다.</li></ul></aside>
+</section>
+
+<section class="slide" data-part="5부 · 자동화와 배포">
+  <div class="sec">L18 · GitHub Actions 기초</div>
+  <h2>push 할 때마다 GitHub 이 대신 검사</h2>
+  <div class="body cols">
+    <pre><span class="c"># .github/workflows/check.yml</span>
+name: Check
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: test -f README.md</pre>
+    <div>
+      <ul class="small" style="margin-top:0">
+        <li><b>on</b> 언제 · <b>jobs</b> 무엇을 · <b>steps</b> 어떤 순서로</li>
+        <li>queued → in_progress → completed, <code>gh run watch</code></li>
+        <li>실패하면 <code>gh run view --log-failed</code> → 고친 커밋 push</li>
+        <li>PR 검사는 <code>gh pr checks</code></li>
+        <li>비밀 값은 <code>${{ secrets.이름 }}</code></li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트 · 60분</h4>
+    <ul><li>가상 GitHub 은 워크플로를 흉내 내어 실행합니다(echo · test · cat 등). 실제 GitHub 연결 시에는 진짜 러너가 돕니다.</li></ul>
+  </aside>
+</section>
+
+<section class="slide" data-part="5부 · 자동화와 배포">
+  <div class="sec">L19 · GitHub Pages 로 사이트 배포하기</div>
+  <h2>저장소의 파일이 그대로 웹 사이트로</h2>
+  <div class="body cols">
+    <div>
+      <p class="small" style="margin-top:0">주소: <code>https://{user}.github.io/{repo}/</code> · 첫 화면 <code>index.html</code></p>
+      <ol class="steps small">
+        <li><code>index.html</code> · <code>style.css</code> 커밋 · push</li>
+        <li>Settings → Pages → <b>Deploy from a branch</b> → main · <code>/ (root)</code> 또는 <code>/docs</code></li>
+        <li>한 번 켜 두면 push 할 때마다 사이트가 바뀜</li>
+      </ol>
+    </div>
+    <div>
+      <table class="tight">
+        <thead><tr><th>HTML 경로</th><th>결과</th></tr></thead>
+        <tbody>
+          <tr><td><code>href="style.css"</code></td><td>열림 (권장)</td></tr>
+          <tr><td><code>href="/style.css"</code></td><td><b>404</b> — 저장소 이름이 빠짐</td></tr>
+        </tbody>
+      </table>
+      <div class="box ask" style="font-size:17px"><b>404 점검 순서</b>Pages 켜짐? → 브랜치 · 폴더? → index.html 이름 · 대소문자? → push 했나?</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트 · 50분</h4>
+    <ul>
+      <li>Pages 는 <b>정적 사이트 전용</b>: HTML · CSS · JS 는 되고, 서버 프로그램 · DB · 비밀 값이 필요한 기능은 안 됩니다.</li>
+      <li>실제 GitHub 은 처음 켤 때 1~2분 동안 404 가 나올 수 있습니다. 미리 말해 두지 않으면 학생들이 고장으로 생각합니다.</li>
+    </ul>
+  </aside>
+</section>
+
+<section class="slide" data-part="5부 · 자동화와 배포">
+  <div class="sec">L22 · Pages 심화 · NEW</div>
+  <h2>GitHub Actions 로 Pages 배포하기</h2>
+  <div class="body cols">
+    <pre style="font-size:14.5px">permissions:
+  contents: read
+  pages: write          <span class="c"># Pages 에 쓸 권한</span>
+  id-token: write       <span class="c"># 신분 증명 토큰</span>
+jobs:
+  build:
+    steps:
+      - uses: actions/checkout@v4
+      - run: test -f site/index.html   <span class="c"># 배포 전 검사</span>
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: site }
+  deploy:
+    needs: build
+    environment: github-pages
+    steps:
+      - uses: actions/deploy-pages@v4</pre>
+    <div>
+      <table class="tight">
+        <thead><tr><th></th><th>브랜치 (L19)</th><th>Actions (L22)</th></tr></thead>
+        <tbody>
+          <tr><td>폴더</td><td>/ · /docs 만</td><td>아무 폴더 (site · dist)</td></tr>
+          <tr><td>검사 · 빌드</td><td>없음</td><td>build 잡에서</td></tr>
+          <tr><td>설정</td><td>Deploy from a branch</td><td><b>Source: GitHub Actions</b></td></tr>
+        </tbody>
+      </table>
+      <div class="box tip" style="font-size:17px"><b>검사가 실패하면</b>deploy 잡이 건너뛰어져 망가진 사이트가 나가지 않습니다.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트 · L22 60분</h4>
+    <ul>
+      <li>미션: Actions 로 site 폴더 배포하기 · 빠진 권한 채우기 · 검사에 걸린 배포 살리기 (가상 GitHub 에서 채점됨).</li>
+      <li>실제 GitHub 에서는 Settings → Pages 의 Source 를 <b>GitHub Actions</b> 로 먼저 바꿔야 deploy 가 성공합니다. 이 설정을 빼먹으면 "Ensure GitHub Pages has been enabled" 오류.</li>
+    </ul>
+  </aside>
+</section>
+
+<section class="slide" data-part="5부 · 자동화와 배포">
+  <div class="sec">L22 · Pages 심화 · NEW</div>
+  <h2>사용자 사이트 · 내 도메인 · 팀 대시보드</h2>
+  <div class="body">
+    <div class="cols3">
+      <div class="card"><div class="dn">사용자 사이트</div><b>{user}.github.io</b><span>이 이름의 저장소는 주소에 저장소 이름이 붙지 않음. 계정에 하나. 이 강의실도 <code>bctcaiedu.github.io</code></span></div>
+      <div class="card"><div class="dn">내 도메인</div><b>Custom domain + DNS</b><span>www → CNAME <code>{user}.github.io</code>, 맨 앞 주소 → A 레코드 4개(185.199.108~111.153), Enforce HTTPS, 도메인 Verify</span></div>
+      <div class="card"><div class="dn">팀 대시보드</div><b>브라우저 앱은 그대로</b><span>AIoT 대시보드를 site/ 에 넣어 배포. https 라서 브로커는 <code>wss://</code> 만</span></div>
+    </div>
+    <div class="box warn"><b>Pages 에 올리면 누구나 읽습니다</b>ThingSpeak · AI API 키를 HTML · JS 에 적지 않습니다. 키가 필요한 기능은 서버(Docker 로 띄운 앱) 쪽에.</div>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트</h4>
+    <ul>
+      <li>Actions 방식에서는 도메인이 Settings 에만 저장되고 <code>CNAME</code> 파일은 쓰이지 않습니다. 브랜치 방식에서는 CNAME 파일로 저장됩니다.</li>
+      <li>도메인을 연결한 채 저장소를 지우면 남이 가로챌 수 있으니 계정 Settings → Pages 에서 도메인 확인(Verify)을 권합니다.</li>
+      <li>Docker 과정 18장(GHCR 배포)과 짝지으면 "정적은 Pages, 서버는 컨테이너" 구분이 분명해집니다.</li>
+    </ul>
+  </aside>
+</section>
+
+<section class="slide" data-part="5부 · 자동화와 배포">
+  <div class="sec">L20 · L21 · 릴리스와 저장소 보안</div>
+  <h2>버전을 내보내고, 비밀을 지키기</h2>
+  <div class="body cols">
+    <div>
+      <p class="small" style="margin-top:0"><b>MAJOR.MINOR.PATCH</b> — 호환 깨짐 · 기능 추가 · 버그 수정</p>
+      <pre style="font-size:15px">git tag -a v1.0.0 -m "첫 공개"
+git push origin v1.0.0
+gh release create v1.0.0 \
+  --title "v1.0.0" --generate-notes</pre>
+      <p class="small"><code>--prerelease</code> 시험판 · <code>--draft</code> 초안 · 공개 뒤 버그는 태그에서 hotfix → PATCH</p>
+    </div>
+    <div>
+      <ul class="small" style="margin-top:0">
+        <li>README: 제목 · 소개 · 설치 · 사용법 · 기여 · 라이선스</li>
+        <li>라이선스가 없으면 남이 쓸 수 없음 → MIT 등 LICENSE</li>
+        <li>템플릿 · CODEOWNERS 는 <code>.github/</code></li>
+        <li><code>.env</code> 는 .gitignore, <code>.env.example</code> 로 이름만 공유</li>
+      </ul>
+      <div class="box warn" style="font-size:17px"><b>올려 버렸다면</b>키 폐기 · 재발급이 먼저. <code>git rm --cached</code> 로 빼도 이력에는 남습니다.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트 · 110분</h4>
+    <ul><li>토큰은 최소 권한 · 짧은 만료 · 쓰고 나면 삭제, 계정은 2단계 인증. 강좌 실습용 토큰도 수업 마지막에 같이 지웁니다.</li></ul>
+  </aside>
+</section>
+
+<!-- ════════════════════ 6부 ════════════════════ -->
+<section class="slide part" data-part="6부 · 응용 프로젝트">
+  <div class="eyebrow">6부 · P1~P5</div>
+  <h1>응용 프로젝트</h1>
+  <p>배운 것을 이어 붙여 처음부터 끝까지. 단계마다 미션으로 채점됩니다.</p>
+  <div class="big">🏁</div>
+  <aside class="notes"><h4>교수 노트</h4><ul><li>프로젝트는 단계별 미션이라 학생마다 속도가 달라도 됩니다. 강사는 막힌 학생의 <code>git status</code> · <code>git log --oneline --graph --all</code> 만 같이 봐 주세요.</li></ul></aside>
+</section>
+
+<section class="slide" data-part="6부 · 응용 프로젝트">
+  <div class="sec">PROJECTS</div>
+  <h2>다섯 개의 프로젝트</h2>
+  <div class="body">
+    <table class="tight">
+      <thead><tr><th style="width:30%">프로젝트</th><th>단계</th><th style="width:10%">시간</th></tr></thead>
+      <tbody>
+        <tr><td><b>P1</b> 나만의 포트폴리오 사이트</td><td>첫 화면 push → 브랜치 · PR → 병합 · pull → <b>Pages 켜기</b> → 고쳐 재배포 → 태그 · 릴리스</td><td>80분</td></tr>
+        <tr><td><b>P2</b> 팀 프로젝트 한 바퀴</td><td>이슈 둘 → 브랜치 · PR → 변경 요청 반영 → 충돌 풀고 병합 → 팀원 PR 확인 · 병합</td><td>90분</td></tr>
+        <tr><td><b>P3</b> 오픈소스에 첫 기여</td><td>이슈 읽고 포크 · 복제 → 브랜치에서 추가 → 원본에 PR → upstream 최신화 → 두 번째 기여</td><td>80분</td></tr>
+        <tr><td><b>P4</b> 검사가 지키는 저장소</td><td>검사 워크플로 → 실패 고치기 → 브랜치 보호 → 거절된 push 를 PR 로 → 릴리스 노트 자동 생성</td><td>80분</td></tr>
+        <tr><td><b>P5</b> 사고 복구 훈련</td><td>main 의 커밋 옮기기 · reset 복구 · 지운 브랜치 · push 한 커밋 revert · 엉킨 병합 · amend</td><td>70분</td></tr>
+      </tbody>
+    </table>
+    <div class="box tip" style="font-size:18px"><b>P1 다음에 L22 를</b>포트폴리오를 Actions 방식으로 바꾸거나 {user}.github.io 사용자 사이트로 옮기면 Pages 심화를 바로 응용합니다.</div>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트 · 약 6.7시간</h4>
+    <ul><li>평가 추천: P1(개인 결과물 URL) + P2(팀 협업 기록) + P5(사고 대처). P5 는 시험처럼 시간 제한을 두어도 좋습니다.</li></ul>
+  </aside>
+</section>
+
+<section class="slide quiz" data-part="6부 · 응용 프로젝트">
+  <div class="sec">QUIZ</div>
+  <h2>확인 퀴즈 <span class="tag">클릭하면 정답</span></h2>
+  <div class="body">
+    <ol class="small">
+      <li><b>이미 push 한 잘못된 커밋을 취소하려면?</b><br><span class="ans">→ git revert 커밋. 공유한 이력은 reset 으로 고쳐 쓰지 않습니다.</span></li>
+      <li><b>push 가 ! [rejected] (fetch first) 로 거절됐다. 무슨 뜻이고 어떻게?</b><br><span class="ans">→ 원격에 내가 합치지 않은 커밋이 있음. git pull 로 받아 합친 뒤 다시 push.</span></li>
+      <li><b>프로젝트 사이트에서 &lt;link href="/style.css"&gt; 는?</b><br><span class="ans">→ 저장소 이름이 빠진 주소를 찾아 404. 상대 경로 style.css 로.</span></li>
+      <li><b>사이트 파일이 dist 폴더에 생긴다. Pages 로 배포하려면?</b><br><span class="ans">→ GitHub Actions 방식, upload-pages-artifact 의 path: dist (브랜치 방식은 / · /docs 만).</span></li>
+      <li><b>Pages 배포 워크플로에 꼭 필요한 권한 두 가지는?</b><br><span class="ans">→ pages: write, id-token: write</span></li>
+    </ol>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트</h4>
+    <ul><li>문항을 클릭하면 정답이 보입니다. PDF 로 저장하면 정답이 모두 보이게 인쇄됩니다. 강의별 퀴즈는 강좌 각 강의 끝에 있습니다.</li></ul>
+  </aside>
+</section>
+
+<section class="slide" data-part="6부 · 응용 프로젝트">
+  <div class="sec">SUMMARY</div>
+  <h2>정리: 이 과정을 마치면</h2>
+  <div class="body">
+    <div class="cols3">
+      <div class="card"><div class="dn">혼자서</div><b>이력을 남기고 되돌린다</b><span>add · commit · diff · log, restore · reset · revert · reflog, .gitignore</span></div>
+      <div class="card"><div class="dn">갈라져서</div><b>브랜치로 일한다</b><span>switch · merge · 충돌 해결 · rebase · stash · tag</span></div>
+      <div class="card"><div class="dn">GitHub 과</div><b>주고받는다</b><span>push · clone · fetch · pull, 거절 해결, 원격 브랜치 · 태그</span></div>
+      <div class="card"><div class="dn">팀으로</div><b>협업한다</b><span>이슈 · PR · 리뷰 · 브랜치 보호 · 포크</span></div>
+      <div class="card"><div class="dn">자동으로</div><b>검사하고 배포한다</b><span>Actions · Pages(브랜치 · Actions · 도메인) · 릴리스</span></div>
+      <div class="card"><div class="dn">안전하게</div><b>비밀을 지킨다</b><span>.env · 토큰 최소 권한 · 올린 키는 재발급</span></div>
+    </div>
+    <div class="box tip"><b>다음 단계</b>Docker 쉽게 배우기(18장 GHCR 배포) · AIoT 프로젝트(팀 저장소 · 대시보드 Pages 공개)로 이어집니다.</div>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트</h4>
+    <ul><li>마지막 시간에는 학생 각자 P1 사이트 주소를 모아 공유 문서에 올리게 하면 포트폴리오 첫 줄이 됩니다.</li></ul>
+  </aside>
+</section>
+
+</div><!-- /#view -->
+
+<div id="notes"></div>
+<div id="grid"></div>
+<div id="pv">
+  <div class="top"><span class="clock" id="pvClock">00:00</span><span id="pvCnt"></span><span id="pvPart" style="color:#93a1b5"></span><span style="flex:1"></span><span style="font-size:13px;color:#93a1b5">← → 로 넘기면 발표 창도 함께 넘어갑니다</span></div>
+  <div class="left"><div class="lbl">현재</div><div class="pcur" id="pvCur"></div><div class="lbl">다음</div><div class="pnxt" id="pvNext"></div></div>
+  <div class="pnotes" id="pvNotes"></div>
+</div>
+
+<script>
+(function () {
+  const SW = 1280, SH = 720;
+  const params = new URLSearchParams(location.search);
+  const isPresenter = params.has('presenter');
+  const slides = [...document.querySelectorAll('#view > .slide')];
+  const total = slides.length;
+  const $ = (id) => document.getElementById(id);
+  let cur = 0;
+  const chan = 'BroadcastChannel' in window ? new BroadcastChannel('git-slides') : null;
+
+  // 쪽 번호와 꼬리말
+  slides.forEach((s, i) => {
+    const f = document.createElement('div');
+    f.className = 'foot';
+    f.innerHTML = `<span>Git · GitHub 실습 · 교수용 · ${s.dataset.part || ''}</span><span>${i + 1} / ${total}</span>`;
+    s.appendChild(f);
+  });
+
+  // 단원 이동 목록
+  const parts = [];
+  slides.forEach((s, i) => { const p = s.dataset.part; if (p && !parts.some((x) => x.p === p)) parts.push({ p, i }); });
+  $('jump').innerHTML = parts.map((x) => `<option value="${x.i}">${x.p}</option>`).join('');
+  $('jump').onchange = (e) => go(+e.target.value);
+
+  // 퀴즈 정답 보기
+  document.querySelectorAll('.slide.quiz li').forEach((li) => li.addEventListener('click', (e) => { e.stopPropagation(); li.querySelector('.ans').style.visibility = 'visible'; }));
+
+  function fit() {
+    const v = $('view');
+    const W = v.clientWidth, H = v.clientHeight;
+    const k = Math.min(W / SW, H / SH) * 0.98;
+    const x = (W - SW * k) / 2, y = (H - SH * k) / 2;
+    slides.forEach((s) => { s.style.transform = `translate(${x}px,${y}px) scale(${k})`; });
+  }
+
+  function notesHtml(i) {
+    const n = slides[i] && slides[i].querySelector('aside.notes');
+    return n ? n.innerHTML : '<h4>교수 노트</h4><p>이 슬라이드에는 노트가 없습니다.</p>';
+  }
+
+  function render(broadcast) {
+    slides.forEach((s, i) => s.classList.toggle('cur', i === cur));
+    $('cnt').textContent = `${cur + 1} / ${total}`;
+    $('prog').style.width = `${((cur + 1) / total) * 100}%`;
+    $('notes').innerHTML = notesHtml(cur);
+    const pi = parts.filter((x) => x.i <= cur).pop();
+    if (pi) $('jump').value = pi.i;
+    document.querySelectorAll('#grid .th').forEach((t, i) => t.classList.toggle('cur', i === cur));
+    if (location.hash !== '#' + (cur + 1)) history.replaceState(null, '', '#' + (cur + 1));
+    if (isPresenter) renderPresenter();
+    if (broadcast && chan) chan.postMessage({ go: cur });
+  }
+  function go(i, broadcast = true) { cur = Math.max(0, Math.min(total - 1, i)); render(broadcast); }
+  const next = () => go(cur + 1), prev = () => go(cur - 1);
+
+  // 교수 노트
+  function setNotes(on) {
+    document.body.classList.toggle('notes', on);
+    document.documentElement.style.setProperty('--notes-h', on ? '28vh' : '0px');
+    $('bNotes').classList.toggle('on', on);
+    try { localStorage.setItem('git-slides.notes', on ? '1' : ''); } catch (e) {}
+    fit();
+  }
+  $('bNotes').onclick = () => setNotes(!document.body.classList.contains('notes'));
+
+  // 전체 보기
+  function buildGrid() {
+    $('grid').innerHTML = slides.map((s, i) => `<div class="th" data-i="${i}"><div class="mini">${s.outerHTML.replace(/class="slide([^"]*)"/, 'class="slide$1"')}</div>${i + 1}. ${(s.querySelector('h2,h1') || { innerHTML: '' }).innerHTML.replace(/<br\s*\/?>/g, ' ').replace(/<[^>]+>/g, '')}</div>`).join('');
+    $('grid').querySelectorAll('.th').forEach((t) => { t.onclick = () => { go(+t.dataset.i); toggleGrid(false); }; });
+  }
+  function fitGrid() {
+    $('grid').querySelectorAll('.mini').forEach((m) => { const s = m.querySelector('.slide'); if (s) s.style.transform = `scale(${m.clientWidth / SW})`; });
+  }
+  function toggleGrid(on) {
+    if (on && !$('grid').children.length) buildGrid();
+    document.body.classList.toggle('grid', on);
+    $('bGrid').classList.toggle('on', on);
+    if (on) fitGrid();
+    render(false);
+  }
+  $('bGrid').onclick = () => toggleGrid(!document.body.classList.contains('grid'));
+
+  // 전체 화면 발표
+  function toggleFull() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+  document.addEventListener('fullscreenchange', () => { document.body.classList.toggle('present', !!document.fullscreenElement); setTimeout(fit, 50); });
+  $('bFull').onclick = toggleFull;
+
+  // 타이머
+  let tStart = 0, tAcc = 0, tRun = false;
+  const fmt = (ms) => { const s = Math.floor(ms / 1000); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
+  function tick() { const ms = tAcc + (tRun ? Date.now() - tStart : 0); $('timer').textContent = fmt(ms); if ($('pvClock')) $('pvClock').textContent = fmt(ms); }
+  function toggleTimer() { if (tRun) { tAcc += Date.now() - tStart; tRun = false; } else { tStart = Date.now(); tRun = true; } $('bTimer').classList.toggle('on', tRun); }
+  $('bTimer').onclick = toggleTimer;
+  $('timer').ondblclick = () => { tAcc = 0; tStart = Date.now(); tick(); };
+  setInterval(tick, 500);
+
+  // 발표자 창
+  $('bPresenter').onclick = () => window.open(location.pathname + '?presenter#' + (cur + 1), 'git-presenter', 'width=1280,height=760');
+  function mini(el, i) {
+    el.innerHTML = i < total ? slides[i].outerHTML : '<div style="padding:20px;color:#666">마지막 슬라이드입니다</div>';
+    const s = el.querySelector('.slide');
+    if (!s) return;
+    s.style.display = 'flex';
+    const k = el.clientWidth / SW;
+    el.style.height = SH * k + 'px';
+    s.style.transform = `scale(${k})`;
+  }
+  function renderPresenter() {
+    mini($('pvCur'), cur); mini($('pvNext'), cur + 1);
+    $('pvNotes').innerHTML = notesHtml(cur);
+    $('pvCnt').textContent = `${cur + 1} / ${total}`;
+    $('pvPart').textContent = slides[cur].dataset.part || '';
+  }
+  if (chan) chan.onmessage = (e) => { if (e.data && typeof e.data.go === 'number' && e.data.go !== cur) go(e.data.go, false); };
+
+  // 인쇄 (PDF 저장)
+  $('bPrint').onclick = () => {
+    const withNotes = confirm('교수 노트도 함께 인쇄할까요?\n확인 = 노트 포함, 취소 = 슬라이드만\n(인쇄 창에서 "PDF로 저장", 배경 그래픽 켜기를 고르세요)');
+    document.body.classList.toggle('print-notes', withNotes);
+    window.print();
+  };
+
+  // 키보드 · 클릭
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'SELECT' || e.altKey || e.ctrlKey || e.metaKey) return;
+    const k = e.key;
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(k)) { e.preventDefault(); next(); }
+    else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); prev(); }
+    else if (k === 'Home') go(0);
+    else if (k === 'End') go(total - 1);
+    else if (k === 'n' || k === 'N') setNotes(!document.body.classList.contains('notes'));
+    else if (k === 'g' || k === 'G') toggleGrid(!document.body.classList.contains('grid'));
+    else if (k === 'f' || k === 'F') toggleFull();
+    else if (k === 'p' || k === 'P') $('bPresenter').click();
+    else if (k === 't' || k === 'T') toggleTimer();
+    else if (k === 'Escape' && document.body.classList.contains('grid')) toggleGrid(false);
+  });
+  $('view').addEventListener('click', (e) => {
+    if (e.target.closest('a,button,select,.quiz li')) return;
+    const r = $('view').getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width;
+    if (x < 0.2) prev(); else if (x > 0.8) next();
+  });
+  // 발표 중 마우스를 화면 맨 위로 올리면 메뉴 보이기
+  document.addEventListener('mousemove', (e) => { $('bar').classList.toggle('peek', document.body.classList.contains('present') && e.clientY < 8); });
+  $('bPrev').onclick = prev; $('bNext').onclick = next;
+  window.addEventListener('resize', () => { fit(); if (document.body.classList.contains('grid')) fitGrid(); if (isPresenter) renderPresenter(); });
+  window.addEventListener('hashchange', () => { const n = parseInt(location.hash.slice(1), 10); if (n && n - 1 !== cur) go(n - 1); });
+
+  if (isPresenter) document.body.classList.add('presenter');
+  const h = parseInt(location.hash.slice(1), 10);
+  cur = h ? Math.max(0, Math.min(total - 1, h - 1)) : 0;
+  let saved = ''; try { saved = localStorage.getItem('git-slides.notes'); } catch (e) {}
+  setNotes(!!saved && !isPresenter);
+  render(false);
+})();
+</script>
+</html>
