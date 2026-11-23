@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 6 강의 슬라이드 · 바이브 코딩 × 하네스</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📺</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
+<script>try{var t=JSON.parse(localStorage.getItem('vibe70-theme'));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<style>
+/* ===================================================================
+   vibe70 공통 테마 — ubuntu2404 강좌와 같은 분위기 (라이트 / 다크)
+   색을 바꾸려면 --accent / --accent2 와 .hero 그라데이션만 고치면 됩니다.
+   =================================================================== */
+:root {
+  --bg: #f4f6f9;
+  --pane: #ffffff;
+  --card: #ffffff;
+  --card2: #f7f9fc;
+  --line: #e1e6ee;
+  --fg: #1d2433;
+  --muted: #6b7587;
+  --accent: #7c3aed;        /* 바이올렛 */
+  --accent-soft: #f1ebfd;
+  --accent2: #c2185b;       /* 라즈베리 */
+  --accent2-soft: #fce8f0;
+  --ok: #1f9d55;
+  --ok-soft: #e3f6ec;
+  --warn: #c98a00;
+  --warn-soft: #fff6d9;
+  --danger: #d64541;
+  --danger-soft: #fdeaea;
+  --info: #2563eb;
+  --info-soft: #e8f0fe;
+  --code-bg: #f6f8fb;
+  --code-fg: #24292f;
+  --term-bg: #0f1419;
+  --term-fg: #d7dde8;
+  --term-muted: #7d8799;
+  --term-in: #7ee787;
+  --shadow: 0 1px 2px rgba(20, 30, 50, .06), 0 4px 16px rgba(20, 30, 50, .06);
+  --radius: 10px;
+  --nav-w: 290px;
+  --grad: linear-gradient(135deg, #7c3aed 0%, #b4248f 48%, #2a0f45 100%);
+  --grad-bar: linear-gradient(90deg, #7c3aed, #f472b6);
+  --mono: 'JetBrains Mono', 'D2Coding', Consolas, 'Courier New', monospace;
+  --sans: 'Pretendard Variable', Pretendard, -apple-system, 'Segoe UI', 'Malgun Gothic', sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1116; --pane: #151a21; --card: #1a2029; --card2: #1f2631; --line: #2a323e;
+    --fg: #e3e8f0; --muted: #8d97a8;
+    --accent: #a78bfa; --accent-soft: #241b3d; --accent2: #f472b6; --accent2-soft: #3a1a2d;
+    --ok: #4cc983; --ok-soft: #132e20; --warn: #f2c14e; --warn-soft: #33290f;
+    --danger: #ff6b61; --danger-soft: #3a1a18; --info: #79a7ff; --info-soft: #16233b;
+    --code-bg: #11161d; --code-fg: #d6deeb;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1116; --pane: #151a21; --card: #1a2029; --card2: #1f2631; --line: #2a323e;
+  --fg: #e3e8f0; --muted: #8d97a8;
+  --accent: #a78bfa; --accent-soft: #241b3d; --accent2: #f472b6; --accent2-soft: #3a1a2d;
+  --ok: #4cc983; --ok-soft: #132e20; --warn: #f2c14e; --warn-soft: #33290f;
+  --danger: #ff6b61; --danger-soft: #3a1a18; --info: #79a7ff; --info-soft: #16233b;
+  --code-bg: #11161d; --code-fg: #d6deeb;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, code, kbd, pre, input { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font-family: var(--sans);
+  font-size: 15px; line-height: 1.65; -webkit-font-smoothing: antialiased;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+code, kbd, pre { font-family: var(--mono); }
+kbd { font-size: .82em; padding: 1px 6px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; background: var(--card2); }
+
+/* ---------------------------------------------------------------- 버튼 */
+.btn {
+  display: inline-flex; align-items: center; gap: 5px; text-decoration: none;
+  border: 1px solid var(--line); background: var(--card); color: var(--fg);
+  border-radius: 8px; padding: 6px 12px; cursor: pointer; font-weight: 600; font-size: 13.5px;
+  white-space: nowrap; transition: background .12s, border-color .12s, color .12s;
+}
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:hover { filter: brightness(1.07); }
+.icon-btn {
+  border: none; background: transparent; cursor: pointer; font-size: 17px; line-height: 1; text-decoration: none;
+  width: 32px; height: 32px; border-radius: 8px; color: var(--muted); display: inline-grid; place-items: center; flex: none;
+}
+.icon-btn:hover { background: var(--card2); color: var(--fg); }
+
+/* ---------------------------------------------------------------- 왼쪽 사이드바 (nav.js 가 만듭니다) */
+.vnav {
+  position: fixed; inset: 0 auto 0 0; width: var(--nav-w); z-index: 60;
+  display: flex; flex-direction: column; background: var(--pane); border-right: 1px solid var(--line);
+  transition: transform .2s ease;
+}
+.vnav .brand { display: flex; align-items: center; gap: 10px; padding: 14px 10px 10px 14px; }
+.vnav .brand-logo {
+  width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; font-size: 21px; flex: none;
+  background: linear-gradient(135deg, #7c3aed, #f472b6); text-decoration: none; box-shadow: 0 2px 8px rgba(124, 58, 237, .35);
+}
+.vnav .brand-text { flex: 1; min-width: 0; }
+.vnav .brand-title { font-weight: 800; font-size: 16px; letter-spacing: -.01em; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vnav .brand-sub { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vnav .progress-wrap { padding: 2px 14px 8px; }
+.vnav .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); font-weight: 600; }
+.vnav .progress { height: 6px; background: var(--card2); border-radius: 6px; overflow: hidden; border: 1px solid var(--line); }
+.vnav .progress i { display: block; height: 100%; width: 0; background: var(--grad-bar); transition: width .3s; }
+.vnav .nav-search {
+  margin: 4px 12px 8px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--card2); outline: none;
+}
+.vnav .nav-search:focus { border-color: var(--accent); }
+.vnav .nav-tree { flex: 1; overflow-y: auto; padding: 2px 8px 16px; }
+.vnav .nav-home {
+  display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 8px; font-weight: 700;
+  color: var(--fg); text-decoration: none; font-size: 14px;
+}
+.vnav .nav-home:hover { background: var(--card2); }
+.vnav .nav-home.active { background: var(--accent-soft); color: var(--accent); }
+.vnav .nav-group { font-size: 12px; font-weight: 700; color: var(--muted); padding: 14px 10px 4px; }
+.vnav .nav-ch { margin-top: 2px; }
+.vnav .nav-ch-head {
+  display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 8px; cursor: pointer; user-select: none;
+  font-weight: 700; font-size: 14px;
+}
+.vnav .nav-ch-head:hover { background: var(--card2); }
+.vnav .nav-ch-head .no {
+  font: 700 11.5px var(--mono); color: var(--accent); background: var(--accent-soft); border-radius: 6px; padding: 1px 6px; min-width: 38px; text-align: center;
+}
+.vnav .nav-ch-head .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vnav .nav-ch-head .cnt { font-size: 11px; color: var(--muted); font-weight: 500; }
+.vnav .nav-ch-head .caret { color: var(--muted); font-size: 10px; transition: transform .15s; }
+.vnav .nav-ch.open .caret { transform: rotate(90deg); }
+.vnav .nav-ch.active > .nav-ch-head { color: var(--accent); }
+.vnav .nav-secs { display: none; padding: 2px 0 6px 14px; margin-left: 20px; border-left: 1px dashed var(--line); }
+.vnav .nav-ch.open .nav-secs { display: block; }
+.vnav .nav-sec {
+  display: flex; gap: 6px; align-items: flex-start; padding: 5px 8px; border-radius: 7px; font-size: 13.5px;
+  color: var(--fg); text-decoration: none; line-height: 1.45;
+}
+.vnav .nav-sec:hover { background: var(--card2); }
+.vnav .nav-sec.active { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+.vnav .nav-sec .chk { flex: none; width: 16px; color: var(--muted); font-size: 12px; margin-top: 1px; }
+.vnav .nav-sec.done .chk { color: var(--ok); }
+.vnav .nav-sec.period { font-size: 13px; color: var(--muted); }
+.vnav .nav-sec.period b { font: 600 11px var(--mono); color: var(--accent2); margin-right: 2px; }
+.vnav .nav-sec .hit { display: block; font-size: 11.5px; color: var(--muted); font-weight: 400; }
+.vnav .nav-sep { height: 1px; background: var(--line); margin: 5px 8px; opacity: .7; }
+.vnav .nav-foot { border-top: 1px solid var(--line); padding: 8px 10px; }
+.vnav .tool-badge {
+  display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--card2);
+  border-radius: 8px; padding: 6px 10px; font-size: 12.5px; font-weight: 600;
+}
+.vnav .tool-badge .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px var(--ok-soft); flex: none; }
+.vnav-open {
+  position: fixed; left: 14px; bottom: 16px; z-index: 61; width: 46px; height: 46px; border-radius: 50%;
+  border: none; background: linear-gradient(135deg, #7c3aed, #f472b6); color: #fff; font-size: 19px; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(124, 58, 237, .4); display: none;
+}
+.vnav-bd { position: fixed; inset: 0; background: rgba(8, 12, 18, .5); z-index: 59; display: none; }
+body.has-nav { padding-left: var(--nav-w); }
+body.nav-collapsed { padding-left: 0; }
+body.nav-collapsed .vnav { transform: translateX(-100%); }
+body.nav-collapsed .vnav-open { display: block; }
+@media (max-width: 1000px) {
+  body.has-nav { padding-left: 0; }
+  .vnav { transform: translateX(-100%); box-shadow: 0 0 30px rgba(0, 0, 0, .25); }
+  body.nav-open .vnav { transform: none; }
+  body.nav-open .vnav-bd { display: block; }
+  .vnav-open { display: block; }
+  body.nav-open .vnav-open { display: none; }
+}
+@media print { .vnav, .vnav-open, .vnav-bd { display: none !important; } body.has-nav { padding-left: 0; } }
+
+/* ---------------------------------------------------------------- 위쪽 줄 (일차 페이지 공통) */
+.topbar {
+  position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 7px 14px; min-height: 46px; background: var(--pane); border-bottom: 1px solid var(--line);
+}
+.crumb { font-size: 13.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1; }
+.crumb b { color: var(--fg); }
+.view-switch { display: flex; background: var(--card2); border: 1px solid var(--line); border-radius: 9px; padding: 3px; gap: 3px; flex: none; }
+.view-switch a {
+  border-radius: 7px; padding: 3px 10px; font-weight: 700; font-size: 12.5px; color: var(--muted); text-decoration: none; white-space: nowrap;
+}
+.view-switch a:hover { color: var(--fg); }
+.view-switch a.active { background: var(--pane); color: var(--accent); box-shadow: var(--shadow); }
+
+/* ---------------------------------------------------------------- 문서 공통 */
+.doc { max-width: 920px; margin: 0 auto; padding: 28px 34px 80px; }
+.hero {
+  border-radius: 16px; padding: 30px 32px; margin-bottom: 20px; color: #fff; position: relative; overflow: hidden;
+  background: radial-gradient(circle at 85% 20%, rgba(255, 255, 255, .18), transparent 40%), var(--grad);
+}
+.hero .badge { display: inline-flex; font-weight: 700; font-size: 12.5px; background: rgba(255, 255, 255, .18); border-radius: 20px; padding: 3px 12px; }
+.hero h1 { margin: 10px 0 6px; font-size: 32px; line-height: 1.25; letter-spacing: -.02em; }
+.hero p { margin: 4px 0; opacity: .95; max-width: 62ch; }
+.hero .hero-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.hero .btn { background: rgba(255, 255, 255, .95); color: #1d2433; border-color: transparent; }
+.hero .btn.outline { background: transparent; color: #fff; border-color: rgba(255, 255, 255, .7); }
+.hero .emo { position: absolute; right: 26px; bottom: -18px; font-size: 120px; opacity: .22; pointer-events: none; }
+.meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; font-weight: 600; border: 1px solid var(--line); background: var(--card); border-radius: 20px; padding: 2px 10px; color: var(--muted); }
+.hero .chip { background: rgba(255, 255, 255, .14); border-color: rgba(255, 255, 255, .35); color: #fff; }
+.callout { border-radius: var(--radius); padding: 12px 16px; margin: 14px 0; border: 1px solid var(--line); border-left-width: 5px; background: var(--card); }
+.callout .ct { font-weight: 800; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+.callout p { margin: 4px 0; }
+.callout.tip { border-left-color: var(--ok); background: var(--ok-soft); }
+.callout.tip .ct { color: var(--ok); }
+.callout.warn { border-left-color: var(--danger); background: var(--danger-soft); }
+.callout.warn .ct { color: var(--danger); }
+.callout.info { border-left-color: var(--accent); background: var(--accent-soft); }
+.callout.info .ct { color: var(--accent); }
+
+@media (max-width: 860px) {
+  .doc { padding: 20px 16px 60px; }
+  .hero { padding: 24px 20px; }
+  .hero h1 { font-size: 26px; }
+  .view-switch a { padding: 3px 8px; }
+}
+
+/* 강의 슬라이드 — theme.css 위에 얹는 스타일 */
+body { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+/* ---------- 위쪽 줄 ---------- */
+.bar {
+  display: flex; align-items: center; gap: 6px; padding: 6px 12px; flex-wrap: wrap; min-height: 46px;
+  background: var(--pane); border-bottom: 1px solid var(--line); flex: none;
+}
+.bar .brand { font-size: 13.5px; font-weight: 700; color: var(--muted); margin-right: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: 36%; }
+.bar .brand b { color: var(--fg); }
+.bar button, .bar select {
+  border: 1px solid var(--line); background: var(--card); color: var(--fg); border-radius: 8px;
+  padding: 5px 11px; cursor: pointer; font-weight: 600; font-size: 13px; white-space: nowrap;
+}
+.bar button:hover, .bar select:hover { border-color: var(--accent); }
+.bar button.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.bar button.play { background: var(--accent); border-color: var(--accent); color: #fff; min-width: 88px; }
+.bar button.play.playing { background: var(--accent2); border-color: var(--accent2); }
+.count { font: 700 13px var(--mono); min-width: 64px; text-align: center; font-variant-numeric: tabular-nums; }
+.prog { height: 3px; background: var(--card2); flex: none; }
+.prog i { display: block; height: 100%; width: 0; background: var(--grad-bar); transition: width .3s; }
+
+/* ---------- 무대 ---------- */
+.wrap { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; padding: 14px; min-height: 0; }
+.stage {
+  width: 100%; aspect-ratio: 16/9; max-height: 100%; position: relative; overflow: hidden;
+  border-radius: 10px; box-shadow: 0 10px 40px rgba(15, 25, 45, .18);
+  --s-bg: #ffffff; --s-fg: #1b2230; --s-muted: #6a7486; --s-line: #e3e8ef; --s-card: #f5f7fb;
+  --s-accent: #7c3aed; --s-accent2: #c2185b; --s-soft: #f1ebfd;
+}
+:root[data-theme="dark"] .stage { --s-bg: #161b23; --s-fg: #e7ecf3; --s-muted: #95a0b2; --s-line: #2b3340; --s-card: #1d2430; --s-accent: #a78bfa; --s-accent2: #f472b6; --s-soft: #241b3d; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .stage { --s-bg: #161b23; --s-fg: #e7ecf3; --s-muted: #95a0b2; --s-line: #2b3340; --s-card: #1d2430; --s-accent: #a78bfa; --s-accent2: #f472b6; --s-soft: #241b3d; }
+}
+.slide {
+  position: absolute; inset: 0; container-type: size; padding: 5.5cqh 5cqw 4.5cqh 5.6cqw;
+  display: none; flex-direction: column; background: var(--s-bg); color: var(--s-fg);
+}
+.slide.show { display: flex; animation: slideIn .22s ease-out; }
+@keyframes slideIn { from { transform: translateX(.8cqw); } to { transform: none; } }
+.slide::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: .7cqw; background: linear-gradient(var(--s-accent), var(--s-accent2)); }
+
+/* 표지 · 구분 슬라이드는 히어로 그라데이션 */
+.slide.dk { color: #fff; background: radial-gradient(circle at 85% 20%, rgba(255, 255, 255, .18), transparent 40%), var(--grad); }
+.slide.dk::before { display: none; }
+
+.eb { font-size: 2.2cqh; font-weight: 800; color: var(--s-accent); margin-bottom: 1.2cqh; letter-spacing: .02em; }
+.dk .eb { display: inline-block; align-self: flex-start; color: #fff; background: rgba(255, 255, 255, .18); border-radius: 3cqh; padding: .5cqh 1.6cqw; }
+h1 { font-size: 8cqh; line-height: 1.18; font-weight: 800; letter-spacing: -.03em; margin: 0; text-wrap: balance; }
+h2 { font-size: 6cqh; line-height: 1.22; font-weight: 800; letter-spacing: -.02em; margin: 0; text-wrap: balance; }
+.slide:not(.dk) h2::after { content: ''; display: block; width: 9cqh; height: .7cqh; border-radius: 1cqh; background: var(--s-accent); margin-top: 1.6cqh; }
+.sub { font-size: 3cqh; color: var(--s-muted); margin-top: 1.6cqh; line-height: 1.5; max-width: 62ch; }
+.dk .sub { color: rgba(255, 255, 255, .88); }
+.lead { font-size: 3.2cqh; color: var(--s-accent2); margin-top: 1.6cqh; font-weight: 700; }
+.dk .lead { color: #ffd6ec; }
+
+.fill { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; min-height: 0; }
+.foot { font-size: 2.1cqh; color: var(--s-muted); margin-top: auto; padding-top: 1.6cqh; }
+.dk .foot { color: rgba(255, 255, 255, .75); }
+
+.grid { display: grid; gap: 1.8cqh 1.6cqw; }
+.g2 { grid-template-columns: 1fr 1fr; }
+.g3 { grid-template-columns: repeat(3, 1fr); }
+.g4 { grid-template-columns: repeat(4, 1fr); }
+.card {
+  background: var(--s-card); border: 1px solid var(--s-line); border-radius: 1.6cqh;
+  padding: 2.4cqh 2cqw; display: flex; flex-direction: column; gap: .8cqh; justify-content: center;
+}
+.dk .card { background: rgba(255, 255, 255, .12); border-color: rgba(255, 255, 255, .22); }
+.card .n { font: 700 2cqh var(--mono); color: var(--s-accent); }
+.dk .card .n { color: #fff; opacity: .85; }
+.card .t { font-size: 2.9cqh; font-weight: 800; line-height: 1.3; }
+.card .d { font-size: 2.3cqh; color: var(--s-muted); line-height: 1.5; }
+.dk .card .d { color: rgba(255, 255, 255, .8); }
+.card.warn { background: #fdeaea; border-color: #f3c6c4; }
+.card.warn .t, .card.warn .n { color: #d64541; }
+
+.rowlist { display: flex; flex-direction: column; gap: 1.2cqh; }
+.row { display: flex; align-items: center; gap: 2cqw; background: var(--s-card); border: 1px solid var(--s-line); border-radius: 1.4cqh; padding: 1.8cqh 2cqw; }
+.dot { flex: none; width: 5.4cqh; height: 5.4cqh; border-radius: 50%; background: var(--s-accent); color: #fff; display: grid; place-items: center; font: 700 2.2cqh var(--mono); }
+.row .t { font-size: 2.9cqh; font-weight: 800; flex: none; }
+.row .d { font-size: 2.4cqh; color: var(--s-muted); line-height: 1.45; }
+
+.stack { display: flex; flex-direction: column; gap: .9cqh; }
+.lay { display: flex; align-items: center; gap: 2cqw; border-radius: 1.2cqh; padding: 1.8cqh 2cqw; border: 1px solid var(--s-line); background: var(--s-card); }
+.lay b { font-size: 2.9cqh; min-width: 12cqw; }
+.lay span { font-size: 2.4cqh; color: var(--s-muted); }
+
+pre { background: #0f1419; color: #d7dde8; border-radius: 1.2cqh; padding: 2.4cqh 2cqw; margin: 0; font-size: 2.35cqh; line-height: 1.7; overflow: hidden; white-space: pre-wrap; }
+pre .p { color: #7ee787; }
+pre .c { color: #7d8799; }
+code { font-size: .92em; background: var(--s-soft); color: var(--s-accent2); padding: .1em .35em; border-radius: .4em; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 1cqh 1cqw; }
+.chip { font-size: 2.3cqh; font-weight: 700; background: var(--s-soft); border-radius: 3cqh; padding: .7cqh 1.4cqw; color: var(--s-accent); }
+.chip.bad { background: #fdeaea; color: #d64541; }
+.banner { background: #fdeaea; color: #b4302c; border-left: .8cqh solid #d64541; border-radius: 1.2cqh; padding: 2cqh 2cqw; font-size: 2.7cqh; font-weight: 700; line-height: 1.45; }
+.bannerG { background: var(--s-soft); color: var(--s-accent); border-left: .8cqh solid var(--s-accent); border-radius: 1.2cqh; padding: 2cqh 2cqw; font-size: 2.7cqh; font-weight: 700; line-height: 1.45; }
+.dk .bannerG, .dk .banner { background: rgba(255, 255, 255, .14); color: #fff; border-left-color: #fff; }
+.tnote { margin-top: 1.6cqh; border-left: .5cqh solid var(--s-accent2); background: var(--s-card); padding: 1.4cqh 1.6cqw; font-size: 2.1cqh; line-height: 1.5; }
+body:not(.notes) .tnote { display: none; }
+.nar { display: none; }
+
+/* ---------- 자막 ---------- */
+.cap { flex: none; min-height: 58px; display: flex; align-items: center; justify-content: center; padding: 8px 18px 14px; }
+.cap p { margin: 0; max-width: 1000px; text-align: center; font-size: 15px; line-height: 1.6; color: var(--fg); background: var(--pane); border: 1px solid var(--line); border-radius: 10px; padding: 8px 16px; box-shadow: var(--shadow); }
+.cap p.idle { color: var(--muted); font-size: 13px; box-shadow: none; background: transparent; border-color: transparent; }
+body.nocap .cap { display: none; }
+.toast { position: fixed; left: 50%; bottom: 86px; transform: translateX(-50%); background: #1d2433; color: #fff; padding: 9px 18px; border-radius: 10px; font-weight: 600; font-size: 13.5px; display: none; z-index: 90; }
+.toast.show { display: block; }
+@media (max-width: 1200px) { .bar .brand { display: none; } }
+@media (max-width: 760px) { .cap p { font-size: 13.5px; } }
+
+</style>
+</head>
+<body>
+<div class="bar">
+  <span class="brand">Day 6 › <b>하네스 I · 규칙과 기억</b></span>
+  <div class="view-switch"><a href="index.html" class="active">📺 슬라이드</a><a href="lab.html">🛠️ 실습</a><a href="quiz.html">✅ 퀴즈</a></div>
+  <button id="prev" title="이전 (←)">◀</button>
+  <span class="count" id="count">1 / 19</span>
+  <button id="next" title="다음 (→)">▶</button>
+  <button class="play" id="play" title="재생 / 정지 (Space)">▶ 재생</button>
+  <button id="auto" class="on" title="나레이션이 끝나면 자동으로 다음 장">자동 진행</button>
+  <select id="rate" title="말하기 속도">
+    <option value="0.85">0.85배</option>
+    <option value="1" selected>1.0배</option>
+    <option value="1.15">1.15배</option>
+    <option value="1.3">1.3배</option>
+    <option value="1.5">1.5배</option>
+  </select>
+  <select id="voice" title="목소리"></select>
+  <button id="cap" class="on" title="자막">자막</button>
+  <button id="full" title="전체화면 (F)">⛶</button>
+</div>
+<div class="prog"><i id="prog"></i></div>
+
+<div class="wrap"><div class="stage" id="stage">
+<section class="slide dk show">
+    <div class="fill">
+      <div class="eb">DAY 06 / 10 · 36–42차시 · 7시간</div>
+      <h1>하네스 I<br>규칙과 기억</h1>
+      <div class="lead">규칙 파일 하나로 세 도구를 같은 방향으로 움직인다</div>
+      <div class="sub" style="margin-top:3cqh">「Claude Code · Gemini CLI · Codex CLI로 배우는 AI 에이전트 개발」 70시간 과정</div>
+    </div>
+  <div class="nar">6일차입니다. 오늘의 주제는 하네스 I · 규칙과 기억입니다. 규칙 파일 하나로 세 도구를 같은 방향으로 움직인다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Learning Objectives</div>
+    <h2>오늘 끝났을 때 할 수 있어야 하는 것</h2>
+    <div class="fill"><div class="grid g2" style="margin-top:2cqh">
+      <div class="card"><span class="n">01</span><span class="t">CLAUDE.md · GEMINI.md · AGENTS.md를</span><span class="d">구분하고 읽히는 위치를 설명할 수 있다</span></div>
+      <div class="card"><span class="n">02</span><span class="t">AGENTS.md를 공통 규칙으로 두고</span><span class="d">세 도구에서 모두 쓰게 할 수 있다</span></div>
+      <div class="card"><span class="n">03</span><span class="t">검증 가능한 규칙을</span><span class="d">구체적으로 쓸 수 있다</span></div>
+      <div class="card"><span class="n">04</span><span class="t">권한과 메모리를</span><span class="d">설정 파일로 관리할 수 있다</span></div>
+    </div></div>
+  <div class="nar">오늘 끝났을 때 할 수 있어야 하는 것은 4가지입니다. CLAUDE.md · GEMINI.md · AGENTS.md를 구분하고 읽히는 위치를 설명하는 것, AGENTS.md를 공통 규칙으로 두고 세 도구에서 모두 쓰게 하는 것, 검증 가능한 규칙을 구체적으로 쓸 수 있다, 권한과 메모리를 설정 파일로 관리하는 것입니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">Today's Schedule</div>
+    <h2>오늘 하루 · 일곱 차시</h2>
+    <div class="fill"><div class="grid g4" style="margin-top:2cqh">
+      <div class="card"><span class="n">36차시 · 09:00–09:50</span><span class="t">하네스란 무엇인가</span><span class="d">세 도구 공통</span></div>
+      <div class="card"><span class="n">37차시 · 10:00–10:50</span><span class="t">규칙 파일 세 가지</span><span class="d">세 도구 공통</span></div>
+      <div class="card"><span class="n">38차시 · 11:00–11:50</span><span class="t">규칙 하나로 세 도구</span><span class="d">세 도구 공통</span></div>
+      <div class="card"><span class="n">39차시 · 12:00–12:50</span><span class="t">좋은 규칙과 나쁜 규칙</span><span class="d">세 도구 공통</span></div>
+      <div class="card"><span class="n" style="color:var(--s-accent2)">40차시 · 13:50–14:40</span><span class="t">권한 설계</span><span class="d">세 도구 공통</span></div>
+      <div class="card"><span class="n" style="color:var(--s-accent2)">41차시 · 14:50–15:40</span><span class="t">메모리</span><span class="d">세 도구 공통</span></div>
+      <div class="card"><span class="n" style="color:var(--s-accent2)">42차시 · 15:50–16:40</span><span class="t">실습: 규칙 적용 전후 비교</span><span class="d">세 도구 공통</span></div>
+    </div></div>
+    <div class="foot">차시마다 50분 수업 + 10분 휴식 · 점심 12:50–13:50</div>
+  <div class="nar">오늘은 일곱 차시입니다. 오전 네 차시, 점심 뒤 세 차시로 진행합니다.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">36차시 · 09:00–09:50 · 세 도구 공통</div>
+      <h2>하네스란 무엇인가</h2>
+      <div class="sub">엔진과 고삐 · 계기판 · 안전벨트</div>
+    </div>
+  <div class="nar">36차시, 하네스란 무엇인가입니다. 엔진과 고삐 · 계기판 · 안전벨트.</div>
+</section>
+<section class="slide">
+    <div class="eb">36차시 · Key Points</div>
+    <h2>하네스란 무엇인가</h2>
+    <div class="sub">엔진과 고삐 · 계기판 · 안전벨트</div>
+    
+    <div class="fill"><div class="grid g3" style="margin-top:1.6cqh">
+        <div class="card"><span class="n">01</span><span class="t">5일차 실패를 다시 보기</span><span class="d">TODO 설명</span></div>
+        <div class="card"><span class="n">02</span><span class="t">하네스의 4요소: 규칙 · 권한 · 도구 · 검증</span><span class="d">TODO 설명</span></div>
+        <div class="card"><span class="n">03</span><span class="t">오늘부터 8일차까지의 지도</span><span class="d">TODO 설명</span></div>
+      </div></div>
+    <div class="foot">TODO · 이 차시의 시연 화면, 예시 프롬프트, 확인 질문 슬라이드를 아래에 추가하세요.</div>
+  <div class="nar">TODO 나레이션. 이 차시의 핵심은 세 가지입니다. 5일차 실패를 다시 보기, 하네스의 4요소: 규칙 · 권한 · 도구 · 검증, 오늘부터 8일차까지의 지도.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">37차시 · 10:00–10:50 · 세 도구 공통</div>
+      <h2>규칙 파일 세 가지</h2>
+      <div class="sub">CLAUDE.md · GEMINI.md · AGENTS.md</div>
+    </div>
+  <div class="nar">37차시, 규칙 파일 세 가지입니다. CLAUDE.md · GEMINI.md · AGENTS.md.</div>
+</section>
+<section class="slide">
+    <div class="eb">37차시 · Key Points</div>
+    <h2>규칙 파일 세 가지</h2>
+    <div class="sub">CLAUDE.md · GEMINI.md · AGENTS.md</div>
+    
+    <div class="fill"><div class="grid g3" style="margin-top:1.6cqh">
+        <div class="card"><span class="n">01</span><span class="t">파일이 읽히는 위치와 순서</span><span class="d">TODO 설명</span></div>
+        <div class="card"><span class="n">02</span><span class="t">전역 규칙과 프로젝트 규칙</span><span class="d">TODO 설명</span></div>
+        <div class="card"><span class="n">03</span><span class="t">세 파일 구조 비교</span><span class="d">TODO 설명</span></div>
+      </div></div>
+    <div class="foot">TODO · 이 차시의 시연 화면, 예시 프롬프트, 확인 질문 슬라이드를 아래에 추가하세요.</div>
+  <div class="nar">TODO 나레이션. 이 차시의 핵심은 세 가지입니다. 파일이 읽히는 위치와 순서, 전역 규칙과 프로젝트 규칙, 세 파일 구조 비교.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">38차시 · 11:00–11:50 · 세 도구 공통</div>
+      <h2>규칙 하나로 세 도구</h2>
+      <div class="sub">AGENTS.md를 공통 규칙으로</div>
+    </div>
+  <div class="nar">38차시, 규칙 하나로 세 도구입니다. AGENTS.md를 공통 규칙으로.</div>
+</section>
+<section class="slide">
+    <div class="eb">38차시 · Key Points</div>
+    <h2>규칙 하나로 세 도구</h2>
+    <div class="sub">AGENTS.md를 공통 규칙으로</div>
+    
+    <div class="fill"><div class="grid g3" style="margin-top:1.6cqh">
+        <div class="card"><span class="n">01</span><span class="t">AGENTS.md에 공통 규칙 쓰기</span><span class="d">TODO 설명</span></div>
+        <div class="card"><span class="n">02</span><span class="t">다른 두 파일에서 연결하기</span><span class="d">TODO 설명</span></div>
+        <div class="card"><span class="n">03</span><span class="t">세 도구가 같은 규칙을 따르는지 확인</span><span class="d">TODO 설명</span></div>
+      </div></div>
+    <div class="foot">TODO · 이 차시의 시연 화면, 예시 프롬프트, 확인 질문 슬라이드를 아래에 추가하세요.</div>
+  <div class="nar">TODO 나레이션. 이 차시의 핵심은 세 가지입니다. AGENTS.md에 공통 규칙 쓰기, 다른 두 파일에서 연결하기, 세 도구가 같은 규칙을 따르는지 확인.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">39차시 · 12:00–12:50 · 세 도구 공통</div>
+      <h2>좋은 규칙과 나쁜 규칙</h2>
+      <div class="sub">구체적이고 검증 가능한 지시</div>
+    </div>
+  <div class="nar">39차시, 좋은 규칙과 나쁜 규칙입니다. 구체적이고 검증 가능한 지시.</div>
+</section>
+<section class="slide">
+    <div class="eb">39차시 · Key Points</div>
+    <h2>좋은 규칙과 나쁜 규칙</h2>
+    <div class="sub">구체적이고 검증 가능한 지시</div>
+    
+    <div class="fill"><div class="grid g3" style="margin-top:1.6cqh">
+        <div class="card"><span class="n">01</span><span class="t">"깔끔하게" 대신 무엇을 어떻게</span><span class="d">TODO 설명</span></div>
+        <div class="card"><span class="n">02</span><span class="t">금지 사항과 이유</span><span class="d">TODO 설명</span></div>
+        <div class="card"><span class="n">03</span><span class="t">규칙은 짧을수록 잘 지켜진다</span><span class="d">TODO 설명</span></div>
+      </div></div>
+    <div class="foot">TODO · 이 차시의 시연 화면, 예시 프롬프트, 확인 질문 슬라이드를 아래에 추가하세요.</div>
+  <div class="nar">TODO 나레이션. 이 차시의 핵심은 세 가지입니다. "깔끔하게" 대신 무엇을 어떻게, 금지 사항과 이유, 규칙은 짧을수록 잘 지켜진다.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">40차시 · 13:50–14:40 · 세 도구 공통</div>
+      <h2>권한 설계</h2>
+      <div class="sub">허용 목록과 차단 목록</div>
+    </div>
+  <div class="nar">40차시, 권한 설계입니다. 허용 목록과 차단 목록.</div>
+</section>
+<section class="slide">
+    <div class="eb">40차시 · Key Points</div>
+    <h2>권한 설계</h2>
+    <div class="sub">허용 목록과 차단 목록</div>
+    
+    <div class="fill"><div class="grid g3" style="margin-top:1.6cqh">
+        <div class="card"><span class="n">01</span><span class="t">settings.json · config.toml 등 설정 파일</span><span class="d">TODO 설명</span></div>
+        <div class="card"><span class="n">02</span><span class="t">허용할 명령 · 막을 명령</span><span class="d">TODO 설명</span></div>
+        <div class="card"><span class="n">03</span><span class="t">프로젝트 설정과 개인 설정 나누기</span><span class="d">TODO 설명</span></div>
+      </div></div>
+    <div class="foot">TODO · 이 차시의 시연 화면, 예시 프롬프트, 확인 질문 슬라이드를 아래에 추가하세요.</div>
+  <div class="nar">TODO 나레이션. 이 차시의 핵심은 세 가지입니다. settings.json · config.toml 등 설정 파일, 허용할 명령 · 막을 명령, 프로젝트 설정과 개인 설정 나누기.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">41차시 · 14:50–15:40 · 세 도구 공통</div>
+      <h2>메모리</h2>
+      <div class="sub">세션이 바뀌어도 이어지는 지식</div>
+    </div>
+  <div class="nar">41차시, 메모리입니다. 세션이 바뀌어도 이어지는 지식.</div>
+</section>
+<section class="slide">
+    <div class="eb">41차시 · Key Points</div>
+    <h2>메모리</h2>
+    <div class="sub">세션이 바뀌어도 이어지는 지식</div>
+    
+    <div class="fill"><div class="grid g3" style="margin-top:1.6cqh">
+        <div class="card"><span class="n">01</span><span class="t">세 도구의 메모리 방식 비교</span><span class="d">TODO 설명</span></div>
+        <div class="card"><span class="n">02</span><span class="t">무엇을 기억시키고 무엇은 안 하나</span><span class="d">TODO 설명</span></div>
+        <div class="card"><span class="n">03</span><span class="t">오래된 기억 정리</span><span class="d">TODO 설명</span></div>
+      </div></div>
+    <div class="foot">TODO · 이 차시의 시연 화면, 예시 프롬프트, 확인 질문 슬라이드를 아래에 추가하세요.</div>
+  <div class="nar">TODO 나레이션. 이 차시의 핵심은 세 가지입니다. 세 도구의 메모리 방식 비교, 무엇을 기억시키고 무엇은 안 하나, 오래된 기억 정리.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">42차시 · 15:50–16:40 · 세 도구 공통</div>
+      <h2>실습: 규칙 적용 전후 비교</h2>
+      <div class="sub">누적 프로젝트에 하네스 1단계</div>
+    </div>
+  <div class="nar">42차시, 실습: 규칙 적용 전후 비교입니다. 누적 프로젝트에 하네스 1단계.</div>
+</section>
+<section class="slide">
+    <div class="eb">42차시 · Key Points</div>
+    <h2>실습: 규칙 적용 전후 비교</h2>
+    <div class="sub">누적 프로젝트에 하네스 1단계</div>
+    
+    <div class="fill"><div class="grid g3" style="margin-top:1.6cqh">
+        <div class="card"><span class="n">01</span><span class="t">공통 규칙 파일 작성</span><span class="d">TODO 설명</span></div>
+        <div class="card"><span class="n">02</span><span class="t">같은 요청을 규칙 전 · 후로</span><span class="d">TODO 설명</span></div>
+        <div class="card"><span class="n">03</span><span class="t">달라진 점 기록</span><span class="d">TODO 설명</span></div>
+      </div></div>
+    <div class="foot">TODO · 이 차시의 시연 화면, 예시 프롬프트, 확인 질문 슬라이드를 아래에 추가하세요.</div>
+  <div class="nar">TODO 나레이션. 이 차시의 핵심은 세 가지입니다. 공통 규칙 파일 작성, 같은 요청을 규칙 전 · 후로, 달라진 점 기록.</div>
+</section>
+<section class="slide">
+    <div class="eb">Assignment 06 · 제출 익일 09:00</div>
+    <h2>공통 규칙 파일과 전후 비교</h2>
+    <div class="sub">누적 프로젝트에 규칙 파일과 권한 설정을 적용하고 효과를 보입니다.</div>
+    <div class="fill"><div class="grid g2" style="margin-top:2cqh">
+      <div class="card"><span class="n">01</span><span class="t">AGENTS.md 전문과 연결한 CLAUDE.md · GEMINI.md</span></div>
+      <div class="card"><span class="n">02</span><span class="t">권한 설정 파일 캡처</span></div>
+      <div class="card"><span class="n">03</span><span class="t">같은 요청의 규칙 적용 전 · 후 결과 비교</span></div>
+      <div class="card"><span class="n">04</span><span class="t">5일차 "막고 싶은 실수" 중 규칙으로 막은 것</span></div>
+    </div></div>
+    <div class="foot">TODO 채점 기준. 결과물이 동작하는지, 그리고 어떻게 확인했는지를 함께 봅니다.</div>
+  <div class="nar">오늘의 과제는 공통 규칙 파일과 전후 비교입니다. 누적 프로젝트에 규칙 파일과 권한 설정을 적용하고 효과를 보입니다.</div>
+</section>
+<section class="slide dk">
+    <div class="fill">
+      <div class="eb">Wrap-up</div>
+      <h2>오늘 한 일</h2>
+      <div class="sub" style="font-size:3.4cqh;margin-top:2cqh">하네스란 무엇인가 · 규칙 파일 세 가지 · 규칙 하나로 세 도구 · 좋은 규칙과 나쁜 규칙 · 권한 설계</div>
+      <div class="lead" style="margin-top:4cqh">내일 · Day 7 — 하네스 II · 재사용과 자동화</div>
+      <div class="sub">반복되는 요청은 명령으로, 반복되는 검사는 훅으로</div>
+    </div>
+  <div class="nar">오늘 수고하셨습니다. 내일은 하네스 II · 재사용과 자동화입니다. 오늘 마지막에 커밋하고 배포까지 해 두세요. 내일 첫 시간은 오늘 결과물을 여는 것으로 시작합니다.</div>
+</section>
+</div></div>
+
+<div class="cap"><p id="capText" class="idle">▶ 재생을 누르면 나레이션이 시작됩니다 · ← → 슬라이드 이동 · Space 재생/정지 · F 전체화면</p></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const synth  = window.speechSynthesis;
+  const $ = id => document.getElementById(id);
+  let idx = 0, playing = false, auto = true, chunks = [], ci = 0, voices = [], voice = null;
+
+  $('count').textContent = '1 / ' + slides.length;
+
+  function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 3800); }
+
+  function narration(i){ const n = slides[i].querySelector('.nar'); return n ? n.textContent.trim() : ''; }
+  function splitSentences(t){
+    return t.split(/(?<=[.?!])\s+/).map(s=>s.trim()).filter(Boolean);
+  }
+
+  function show(i){
+    slides[idx].classList.remove('show');
+    idx = Math.max(0, Math.min(slides.length-1, i));
+    slides[idx].classList.add('show');
+    $('count').textContent = (idx+1) + ' / ' + slides.length;
+    $('prog').style.width = ((idx+1)/slides.length*100) + '%';
+  }
+
+  function setCap(text, idle){
+    const p = $('capText');
+    p.textContent = text;
+    p.classList.toggle('idle', !!idle);
+  }
+
+  function stop(){
+    playing = false; chunks = []; ci = 0;
+    try { synth.cancel(); } catch(e){}
+    $('play').textContent = '▶ 재생';
+    $('play').classList.remove('playing');
+    setCap('▶ 재생을 누르면 나레이션이 시작됩니다 · ← → 슬라이드 이동 · Space 재생/정지 · F 전체화면', true);
+  }
+
+  function speakNext(){
+    if (!playing) return;
+    if (ci >= chunks.length){
+      if (auto && idx < slides.length-1){ show(idx+1); startSpeaking(); }
+      else { stop(); }
+      return;
+    }
+    const u = new SpeechSynthesisUtterance(chunks[ci]);
+    u.lang = 'ko-KR';
+    if (voice) u.voice = voice;
+    u.rate = parseFloat($('rate').value);
+    u.onend = () => { ci++; speakNext(); };
+    u.onerror = () => { ci++; speakNext(); };
+    setCap(chunks[ci]);
+    synth.speak(u);
+  }
+
+  function startSpeaking(){
+    try { synth.cancel(); } catch(e){}
+    chunks = splitSentences(narration(idx)); ci = 0;
+    if (!chunks.length){ if (auto && idx < slides.length-1){ show(idx+1); setTimeout(startSpeaking,120); } else stop(); return; }
+    playing = true;
+    $('play').textContent = '❚❚ 정지';
+    $('play').classList.add('playing');
+    setTimeout(speakNext, 120);
+  }
+
+  function toggle(){ playing ? stop() : startSpeaking(); }
+  function go(d){ const was = playing; stop(); show(idx+d); if (was) setTimeout(startSpeaking, 150); }
+
+  /* voices */
+  function loadVoices(){
+    voices = synth.getVoices();
+    const ko = voices.filter(v => /^ko/i.test(v.lang));
+    const sel = $('voice');
+    sel.innerHTML = '';
+    const list = ko.length ? ko : voices;
+    if (!list.length){ sel.innerHTML = '<option>음성 없음</option>'; return; }
+    list.forEach((v,i) => {
+      const o = document.createElement('option');
+      o.value = voices.indexOf(v); o.textContent = v.name.replace(/Microsoft |Google /,'');
+      sel.appendChild(o);
+    });
+    voice = list[0];
+    sel.value = voices.indexOf(voice);
+    if (!ko.length) toast('한국어 음성이 없습니다 — Chrome 또는 Edge에서 열어 보세요');
+  }
+  loadVoices();
+  if (typeof synth.onvoiceschanged !== 'undefined') synth.onvoiceschanged = loadVoices;
+
+  /* controls */
+  $('play').onclick = toggle;
+  $('prev').onclick = () => go(-1);
+  $('next').onclick = () => go(1);
+  $('voice').onchange = e => { voice = voices[e.target.value]; if (playing){ const w=idx; stop(); show(w); startSpeaking(); } };
+  $('rate').onchange  = () => { if (playing){ const w=idx; stop(); show(w); startSpeaking(); } };
+  $('auto').onclick   = e => { auto = !auto; e.target.classList.toggle('on', auto); };
+  $('cap').onclick    = e => { document.body.classList.toggle('nocap'); e.target.classList.toggle('on', !document.body.classList.contains('nocap')); };
+  $('full').onclick   = () => { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); };
+
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'SELECT') return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown'){ e.preventDefault(); go(1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); go(-1); }
+    else if (e.key === ' '){ e.preventDefault(); toggle(); }
+    else if (e.key === 'f' || e.key === 'F'){ $('full').click(); }
+    else if (e.key === 'Home'){ go(-idx); }
+    else if (e.key === 'End'){ go(slides.length-1-idx); }
+  });
+  $('stage').addEventListener('click', e => { if (e.clientX > window.innerWidth/2) go(1); else go(-1); });
+  window.addEventListener('beforeunload', () => { try{ synth.cancel(); }catch(e){} });
+  window.deckGo = n => { const was = playing; stop(); show(n); if (was) setTimeout(startSpeaking, 150); };
+})();
+
+</script>
+<script src="../nav.js"></script>
+</body>
+</html>
