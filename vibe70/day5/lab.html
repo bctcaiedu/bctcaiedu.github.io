@@ -325,7 +325,7 @@ footer.docfoot { max-width: 920px; margin: 0 auto; padding: 0 34px 40px; font-si
     <span class="badge">DAY 05 · 29–35차시 · 실습 가이드</span>
     <h1>바이브 코딩의 한계와 검증</h1>
     <p>"됐다"는 말을 믿지 말고 직접 확인한다. 차시 순서대로 쌓이니 건너뛰지 마세요.</p>
-    <div class="meta-row"><span class="chip">⏱ 7시간 · 7차시</span><span class="chip">🧰 세 도구 공통</span><span class="chip">✅ 퀴즈 4문항</span></div>
+    <div class="meta-row"><span class="chip">⏱ 7시간 · 7차시</span><span class="chip">🧰 세 도구 공통 · 세 도구 공통 · git · Beyond Compare</span><span class="chip">✅ 퀴즈 7문항</span></div>
     <span class="emo">🛠️</span>
   </div>
 
@@ -431,20 +431,105 @@ footer.docfoot { max-width: 920px; margin: 0 auto; padding: 0 34px 40px; font-si
   </section>
 
   <section class="part-sec" id="p34">
-    <div class="part"><span class="pn">34차시</span><h2>검증 습관</h2><span class="pt">14:50–15:40 · 세 도구 공통</span></div>
-    <p class="lede">직접 확인하는 체크리스트</p>
+    <div class="part"><span class="pn">34차시</span><h2>검증 습관 · AI 코드 검토</h2><span class="pt">14:50–15:40 · 세 도구 공통 · git · Beyond Compare</span></div>
+    <p class="lede">AI가 무엇을 바꿨는지 git과 Beyond Compare로 직접 찾고, 원하는 변경만 커밋합니다. 버전 관리 없이 AI에게 코드를 맡기지 않습니다.</p>
     
+    <div class="stepc">
+      <div class="shead"><span class="sn">STEP 1</span><h3>Beyond Compare 설치와 git 연결</h3></div>
+      <div class="sbody">
+      <ol>
+        <li><a href="https://www.scootersoftware.com/download" target="_blank" rel="noopener">scootersoftware.com/download</a> 에서 Beyond Compare 5 를 받아 설치합니다. 30일 체험판으로 시작합니다(계속 쓰려면 라이선스, 무료 대안은 WinMerge).</li>
+        <li>Git Bash 에서 git 과 연결합니다.</li>
+      </ol>
+      <pre><span class="p">git config --global diff.tool bc</span>
+<span class="p">git config --global difftool.bc.path "C:/Program Files/Beyond Compare 5/BComp.exe"</span>
+<span class="p">git config --global difftool.prompt false</span>
+<span class="p">git config --global merge.tool bc</span>
+<span class="p">git config --global mergetool.bc.path "C:/Program Files/Beyond Compare 5/BComp.exe"</span>
+<span class="p">git config --global --get diff.tool</span>
+<span class="o">bc</span></pre>
+      <div class="box q"><span class="lbl">macOS</span><p>앱을 연 뒤 메뉴 Beyond Compare → Install Command Line Tools, 그다음 <code>git config --global diff.tool bc</code> 만 합니다.</p></div></div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">STEP 2</span><h3>프로젝트 폴더 정하기와 기준점 커밋</h3></div>
+      <div class="sbody">
+      <p>누적 프로젝트 폴더로 이동합니다. 코딩 에이전트는 <b>실행한 폴더</b>를 작업 공간으로 삼으므로, 반드시 이 폴더 안에서 실행합니다. 홈 폴더나 바탕 화면에서 실행하지 않습니다.</p>
+      <pre><span class="p">cd ~/vibe-project</span>          <span class="c"># 내 누적 프로젝트 폴더</span>
+<span class="p">git status</span>                 <span class="c"># 커밋 안 한 것이 있으면 먼저 커밋</span>
+<span class="p">git add -A</span>
+<span class="p">git commit -m "AI 작업 전 기준점"</span>
+<span class="p">git switch -c ai-claude</span></pre>
+      <div class="box warn"><span class="lbl">기준점이 없으면</span><p>AI 결과가 마음에 들지 않아도 돌아갈 곳이 없습니다. AI 를 부르기 전에 커밋 — 이것이 오늘의 가장 중요한 습관입니다.</p></div></div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">STEP 3</span><h3>세 도구에게 같은 일 맡기기</h3></div>
+      <div class="sbody">
+      <p>세 브랜치를 모두 <b>기준점에서</b> 만들고, 브랜치마다 도구 하나를 실행해 같은 요청을 합니다.</p>
+      <pre><span class="p">git switch -c ai-claude main</span>   <span class="c"># → claude 실행</span>
+<span class="p">git switch -c ai-gemini main</span>   <span class="c"># → gemini 실행</span>
+<span class="p">git switch -c ai-codex main</span>    <span class="c"># → codex 실행</span></pre>
+      <span class="prelbl">요청 예시 — 고칠 파일과 금지할 것을 적는다</span>
+      <pre>내 프로젝트에 다크 모드 버튼을 추가해줘.
+- index.html 에 버튼 하나, app.js 에 전환 함수, style.css 에 .dark 규칙만 추가
+- 다른 파일과 기존 스타일은 고치지 말고, 새 파일은 만들지 마
+- 끝나면 바꾼 파일과 바꾼 줄 수를 목록으로 알려줘</pre>
+      <div class="box q"><span class="lbl">브랜치를 바꾸기 전에</span><p>도구 하나가 끝나면 그 결과를 <code>git add -A</code> · <code>git commit -m "AI(claude): 다크 모드 — 검토 전"</code> 으로 그 브랜치에 임시 커밋해 둡니다. 그래야 다음 브랜치로 옮겨도 결과가 섞이지 않습니다.</p></div></div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">STEP 4</span><h3>무엇이 바뀌었나 찾기</h3></div>
+      <div class="sbody">
+      <p>넓은 것에서 좁은 것으로. 어떤 파일이 → 얼마나 → 어떻게.</p>
+      <pre><span class="p">git diff --stat main ai-claude</span>       <span class="c"># 파일 목록과 줄 수</span>
+<span class="p">git diff --name-status main ai-claude</span> <span class="c"># A 새 파일 · M 고침 · D 지움</span>
+<span class="p">git difftool -d main ai-claude</span>       <span class="c"># Beyond Compare 폴더 비교</span></pre>
+      <div class="tablewrap"><table>
+        <thead><tr><th>확인할 것</th><th>보는 곳</th></tr></thead>
+        <tbody>
+          <tr><td>AI 가 말한 "바꾼 파일" 과 실제 목록이 같은가</td><td><code>--stat</code> · <code>--name-status</code></td></tr>
+          <tr><td>부탁하지 않은 파일 · 서식 변경</td><td>Beyond Compare 폴더 비교의 빨간 파일</td></tr>
+          <tr><td>새로 생긴 파일 (로그 · 메모 · 백업)</td><td><code>A</code> 표시, 한쪽에만 있는 파일</td></tr>
+          <tr><td>지워진 코드 · 바뀐 함수 이름</td><td>줄 비교의 빨간 줄</td></tr>
+          <tr><td>비밀 값 · 라이브러리 추가</td><td><code>.env</code> · <code>package.json</code> · <code>requirements.txt</code> 의 diff</td></tr>
+        </tbody>
+      </table></div></div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">STEP 5</span><h3>골라 담아 main 에 합치기</h3></div>
+      <div class="sbody">
+      <p>세 결과 중 가장 깨끗한 브랜치 하나를 고릅니다. 그 브랜치에서 원하지 않는 변경만 되돌리고 다시 커밋한 뒤 main 에 합칩니다.</p>
+      <pre><span class="p">git switch ai-claude</span>
+<span class="p">git restore --source=main style.css</span>   <span class="c"># 부탁 안 한 변경을 기준점 내용으로</span>
+<span class="p">git rm debug.log</span>                    <span class="c"># AI 가 만든 찌꺼기 (임시 커밋에 들어갔던 것)</span>
+<span class="p">git commit -am "AI(claude): 다크 모드 — 검토 후 정리"</span>
+<span class="p">git switch main</span>
+<span class="p">git merge ai-claude</span>
+<span class="p">git branch -D ai-gemini ai-codex</span>       <span class="c"># 쓰지 않은 시도는 버림</span></pre>
+      <div class="box check"><span class="lbl">커밋 메시지에 남길 것</span><p>어느 AI 를 썼는지, 무엇을 부탁했는지, 무엇을 버렸는지. 나중에 이 커밋을 보는 사람이 어디를 더 의심해야 할지 알 수 있습니다.</p></div></div>
+    </div>
+
+    <div class="stepc">
+      <div class="shead"><span class="sn">STEP 6</span><h3>먼저 연습해 보기 — Git 실습 L23</h3></div>
+      <div class="sbody">
+      <p>명령이 익숙하지 않으면 설치 없이 브라우저에서 연습합니다. <a href="../../git/#l23" target="_blank" rel="noopener">Git · GitHub 실습 L23 · AI 가 만든 코드 검토하기</a> 의 미션 3개(기준점 만들기 · 원하는 변경만 담기 · 망친 시도 버리기)를 풀고 오면 이 차시가 훨씬 빠릅니다.</p></div>
+    </div>
     
     <div class="mission">
-      <div class="mhead"><span class="mn">MISSION 06</span><h3>검증 습관</h3></div>
+      <div class="mhead"><span class="mn">MISSION 06</span><h3>세 도구 비교표 만들기</h3></div>
       
-      <ul>
-        <li>"됐습니다"를 확인하는 법</li>
-        <li>화면 · 로그 · 테스트로 확인</li>
-        <li>확인 체크리스트 만들기</li>
-      </ul>
-      <div class="box q"><span class="lbl">TODO · 실습 단계 작성</span>
-        <p>단계별 절차, 예시 프롬프트, 실행 결과 예시, 확인 질문을 여기에 채웁니다.</p></div>
+      <p>STEP 3 ~ 5 를 마치고 아래 표를 채워 과제 보고서에 붙입니다.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>도구</th><th>AI 가 말한 바꾼 파일</th><th><code>git diff --stat</code> 실제 목록</th><th>부탁 안 한 변경 · 새 파일</th><th>채택</th></tr></thead>
+        <tbody>
+          <tr><td>Claude Code</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>Gemini CLI</td><td></td><td></td><td></td><td></td></tr>
+          <tr><td>Codex CLI</td><td></td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table></div>
+      <div class="box q"><span class="lbl">확인 질문</span><p>세 도구 중 지시를 가장 잘 지킨 것은? 부탁하지 않은 변경을 하나도 못 찾았다면, 정말 없었는지 Beyond Compare 폴더 비교로 다시 보세요.</p></div>
     </div>
     <div class="section-end"><span>34차시를 마쳤나요? 표시해 두면 왼쪽 학습 진도에 반영됩니다.</span><button class="btn done-btn" type="button" data-no="34">✓ 완료로 표시</button></div>
   </section>
@@ -477,6 +562,9 @@ footer.docfoot { max-width: 920px; margin: 0 auto; padding: 0 34px 40px; font-si
         <tr><td>명령을 찾을 수 없음 (command not found)</td><td>설치가 안 됐거나 PATH에 없음</td><td>터미널을 새로 열고 버전 확인. 그래도 안 되면 다시 설치</td></tr>
         <tr><td>로그인 · 인증 오류</td><td>계정 로그인이 풀렸거나 사용량 초과</td><td>로그인 명령을 다시 실행하고 사용량 확인. 막히면 다른 도구로 진행</td></tr>
         <tr><td>AI가 같은 실수를 반복</td><td>맥락이 길어져 규칙을 놓침</td><td>요약 후 새 세션에서 핵심만 다시 전달</td></tr>
+        <tr><td>git difftool 이 Beyond Compare 를 못 찾음</td><td>difftool.bc.path 경로가 설치 폴더와 다름</td><td>설치 폴더의 BComp.exe 경로를 / 로 적어 다시 설정 (예: C:/Program Files/Beyond Compare 5/BComp.exe)</td></tr>
+        <tr><td>AI 결과가 다른 브랜치와 섞임</td><td>임시 커밋 없이 브랜치를 바꿈</td><td>도구가 끝날 때마다 그 브랜치에 커밋한 뒤 switch</td></tr>
+        <tr><td>git diff 에 아무것도 안 나옴</td><td>AI 가 이미 커밋했거나 비교 대상이 틀림</td><td>git log 로 확인하고 git diff main ai-브랜치 처럼 기준점과 비교</td></tr>
         <tr><td>TODO</td><td>이 날 자주 나오는 오류를 추가하세요</td><td></td></tr>
       </tbody>
     </table></div>
@@ -484,8 +572,8 @@ footer.docfoot { max-width: 920px; margin: 0 auto; padding: 0 34px 40px; font-si
 
   <section class="part-sec" id="quiz">
     <div class="part"><span class="pn">부록 B</span><h2>오늘의 퀴즈</h2></div>
-    <div class="callout info"><div class="ct">✅ Day 5 · 4문항</div>
-      <p>객관식과 직접 입력이 섞여 있습니다. 가이드를 다시 보지 말고 먼저 풀어 보세요. <strong>4문항 이상</strong>이면 통과입니다.</p>
+    <div class="callout info"><div class="ct">✅ Day 5 · 7문항</div>
+      <p>객관식과 직접 입력이 섞여 있습니다. 가이드를 다시 보지 말고 먼저 풀어 보세요. <strong>6문항 이상</strong>이면 통과입니다.</p>
       <p><a class="btn primary" href="quiz.html" style="color:#fff">▶ 퀴즈 풀러 가기</a></p></div>
   </section>
 
@@ -499,6 +587,9 @@ footer.docfoot { max-width: 920px; margin: 0 auto; padding: 0 34px 40px; font-si
         <li><label><input type="checkbox"><span>맥락 창이 꽉 찰 때 압축과 새 세션으로 대응할 수 있다</span></label></li>
         <li><label><input type="checkbox"><span>보안 기본을 키 · 입력 검증 · 샌드박스로 점검할 수 있다</span></label></li>
         <li><label><input type="checkbox"><span>AI에게 테스트를 먼저 쓰게 하고 결과로 검증할 수 있다</span></label></li>
+        <li><label><input type="checkbox"><span>AI 에게 맡기기 전에 기준점 커밋과 AI 전용 브랜치를 만들었다</span></label></li>
+        <li><label><input type="checkbox"><span>Beyond Compare(또는 WinMerge)를 git difftool 로 연결하고 AI 의 변경을 폴더 비교로 확인했다</span></label></li>
+        <li><label><input type="checkbox"><span>세 도구 비교표에서 부탁하지 않은 변경 · 새 파일을 찾아 정리했다</span></label></li>
         <li><label><input type="checkbox"><span>오늘 결과물을 커밋하고 push했다</span></label></li>
       </ul>
     </div>
@@ -510,7 +601,7 @@ footer.docfoot { max-width: 920px; margin: 0 auto; padding: 0 34px 40px; font-si
     <div class="stepc">
       <div class="shead"><span class="sn">제출 항목</span><h3>각 항목마다 결과 화면 캡처와 사용한 요청문(프롬프트)을 함께 붙일 것</h3></div>
       <div class="sbody">
-        <ol><li>AI가 틀린 장면 3개와 유형 (환각 · 오래된 지식 · 오답)</li><li>누적 프로젝트에 추가한 테스트 3개 이상</li><li>망가진 프로젝트를 고친 과정</li><li>"다음엔 규칙으로 막고 싶은 실수" 목록</li></ol>
+        <ol><li>AI가 틀린 장면 3개와 유형 (환각 · 오래된 지식 · 오답)</li><li>누적 프로젝트에 추가한 테스트 3개 이상</li><li>망가진 프로젝트를 고친 과정</li><li>"다음엔 규칙으로 막고 싶은 실수" 목록</li><li>34차시 세 도구 비교표와 Beyond Compare 폴더 비교 캡처 1장</li></ol>
         
         <div class="box check"><span class="lbl">채점 기준</span><p>TODO 채점 기준. 결과물이 동작하는지, 그리고 어떻게 확인했는지를 함께 봅니다.</p></div>
       </div>

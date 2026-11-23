@@ -349,7 +349,7 @@ body.nocap .cap { display: none; }
   <span class="brand">Day 5 › <b>바이브 코딩의 한계와 검증</b></span>
   <div class="view-switch"><a href="index.html" class="active">📺 슬라이드</a><a href="lab.html">🛠️ 실습</a><a href="quiz.html">✅ 퀴즈</a></div>
   <button id="prev" title="이전 (←)">◀</button>
-  <span class="count" id="count">1 / 19</span>
+  <span class="count" id="count">1 / 22</span>
   <button id="next" title="다음 (→)">▶</button>
   <button class="play" id="play" title="재생 / 정지 (Space)">▶ 재생</button>
   <button id="auto" class="on" title="나레이션이 끝나면 자동으로 다음 장">자동 진행</button>
@@ -384,8 +384,9 @@ body.nocap .cap { display: none; }
       <div class="card"><span class="n">02</span><span class="t">맥락 창이 꽉 찰 때</span><span class="d">압축과 새 세션으로 대응할 수 있다</span></div>
       <div class="card"><span class="n">03</span><span class="t">보안 기본을</span><span class="d">키 · 입력 검증 · 샌드박스로 점검할 수 있다</span></div>
       <div class="card"><span class="n">04</span><span class="t">AI에게</span><span class="d">테스트를 먼저 쓰게 하고 결과로 검증할 수 있다</span></div>
+      <div class="card"><span class="n">05</span><span class="t">AI가 바꾼 코드를</span><span class="d">git diff와 Beyond Compare로 찾아 원하는 변경만 커밋할 수 있다</span></div>
     </div></div>
-  <div class="nar">오늘 끝났을 때 할 수 있어야 하는 것은 4가지입니다. AI가 틀리는 방식을 환각 · 오래된 지식 · 자신감 있는 오답으로 구분하는 것, 맥락 창이 꽉 찰 때 압축과 새 세션으로 대응하는 것, 보안 기본을 키 · 입력 검증 · 샌드박스로 점검하는 것, AI에게 테스트를 먼저 쓰게 하고 결과로 검증하는 것입니다.</div>
+  <div class="nar">오늘 끝났을 때 할 수 있어야 하는 것은 5가지입니다. AI가 틀리는 방식을 환각 · 오래된 지식 · 자신감 있는 오답으로 구분하는 것, 맥락 창이 꽉 찰 때 압축과 새 세션으로 대응하는 것, 보안 기본을 키 · 입력 검증 · 샌드박스로 점검하는 것, AI에게 테스트를 먼저 쓰게 하고 결과로 검증하는 것, 그리고 AI가 바꾼 코드를 git diff와 Beyond Compare로 찾아 원하는 변경만 커밋하는 것입니다.</div>
 </section>
 <section class="slide">
     <div class="eb">Today's Schedule</div>
@@ -396,7 +397,7 @@ body.nocap .cap { display: none; }
       <div class="card"><span class="n">31차시 · 11:00–11:50</span><span class="t">보안 기본</span><span class="d">세 도구 공통</span></div>
       <div class="card"><span class="n">32차시 · 12:00–12:50</span><span class="t">저작권 · 라이선스 · 윤리</span><span class="d">세 도구 공통</span></div>
       <div class="card"><span class="n" style="color:var(--s-accent2)">33차시 · 13:50–14:40</span><span class="t">테스트 입문</span><span class="d">세 도구 공통</span></div>
-      <div class="card"><span class="n" style="color:var(--s-accent2)">34차시 · 14:50–15:40</span><span class="t">검증 습관</span><span class="d">세 도구 공통</span></div>
+      <div class="card"><span class="n" style="color:var(--s-accent2)">34차시 · 14:50–15:40</span><span class="t">검증 습관 · AI 코드 검토</span><span class="d">세 도구 공통 · git · Beyond Compare</span></div>
       <div class="card"><span class="n" style="color:var(--s-accent2)">35차시 · 15:50–16:40</span><span class="t">실습: 망가진 프로젝트 고치기</span><span class="d">세 도구 공통</span></div>
     </div></div>
     <div class="foot">차시마다 50분 수업 + 10분 휴식 · 점심 12:50–13:50</div>
@@ -509,24 +510,79 @@ body.nocap .cap { display: none; }
 </section>
 <section class="slide dk">
     <div class="fill">
-      <div class="eb">34차시 · 14:50–15:40 · 세 도구 공통</div>
-      <h2>검증 습관</h2>
-      <div class="sub">직접 확인하는 체크리스트</div>
+      <div class="eb">34차시 · 14:50–15:40 · 세 도구 공통 · git · Beyond Compare</div>
+      <h2>검증 습관 · AI 코드 검토</h2>
+      <div class="sub">어디가 바뀌었는지 모르면 검증할 수 없다</div>
     </div>
-  <div class="nar">34차시, 검증 습관입니다. 직접 확인하는 체크리스트.</div>
+  <div class="nar">34차시, 검증 습관입니다. 오늘은 그중에서도 AI가 만든 코드를 검토하는 법을 익힙니다. 어디가 바뀌었는지 모르면 검증할 수 없습니다.</div>
 </section>
 <section class="slide">
-    <div class="eb">34차시 · Key Points</div>
-    <h2>검증 습관</h2>
-    <div class="sub">직접 확인하는 체크리스트</div>
+    <div class="eb">34차시 · 왜</div>
+    <h2>AI는 무엇을 바꿨는지 정확히 말해 주지 않는다</h2>
+    <div class="sub">설명이 아니라 실제로 바뀐 줄을 본다</div>
     
     <div class="fill"><div class="grid g3" style="margin-top:1.6cqh">
-        <div class="card"><span class="n">01</span><span class="t">"됐습니다"를 확인하는 법</span><span class="d">TODO 설명</span></div>
-        <div class="card"><span class="n">02</span><span class="t">화면 · 로그 · 테스트로 확인</span><span class="d">TODO 설명</span></div>
-        <div class="card"><span class="n">03</span><span class="t">확인 체크리스트 만들기</span><span class="d">TODO 설명</span></div>
+        <div class="card warn"><span class="n">01</span><span class="t">부탁 안 한 파일까지</span><span class="d">서식 정리 · 이름 바꾸기 · 코드 지우기. 진짜 바뀐 줄이 수백 줄 속에 묻힌다</span></div>
+        <div class="card warn"><span class="n">02</span><span class="t">새 파일이 생긴다</span><span class="d">로그 · 메모 · 백업 · 테스트 파일. 그대로 커밋하면 저장소가 더러워진다</span></div>
+        <div class="card warn"><span class="n">03</span><span class="t">"고쳤습니다"의 함정</span><span class="d">바꾼 파일 목록을 빠뜨리거나 틀리게 말한다. 비밀 값 · 의존성 변경도 끼어든다</span></div>
+      </div>
+      <div class="banner" style="margin-top:2.4cqh">원칙 — 내가 읽지 않은 줄은 커밋하지 않는다. 커밋하는 순간 AI 코드는 내 코드다.</div></div>
+    
+  <div class="nar">Claude Code, Gemini CLI, Codex 같은 코딩 에이전트는 폴더의 파일을 직접 고칩니다. 문제는 무엇을 바꿨는지 정확히 알려 주지 않는다는 것입니다. 부탁하지 않은 파일의 서식을 정리하거나 이름을 바꾸고, 로그나 메모 파일을 새로 만들고, 바꾼 파일 목록을 빠뜨리거나 틀리게 말하기도 합니다. 그래서 원칙은 하나입니다. 내가 읽지 않은 줄은 커밋하지 않는다. 커밋하는 순간 AI 코드는 내 코드가 됩니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">34차시 · 순서</div>
+    <h2>AI에게 맡기는 안전한 순서</h2>
+    <div class="sub">기준점이 있어야 비교할 수 있고, 돌아올 수 있다</div>
+    
+    <div class="fill"><div class="rowlist">
+        <div class="row"><span class="dot">1</span><span class="t">폴더 정하기</span><span class="d">프로젝트 폴더 하나에서만 에이전트를 실행 (홈 · 바탕 화면 금지)</span></div>
+        <div class="row"><span class="dot">2</span><span class="t">기준점</span><span class="d"><code>git commit</code> 후 <code>git switch -c ai-기능이름</code></span></div>
+        <div class="row"><span class="dot">3</span><span class="t">맡기기</span><span class="d">고칠 파일과 고치지 말 것, 새 파일 금지를 요청에 적는다</span></div>
+        <div class="row"><span class="dot">4</span><span class="t">찾기</span><span class="d"><code>git status</code> → <code>git diff --stat</code> → <code>git difftool -d</code> (Beyond Compare)</span></div>
+        <div class="row"><span class="dot">5</span><span class="t">골라 담기</span><span class="d"><code>git restore</code> · <code>git clean -n/-f</code> · <code>git add 파일</code> · <code>git commit -m "AI: …"</code></span></div>
       </div></div>
-    <div class="foot">TODO · 이 차시의 시연 화면, 예시 프롬프트, 확인 질문 슬라이드를 아래에 추가하세요.</div>
-  <div class="nar">TODO 나레이션. 이 차시의 핵심은 세 가지입니다. "됐습니다"를 확인하는 법, 화면 · 로그 · 테스트로 확인, 확인 체크리스트 만들기.</div>
+    <div class="foot">망쳤으면 → git switch main · git branch -D ai-기능이름 으로 통째로 버린다</div>
+  <div class="nar">순서는 다섯 단계입니다. 첫째, 에이전트는 프로젝트 폴더 하나에서만 실행합니다. 둘째, 맡기기 전에 커밋해서 기준점을 남기고 AI 전용 브랜치로 옮깁니다. 셋째, 요청에 고칠 파일과 고치지 말 것을 적습니다. 넷째, 끝나면 git status, git diff stat, 그리고 Beyond Compare로 바뀐 곳을 찾습니다. 다섯째, 원하지 않는 변경은 restore, 찌꺼기 파일은 clean으로 정리하고 원하는 파일만 add해서 커밋합니다. 결과가 엉망이면 main으로 돌아와 브랜치를 지우면 됩니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">34차시 · 도구</div>
+    <h2>Beyond Compare를 git에 연결하기</h2>
+    <div class="sub">폴더 비교 한 화면으로 AI의 변경을 훑는다</div>
+    
+    <div class="fill"><div class="grid g2" style="align-items:start">
+        <pre><span class="c"># Windows (경로는 설치 폴더에 맞게)</span>
+git config --global diff.tool bc
+git config --global difftool.bc.path "C:/Program Files/Beyond Compare 5/BComp.exe"
+git config --global difftool.prompt false
+git config --global merge.tool bc
+
+<span class="c"># 쓰기</span>
+<span class="p">git difftool -d</span>              <span class="c"># 바뀐 파일 전체를 폴더 비교로</span>
+<span class="p">git difftool -d main ai-menu</span> <span class="c"># 합치기 전 브랜치 비교</span></pre>
+        <div class="stack">
+          <div class="lay"><b>빨강</b><span>다른 파일 · 다른 줄</span></div>
+          <div class="lay"><b>보라 · 파랑</b><span>한쪽에만 있는 파일 (AI가 새로 만든 것)</span></div>
+          <div class="lay"><b>화살표</b><span>덩어리 단위로 원래 내용을 되가져오기</span></div>
+          <div class="lay"><b>무료 대안</b><span>WinMerge · VS Code 비교 · Meld</span></div>
+        </div>
+      </div></div>
+    <div class="foot">Beyond Compare 는 30일 체험판 뒤 라이선스 필요 · 자세한 실습은 Git · GitHub 실습 L23</div>
+  <div class="nar">비교 도구는 Beyond Compare를 씁니다. 두 폴더나 두 파일을 나란히 놓고 다른 곳을 색으로 보여 줍니다. git config로 diff tool을 bc로 정해 두면 git difftool 대시 d 한 줄로 바뀐 파일 전체가 폴더 비교 화면에 열립니다. 빨간색은 다른 곳, 한쪽에만 있는 파일은 AI가 새로 만든 파일입니다. 원하지 않는 덩어리는 화살표로 원래 내용을 되가져올 수 있습니다. 무료로는 WinMerge나 VS Code 비교 화면을 써도 흐름은 같습니다.</div>
+</section>
+<section class="slide">
+    <div class="eb">34차시 · 실습</div>
+    <h2>세 도구로 같은 일을 시키고, 세 브랜치를 비교한다</h2>
+    <div class="sub">누가 무엇을 몰래 바꿨는지 표로 남긴다</div>
+    
+    <div class="fill"><div class="grid g3" style="margin-top:1.6cqh">
+        <div class="card"><span class="n">ai-claude</span><span class="t">Claude Code</span><span class="d">브랜치에서 <code>claude</code> 실행 → 같은 요청</span></div>
+        <div class="card"><span class="n">ai-gemini</span><span class="t">Gemini CLI</span><span class="d">기준점에서 새 브랜치 → <code>gemini</code></span></div>
+        <div class="card"><span class="n">ai-codex</span><span class="t">Codex CLI</span><span class="d">기준점에서 새 브랜치 → <code>codex</code></span></div>
+      </div>
+      <div class="bannerG" style="margin-top:2.4cqh">비교표 — AI가 말한 "바꾼 파일" vs <code>git diff --stat</code> · 부탁 안 한 변경 · 새 파일 · 최종 채택 여부</div></div>
+    
+  <div class="nar">실습에서는 세 도구에게 같은 요청을 합니다. 기준점 커밋에서 ai claude, ai gemini, ai codex 세 브랜치를 만들고 각 브랜치에서 도구를 하나씩 실행합니다. 끝나면 AI가 말한 바꾼 파일 목록과 git diff stat의 실제 목록을 비교하고, 부탁하지 않은 변경과 새 파일을 표로 정리합니다. 가장 깨끗한 결과 하나만 골라 main에 합칩니다.</div>
 </section>
 <section class="slide dk">
     <div class="fill">
@@ -558,6 +614,7 @@ body.nocap .cap { display: none; }
       <div class="card"><span class="n">02</span><span class="t">누적 프로젝트에 추가한 테스트 3개 이상</span></div>
       <div class="card"><span class="n">03</span><span class="t">망가진 프로젝트를 고친 과정</span></div>
       <div class="card"><span class="n">04</span><span class="t">"다음엔 규칙으로 막고 싶은 실수" 목록</span></div>
+      <div class="card"><span class="n">05</span><span class="t">34차시 세 도구 비교표와 Beyond Compare 폴더 비교 캡처 1장</span></div>
     </div></div>
     <div class="foot">TODO 채점 기준. 결과물이 동작하는지, 그리고 어떻게 확인했는지를 함께 봅니다.</div>
   <div class="nar">오늘의 과제는 한계 사례 보고서입니다. AI가 틀린 장면을 모으고, 테스트로 막은 사례를 남깁니다.</div>
@@ -566,7 +623,7 @@ body.nocap .cap { display: none; }
     <div class="fill">
       <div class="eb">Wrap-up</div>
       <h2>오늘 한 일</h2>
-      <div class="sub" style="font-size:3.4cqh;margin-top:2cqh">AI가 틀리는 방식 · 맥락 창 이해하기 · 보안 기본 · 저작권 · 라이선스 · 윤리 · 테스트 입문</div>
+      <div class="sub" style="font-size:3.4cqh;margin-top:2cqh">AI가 틀리는 방식 · 맥락 창 이해하기 · 보안 기본 · 저작권 · 라이선스 · 윤리 · 테스트 입문 · AI 코드 검토</div>
       <div class="lead" style="margin-top:4cqh">내일 · Day 6 — 하네스 I · 규칙과 기억</div>
       <div class="sub">규칙 파일 하나로 세 도구를 같은 방향으로 움직인다</div>
     </div>
