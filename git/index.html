@@ -18652,14 +18652,15 @@ Course.lesson({
     id: 'l23', no: '23', part: 5, track: 'auto',
     title: 'AI 가 만든 코드 검토하기 — git 과 Beyond Compare',
     subtitle: '생성형 AI 는 어디를 새로 만들고 어디를 고쳤는지 알려 주지 않습니다. 기준점 커밋, AI 전용 브랜치, 비교 도구로 한 줄씩 확인하고 골라 담는 습관을 익힙니다.',
-    time: '70분',
-    tags: ['git diff --stat', 'git difftool -d', 'Beyond Compare', 'git restore', 'git clean', 'git branch -D'],
+    time: '90분',
+    tags: ['git diff --stat', 'git difftool -d', 'Beyond Compare', 'TortoiseGit', 'git restore', 'git clean', 'git branch -D'],
     goals: [
       'AI 가 만든 코드를 그대로 쓰면 왜 위험한지, 버전 관리와 비교 도구가 왜 꼭 필요한지 설명할 수 있다',
-      'Beyond Compare 를 설치하고 git difftool · mergetool 로 연결할 수 있다',
+      'Beyond Compare 를 설치하고 git difftool · mergetool 과 TortoiseGit 의 비교 · 병합 도구로 연결할 수 있다',
       'AI 에게 맡길 프로젝트 폴더를 정하고, 기준점 커밋과 AI 전용 브랜치를 만든 뒤 작업을 맡길 수 있다',
       'AI 가 바꾼 파일과 줄을 git diff 와 Beyond Compare 로 찾아, 원하는 변경만 골라 커밋할 수 있다',
-      '실패한 AI 시도를 기준점으로 깨끗하게 되돌릴 수 있다'
+      '실패한 AI 시도를 기준점으로 깨끗하게 되돌릴 수 있다',
+      'Windows 에서 TortoiseGit 과 Beyond Compare 만으로 같은 검토 흐름을 그래픽하게 할 수 있다'
     ],
     start: {
       title: '실습 준비',
@@ -18772,6 +18773,70 @@ Course.lesson({
       { callout: 'tip', title: '브랜치를 안 만들었다면', body: 'AI 가 main 에서 바로 고쳤고 아직 커밋하지 않았다면 <code>git restore .</code> 과 <code>git clean -f</code> 로 기준점 커밋 상태로 돌아갑니다. 이미 커밋했다면 <code>git reset --hard 기준점커밋</code> (push 전) 또는 <code>git revert</code> (push 후). 기준점 커밋이 없었다면 돌아갈 곳이 없습니다 — 그래서 실습 1 이 가장 중요합니다.' },
       { mission: 'm3' },
 
+      { h2: '실습 6 · TortoiseGit 과 Beyond Compare 로 그래픽하게 (Windows)' },
+      '명령 대신 <b>탐색기 오른쪽 버튼</b>으로 실습 1~5 와 똑같은 일을 합니다. TortoiseGit 은 Git 을 새로 만든 것이 아니라 Git for Windows 를 불러 쓰는 탐색기 확장이므로(<a href="#ref3">부록 C</a>), 아래 메뉴마다 같은 git 명령이 돕니다. 이 실습은 <b>내 Windows PC</b> 에서 합니다.',
+      { h3: '준비 — 설치하고 Beyond Compare 를 비교 · 병합 도구로 정하기' },
+      { steps: [
+        { t: 'Git for Windows → TortoiseGit → Beyond Compare 5 순서로 설치', d: 'TortoiseGit 은 <a href="https://tortoisegit.org/download/" target="_blank" rel="noopener">tortoisegit.org</a> 의 64비트 MSI 와 한국어 언어 팩(선택), Beyond Compare 는 <a href="https://www.scootersoftware.com/download" target="_blank" rel="noopener">scootersoftware.com</a> 에서 받습니다. 설치 뒤 탐색기를 다시 띄웁니다.' },
+        { t: '아무 폴더나 오른쪽 버튼 → TortoiseGit → Settings', d: 'Windows 11 은 맨 아래 <b>추가 옵션 표시</b>(<code>Shift</code>+<code>F10</code>) 안에 있습니다.' },
+        { t: '왼쪽 목록 Diff Viewer → External 고르기', d: '아래 첫째 줄을 그대로 붙여 넣습니다. 앞으로 TortoiseGit 에서 "비교" 를 누르면 Beyond Compare 가 열립니다.' },
+        { t: 'Diff Viewer 아래 Merge Tool → External 고르기', d: '아래 둘째 줄을 붙여 넣습니다. 충돌을 풀 때(Edit conflicts) Beyond Compare 병합 화면이 열립니다(3-way 병합은 Pro).' },
+        { t: '확인', d: 'Apply → OK. 경로는 설치 폴더에 맞게 고칩니다(Beyond Compare 4 라면 <code>Beyond Compare 4</code>).' }
+      ] },
+      { code: 'Diff Viewer  (External)\n"C:\\Program Files\\Beyond Compare 5\\BComp.exe" %base %mine /title1=%bname /title2=%yname /leftreadonly\n\nMerge Tool   (External)\n"C:\\Program Files\\Beyond Compare 5\\BComp.exe" %mine %theirs %base %merged /title1=%yname /title2=%tname /title3=%bname /title4=%mname', lang: 'text', run: false, title: 'TortoiseGit Settings 에 붙여 넣을 두 줄' },
+      { callout: 'info', title: 'git difftool 설정과는 따로입니다', body: '위 설정은 TortoiseGit 창에서 쓰는 비교 도구입니다. 명령줄의 <code>git difftool</code> 은 앞에서 한 <code>git config --global diff.tool bc</code> 를 씁니다. 둘 다 해 두면 어느 쪽으로 일해도 Beyond Compare 가 열립니다.' },
+
+      { h3: '① 기준점 — 커밋하고 AI 브랜치 만들기' },
+      { steps: [
+        { t: '프로젝트 폴더(예: C:\\ai-lab\\menu-app) 오른쪽 버튼 → Git Commit -> "main"', d: '창 아래 목록에서 커밋할 파일을 체크하고(<b>체크 = 스테이징</b>), 메시지 <code>AI 작업 전 기준점</code> 을 적고 Commit. 폴더 아이콘이 초록 체크로 바뀝니다.' },
+        { t: '오른쪽 버튼 → TortoiseGit → Create Branch', d: 'Branch 에 <code>ai-menu</code>, 시작점은 HEAD, <b>Switch to new branch</b> 를 체크하고 OK. 이제 커밋 메뉴 이름이 <code>Git Commit -&gt; "ai-menu"</code> 로 바뀝니다.' }
+      ] },
+      { table: { head: ['TortoiseGit', '같은 명령'], rows: [
+        ['Git Commit -&gt; "main" (파일 체크 후)', '<code>git add 파일</code> · <code>git commit -m "…"</code>'],
+        ['Create Branch + Switch to new branch', '<code>git switch -c ai-menu</code>']
+      ] } },
+
+      { h3: '② AI 에게 맡기기' },
+      '프로젝트 폴더를 탐색기로 연 상태에서 <b>주소창에 <code>cmd</code> 를 치고 Enter</b>(또는 빈 곳 오른쪽 버튼 → 터미널에서 열기)를 하면 그 폴더에서 터미널이 열립니다. 여기서 <code>claude</code> · <code>gemini</code> · <code>codex</code> 를 실행하고 실습 2 의 요청문을 그대로 씁니다. 채팅 AI 라면 답을 복사해 파일에 붙여 넣습니다.',
+      { callout: 'warn', title: '폴더를 확인하고 실행합니다', body: '터미널 제목과 프롬프트가 <code>C:\\ai-lab\\menu-app&gt;</code> 인지 보고 에이전트를 실행합니다. 바탕 화면이나 사용자 폴더에서 열린 터미널에서 실행하면 AI 가 엉뚱한 파일을 읽고 고칠 수 있습니다.' },
+
+      { h3: '③ 무엇이 바뀌었나 — 아이콘과 변경 확인 창' },
+      'AI 가 끝나면 탐색기의 아이콘부터 봅니다. <b>빨간 느낌표</b>는 고쳐진 파일, <b>물음표</b>는 Git 이 모르는 새 파일입니다(<code>git status</code> 를 그림으로 본 것). 그다음 폴더 오른쪽 버튼 → <b>TortoiseGit → Check for modifications</b> 를 열고 <b>Show unversioned files</b> 를 체크합니다.',
+      { svg: '<svg viewBox="0 0 760 300" role="img" aria-label="TortoiseGit 변경 확인 창: app.js 와 index.html 과 style.css 는 수정됨, debug.log 와 ai-notes.md 는 버전 관리 안 됨으로 표시되고, 파일을 두 번 누르면 Beyond Compare 가 열립니다">  <rect x="10" y="10" width="740" height="280" rx="10" fill="var(--bg-elev)" stroke="var(--border)" stroke-width="1.5"/>  <rect x="10" y="10" width="740" height="34" rx="10" fill="var(--bg-elev-2)"/>  <text x="26" y="32" font-size="13" font-weight="700" fill="var(--text)">C:\\ai-lab\\menu-app - Working Tree Changes (변경 확인)</text>  <text x="26" y="66" font-size="12" fill="var(--text-faint)">브랜치: ai-menu</text>  <rect x="560" y="54" width="14" height="14" rx="3" fill="var(--accent)"/><text x="563" y="65" font-size="11" fill="#fff">✓</text>  <text x="580" y="66" font-size="12" fill="var(--text)">Show unversioned files</text>  <rect x="26" y="80" width="708" height="24" fill="var(--bg-elev-2)" stroke="var(--border)"/>  <text x="36" y="96" font-size="12" font-weight="700" fill="var(--text)">Path</text>  <text x="300" y="96" font-size="12" font-weight="700" fill="var(--text)">Status</text>  <text x="440" y="96" font-size="12" font-weight="700" fill="var(--text)">Lines added</text>  <text x="560" y="96" font-size="12" font-weight="700" fill="var(--text)">Lines removed</text>  <g font-size="12.5" fill="var(--text)">    <rect x="26" y="104" width="708" height="26" fill="var(--accent-soft)"/>    <text x="36" y="122">📄 app.js</text><text x="300" y="122" fill="var(--danger)">Modified</text><text x="440" y="122">12</text><text x="560" y="122">2</text>    <text x="36" y="148">📄 index.html</text><text x="300" y="148" fill="var(--danger)">Modified</text><text x="440" y="148">1</text><text x="560" y="148">0</text>    <text x="36" y="174">📄 style.css</text><text x="300" y="174" fill="var(--danger)">Modified</text><text x="440" y="174">12</text><text x="560" y="174">3</text>    <text x="36" y="200">❔ ai-notes.md</text><text x="300" y="200" fill="var(--text-faint)">Unversioned</text>    <text x="36" y="226">❔ debug.log</text><text x="300" y="226" fill="var(--text-faint)">Unversioned</text>  </g>  <text x="36" y="262" font-size="12" fill="var(--text-dim)">파일 두 번 누르기 → Beyond Compare 비교 · 오른쪽 버튼 → Revert(되돌리기) · Delete(삭제) · Add</text>  <rect x="610" y="246" width="60" height="26" rx="5" fill="var(--bg-elev-2)" stroke="var(--border)"/><text x="640" y="263" text-anchor="middle" font-size="12" fill="var(--text)">Commit</text>  <rect x="678" y="246" width="60" height="26" rx="5" fill="var(--bg-elev-2)" stroke="var(--border)"/><text x="708" y="263" text-anchor="middle" font-size="12" fill="var(--text)">Refresh</text></svg>', caption: '변경 확인 창 (단순화한 그림) — 바뀐 파일과 새 파일, 늘어난 줄 · 줄어든 줄이 한 목록에 나옵니다' },
+      { table: { head: ['보이는 것', '판단', '할 일'], rows: [
+        ['app.js · index.html — Modified', '부탁한 것', '두 번 눌러 Beyond Compare 로 줄 단위 검토'],
+        ['style.css — Modified', '부탁하지 않은 것', '통째로 버리려면 오른쪽 버튼 → <b>Revert</b>, 일부만 버리려면 ④'],
+        ['ai-notes.md · debug.log — Unversioned', 'AI 가 만든 찌꺼기', '오른쪽 버튼 → <b>Delete</b> (휴지통으로)']
+      ] } },
+      { callout: 'warn', title: 'TortoiseGit 의 Revert 는 git revert 가 아닙니다', body: 'TortoiseGit 메뉴의 <b>Revert</b> 는 커밋하지 않은 변경을 버리는 <code>git restore</code> 입니다. 이미 만든 커밋을 취소하는 <code>git revert</code> 는 Show log 에서 커밋 오른쪽 버튼 → <b>Revert change by this commit</b> 입니다(<a href="#ref3">부록 C</a>).' },
+
+      { h3: '④ Beyond Compare 에서 덩어리 단위로 되돌리기' },
+      '변경 확인 창에서 파일을 두 번 누르면 Beyond Compare 가 열립니다. 왼쪽은 <b>기준점 커밋(읽기 전용)</b>, 오른쪽은 <b>지금 작업 폴더</b>입니다. 파일 안에서 일부만 원래대로 돌리고 싶을 때 씁니다.',
+      { svg: '<svg viewBox="0 0 760 290" role="img" aria-label="Beyond Compare 줄 비교: 왼쪽은 기준점 커밋, 오른쪽은 작업 폴더, 다른 줄은 빨간색으로 표시되고 화살표 단추로 왼쪽 내용을 오른쪽으로 되가져옵니다">  <rect x="10" y="10" width="740" height="270" rx="10" fill="var(--bg-elev)" stroke="var(--border)" stroke-width="1.5"/>  <rect x="10" y="10" width="740" height="34" rx="10" fill="var(--bg-elev-2)"/>  <text x="26" y="32" font-size="13" font-weight="700" fill="var(--text)">Beyond Compare · 텍스트 비교 — style.css</text>  <rect x="300" y="18" width="150" height="20" rx="4" fill="var(--accent)"/><text x="375" y="32" text-anchor="middle" font-size="11.5" font-weight="700" fill="#fff">⇨ Copy to Right</text>  <text x="470" y="32" font-size="11.5" fill="var(--text-dim)">◀ ▶ 다음 · 이전 차이</text>  <rect x="26" y="54" width="350" height="22" fill="var(--bg-elev-2)" stroke="var(--border)"/><text x="36" y="69" font-size="11.5" fill="var(--text-dim)">왼쪽 · style.css (기준점, 읽기 전용)</text>  <rect x="384" y="54" width="350" height="22" fill="var(--bg-elev-2)" stroke="var(--border)"/><text x="394" y="69" font-size="11.5" fill="var(--text-dim)">오른쪽 · style.css (작업 폴더, 고칠 수 있음)</text>  <g font-family="JetBrains Mono, monospace" font-size="12" fill="var(--text)">    <rect x="26" y="84" width="350" height="44" fill="var(--danger-soft)"/>    <rect x="384" y="84" width="350" height="92" fill="var(--danger-soft)"/>    <text x="36" y="101">body { font-family: sans-serif;</text>    <text x="36" y="119">  margin: 24px; }</text>    <text x="394" y="101">body {</text>    <text x="394" y="119">    font-family: "Noto Sans KR";</text>    <text x="394" y="137">    background: #111;</text>    <text x="394" y="155">    color: #eee;</text>    <text x="394" y="171">}</text>    <text x="36" y="200">h1 { color: #d9480f; }</text>    <rect x="384" y="186" width="350" height="22" fill="var(--danger-soft)"/>    <text x="394" y="202">h1 { color: #ffd43b; }</text>  </g>  <path d="M378 104 L382 104" stroke="var(--danger)" stroke-width="3"/>  <text x="26" y="244" font-size="12.5" fill="var(--text)">① 빨간 덩어리 클릭 → ② <tspan font-weight="700">Copy to Right</tspan> (기준점 내용을 작업 폴더 쪽으로) → ③ Ctrl+S 저장 → ④ 창 닫기</text>  <text x="26" y="266" font-size="12" fill="var(--text-faint)">부탁한 변경(app.js)은 그대로 두고, 부탁하지 않은 덩어리만 되가져옵니다</text></svg>', caption: 'Beyond Compare 줄 비교 (단순화한 그림) — 빨간 줄이 다른 곳, 화살표 단추로 왼쪽(기준점) 내용을 오른쪽(작업 폴더)으로 되가져옵니다' },
+      { steps: [
+        { t: '다음 차이로 이동', d: '툴바의 다음 · 이전 차이 단추(또는 <code>Ctrl</code>+<code>N</code> / <code>Ctrl</code>+<code>P</code>)로 빨간 덩어리를 하나씩 봅니다. 부탁한 변경인지, 부탁하지 않은 변경인지 판단합니다.' },
+        { t: '원하지 않는 덩어리만 되가져오기', d: '그 덩어리를 누르고 <b>Copy to Right</b>(왼쪽 내용을 오른쪽으로). 오른쪽이 기준점과 같아지며 빨간색이 사라집니다.' },
+        { t: '저장하고 닫기', d: '<code>Ctrl</code>+<code>S</code> 로 오른쪽 파일을 저장하고 창을 닫습니다. 변경 확인 창에서 <b>Refresh</b> 를 누르면 줄 수가 줄어든 것을 볼 수 있습니다.' }
+      ] },
+      { try: 'Beyond Compare 만 따로 써서 <b>폴더 두 개</b>를 비교해 보세요. 탐색기에서 AI 를 쓰기 전 폴더 복사본을 오른쪽 버튼 → Select Left Folder for Compare, AI 가 고친 폴더를 오른쪽 버튼 → Compare to 로 고르면 폴더 비교 창이 열립니다. Git 저장소가 아닌 폴더를 받을 때도 쓸 수 있습니다.' },
+
+      { h3: '⑤ 골라 담아 커밋하기' },
+      { steps: [
+        { t: '폴더 오른쪽 버튼 → Git Commit -&gt; "ai-menu"', d: '목록에서 <b>app.js 와 index.html 만 체크</b>합니다. 체크하지 않은 파일은 커밋에 들어가지 않습니다(스테이징과 같음).' },
+        { t: '커밋 창에서 한 번 더 검토', d: '목록의 파일을 두 번 누르면 Beyond Compare 로 이번 커밋에 들어갈 차이를 마지막으로 봅니다.' },
+        { t: '메시지 쓰고 Commit', d: '제목 <code>AI: 메뉴 목록 표시 기능</code>, 본문에 사용한 AI 와 부탁한 내용, 버린 것을 적습니다.' }
+      ] },
+
+      { h3: '⑥ 브랜치 비교 · 병합 · 망친 시도 버리기' },
+      { table: { head: ['하고 싶은 일', 'TortoiseGit 메뉴', '같은 명령'], rows: [
+        ['main 과 AI 브랜치 전체 비교', 'TortoiseGit → <b>Browse References</b> → <code>main</code> 과 <code>ai-menu</code> 를 <code>Ctrl</code> 로 함께 골라 오른쪽 버튼 → <b>Compare selected refs</b> → 파일 두 번 누르기', '<code>git difftool -d main ai-menu</code>'],
+        ['로그에서 두 커밋 비교', 'TortoiseGit → <b>Show log</b> → 두 커밋을 <code>Ctrl</code> 로 골라 오른쪽 버튼 → <b>Compare revisions</b>', '<code>git diff A B</code>'],
+        ['main 에 합치기', '<b>Switch/Checkout</b> 으로 main → TortoiseGit → <b>Merge</b> → From: ai-menu', '<code>git switch main</code> · <code>git merge ai-menu</code>'],
+        ['망친 브랜치 버리기', 'main 으로 Switch/Checkout → Browse References → <code>ai-try</code> 오른쪽 버튼 → <b>Delete branch</b> (합치지 않았다는 경고에 확인)', '<code>git branch -D ai-try</code>'],
+        ['충돌 풀기', '충돌 파일 오른쪽 버튼 → TortoiseGit → <b>Edit conflicts</b> → Beyond Compare 병합 화면', '<code>git mergetool</code>']
+      ] }, caption: 'GUI 와 명령은 같은 저장소를 다룹니다. 섞어 써도 됩니다' },
+      { callout: 'check', title: 'GUI 로 할 때의 점검', body: '<ul><li>AI 를 부르기 전 폴더 아이콘이 <b>초록 체크</b>이고, 커밋 메뉴에 <code>"ai-…"</code> 브랜치 이름이 보인다</li><li>AI 가 끝나면 <b>Check for modifications</b> 에서 Show unversioned files 를 켜고 목록 전체를 본다</li><li>부탁한 파일은 Beyond Compare 로 모든 줄을 읽었다</li><li>부탁하지 않은 변경은 Revert 나 Copy to Right 로, 새 파일은 Delete 로 정리했다</li><li>커밋 창에서 체크한 파일이 부탁한 파일뿐이다</li></ul>' },
+
       { h2: 'AI 와 일할 때의 규칙' },
       { callout: 'check', title: '매번 확인할 것', body: '<ul><li>AI 에게 맡기기 전에 <b>커밋</b>하고, AI 작업은 <b>브랜치</b>에서 한다</li><li>코딩 에이전트는 <b>프로젝트 폴더에서</b> 실행한다</li><li>요청에 고칠 파일과 고치지 말 것을 적는다</li><li>끝나면 <code>git status</code> → <code>git diff --stat</code> → Beyond Compare 로 <b>모든 줄</b>을 본다</li><li>부탁하지 않은 변경 · 새 파일 · 비밀 값 · 의존성 변경을 찾는다</li><li>직접 실행해 보고, 이해하지 못한 줄은 AI 에게 "이 줄은 왜 필요해?" 라고 묻는다</li><li>커밋 메시지에 AI 사용과 부탁한 내용을 남긴다</li><li>망쳤으면 브랜치를 버리고 기준점에서 다시 시작한다</li></ul>' }
     ],
@@ -18869,7 +18934,8 @@ Course.lesson({
       '확인은 <code>git status</code>(어떤 파일) → <code>git diff --stat</code>(얼마나) → <code>git diff</code> · Beyond Compare(어떻게) 순서로 합니다',
       'Beyond Compare 는 <code>diff.tool bc</code> 로 연결하고 <code>git difftool -d</code> 로 폴더 비교를 엽니다',
       '원하지 않는 변경은 <code>git restore</code>, AI 가 만든 찌꺼기는 <code>git clean -n</code> → <code>-f</code>, 원하는 것만 <code>git add</code> 해서 커밋합니다',
-      '망친 시도는 main 으로 돌아와 <code>git branch -D</code> 로 통째로 버립니다'
+      '망친 시도는 main 으로 돌아와 <code>git branch -D</code> 로 통째로 버립니다',
+      'Windows 에서는 TortoiseGit 의 Check for modifications · Revert · Git Commit(파일 체크) · Browse References 와 Beyond Compare 의 Copy to Right 로 같은 흐름을 그래픽하게 할 수 있습니다'
     ],
     terms: [
       ['Beyond Compare', 'Scooter Software 의 파일 · 폴더 비교 도구. 다른 곳을 색으로 보여 주고 덩어리 단위로 옮길 수 있습니다'],
@@ -20810,6 +20876,8 @@ Course.lesson({
     ] } },
     '<b>Sync</b> 창이 가장 쓸모 많습니다. 위쪽에 <b>Out Commits</b>(내가 올릴 커밋)과 <b>In Commits</b>(받아야 할 커밋)가 목록으로 나옵니다. <code>git status</code> 가 「ahead 2, behind 1」 이라고 숫자로만 알려 주는 것을, 어떤 커밋인지까지 보여 주는 셈입니다.',
     { callout: 'info', title: '처음 Push 할 때 창이 하나 더 뜹니다', body: 'HTTPS 주소라면 <b>Git Credential Manager</b> 가 브라우저를 열어 GitHub 로그인을 받습니다. 한 번 해 두면 Windows 자격 증명 관리자에 저장되어 다시 묻지 않습니다. 개인 액세스 토큰으로 할 때는 사용자 이름에 GitHub 아이디, <b>비밀번호 자리에 토큰</b>을 넣습니다 — 11강에서 만든 그 토큰입니다. 저장된 것을 지우려면 Windows 의 「자격 증명 관리자」 → Windows 자격 증명에서 <code>git:https://github.com</code> 항목을 지웁니다.' },
+
+    { callout: 'tip', title: 'Beyond Compare 를 비교 · 병합 도구로', body: 'Settings → Diff Viewer · Merge Tool 에 Beyond Compare 를 지정하면 TortoiseGit 의 모든 비교 · 충돌 해결 창이 Beyond Compare 로 열립니다. 설정 줄과, AI 가 만든 코드를 그래픽하게 검토하는 실습은 <a href="#l23">L23 실습 6</a> 에 있습니다.' },
 
     { h2: '이름이 반대인 메뉴 — Revert' },
     { callout: 'danger', title: 'TortoiseGit 의 Revert 는 git revert 가 아닙니다', body: '<p>폴더 메뉴의 <b>Revert</b> 는 고친 내용을 버리고 마지막 커밋 상태로 되돌리는 것 — 터미널의 <code>git restore</code> 입니다. <b>되돌릴 수 없습니다.</b></p><p>터미널의 <code>git revert</code>(취소하는 커밋을 새로 더하기)는 <b>Show log 창에서 커밋을 오른쪽 버튼 → Revert change by this commit</b> 입니다. 이름이 같고 뜻은 반대이니, <b>어느 창에서 눌렀는가</b>로 구분하세요.</p>' },

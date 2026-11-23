@@ -289,7 +289,8 @@ git config --global merge.tool bc
 <span class="p">git config --global mergetool.bc.path "C:/Program Files/Beyond Compare 5/BComp.exe"</span>
 <span class="p">git config --global --get diff.tool</span>
 <span class="o">bc</span></pre>
-      <div class="box q"><span class="lbl">macOS</span><p>앱을 연 뒤 메뉴 Beyond Compare → Install Command Line Tools, 그다음 <code>git config --global diff.tool bc</code> 만 합니다.</p></div>` },
+      <div class="box q"><span class="lbl">macOS</span><p>앱을 연 뒤 메뉴 Beyond Compare → Install Command Line Tools, 그다음 <code>git config --global diff.tool bc</code> 만 합니다.</p></div>
+      <div class="box check"><span class="lbl">Windows 에서 그래픽하게 — TortoiseGit + Beyond Compare</span><p>명령 대신 탐색기 오른쪽 버튼으로 해도 됩니다. TortoiseGit Settings → Diff Viewer · Merge Tool 에 Beyond Compare 를 지정하고, <b>Check for modifications</b>(바뀐 파일 · 새 파일 목록) → 파일 두 번 누르기(Beyond Compare 비교) → <b>Revert</b> · <b>Copy to Right</b> 로 되돌리기 → <b>Git Commit</b> 에서 부탁한 파일만 체크. 설정 줄과 단계별 그림은 <a href="../../git/#l23" target="_blank" rel="noopener">Git 실습 L23 · 실습 6</a> 에 있습니다. STEP 2~5 의 명령 옆에 같은 메뉴를 적어 두었으니 GUI 로 따라가도 됩니다.</p></div>` },
           { sn: 'STEP 2', h: '프로젝트 폴더 정하기와 기준점 커밋', body: `
       <p>누적 프로젝트 폴더로 이동합니다. 코딩 에이전트는 <b>실행한 폴더</b>를 작업 공간으로 삼으므로, 반드시 이 폴더 안에서 실행합니다. 홈 폴더나 바탕 화면에서 실행하지 않습니다.</p>
       <pre><span class="p">cd ~/vibe-project</span>          <span class="c"># 내 누적 프로젝트 폴더</span>
@@ -311,6 +312,7 @@ git config --global merge.tool bc
       <div class="box q"><span class="lbl">브랜치를 바꾸기 전에</span><p>도구 하나가 끝나면 그 결과를 <code>git add -A</code> · <code>git commit -m "AI(claude): 다크 모드 — 검토 전"</code> 으로 그 브랜치에 임시 커밋해 둡니다. 그래야 다음 브랜치로 옮겨도 결과가 섞이지 않습니다.</p></div>` },
           { sn: 'STEP 4', h: '무엇이 바뀌었나 찾기', body: `
       <p>넓은 것에서 좁은 것으로. 어떤 파일이 → 얼마나 → 어떻게.</p>
+      <p class="lede" style="margin:0">GUI: TortoiseGit → Browse References → <code>main</code> 과 <code>ai-claude</code> 를 함께 골라 Compare selected refs → 파일 두 번 누르기</p>
       <pre><span class="p">git diff --stat main ai-claude</span>       <span class="c"># 파일 목록과 줄 수</span>
 <span class="p">git diff --name-status main ai-claude</span> <span class="c"># A 새 파일 · M 고침 · D 지움</span>
 <span class="p">git difftool -d main ai-claude</span>       <span class="c"># Beyond Compare 폴더 비교</span></pre>
