@@ -161,7 +161,7 @@
     <div class="eyebrow">한국폴리텍대학 분당융합기술교육원 · AI응용소프트웨어과</div>
     <h1>AIoT 프로젝트<br>모으고, 쌓고, 판단하는 사물인터넷</h1>
     <p>센서가 데이터를 <b>모으고</b>, 클라우드가 <b>쌓고</b>, AI가 <b>판단</b>해 다시 기기를 움직입니다. 보드가 없어도 스마트폰을 IoT 디바이스로 바꾸는 시뮬레이터로 바로 시작하고, MQTT · 클라우드 · 이상 탐지 · 영상 AI · LLM을 하나의 시스템으로 엮어 팀 프로젝트로 완성합니다.</p>
-    <div class="meta"><span>스마트폰 + PC면 시작</span><span>3~4인 팀 프로젝트</span><span>무료 클라우드</span><span>Python · MQTT</span><span>실습 6개 + 프로젝트</span></div>
+    <div class="meta"><span>스마트폰 + PC면 시작</span><span>3~4인 팀 프로젝트</span><span>무료 클라우드</span><span>Python · MQTT</span><span>실습 6개 + ESP32 실습 2개 + 프로젝트</span></div>
     <div class="cup">📡</div>
   </div>
 </header>
@@ -175,6 +175,9 @@
     <a href="#device"><small>DEVICE</small>스마트폰 IoT 시뮬레이터</a>
     <a href="#lab1"><small>LAB 1</small>휴대폰을 IoT 디바이스로</a>
     <a href="#lab2"><small>LAB 2</small>MQTT 송수신과 자동화</a>
+    <a href="#esp32"><small>LAB 2-A · ESP32</small>Wokwi ESP32 발행 · 구독</a>
+    <a href="#remote"><small>LAB 2-B · DASHBOARD</small>웹 대시보드 원격 제어</a>
+    <a href="#security"><small>SECURITY</small>IoT 보안</a>
     <a href="#cloud"><small>CLOUD</small>클라우드 서비스</a>
     <a href="#lab3"><small>LAB 3</small>ThingSpeak 저장과 알림</a>
     <a href="#data"><small>DATA × AI</small>IoT 데이터와 AI</a>
@@ -245,7 +248,7 @@
             <tr><td>스마트폰 + IoT 시뮬레이터</td><td>1인 1대 (본인 것)</td><td>센서와 LED 역할을 하는 디바이스</td></tr>
             <tr><td>PC (Python, 브라우저)</td><td>1인 1대</td><td>MQTT 클라이언트, Colab, 영상 AI, LLM 호출</td></tr>
             <tr><td>웹카메라</td><td>1인 또는 2인 1개</td><td>LAB 5 관절 추출</td></tr>
-            <tr><td>ESP32 + 센서 키트 (DHT22, 조도, LED)</td><td>있는 만큼</td><td>심화 과제, 실제 센서와 비교</td></tr>
+            <tr><td>ESP32 + 센서 키트 (DHT22, 조도, LED)</td><td>있는 만큼 (없으면 Wokwi)</td><td>LAB 2-A · 2-B, 심화 과제, 실제 센서와 비교</td></tr>
             <tr><td>라즈베리파이</td><td>팀당 1대 (선택)</td><td>프로젝트, 인터넷이 막힌 곳의 로컬 브로커</td></tr>
             <tr><td>Kinect, 로봇개 Go2, tiki-mini</td><td>시연 · 프로젝트용</td><td>깊이 카메라, 로봇 연동 프로젝트</td></tr>
           </tbody>
@@ -257,7 +260,8 @@
         <li><input type="checkbox" aria-label="완료">Python 3.11과 패키지: <code>pip install "paho-mqtt>=2.0" mediapipe opencv-python anthropic</code></li>
         <li><input type="checkbox" aria-label="완료"><a href="https://mqtt-explorer.com/" target="_blank" rel="noopener">MQTT Explorer</a> — 브로커에 오가는 메시지를 눈으로 보는 프로그램</li>
         <li><input type="checkbox" aria-label="완료">Google 계정(Colab), ThingSpeak 계정</li>
-        <li><input type="checkbox" aria-label="완료">(ESP32를 쓰면) Arduino IDE 2.x, ESP32 보드 패키지, CP210x/CH340 드라이버</li>
+        <li><input type="checkbox" aria-label="완료">설치 없이 브라우저로: <a href="https://wokwi.com/projects/new/esp32" target="_blank" rel="noopener">Wokwi</a>(ESP32 시뮬레이터), <a href="https://www.hivemq.com/demos/websocket-client/" target="_blank" rel="noopener">HiveMQ 웹 클라이언트</a> — LAB 2-A · 2-B</li>
+        <li><input type="checkbox" aria-label="완료">(실제 ESP32 보드를 쓰면) Arduino IDE 2.x, ESP32 보드 패키지, CP210x/CH340 드라이버</li>
       </ul>
     </section>
 
@@ -340,6 +344,8 @@
             <tr><td><code>aiot-kt2611/&lt;번호&gt;/button</code></td><td>디바이스 → 브로커</td><td><code>PRESSED</code></td></tr>
             <tr><td><code>aiot-kt2611/&lt;번호&gt;/event</code></td><td>디바이스 → 브로커</td><td><code>{"type":"shake","g":1.9}</code></td></tr>
             <tr><td><code>aiot-kt2611/&lt;번호&gt;/ai</code></td><td>AI → 브로커</td><td><code>{"angle":92}</code></td></tr>
+            <tr><td><code>aiot-kt2611/&lt;번호&gt;/servo</code></td><td>브로커 → 디바이스</td><td><code>0</code> ~ <code>180</code> (ESP32 서보, <a href="#remote">LAB 2-B</a>)</td></tr>
+            <tr><td><code>aiot-kt2611/&lt;번호&gt;/led/state</code>, <code>…/servo/state</code></td><td>디바이스 → 브로커</td><td>명령을 실행한 뒤의 실제 상태, retain (<a href="#remote">LAB 2-B</a>)</td></tr>
           </tbody>
         </table>
       </div>
@@ -493,8 +499,10 @@ client.loop_forever()   # Ctrl+C로 종료</code></pre></div>
         <li><code>button</code>을 누를 때마다 LED가 <code>TOGGLE</code> 되게 하기</li>
       </ul>
 
+      <div class="tip"><p>보드가 없어도 ESP32를 붙여 볼 수 있습니다. <a href="#esp32">LAB 2-A</a>에서 Wokwi 시뮬레이터의 ESP32를 같은 브로커 · 같은 토픽에 연결하고, <a href="#remote">LAB 2-B</a>에서 웹 대시보드로 LED와 서보를 원격 제어합니다.</p></div>
+
       <details class="full">
-        <summary>심화 과제 · ESP32를 같은 토픽으로 연결하기</summary>
+        <summary>심화 과제 · 실제 ESP32 보드를 같은 토픽으로 연결하기</summary>
         <div class="inner">
           <p><code>PubSubClient</code>(Nick O'Leary) 라이브러리를 설치하고 올리면 ESP32가 시뮬레이터와 똑같이 동작합니다. 위의 Python 자동화 코드도 그대로 통합니다. ESP32는 2.4GHz Wi-Fi만 지원합니다.</p>
           <div class="code"><span class="lang">Arduino (C++)</span><pre><code>#include &lt;WiFi.h&gt;
@@ -565,6 +573,538 @@ void loop() {
 }</code></pre></div>
         </div>
       </details>
+    </section>
+
+    <!-- ───────── LAB 2-A · Wokwi ESP32 ───────── -->
+    <section id="esp32">
+      <div class="sec">Lab 2-A · ESP32</div>
+      <h2>Wokwi ESP32로 발행 · 구독하기</h2>
+      <p class="lead">보드가 없어도 브라우저 속 <b>Wokwi 시뮬레이터</b>의 ESP32를 진짜 디바이스처럼 브로커에 연결할 수 있습니다. LAB 2와 <b>같은 브로커, 같은 토픽 규칙</b>을 쓰기 때문에, 휴대폰 시뮬레이터 옆에 ESP32가 한 대 더 생기는 셈입니다. 받은 값은 <b>HiveMQ 웹 클라이언트</b>로 확인합니다.</p>
+
+      <figure>
+        <div class="diagram">
+          <svg viewBox="0 0 760 230" role="img" aria-label="Wokwi의 ESP32는 1883번 포트로, 브라우저의 웹 클라이언트와 휴대폰 시뮬레이터는 8884번 포트로 같은 HiveMQ 브로커에 접속합니다">
+            <defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="ah" d="M0 0L10 5L0 10z"/></marker></defs>
+            <rect class="bx" x="24" y="40" width="200" height="60" rx="8"/><text class="t" x="124" y="66">ESP32 (Wokwi)</text><text class="s" x="124" y="86">PubSubClient · 포트 1883</text>
+            <rect class="bx" x="24" y="140" width="200" height="60" rx="8"/><text class="t" x="124" y="166">휴대폰 시뮬레이터</text><text class="s" x="124" y="186">MQTT.js · 포트 8884 (wss)</text>
+            <rect class="bx main" x="280" y="86" width="200" height="60" rx="8"/><text class="t" x="380" y="112">broker.hivemq.com</text><text class="s" x="380" y="132">토픽별로 나눠 전달</text>
+            <rect class="bx" x="536" y="40" width="200" height="60" rx="8"/><text class="t" x="636" y="66">HiveMQ 웹 클라이언트</text><text class="s" x="636" y="86">브라우저 · 포트 8884 (wss)</text>
+            <rect class="bx" x="536" y="140" width="200" height="60" rx="8"/><text class="t" x="636" y="166">PC Python · MQTT Explorer</text><text class="s" x="636" y="186">LAB 2 코드 · 포트 1883</text>
+            <path class="ln" d="M224 70H252V106H276" marker-end="url(#ah2)"/>
+            <path class="ln" d="M224 170H252V126H276" marker-end="url(#ah2)"/>
+            <path class="ln" d="M480 106H508V70H532" marker-end="url(#ah2)"/>
+            <path class="ln" d="M480 126H508V170H532" marker-end="url(#ah2)"/>
+            <text class="e" x="40" y="24">…/s01w/sensor 발행 · …/s01w/cmd 구독</text>
+            <text class="e" x="540" y="24">구독: aiot-kt2611/s01w/#</text>
+          </svg>
+        </div>
+        <figcaption>ESP32와 Python은 일반 TCP 문(1883), 브라우저는 암호화된 WebSocket 문(8884)으로 같은 브로커에 들어옵니다. 주소는 같고 문만 다릅니다.</figcaption>
+      </figure>
+
+      <h3>① 내 ESP32의 번호 정하기</h3>
+      <p>휴대폰 시뮬레이터와 Wokwi ESP32를 함께 켜 두면 같은 번호로는 값이 섞입니다. 그래서 ESP32는 <b>내 번호 뒤에 <code>w</code>(Wokwi)</b>를 붙여 씁니다. 예: <code>s01</code> → <code>s01w</code>. 반 코드(<code>aiot-kt2611</code>)는 LAB 2와 같습니다.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>토픽</th><th>방향</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td><code>aiot-kt2611/s01w/sensor</code></td><td>ESP32 → 브로커</td><td>5초마다 <code>{"temp":24.0,"hum":40.0}</code> 발행</td></tr>
+            <tr><td><code>aiot-kt2611/s01w/cmd</code></td><td>브로커 → ESP32</td><td>ESP32가 구독. 받은 글자를 시리얼 모니터에 출력</td></tr>
+            <tr><td><code>aiot-kt2611/s01w/#</code></td><td>(구독 전용)</td><td>웹 클라이언트가 구독. 내 ESP32의 모든 토픽을 한꺼번에 받음</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>② Wokwi에서 ESP32 준비하기</h3>
+      <div class="launch">
+        <b>🟪 Wokwi ESP32 열기</b>
+        <span>가입하지 않아도 실행됩니다. 로그인하면 <b>Save</b>로 저장해 LAB 2-B에서 이어서 쓸 수 있습니다.</span>
+        <a class="btn primary" href="https://wokwi.com/projects/new/esp32" target="_blank" rel="noopener">열기 →</a>
+      </div>
+      <div class="mission">
+        <div class="mh"><span class="mn">STEPS</span><b>ESP32를 브로커에 연결하기</b></div>
+        <ol>
+          <li>새 ESP32 프로젝트(보드: ESP32 DevKitC V4)를 엽니다.</li>
+          <li><b>+</b>(부품 추가) → <code>DHT22</code>. VCC → <code>3V3</code>, SDA → <b>GPIO15</b>, GND → <code>GND</code>로 연결합니다. LAB 2-B의 <code>diagram.json</code>을 붙여넣으면 배선이 한 번에 끝납니다.</li>
+          <li><b>Library Manager</b> 탭 → <b>+</b> → <code>PubSubClient</code>(Nick O'Leary)와 <code>DHT sensor library</code>(Adafruit)를 추가합니다.</li>
+          <li>아래 코드를 <code>sketch.ino</code>에 붙여넣고 <code>PREFIX</code>와 <code>ME</code>를 내 것으로 바꿉니다.</li>
+          <li>▶을 누르고 시리얼 모니터에 아래 "정상 출력"처럼 나오는지 봅니다. Wi-Fi에 몇 초, MQTT 접속에 1~2초 걸립니다.</li>
+        </ol>
+      </div>
+
+      <div class="code"><span class="lang">Arduino (C++) · Wokwi · sketch.ino — 센서값 발행 + 명령 구독</span><pre><code>// Wokwi 라이브러리 관리자에서 PubSubClient, DHT sensor library 추가
+#include &lt;WiFi.h&gt;
+#include &lt;PubSubClient.h&gt;
+#include "DHT.h"
+
+const char* PREFIX = "aiot-kt2611";  // ← 반 코드
+const char* ME     = "s01w";         // ← 내 번호 + w (휴대폰과 겹치지 않게)
+DHT dht(15, DHT22);                  // DHT22 데이터 → GPIO15
+WiFiClient net;                      // 인터넷 연결 (TCP)
+PubSubClient mqtt(net);              // 그 위에서 MQTT로 대화
+
+String topic(const char* sub) { return String(PREFIX) + "/" + ME + "/" + sub; }
+
+// 구독한 토픽에 메시지가 오면 자동으로 불리는 함수
+void onMessage(char* t, byte* payload, unsigned int len) {
+  Serial.print("[받음] ");
+  Serial.print(t);
+  Serial.print(" : ");
+  for (unsigned int i = 0; i &lt; len; i++) Serial.print((char)payload[i]);
+  Serial.println();
+}
+
+// 브로커에 접속될 때까지 2초마다 다시 시도
+void connectMqtt() {
+  while (!mqtt.connected()) {
+    String id = "esp32-" + String(random(0xffffff), HEX);  // 클라이언트 ID는 기기마다 달라야 함
+    Serial.print("MQTT 접속 시도 (" + id + ") ... ");
+    if (mqtt.connect(id.c_str())) {
+      Serial.println("성공");
+      mqtt.subscribe(topic("cmd").c_str());                // 접속할 때마다 구독도 다시
+      Serial.println("구독: " + topic("cmd"));
+    } else {
+      Serial.print("실패, state=");
+      Serial.println(mqtt.state());                        // 숫자로 실패 원인 확인
+      delay(2000);
+    }
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  dht.begin();
+  WiFi.begin("Wokwi-GUEST", "", 6);                        // Wokwi의 가상 Wi-Fi
+  Serial.print("Wi-Fi 연결 중");
+  while (WiFi.status() != WL_CONNECTED) { delay(250); Serial.print("."); }
+  Serial.println(" 연결됨, IP: " + WiFi.localIP().toString());
+
+  mqtt.setServer("broker.hivemq.com", 1883);               // 브로커 주소와 포트
+  mqtt.setCallback(onMessage);                             // 메시지가 오면 onMessage 실행
+}
+
+void loop() {
+  if (!mqtt.connected()) connectMqtt();                    // 끊겼으면 다시 접속
+  mqtt.loop();                                             // 받은 메시지 처리, 자주 불러야 함
+
+  static unsigned long last = 0;
+  if (millis() - last &gt;= 5000) {                           // delay 대신 millis로 5초 세기
+    last = millis();
+    float t = dht.readTemperature();
+    float h = dht.readHumidity();
+    if (isnan(t) || isnan(h)) { Serial.println("DHT22 읽기 실패"); return; }
+    char json[48];
+    snprintf(json, sizeof json, "{\"temp\":%.1f,\"hum\":%.1f}", t, h);  // LAB 2와 같은 JSON
+    mqtt.publish(topic("sensor").c_str(), json);
+    Serial.println("[보냄] " + topic("sensor") + " : " + json);
+  }
+}</code></pre></div>
+
+      <div class="code term"><span class="lang">정상 출력 예 (시리얼 모니터)</span><pre><code>Wi-Fi 연결 중...... 연결됨, IP: 10.13.37.2
+MQTT 접속 시도 (esp32-a3f91c) ... 성공
+구독: aiot-kt2611/s01w/cmd
+[보냄] aiot-kt2611/s01w/sensor : {"temp":24.0,"hum":40.0}</code></pre></div>
+
+      <h3>코드에서 꼭 알아야 할 줄</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>코드</th><th>하는 일</th></tr></thead>
+          <tbody>
+            <tr><td><code>mqtt.setServer("broker.hivemq.com", 1883)</code></td><td>어느 브로커의 어느 문(포트)으로 들어갈지. ESP32는 일반 TCP 문인 <b>1883</b>을 씁니다.</td></tr>
+            <tr><td><code>mqtt.connect(id)</code></td><td>브로커에 접속. <b>클라이언트 ID</b>가 같은 기기가 이미 있으면 브로커가 먼저 온 쪽을 끊습니다. Wokwi의 ESP32는 모두 MAC 주소가 같아서 무작위 ID를 씁니다.</td></tr>
+            <tr><td><code>mqtt.subscribe(토픽)</code></td><td>이 토픽의 메시지를 보내 달라고 등록. 접속이 끊겼다 다시 붙으면 구독도 사라지므로 <b>접속 성공 직후</b>에 합니다.</td></tr>
+            <tr><td><code>mqtt.publish(토픽, 글자)</code></td><td>메시지 발행. 숫자는 <code>snprintf</code>로 <b>글자(JSON)</b>로 만들어 보냅니다.</td></tr>
+            <tr><td><code>mqtt.loop()</code></td><td>받은 메시지를 처리하고 연결을 유지합니다. <code>delay(5000)</code>처럼 오래 멈추면 메시지를 늦게 받으므로 5초 간격은 <code>millis()</code>로 셉니다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>③ HiveMQ 웹 클라이언트로 구독하기</h3>
+      <p>ESP32가 보낸 메시지를 브라우저에서 바로 확인합니다. 설치도 가입도 필요 없습니다. PC에 MQTT Explorer가 있다면 LAB 2처럼 그것으로 봐도 됩니다. Wokwi 탭은 시뮬레이션을 켜 둔 채로 두고, <b>새 탭</b>에서 엽니다.</p>
+      <div class="launch">
+        <b>🔗 HiveMQ 웹 클라이언트</b>
+        <span><code>https://www.hivemq.com/demos/websocket-client/</code> — 위쪽 광고(Get your free account)는 무시합니다.</span>
+        <a class="btn primary" href="https://www.hivemq.com/demos/websocket-client/" target="_blank" rel="noopener">열기 →</a>
+      </div>
+      <div class="mission">
+        <div class="mh"><span class="mn">STEPS</span><b>구독하고, 거꾸로 보내기</b></div>
+        <ol>
+          <li><b>Host</b>는 <code>broker.hivemq.com</code>(기본값 <code>mqtt-dashboard.com</code>도 같은 브로커), <b>Port</b> <code>8884</code>, <b>SSL 체크</b>를 그대로 두고 <b>Connect</b>를 누릅니다. 빨간 점이 초록색으로 바뀌면 접속된 것입니다.</li>
+          <li><b>Add New Topic Subscription</b> → Topic에 <code>aiot-kt2611/s01w/#</code> → <b>Subscribe</b>.</li>
+          <li><b>Messages</b>에 5초마다 <code>…/s01w/sensor</code>와 JSON이 쌓이면 <b>발행 → 브로커 → 구독</b>이 된 것입니다.</li>
+          <li><b>Publish</b> 칸의 Topic에 <code>aiot-kt2611/s01w/cmd</code>, Message에 <code>hello</code>를 쓰고 <b>Publish</b>. Wokwi 시리얼 모니터에 <code>[받음] aiot-kt2611/s01w/cmd : hello</code>가 나오면 반대 방향도 성공입니다.</li>
+        </ol>
+      </div>
+      <div class="tip"><p>Wokwi 시뮬레이션은 탭이 뒤로 가면 느려지거나 멈출 수 있습니다. 창 두 개를 화면 왼쪽 · 오른쪽에 나란히 놓으세요(<code>Win</code> + <code>←</code> / <code>→</code>).</p></div>
+
+      <h3>④ 확인 실험</h3>
+      <ul>
+        <li><b>온도 바꾸기</b> — Wokwi에서 DHT22를 클릭해 온도를 30℃로 옮깁니다. 5초 안에 웹 클라이언트에 <code>"temp":30.0</code>이 도착하나요?</li>
+        <li><b>구독 범위 바꾸기</b> — 구독을 <code>aiot-kt2611/s01w/sensor</code>(정확한 토픽)로 바꾸면 hello를 보내도 센서값만 보입니다. <code>aiot-kt2611/+/sensor</code>로 바꾸면 반 전체의 휴대폰과 ESP32 센서값이 함께 보입니다. <code>+</code>와 <code>#</code>의 차이입니다.</li>
+        <li><b>LAB 2 코드 재사용</b> — <code>lab2_auto_led.py</code>의 <code>ME</code>를 <code>"s01w"</code>로만 바꿔 실행하고 DHT22 온도를 28℃ 위로 올립니다. 웹 클라이언트에 <code>…/s01w/led : ON</code>이 보이면, Python 코드는 디바이스가 휴대폰이든 ESP32든 <b>그대로</b> 동작한 것입니다. LED를 실제로 켜는 코드는 LAB 2-B에서 붙입니다.</li>
+        <li><b>Retain 실험</b> — Publish에서 <b>Retain</b>을 체크하고 보낸 뒤 구독을 지웠다 다시 하면, 마지막 메시지가 바로 도착합니다. 실험 뒤에는 같은 토픽에 빈 Message + Retain으로 한 번 보내 지워 둡니다. LAB 2-B에서 이 기능을 씁니다.</li>
+      </ul>
+
+      <h3>문제 해결</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>증상</th><th>확인할 것</th></tr></thead>
+          <tbody>
+            <tr><td><code>Wi-Fi 연결 중......</code>만 계속</td><td>SSID가 <code>Wokwi-GUEST</code>, 비밀번호가 <code>""</code>(빈 글자)인지 확인합니다.</td></tr>
+            <tr><td><code>state=-2</code> (접속 실패)</td><td>주소 오타와 포트 <b>1883</b>을 확인합니다. 8884는 브라우저용이라 ESP32에서는 안 됩니다. 잠시 뒤 자동 재시도로 붙기도 합니다.</td></tr>
+            <tr><td><code>state=-4</code> (시간 초과)</td><td>수업 중 접속이 몰리면 생길 수 있습니다. 기다리면 대부분 다시 붙습니다.</td></tr>
+            <tr><td>접속 · 끊김이 계속 반복됨</td><td>클라이언트 ID가 다른 기기와 겹쳤습니다. ID를 고정 글자(<code>"esp32"</code>)로 쓰지 말고 무작위로 만듭니다.</td></tr>
+            <tr><td>"[보냄]"은 찍히는데 웹에 안 옴</td><td>토픽 철자를 한 글자씩 대조합니다. 대소문자, <code>/</code> 위치, 반 코드, 번호가 같아야 합니다.</td></tr>
+            <tr><td>웹 클라이언트 점이 계속 빨간색</td><td>Port 8884와 SSL 체크를 확인합니다. 학교 네트워크가 8884를 막으면 휴대폰 데이터 핫스폿으로 시험합니다.</td></tr>
+            <tr><td><code>DHT22 읽기 실패</code></td><td>SDA가 GPIO15에 연결됐는지, 코드의 <code>DHT dht(15, DHT22)</code>와 번호가 같은지 확인합니다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted">더 자세한 그림 설명은 아두이노 과정 <a href="../arduino/#l36">36차시 MQTT 발행과 구독</a>에 있습니다. 실제 ESP32 보드로 하려면 LAB 2의 "심화 과제" 코드처럼 Wi-Fi 이름과 비밀번호만 강의실 것으로 바꿉니다.</p>
+    </section>
+
+    <!-- ───────── LAB 2-B · 원격 제어 대시보드 ───────── -->
+    <section id="remote">
+      <div class="sec">Lab 2-B · Dashboard</div>
+      <h2>웹 대시보드로 원격 제어하기</h2>
+      <p class="lead">이번에는 방향을 하나 더 늘립니다. 웹 페이지의 버튼이 명령을 <b>발행</b>하고, ESP32가 그 명령을 <b>구독</b>해 LED와 서보를 움직입니다. 순서는 <b>ESP32 준비 → 웹 클라이언트로 먼저 시험 → 내 대시보드 만들기 → 휴대폰에서 열기</b>입니다.</p>
+
+      <figure>
+        <div class="diagram">
+          <svg viewBox="0 0 760 250" role="img" aria-label="대시보드가 led와 servo 토픽으로 명령을 보내면 ESP32가 동작한 뒤 led/state와 servo/state 토픽으로 실제 상태를 알려 줍니다">
+            <defs><marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="ah" d="M0 0L10 5L0 10z"/></marker></defs>
+            <rect class="bx" x="24" y="96" width="190" height="64" rx="8"/><text class="t" x="119" y="122">📱 웹 대시보드</text><text class="s" x="119" y="142">MQTT.js · wss 8884</text>
+            <rect class="bx main" x="285" y="96" width="190" height="64" rx="8"/><text class="t" x="380" y="122">broker.hivemq.com</text><text class="s" x="380" y="142">토픽으로 나눠 전달</text>
+            <rect class="bx" x="546" y="96" width="190" height="64" rx="8"/><text class="t" x="641" y="122">📟 ESP32 (Wokwi)</text><text class="s" x="641" y="142">LED · 서보 · DHT22</text>
+            <path class="ln" d="M214 110H281" marker-end="url(#ah3)"/><path class="ln" d="M475 110H542" marker-end="url(#ah3)"/>
+            <path class="ln" d="M546 146H479" marker-end="url(#ah3)"/><path class="ln" d="M285 146H218" marker-end="url(#ah3)"/>
+            <text class="e" x="24" y="40">① 버튼 · 슬라이더 → 명령 발행</text>
+            <text class="e" x="24" y="60">…/s01w/led  "ON" · …/s01w/servo  "90"</text>
+            <text class="e" x="736" style="text-anchor:end" y="40">② 구독 중 → LED · 서보 동작</text>
+            <text class="e" x="736" style="text-anchor:end" y="60">구독: …/s01w/led, …/s01w/servo</text>
+            <text class="e" x="736" style="text-anchor:end" y="196">③ 동작 후 실제 상태 발행 (retain)</text>
+            <text class="e" x="736" style="text-anchor:end" y="216">…/led/state "ON" · …/servo/state "90"</text>
+            <text class="e" x="24" y="196">④ 구독 중 → 화면 갱신</text>
+            <text class="e" x="24" y="216">구독: …/s01w/#</text>
+          </svg>
+        </div>
+        <figcaption>대시보드와 ESP32는 서로를 모르고, 브로커의 토픽으로만 명령과 상태를 주고받습니다. 버튼을 누른 것(명령)과 LED가 실제로 켜진 것(상태)을 다른 토픽으로 나눕니다.</figcaption>
+      </figure>
+
+      <h3>이번 실습의 토픽</h3>
+      <p>명령 토픽 <code>led</code>는 LAB 2와 <b>똑같습니다</b>. 그래서 대시보드에서 번호만 <code>s01</code>로 바꾸면 휴대폰 시뮬레이터의 LED도 같은 버튼으로 켜집니다. 새로 생기는 것은 서보 명령과 <b>상태(state)</b> 토픽입니다.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>토픽 (앞에 <code>aiot-kt2611/s01w/</code>)</th><th>방향</th><th>내용</th><th>메시지 예</th></tr></thead>
+          <tbody>
+            <tr><td><code>sensor</code></td><td>ESP32 → 대시보드</td><td>5초마다 센서값 (LAB 2-A와 같음)</td><td><code>{"temp":24.0,"hum":40.0}</code></td></tr>
+            <tr><td><code>led</code></td><td>대시보드 → ESP32</td><td>LED 명령 (LAB 2와 같음)</td><td><code>ON</code> · <code>OFF</code> · <code>TOGGLE</code></td></tr>
+            <tr><td><code>servo</code></td><td>대시보드 → ESP32</td><td>서보 각도 명령</td><td><code>0</code> ~ <code>180</code></td></tr>
+            <tr><td><code>led/state</code></td><td>ESP32 → 대시보드</td><td>LED 실제 상태 (retain)</td><td><code>ON</code> · <code>OFF</code></td></tr>
+            <tr><td><code>servo/state</code></td><td>ESP32 → 대시보드</td><td>서보 실제 각도 (retain)</td><td><code>90</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><b>명령</b>과 <b>상태</b>를 나누는 것은 실제 IoT 제품에서도 쓰는 방식입니다. 버튼을 눌렀다고 LED가 켜졌다는 보장은 없으므로, 화면에는 ESP32가 알려 준 <b>실제 상태</b>를 보여 줍니다.</p>
+
+      <h3>① Wokwi에서 ESP32 준비하기</h3>
+      <div class="mission">
+        <div class="mh"><span class="mn">STEPS</span><b>LED와 서보 붙이기</b></div>
+        <ol>
+          <li>LAB 2-A에서 저장한 프로젝트를 열고 <b>Save a copy</b>로 복사본을 만듭니다. 저장하지 않았다면 새 ESP32 프로젝트를 엽니다.</li>
+          <li><code>diagram.json</code> 탭의 내용을 모두 지우고 아래 <code>diagram.json</code>을 붙여넣습니다. DHT22(GPIO15), LED + 220Ω 저항(GPIO2), 서보(GPIO18)가 한 번에 배선됩니다.</li>
+          <li><b>Library Manager</b>에 <code>PubSubClient</code>, <code>DHT sensor library</code>가 있는지 확인하고 <code>ESP32Servo</code>를 추가합니다.</li>
+          <li>아래 ESP32 코드를 붙여넣고 <code>PREFIX</code>와 <code>ME</code>를 바꿉니다. ▶ 실행 후 시리얼 모니터에 <code>구독: …/s01w/led, …/s01w/servo</code>가 나오면 명령 받을 준비가 된 것입니다.</li>
+        </ol>
+      </div>
+
+      <details class="full">
+        <summary>diagram.json · 배선 한 번에 붙여넣기</summary>
+        <div class="code"><span class="lang">JSON · Wokwi diagram.json</span><pre><code>{
+  "version": 1,
+  "author": "bctcaiedu",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-dht22", "id": "dht1", "top": -140, "left": -90, "attrs": {} },
+    { "type": "wokwi-resistor", "id": "r1", "top": -72, "left": 120, "rotate": 90, "attrs": { "value": "220" } },
+    { "type": "wokwi-led", "id": "led1", "top": -160, "left": 130, "attrs": { "color": "red" } },
+    { "type": "wokwi-servo", "id": "servo1", "top": -150, "left": 260, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "dht1:VCC", "esp:3V3", "red", [] ],
+    [ "dht1:SDA", "esp:15", "green", [] ],
+    [ "dht1:GND", "esp:GND.1", "black", [] ],
+    [ "esp:2", "r1:1", "orange", [] ],
+    [ "r1:2", "led1:A", "orange", [] ],
+    [ "led1:C", "esp:GND.1", "black", [] ],
+    [ "servo1:PWM", "esp:18", "orange", [] ],
+    [ "servo1:V+", "esp:5V", "red", [] ],
+    [ "servo1:GND", "esp:GND.2", "black", [] ]
+  ],
+  "dependencies": {}
+}</code></pre></div>
+      </details>
+
+      <div class="code"><span class="lang">Arduino (C++) · Wokwi · sketch.ino — 센서값 발행 + LED · 서보 원격 제어</span><pre><code>// Wokwi 라이브러리 관리자에서 PubSubClient, DHT sensor library, ESP32Servo 추가
+#include &lt;WiFi.h&gt;
+#include &lt;PubSubClient.h&gt;
+#include &lt;ESP32Servo.h&gt;
+#include "DHT.h"
+
+const char* PREFIX = "aiot-kt2611";  // ← LAB 2-A와 같게
+const char* ME     = "s01w";
+const int LED = 2;                   // LED → GPIO2
+DHT dht(15, DHT22);                  // DHT22 데이터 → GPIO15
+Servo servo;                         // 서보 신호 → GPIO18
+WiFiClient net;
+PubSubClient mqtt(net);
+bool ledOn = false;
+int  deg   = 0;
+
+String topic(const char* sub) { return String(PREFIX) + "/" + ME + "/" + sub; }
+
+// 실제 상태를 알림. 마지막 true = retain (브로커가 마지막 값을 기억)
+void reportState() {
+  mqtt.publish(topic("led/state").c_str(), ledOn ? "ON" : "OFF", true);
+  mqtt.publish(topic("servo/state").c_str(), String(deg).c_str(), true);
+}
+
+// 구독한 토픽에 명령이 오면 실행
+void onMessage(char* t, byte* payload, unsigned int len) {
+  String tp = t;
+  String msg;
+  for (unsigned int i = 0; i &lt; len; i++) msg += (char)payload[i];
+  msg.trim();
+  Serial.println("[받음] " + tp + " : " + msg);
+
+  if (tp == topic("led")) {                          // LED 명령 (휴대폰 시뮬레이터와 같은 규칙)
+    String up = msg;
+    up.toUpperCase();
+    if (up == "ON" || up.startsWith("#")) ledOn = true;   // 색 코드는 "켜기"로
+    else if (up == "OFF") ledOn = false;
+    else if (up == "TOGGLE") ledOn = !ledOn;
+    else return;                                     // 모르는 명령은 무시
+    digitalWrite(LED, ledOn ? HIGH : LOW);
+  } else if (tp == topic("servo")) {                 // 서보 명령: 0 ~ 180
+    deg = constrain(msg.toInt(), 0, 180);            // 범위 밖 값은 잘라냄
+    servo.write(deg);
+  } else {
+    return;
+  }
+  reportState();
+}
+
+void connectMqtt() {
+  while (!mqtt.connected()) {
+    String id = "esp32-" + String(random(0xffffff), HEX);
+    Serial.print("MQTT 접속 시도 ... ");
+    if (mqtt.connect(id.c_str())) {
+      Serial.println("성공");
+      mqtt.subscribe(topic("led").c_str());
+      mqtt.subscribe(topic("servo").c_str());
+      Serial.println("구독: " + topic("led") + ", " + topic("servo"));
+      reportState();                                 // 접속하자마자 현재 상태부터 알림
+    } else {
+      Serial.print("실패, state=");
+      Serial.println(mqtt.state());
+      delay(2000);
+    }
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(LED, OUTPUT);
+  servo.attach(18, 500, 2400);
+  servo.write(0);
+  dht.begin();
+  WiFi.begin("Wokwi-GUEST", "", 6);
+  Serial.print("Wi-Fi 연결 중");
+  while (WiFi.status() != WL_CONNECTED) { delay(250); Serial.print("."); }
+  Serial.println(" 연결됨");
+  mqtt.setServer("broker.hivemq.com", 1883);
+  mqtt.setCallback(onMessage);
+}
+
+void loop() {
+  if (!mqtt.connected()) connectMqtt();
+  mqtt.loop();                                       // 명령을 바로 받으려면 자주 불러야 함
+
+  static unsigned long last = 0;
+  if (millis() - last &gt;= 5000) {                     // 5초마다 센서값 발행
+    last = millis();
+    float t = dht.readTemperature();
+    float h = dht.readHumidity();
+    if (isnan(t) || isnan(h)) return;
+    char json[48];
+    snprintf(json, sizeof json, "{\"temp\":%.1f,\"hum\":%.1f}", t, h);
+    mqtt.publish(topic("sensor").c_str(), json);
+  }
+}</code></pre></div>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>ESP32 코드 핵심</th><th>하는 일</th></tr></thead>
+          <tbody>
+            <tr><td><code>if (tp == topic("led"))</code></td><td>여러 토픽이 같은 <code>onMessage</code>로 들어오므로 <b>토픽 이름으로 어떤 명령인지 구분</b>합니다.</td></tr>
+            <tr><td><code>msg += (char)payload[i]</code></td><td>메시지는 바이트 배열로 옵니다. 한 글자씩 붙여 <code>String</code>으로 만든 뒤 <code>"ON"</code>과 비교하거나 <code>toInt()</code>로 숫자로 바꿉니다.</td></tr>
+            <tr><td><code>else return;</code> · <code>constrain(…, 0, 180)</code></td><td>누가 <code>abc</code>나 <code>999</code>를 보내도 정해진 명령, 정해진 범위 안에서만 움직이게 막습니다. 원격 명령은 <b>항상 검사</b>합니다.</td></tr>
+            <tr><td><code>publish(…, true)</code></td><td><b>retain</b>: 브로커가 마지막 상태를 기억했다가, 대시보드를 새로 열어도 바로 보내 줍니다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>② 대시보드 만들기 전에 웹 클라이언트로 시험하기</h3>
+      <p>대시보드부터 만들면 안 될 때 ESP32 문제인지 웹 문제인지 알 수 없습니다. 먼저 LAB 2-A의 HiveMQ 웹 클라이언트(또는 MQTT Explorer)로 명령을 직접 보내 <b>ESP32 쪽이 맞는지</b> 확인합니다.</p>
+      <ol>
+        <li><code>aiot-kt2611/s01w/#</code>을 구독합니다. 접속 직후 보낸 <code>led/state : OFF</code>, <code>servo/state : 0</code>이 보입니다.</li>
+        <li>Topic <code>aiot-kt2611/s01w/led</code>, Message <code>ON</code> → <b>Publish</b>. Wokwi의 LED가 켜지고 <code>led/state : ON</code>이 돌아오면 성공입니다.</li>
+        <li>Topic <code>aiot-kt2611/s01w/servo</code>, Message <code>90</code> → Publish. 서보 팔이 90°로 돌고 <code>servo/state : 90</code>이 옵니다. <code>999</code>를 보내면 180으로 제한되는지도 확인합니다.</li>
+        <li>LAB 2의 <code>lab2_auto_led.py</code>(<code>ME = "s01w"</code>)를 실행하고 DHT22 온도를 28℃ 위로 올리면, 이번에는 Wokwi의 LED가 <b>스스로</b> 켜집니다.</li>
+      </ol>
+
+      <h3>③ 강의실 대시보드로 제어하기</h3>
+      <div class="launch">
+        <b>📊 원격 제어 대시보드 열기</b>
+        <span>반 코드와 번호(<code>s01w</code>)를 넣고 <b>적용</b>을 누르면 위 토픽으로 동작합니다. 휴대폰에서도 열립니다. 주소 뒤에 <code>?prefix=aiot-kt2611&amp;id=s01w</code>를 붙이면 바로 적용됩니다.</span>
+        <a class="btn primary" href="dashboard/">열기 →</a>
+      </div>
+      <p>번호를 <code>s01</code>(휴대폰 시뮬레이터)로 바꿔 보세요. 센서값이 보이고 LED 버튼으로 휴대폰 LED도 켜집니다. 그런데 <b>실제 상태</b>는 <code>?</code>로 남습니다. 시뮬레이터는 상태를 알려 주지 않기 때문입니다. 명령만 보내고 확인하지 않는 기기라면 화면의 "켜짐"을 믿을 수 없다는 뜻입니다.</p>
+
+      <h3>④ 내 웹 대시보드 만들기</h3>
+      <p>AI 코딩 도구로 직접 만들거나, 아래 참고 HTML로 시작합니다. HTML 파일 하나면 되고 설치할 것은 없습니다.</p>
+      <div class="code prompt"><span class="lang">AI 코딩 도구에 요청</span><pre>MQTT.js로 wss://broker.hivemq.com:8884/mqtt 에 접속하는 HTML 한 페이지 대시보드를 만들어 줘.
+- "aiot-kt2611/s01w/#"을 구독해서, sensor 토픽의 JSON({"temp":24.0,"hum":40.0})에서 온도와 습도를 크게 보여 줘.
+- ON / OFF 버튼은 "aiot-kt2611/s01w/led"에 "ON", "OFF"를 발행해 줘.
+- 0~180 슬라이더는 손을 뗄 때 "aiot-kt2611/s01w/servo"에 각도를 발행해 줘.
+- LED와 서보의 실제 상태는 led/state, servo/state 토픽으로 받은 값만 보여 줘.
+휴대폰에서도 누르기 쉽게 큰 버튼으로 만들고, 코드에 한국어 주석을 달아 줘.</pre></div>
+      <details class="full">
+        <summary>참고 HTML · dashboard.html</summary>
+        <div class="inner">
+          <ol>
+            <li>아래 HTML을 메모장(또는 VS Code)에 붙여넣고 <code>PREFIX</code>와 <code>ME</code>를 바꿉니다.</li>
+            <li><b>다른 이름으로 저장</b> → 파일 이름 <code>dashboard.html</code>, 파일 형식 <b>모든 파일</b>, 인코딩 <b>UTF-8</b>.</li>
+            <li>파일을 더블클릭해 브라우저로 엽니다. "🟢 연결됨"이 나오고 5초 안에 온도가 보이면 성공입니다. 안 되면 <b>F12</b> → Console 탭의 빨간 오류를 AI에게 보여 줍니다.</li>
+          </ol>
+          <div class="code"><span class="lang">HTML · dashboard.html</span><pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="ko"&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+&lt;title&gt;내 IoT 대시보드&lt;/title&gt;
+&lt;script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"&gt;&lt;/script&gt;
+&lt;style&gt;
+  body { font-family: sans-serif; max-width: 420px; margin: 20px auto; padding: 0 16px; }
+  .temp { font-size: 64px; font-weight: 800; text-align: center; }
+  button { width: 48%; padding: 18px; font-size: 20px; font-weight: 700; border: 0; border-radius: 12px; }
+  #on { background: #f5c542; }
+  #off { background: #ddd; }
+  input[type=range] { width: 100%; }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h2&gt;🌡️ 내 디바이스&lt;/h2&gt;
+&lt;p id="status"&gt;연결 중…&lt;/p&gt;
+&lt;div class="temp"&gt;&lt;span id="temp"&gt;--&lt;/span&gt; °C&lt;/div&gt;
+&lt;p&gt;💧 습도: &lt;b id="hum"&gt;--&lt;/b&gt; %&lt;/p&gt;
+&lt;p&gt;💡 LED 실제 상태: &lt;b id="led"&gt;?&lt;/b&gt;&lt;/p&gt;
+&lt;button id="on"&gt;ON&lt;/button&gt; &lt;button id="off"&gt;OFF&lt;/button&gt;
+&lt;p&gt;🦾 서보 실제 각도: &lt;b id="deg"&gt;?&lt;/b&gt;&lt;/p&gt;
+&lt;input id="servo" type="range" min="0" max="180" step="10" value="0"&gt;
+
+&lt;script&gt;
+const PREFIX = 'aiot-kt2611';   // ← 반 코드
+const ME = 's01w';              // ← ESP32 코드의 ME와 똑같이
+const T = (sub) =&gt; PREFIX + '/' + ME + '/' + sub;
+const $ = (id) =&gt; document.getElementById(id);
+const client = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');   // 브라우저는 8884(wss)
+
+client.on('connect', () =&gt; {
+  $('status').textContent = '🟢 연결됨';
+  client.subscribe(T('#'));                      // 센서값과 상태를 모두 받기
+});
+client.on('close', () =&gt; {
+  $('status').textContent = '🔴 끊김 (자동으로 다시 연결)';
+});
+
+client.on('message', (topic, payload) =&gt; {
+  const msg = payload.toString();                // 받은 메시지는 글자로 바꿔서 사용
+  if (topic === T('sensor')) {
+    try {
+      const d = JSON.parse(msg);                 // {"temp":24.0,"hum":40.0}
+      if (d.temp !== undefined) $('temp').textContent = d.temp;
+      if (d.hum !== undefined) $('hum').textContent = d.hum;
+    } catch (e) { /* JSON이 아니면 무시 */ }
+  }
+  if (topic === T('led/state')) $('led').textContent = msg;
+  if (topic === T('servo/state')) $('deg').textContent = msg + '°';
+});
+
+$('on').onclick = () =&gt; client.publish(T('led'), 'ON');
+$('off').onclick = () =&gt; client.publish(T('led'), 'OFF');
+$('servo').onchange = (e) =&gt; client.publish(T('servo'), e.target.value);   // 손을 뗄 때 보내기
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre></div>
+          <p>내가 만든 파일은 PC에만 있어서 휴대폰에서 열 수 없습니다. 휴대폰에서 쓰려면 <a href="https://codepen.io/pen/" target="_blank" rel="noopener">CodePen</a>에 붙여넣고 저장한 뒤 <b>View → Full Page View</b> 주소를 열거나, 팀 GitHub 저장소의 Pages에 올려 https 주소로 엽니다.</p>
+        </div>
+      </details>
+
+      <h3>⑤ 확인 실험</h3>
+      <ul>
+        <li><b>반응 속도</b> — 버튼을 누르고 LED가 켜질 때까지 얼마나 걸리나요? LAB 3의 ThingSpeak(20초 간격)와 비교해 봅니다. 보통 1초 안쪽입니다.</li>
+        <li><b>새로고침해도 상태 유지</b> — 대시보드를 새로고침하면 LED 상태가 바로 다시 나옵니다. retain 덕분입니다. ESP32 코드의 <code>true</code>를 <code>false</code>로 바꾸면 어떻게 달라지는지 비교합니다.</li>
+        <li><b>ESP32가 꺼진 상태에서 명령</b> — Wokwi를 ■ 정지하고 ON을 누릅니다. 명령은 발행됐지만 상태는 바뀌지 않습니다. "눌렀다"와 "켜졌다"를 나눠 보여 줘야 하는 이유입니다.</li>
+        <li><b>PC와 휴대폰 동시에</b> — PC와 휴대폰에서 대시보드를 함께 열고 휴대폰에서 ON을 누르면 두 화면의 상태가 <b>동시에</b> 바뀝니다. 둘 다 같은 state 토픽을 구독하기 때문입니다.</li>
+      </ul>
+      <div class="tip"><p>안 될 때는 가운데(브로커)에서 양쪽을 봅니다. 웹 클라이언트나 MQTT Explorer로 <code>aiot-kt2611/s01w/#</code>을 구독해 두면 명령과 상태가 모두 보입니다. 명령이 안 보이면 대시보드 문제, 명령은 보이는데 상태가 안 오면 ESP32 문제입니다.</p></div>
+      <div class="warn"><p>지금 대시보드에는 비밀번호가 없어서 토픽을 아는 사람은 누구나 내 LED와 서보를 움직일 수 있습니다. 문 잠금 · 히터 · 모터처럼 위험한 장치는 공개 브로커로 제어하지 않습니다. 바로 아래 IoT 보안에서 이 문제를 다룹니다.</p></div>
+    </section>
+
+    <!-- ───────── IoT 보안 ───────── -->
+    <section id="security">
+      <div class="sec">Security</div>
+      <h2>IoT 보안</h2>
+      <p class="lead">IoT 기기는 카메라 · 도어락 · 자동차 · 의료기기처럼 <b>현실 세계와 바로 연결</b>되어 있어서, 해킹되면 개인정보 유출을 넘어 사생활 침해나 안전 문제로 이어집니다. 기기가 많고, 오래 쓰고, 업데이트가 잘 되지 않아 공격 대상이 되기 쉽습니다.</p>
+
+      <h3>사고의 공통 원인과 예방법</h3>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>공통 원인</th><th>대표 사례</th><th>예방법</th></tr></thead>
+          <tbody>
+            <tr><td><b>기본 · 약한 비밀번호</b></td><td>미라이 봇넷(2016), 아파트 월패드 · 홈캠 해킹(국내)</td><td>처음 설치할 때 반드시 바꾸고, 기기마다 다르게</td></tr>
+            <tr><td><b>업데이트 안 함</b></td><td>심장 박동기 펌웨어 리콜(2017), 지프 원격 해킹(2015)</td><td>펌웨어 · 앱을 최신으로, 업데이트 가능한 제품 선택</td></tr>
+            <tr><td><b>비밀번호 · 키 유출, 공유</b></td><td>Verkada 카메라 노출(2021), 정수장 원격 접속(2021)</td><td>코드 · 화면 공유 · 채팅에 키를 남기지 않기, 사람마다 계정 따로</td></tr>
+            <tr><td><b>인터넷에 그대로 노출</b></td><td>미라이, 지프, 홈캠</td><td>꼭 필요한 기기만 외부 접속 허용, 포트 닫기</td></tr>
+            <tr><td><b>네트워크를 나누지 않음</b></td><td>월패드, 카지노 수족관 온도계</td><td>IoT 기기는 별도 Wi-Fi(게스트 네트워크)로 분리</td></tr>
+            <tr><td><b>암호화 없는 통신</b></td><td>심장 박동기</td><td>HTTPS · MQTT over TLS(8883) 사용</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted">사례별 설명과 뉴스 영상 · 기사 링크는 아두이노 과정 <a href="../arduino/#l38">38차시 데이터 해석과 IoT 보안</a>에 모아 두었습니다.</p>
+
+      <h3>이 과정의 실습에 적용하기</h3>
+      <ul class="checks">
+        <li><input type="checkbox" aria-label="완료">ThingSpeak API 키, Anthropic API 키, Wi-Fi 비밀번호는 <code>YOUR_API_KEY</code> 같은 자리표시자로 바꾼 뒤 AI에게 질문한다</li>
+        <li><input type="checkbox" aria-label="완료">Wokwi 프로젝트 · 팀 저장소를 공유하기 전에 코드에 실제 키가 들어 있지 않은지 확인한다 (공유 링크로 누구나 코드를 볼 수 있음)</li>
+        <li><input type="checkbox" aria-label="완료">공개 브로커에는 이름 · 위치 · 사진 같은 개인정보를 보내지 않고, 반 코드처럼 겹치지 않는 토픽 접두어를 쓴다</li>
+        <li><input type="checkbox" aria-label="완료">원격 제어 명령은 받을 수 있는 값만 허용한다 (LAB 2-B처럼 정해진 명령 외에는 무시, 숫자는 범위 검사)</li>
+        <li><input type="checkbox" aria-label="완료">키가 노출되었다고 의심되면 ThingSpeak · 브로커 · API 콘솔에서 바로 키를 재발급한다</li>
+        <li><input type="checkbox" aria-label="완료">프로젝트에서 실제 장치를 움직인다면 사용자 이름 · 비밀번호가 있는 브로커(HiveMQ Cloud 무료 요금제 등)와 TLS(포트 8883)를 쓴다</li>
+      </ul>
+      <div class="code"><span class="lang">Arduino (C++) · 키를 코드에서 분리하기 (secrets.h)</span><pre><code>// secrets.h — 공유하지 않는 파일 (Wokwi에서는 파일 추가로 만들 수 있음)
+#define WIFI_SSID     "Wokwi-GUEST"
+#define WIFI_PASS     ""
+#define TS_WRITE_KEY  "YOUR_WRITE_KEY"   // 실제 키는 여기에만
+
+// sketch.ino
+#include "secrets.h"
+// ...
+WiFi.begin(WIFI_SSID, WIFI_PASS, 6);</code></pre></div>
+      <div class="ask"><p>팀 프로젝트 구조(디바이스 · 브로커 · 클라우드 · AI)에서 위 6가지 원인 중 해당하는 것은 무엇인가요? 키를 지운 코드와 구조도를 AI에게 보여 주며 보안 점검을 받고, AI가 찾은 위험이 실제로 우리 코드에 해당하는지 직접 확인해 기획서에 적습니다.</p></div>
     </section>
 
     <!-- ───────── 클라우드 ───────── -->
@@ -1054,6 +1594,9 @@ else:
         <li><input type="checkbox" aria-label="완료"><b>LAB 1</b> 시뮬레이터(또는 ESP32)로 센서값과 JSON을 확인했다 — 화면 스크린샷</li>
         <li><input type="checkbox" aria-label="완료"><b>LAB 2</b> MQTT Explorer에서 반 전체 센서값을 봤다 — 스크린샷</li>
         <li><input type="checkbox" aria-label="완료"><b>LAB 2</b> 온도를 올리면 Python 코드가 내 LED를 켠다 — 10초 영상</li>
+        <li><input type="checkbox" aria-label="완료"><b>LAB 2-A</b> Wokwi ESP32의 센서값을 HiveMQ 웹 클라이언트에서 받고, 웹에서 보낸 글자를 시리얼 모니터에서 봤다 — 스크린샷 2장</li>
+        <li><input type="checkbox" aria-label="완료"><b>LAB 2-B</b> 웹 대시보드(휴대폰)로 ESP32의 LED와 서보를 움직이고 실제 상태가 표시된다 — 10초 영상</li>
+        <li><input type="checkbox" aria-label="완료"><b>SECURITY</b> 우리 팀 프로젝트의 보안 위험 2가지와 대책을 기획서에 적었다</li>
         <li><input type="checkbox" aria-label="완료"><b>LAB 3</b> ThingSpeak에 데이터가 쌓이고 대시보드가 보인다 — 스크린샷</li>
         <li><input type="checkbox" aria-label="완료"><b>LAB 4</b> 일부러 만든 이상 상황을 이상 탐지로 찾았다 — Colab 그래프</li>
         <li><input type="checkbox" aria-label="완료"><b>LAB 4</b> 예측 모델의 오차를 기준선과 비교했다 — Colab 출력</li>
@@ -1079,6 +1622,8 @@ else:
             <tr><td>ThingSpeak 응답이 <code>0</code></td><td>15초 안에 다시 전송</td><td>전송 간격 20초 이상 (시뮬레이터 기본값)</td></tr>
             <tr><td>MediaPipe 창이 검은 화면</td><td>다른 프로그램이 카메라 사용 중</td><td>화상회의 프로그램 종료, <code>VideoCapture(1)</code>로 번호 변경</td></tr>
             <tr><td>LLM 호출 시 인증 오류</td><td>환경변수 미설정</td><td>같은 터미널 창에서 <code>ANTHROPIC_API_KEY</code> 설정 후 실행</td></tr>
+            <tr><td>(Wokwi) 시리얼에 <code>state=-2</code></td><td>ESP32가 브라우저용 포트(8884)로 접속</td><td>ESP32와 Python은 <code>1883</code>, 브라우저만 <code>8884</code>(wss). 자세한 표는 <a href="#esp32">LAB 2-A 문제 해결</a></td></tr>
+            <tr><td>(대시보드) ON을 눌러도 상태가 <code>?</code></td><td>번호가 휴대폰 시뮬레이터이거나 ESP32가 꺼짐</td><td>시뮬레이터는 상태를 보내지 않음. ESP32 번호(<code>s01w</code>)와 Wokwi 실행 여부 확인</td></tr>
             <tr><td>(ESP32) 보드가 포트 목록에 안 보임</td><td>드라이버 없음, 충전 전용 케이블</td><td>CP210x/CH340 드라이버 설치, 데이터 케이블로 교체</td></tr>
             <tr><td>(ESP32) 업로드 중 멈춤</td><td>부트 모드 진입 실패</td><td>BOOT 버튼을 누른 채 업로드 시작</td></tr>
             <tr><td>(ESP32) DHT22가 <code>nan</code></td><td>배선 오류, 너무 자주 읽음</td><td>핀과 전원 확인, 2초 간격 유지</td></tr>

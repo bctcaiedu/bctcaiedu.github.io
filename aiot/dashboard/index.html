@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MQTT 원격 제어 대시보드 · AIoT 프로젝트</title>
+<meta name="description" content="broker.hivemq.com에 접속해 ESP32나 휴대폰 시뮬레이터의 센서값을 보고 LED와 서보를 원격으로 제어하는 MQTT 대시보드입니다.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
+<script>try{var t=localStorage.getItem('bctc-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<style>
+  :root { --bg:#f4f6f9; --card:#fff; --card2:#f7f9fc; --line:#e1e6ee; --fg:#1d2433; --muted:#6b7587; --accent:#0e7490; --accent-soft:#e2f3f7; --accent2:#6d28d9;
+    --ok:#1f9d55; --danger:#d64541; --shadow:0 1px 2px rgba(20,30,50,.06),0 4px 16px rgba(20,30,50,.06);
+    --sans:'Pretendard Variable',Pretendard,-apple-system,'Segoe UI','Malgun Gothic',sans-serif; --mono:'JetBrains Mono',Consolas,monospace; color-scheme:light; }
+  :root[data-theme="dark"] { --bg:#0e1116; --card:#1a2029; --card2:#1f2631; --line:#2a323e; --fg:#e3e8f0; --muted:#8d97a8; --accent:#4fd1e8; --accent-soft:#10303a; --accent2:#b79cff;
+    --ok:#4cc983; --danger:#ff6b61; --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+  button, input { font: inherit; color: inherit; }
+  .top { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: var(--card); border-bottom: 1px solid var(--line); }
+  .top a { color: var(--fg); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+  .logo { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; font-size: 19px; background: linear-gradient(135deg, #0e7490, #6d28d9); }
+  .top b { display: block; font-size: 15px; line-height: 1.2; } .top small { font-size: 12px; color: var(--muted); }
+  main { max-width: 560px; margin: 0 auto; padding: 14px 16px 60px; display: flex; flex-direction: column; gap: 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); padding: 14px 16px; }
+  .card h2 { margin: 0 0 8px; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+  .muted { color: var(--muted); font-size: 13px; margin: 4px 0; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  label.f { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin: 8px 0 3px; }
+  input[type=text] { width: 100%; border: 1px solid var(--line); background: var(--card2); border-radius: 9px; padding: 9px 11px; font-size: 15px; outline: none; }
+  input:focus { border-color: var(--accent); }
+  .btn { border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 10px 14px; font-weight: 700; cursor: pointer; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  :root[data-theme="dark"] .btn.primary { color: #0e1116; }
+  .switch { width: 100%; padding: 16px 8px; border-radius: 14px; border: 2px solid var(--line); background: var(--card2); font-size: 17px; font-weight: 800; cursor: pointer; }
+  .switch.on { background: #f5c542; border-color: #c99a06; color: #1d2433; box-shadow: 0 0 24px rgba(245,197,66,.6); }
+  .big { background: var(--card2); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; text-align: center; }
+  .big .k { font-size: 12px; color: var(--muted); font-weight: 700; }
+  .big .v { font: 800 30px/1.2 var(--sans); }
+  .big .v small { font-size: 13px; color: var(--muted); font-weight: 600; }
+  .log { font: 12.5px/1.5 var(--mono); background: var(--card2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; max-height: 200px; overflow-y: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .ok { color: var(--ok); } .err { color: var(--danger); }
+  .note { font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 8px; margin-top: 8px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--danger); display: inline-block; }
+  .dot.on { background: var(--ok); }
+  input[type=range] { width: 100%; accent-color: var(--accent); height: 32px; }
+  code { font-family: var(--mono); font-size: 12.5px; background: var(--card2); border: 1px solid var(--line); border-radius: 5px; padding: 0 4px; overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<header class="top">
+  <a href="../#remote"><span class="logo">📊</span><span><b>MQTT 원격 제어 대시보드</b><small>← AIoT 프로젝트 · LAB 2-B 웹 대시보드</small></span></a>
+</header>
+<main>
+  <section class="card">
+    <h2><span class="dot" id="dot"></span> <span id="status">연결 중…</span></h2>
+    <div class="grid2">
+      <div><label class="f" for="prefix">반 코드 (토픽 앞부분)</label><input type="text" id="prefix" placeholder="예: aiot-kt2611" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+      <div><label class="f" for="devId">디바이스 번호</label><input type="text" id="devId" placeholder="예: s01w" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+    </div>
+    <div style="margin-top:10px"><button class="btn primary" id="saveBtn" type="button">적용</button></div>
+    <p class="muted">브로커: <code>wss://broker.hivemq.com:8884/mqtt</code> · 구독: <code id="subT">-</code></p>
+    <p class="muted">Wokwi ESP32는 <code>s01w</code>처럼 번호 뒤에 <code>w</code>, 휴대폰 시뮬레이터는 <code>s01</code>처럼 번호만 씁니다.</p>
+  </section>
+
+  <section class="card">
+    <h2>🌡️ 센서값 <span class="muted" id="sTime" style="margin-left:auto"></span></h2>
+    <div class="grid3">
+      <div class="big"><div class="k">온도</div><div class="v" id="temp">--<small> °C</small></div></div>
+      <div class="big"><div class="k">습도</div><div class="v" id="hum">--<small> %</small></div></div>
+      <div class="big"><div class="k">조도</div><div class="v" id="light">--</div></div>
+    </div>
+    <p class="muted" style="text-align:center"><code id="sensT">…/sensor</code>로 들어온 JSON에서 읽은 값</p>
+  </section>
+
+  <section class="card">
+    <h2>💡 LED</h2>
+    <div class="grid3">
+      <button class="switch" id="onBtn" type="button">ON</button>
+      <button class="switch" id="offBtn" type="button">OFF</button>
+      <button class="switch" id="togBtn" type="button">TOGGLE</button>
+    </div>
+    <p class="muted">디바이스가 알려 준 실제 상태: <b id="ledState">?</b> <span id="ledHint"></span></p>
+  </section>
+
+  <section class="card">
+    <h2>🦾 서보 각도 <b id="deg" style="margin-left:auto">0°</b></h2>
+    <input type="range" id="servo" min="0" max="180" step="10" value="0" aria-label="서보 각도">
+    <p class="muted">손을 떼면 각도를 보냅니다. 디바이스가 알려 준 실제 각도: <b id="servoState">?</b></p>
+  </section>
+
+  <section class="card">
+    <h2>🔔 기타 명령</h2>
+    <div class="grid2">
+      <button class="btn" id="beepBtn" type="button">BEEP</button>
+      <button class="btn" id="vibBtn" type="button">VIBRATE</button>
+    </div>
+    <p class="muted"><code>…/cmd</code>로 보냅니다. 휴대폰 시뮬레이터는 소리 · 진동, LAB 2-A의 ESP32는 시리얼 모니터에 출력합니다.</p>
+  </section>
+
+  <section class="card">
+    <h2>📝 메시지 기록</h2>
+    <div class="log" id="log"></div>
+    <p class="note">공개 브로커라 같은 반 코드와 번호를 쓰면 누구나 이 화면과 같은 값을 보고, 같은 명령을 보낼 수 있습니다. 개인정보는 보내지 마세요.</p>
+  </section>
+</main>
+<script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const st = {
+    get(k) { try { return localStorage.getItem('aiot-dash.' + k) || localStorage.getItem('phoneiot.' + k) || ''; } catch (e) { return ''; } },
+    set(k, v) { try { localStorage.setItem('aiot-dash.' + k, v); } catch (e) {} }
+  };
+  const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  function log(t, cls) {
+    const d = new Date().toLocaleTimeString('en-GB');
+    $('log').innerHTML = `<span class="${cls || ''}">${d}  ${esc(t)}</span>\n` + $('log').innerHTML;
+  }
+
+  const q = new URLSearchParams(location.search);
+  let prefix = q.get('prefix') || st.get('prefix') || 'aiot-kt2611';
+  let dev = q.get('id') || st.get('id') || '';
+  const T = (sub) => prefix + '/' + dev + '/' + sub;
+  $('prefix').value = prefix; $('devId').value = dev;
+
+  if (typeof mqtt === 'undefined') { $('status').textContent = 'MQTT 라이브러리를 불러오지 못함 (인터넷 확인)'; return; }
+  const client = mqtt.connect('wss://broker.hivemq.com:8884/mqtt', { clientId: 'aiot-dash-' + Math.random().toString(16).slice(2, 10), reconnectPeriod: 2000 });
+  function setStatus(on, t) { $('dot').classList.toggle('on', on); $('status').textContent = t; }
+  function resetView() {
+    ['ledState', 'servoState'].forEach((id) => { $(id).textContent = '?'; });
+    $('temp').innerHTML = '--<small> °C</small>'; $('hum').innerHTML = '--<small> %</small>'; $('light').textContent = '--';
+    $('sTime').textContent = ''; $('ledHint').textContent = ''; $('onBtn').classList.remove('on');
+  }
+  function subscribe() {
+    if (!prefix || !dev) { $('subT').textContent = '-'; log('반 코드와 디바이스 번호를 넣고 적용을 누르세요', 'err'); return; }
+    client.subscribe(T('#'), (err) => err ? log('구독 실패: ' + err.message, 'err') : log('구독: ' + T('#'), 'ok'));
+    $('subT').textContent = T('#'); $('sensT').textContent = T('sensor');
+    // 상태가 오지 않으면 안내 (휴대폰 시뮬레이터는 상태를 보내지 않음)
+    setTimeout(() => { if ($('ledState').textContent === '?') $('ledHint').textContent = '— 상태를 보내지 않는 디바이스이거나 꺼져 있음'; }, 8000);
+  }
+  client.on('connect', () => { setStatus(true, '브로커에 연결됨'); log('broker.hivemq.com 연결됨', 'ok'); subscribe(); });
+  client.on('reconnect', () => setStatus(false, '다시 연결하는 중…'));
+  client.on('close', () => setStatus(false, '연결 끊김'));
+  client.on('error', (e) => log('오류: ' + e.message, 'err'));
+  client.on('message', (topic, payload) => {
+    const msg = payload.toString();
+    log('받음 ' + topic + ' : ' + msg);
+    if (topic === T('sensor')) {
+      let d = null;
+      try { d = JSON.parse(msg); } catch (e) { return; }
+      if (!d || typeof d !== 'object') return;
+      if (d.temp !== undefined) $('temp').innerHTML = esc(d.temp) + '<small> °C</small>';
+      if (d.hum !== undefined) $('hum').innerHTML = esc(d.hum) + '<small> %</small>';
+      if (d.light !== undefined) $('light').textContent = d.light;
+      $('sTime').textContent = new Date().toLocaleTimeString('en-GB');
+    } else if (topic === T('led/state')) {
+      $('ledState').textContent = msg; $('ledHint').textContent = '';
+      $('onBtn').classList.toggle('on', msg.toUpperCase() === 'ON');
+    } else if (topic === T('servo/state')) {
+      $('servoState').textContent = msg + '°';
+    }
+  });
+  function send(sub, msg) {
+    if (!prefix || !dev) return log('반 코드와 디바이스 번호를 먼저 적용하세요', 'err');
+    if (!client.connected) return log('브로커에 연결되지 않았습니다', 'err');
+    client.publish(T(sub), msg);
+    log('보냄 ' + T(sub) + ' : ' + msg, 'ok');
+  }
+  $('saveBtn').onclick = () => {
+    const p = $('prefix').value.trim().replace(/\/+$/, '');
+    const d = $('devId').value.trim().replace(/^\/+|\/+$/g, '');
+    if (/[#+\s]/.test(p + d)) return log('# · + · 띄어쓰기는 쓸 수 없습니다', 'err');
+    if (prefix && dev && client.connected) client.unsubscribe(T('#'));
+    prefix = p; dev = d; st.set('prefix', p); st.set('id', d);
+    resetView();
+    if (client.connected) subscribe();
+  };
+  $('onBtn').onclick = () => send('led', 'ON');
+  $('offBtn').onclick = () => send('led', 'OFF');
+  $('togBtn').onclick = () => send('led', 'TOGGLE');
+  $('beepBtn').onclick = () => send('cmd', 'BEEP');
+  $('vibBtn').onclick = () => send('cmd', 'VIBRATE');
+  $('servo').oninput = () => { $('deg').textContent = $('servo').value + '°'; };
+  $('servo').onchange = () => send('servo', $('servo').value);
+})();
+</script>
+</body>
+</html>
