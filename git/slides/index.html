@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Git · GitHub 실습 · 교수용 슬라이드</title>
-<meta name="description" content="Git · GitHub 실습 강좌 22강과 응용 프로젝트 5개(Git 기초 · 브랜치 · 원격 · 협업 · Actions · Pages · 릴리스)의 교수용 발표 슬라이드">
+<meta name="description" content="Git · GitHub 실습 강좌 23강과 응용 프로젝트 5개(Git 기초 · 브랜치 · 원격 · 협업 · Actions · Pages · 릴리스)의 교수용 발표 슬라이드">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
@@ -168,7 +168,7 @@
   <div class="eyebrow">AI응용소프트웨어과 · Git · GitHub 실습 · 교수용</div>
   <h1>Git · GitHub 실습<br>커밋 하나부터 Pages 배포까지</h1>
   <p>Git 기초 → 브랜치 → GitHub 와 원격 저장소 → 협업 → Actions · Pages · 릴리스 → 응용 프로젝트 5</p>
-  <div class="meta"><span>22강 + 프로젝트 5 · 약 26시간</span><span>브라우저 가상 터미널</span><span>미션 121개</span><span>실제 GitHub 연결</span></div>
+  <div class="meta"><span>23강 + 프로젝트 5 · 약 27시간</span><span>브라우저 가상 터미널</span><span>미션 124개</span><span>실제 GitHub 연결</span></div>
   <aside class="notes">
     <h4>교수 노트</h4>
     <ul>
@@ -190,7 +190,7 @@
         <tr><td><b>2부</b> 브랜치</td><td>L06~L10 브랜치 · 병합 · 충돌 · rebase · stash · tag</td><td>약 4.3시간</td><td>갈라졌다 합치고 충돌을 푼다</td></tr>
         <tr><td><b>3부</b> GitHub 와 원격</td><td>L11~L13 push · clone · fetch · pull · 거절 해결</td><td>약 2.7시간</td><td>GitHub 과 주고받는다</td></tr>
         <tr><td><b>4부</b> 협업</td><td>L14~L17 이슈 · 풀 리퀘스트 · 리뷰 · 포크</td><td>약 3.8시간</td><td>팀으로 일한다</td></tr>
-        <tr style="background:var(--accent-soft)"><td><b>5부</b> 자동화와 배포</td><td>L18~L22 Actions · <b>Pages · Pages 심화</b> · 릴리스 · 보안</td><td>약 4.7시간</td><td>검사하고 사이트로 공개한다</td></tr>
+        <tr style="background:var(--accent-soft)"><td><b>5부</b> 자동화와 배포</td><td>L18~L23 Actions · <b>Pages · Pages 심화</b> · 릴리스 · 보안 · <b>AI 코드 검토</b></td><td>약 5.8시간</td><td>검사하고 공개하고, AI 코드를 검토한다</td></tr>
         <tr><td><b>6부</b> 응용 프로젝트</td><td>P1~P5 포트폴리오 · 팀 · 오픈소스 · 검사 · 사고 복구</td><td>약 6.7시간</td><td>처음부터 끝까지 혼자 해 본다</td></tr>
       </tbody>
     </table>
@@ -199,8 +199,8 @@
   <aside class="notes">
     <h4>교수 노트</h4>
     <ul>
-      <li>시간은 강좌 각 강의에 적힌 시간을 더한 값입니다(합계 약 26시간).</li>
-      <li>AIoT · Docker 과정과 함께 운영한다면 1~4부 → L18 · L19 · L21 · L22 → P2 순서를 추천합니다. 팀 저장소 · Actions · Pages 가 그 과정들의 바탕이 됩니다.</li>
+      <li>시간은 강좌 각 강의에 적힌 시간을 더한 값입니다(합계 약 27시간).</li>
+      <li>AIoT · Docker 과정과 함께 운영한다면 1~4부 → L18 · L19 · L21 · L22 · L23 → P2 순서를 추천합니다. 팀 저장소 · Actions · Pages 가 그 과정들의 바탕이 됩니다.</li>
     </ul>
   </aside>
 </section>
@@ -524,7 +524,7 @@ git push origin main   <span class="c"># 포크를 원본과 맞추기</span></p
 
 <!-- ════════════════════ 5부 ════════════════════ -->
 <section class="slide part" data-part="5부 · 자동화와 배포">
-  <div class="eyebrow">5부 · L18~L22</div>
+  <div class="eyebrow">5부 · L18~L23</div>
   <h1>자동화와 배포</h1>
   <p>push 할 때마다 검사하고, 사이트로 공개하고, 버전을 내보내고, 비밀을 지킵니다.</p>
   <div class="big">🚀</div>
@@ -683,6 +683,41 @@ gh release create v1.0.0 \
   <aside class="notes">
     <h4>교수 노트 · 110분</h4>
     <ul><li>토큰은 최소 권한 · 짧은 만료 · 쓰고 나면 삭제, 계정은 2단계 인증. 강좌 실습용 토큰도 수업 마지막에 같이 지웁니다.</li></ul>
+  </aside>
+</section>
+
+<section class="slide" data-part="5부 · 자동화와 배포">
+  <div class="sec">L23 · AI 코드 검토 · NEW</div>
+  <h2>AI 가 만든 코드는 비교한 뒤에만 커밋</h2>
+  <div class="body cols">
+    <div>
+      <ol class="steps small" style="margin-top:0">
+        <li><b>폴더 정하기</b> — 프로젝트 폴더에서만 AI 실행</li>
+        <li><b>기준점</b> — 커밋 + <code>git switch -c ai-menu</code></li>
+        <li><b>맡기기</b> — 고칠 파일 · 고치지 말 것을 요청에</li>
+        <li><b>찾기</b> — <code>status</code> → <code>diff --stat</code> → <code>difftool -d</code></li>
+        <li><b>골라 담기</b> — <code>restore</code> · <code>clean -n/-f</code> · <code>add</code> · <code>commit -m "AI: …"</code></li>
+        <li><b>망쳤으면</b> — <code>switch main</code> · <code>branch -D ai-try</code></li>
+      </ol>
+    </div>
+    <div>
+      <pre style="font-size:14.5px">git config --global diff.tool bc
+git config --global difftool.bc.path \
+  "C:/Program Files/Beyond Compare 5/BComp.exe"
+git config --global merge.tool bc
+
+git difftool -d              <span class="c"># 폴더 비교</span>
+git difftool -d main ai-menu <span class="c"># 브랜치 비교</span></pre>
+      <div class="box warn" style="font-size:17px"><b>AI 의 몰래 바꾸기</b>부탁 안 한 파일 서식 변경 · 이름 변경 · 새 로그 파일 · 비밀 값 · 의존성 추가 — 설명이 아니라 바뀐 줄을 봅니다.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <h4>교수 노트 · L23 70분</h4>
+    <ul>
+      <li>미션: 기준점 만들기 · AI 변경 골라 담기 · 망친 시도 버리기 (가상 터미널에서 채점). Beyond Compare 설치와 difftool 은 학생 PC 에서 합니다(가상 터미널은 외부 프로그램을 못 띄움).</li>
+      <li>시연 추천: 실제 코딩 에이전트(Claude Code 등)에 "메뉴 기능만 추가해줘"를 시킨 뒤 <code>git status</code> 를 띄워, AI 가 말한 "바꾼 파일" 목록과 실제 목록을 나란히 비교합니다.</li>
+      <li>Beyond Compare 는 30일 체험판 뒤 라이선스가 필요합니다. 무료 대안은 WinMerge · VS Code 비교 화면 · Meld.</li>
+    </ul>
   </aside>
 </section>
 

@@ -10765,7 +10765,7 @@ pre, code, .mono, .t-body, textarea { word-break: normal; }
       { no: 2, id: 'branch', track: 'branch', title: '브랜치', desc: '갈라졌다 합치기, 충돌 풀기, 이력 다듬기' },
       { no: 3, id: 'remote', track: 'remote', title: 'GitHub 와 원격 저장소', desc: '내 컴퓨터의 저장소를 GitHub 과 주고받기' },
       { no: 4, id: 'collab', track: 'collab', title: 'GitHub 로 협업하기', desc: '이슈, 풀 리퀘스트, 코드 리뷰, 포크' },
-      { no: 5, id: 'auto', track: 'auto', title: '자동화와 배포', desc: 'Actions, Pages, 릴리스, 저장소 가꾸기' },
+      { no: 5, id: 'auto', track: 'auto', title: '자동화와 배포', desc: 'Actions, Pages, 릴리스, 저장소 가꾸기, AI 가 만든 코드 검토' },
       { no: 6, id: 'project', track: 'project', title: '응용 프로젝트', desc: '배운 것을 이어 붙여 처음부터 끝까지 해 보기' },
       { no: 7, id: 'ref', track: 'base', title: '부록', desc: '명령어 모음, 용어 사전' }
     ],
@@ -18568,6 +18568,328 @@ Course.lesson({
       ['사용자 지정 GitHub Actions 워크플로로 게시', 'https://docs.github.com/ko/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages'],
       ['GitHub Pages 사용자 지정 도메인 관리', 'https://docs.github.com/ko/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site'],
       ['사용자 지정 도메인 확인', 'https://docs.github.com/ko/pages/configuring-a-custom-domain-for-your-github-pages-site/verifying-your-custom-domain-for-github-pages']
+    ]
+  });
+})();
+
+</script>
+  <script data-src="lessons/l23.js">
+/* L23 — AI 가 만든 코드 검토하기: git 과 Beyond Compare */
+(function () {
+  const INDEX = [
+    '<!DOCTYPE html>',
+    '<html lang="ko">',
+    '<head>',
+    '  <meta charset="utf-8">',
+    '  <title>L23 카페 메뉴</title>',
+    '  <link rel="stylesheet" href="style.css">',
+    '</head>',
+    '<body>',
+    '  <h1>오늘의 메뉴</h1>',
+    '  <ul id="menu"></ul>',
+    '</body>',
+    '</html>',
+    ''
+  ].join('\n');
+  const INDEX_MINE = INDEX.replace('  <h1>오늘의 메뉴</h1>', '  <h1>오늘의 메뉴</h1>\n  <p>영업 시간: 오전 9시 ~ 오후 6시</p>');
+  const INDEX_AI = INDEX.replace('</body>', '  <script src="app.js"><\/script>\n</body>');
+  const STYLE = [
+    'body { font-family: sans-serif; margin: 24px; }',
+    'h1 { color: #d9480f; }',
+    '#menu li { padding: 4px 0; }',
+    ''
+  ].join('\n');
+  /* AI 가 시키지도 않았는데 통째로 바꾼 꾸밈 파일 */
+  const STYLE_AI = [
+    'body {',
+    '    font-family: "Noto Sans KR", sans-serif;',
+    '    margin: 0;',
+    '    padding: 32px;',
+    '    background: #111;',
+    '    color: #eee;',
+    '}',
+    'h1 {',
+    '    color: #ffd43b;',
+    '}',
+    '#menu li {',
+    '    padding: 8px 0;',
+    '}',
+    ''
+  ].join('\n');
+  const APP = [
+    '// 메뉴 목록 (나중에 채움)',
+    'const MENU = [];',
+    ''
+  ].join('\n');
+  const APP_AI = [
+    '// 메뉴 목록을 화면에 그립니다',
+    'const MENU = [',
+    '  { name: "아메리카노", price: 3000 },',
+    '  { name: "카페라테", price: 3800 },',
+    '  { name: "녹차", price: 3500 }',
+    '];',
+    '',
+    'function render() {',
+    '  const ul = document.getElementById("menu");',
+    '  ul.innerHTML = MENU.map(m => `<li>${m.name} — ${m.price.toLocaleString()}원</li>`).join("");',
+    '}',
+    '',
+    'render();',
+    ''
+  ].join('\n');
+  const LOG_AI = '[debug] render called\n[debug] MENU length 3\n';
+  const NOTES_AI = '# AI 작업 메모\n\n- app.js 에 render 추가\n- style.css 를 어두운 테마로 정리\n';
+
+  /* 공통 준비: menu-app 저장소와 첫 커밋 */
+  const base = [
+    k => { k.clearHome(); },
+    'mkdir menu-app', 'cd menu-app', 'git init -b main',
+    k => { k.write('menu-app/index.html', INDEX); k.write('menu-app/style.css', STYLE); k.write('menu-app/app.js', APP); },
+    'git add .', 'git commit -m "첫 화면"'
+  ];
+
+  Course.lesson({
+    id: 'l23', no: '23', part: 5, track: 'auto',
+    title: 'AI 가 만든 코드 검토하기 — git 과 Beyond Compare',
+    subtitle: '생성형 AI 는 어디를 새로 만들고 어디를 고쳤는지 알려 주지 않습니다. 기준점 커밋, AI 전용 브랜치, 비교 도구로 한 줄씩 확인하고 골라 담는 습관을 익힙니다.',
+    time: '70분',
+    tags: ['git diff --stat', 'git difftool -d', 'Beyond Compare', 'git restore', 'git clean', 'git branch -D'],
+    goals: [
+      'AI 가 만든 코드를 그대로 쓰면 왜 위험한지, 버전 관리와 비교 도구가 왜 꼭 필요한지 설명할 수 있다',
+      'Beyond Compare 를 설치하고 git difftool · mergetool 로 연결할 수 있다',
+      'AI 에게 맡길 프로젝트 폴더를 정하고, 기준점 커밋과 AI 전용 브랜치를 만든 뒤 작업을 맡길 수 있다',
+      'AI 가 바꾼 파일과 줄을 git diff 와 Beyond Compare 로 찾아, 원하는 변경만 골라 커밋할 수 있다',
+      '실패한 AI 시도를 기준점으로 깨끗하게 되돌릴 수 있다'
+    ],
+    start: {
+      title: '실습 준비',
+      desc: '홈 폴더에 카페 메뉴 프로젝트 menu-app 을 만들고 첫 커밋을 남깁니다.',
+      steps: base
+    },
+    body: [
+      { h2: '왜 AI 코드는 꼭 비교해야 하나요' },
+      'ChatGPT · Claude · Gemini 같은 생성형 AI 나 Claude Code · Gemini CLI · Codex 같은 코딩 에이전트는 코드를 빠르게 만들어 줍니다. 그런데 결과를 받으면 <b>어느 파일이 새로 생기고, 어느 줄이 고쳐졌는지</b> 알기 어렵습니다. AI 는 부탁하지 않은 곳도 "좋게" 고치고, 무엇을 바꿨는지 설명할 때도 빠뜨리거나 틀리게 말할 수 있습니다.',
+      { table: { head: ['AI 가 자주 하는 "몰래 바꾸기"', '왜 문제인가', '찾는 방법'], rows: [
+        ['부탁하지 않은 파일까지 정리 · 서식 바꾸기', '진짜 바뀐 줄이 수백 줄 속에 묻힙니다', '<code>git diff --stat</code> 으로 파일 목록부터'],
+        ['함수 이름 · 변수 이름 바꾸기, 코드 지우기', '다른 파일에서 부르던 곳이 깨집니다', 'Beyond Compare 줄 비교에서 빨간 줄(지운 줄)'],
+        ['새 파일 만들기 (로그, 메모, 테스트, 백업)', '쓰레기 파일이 저장소에 올라갑니다', '<code>git status</code> 의 Untracked files'],
+        ['비밀 값 · 주소를 코드에 적기', '키가 공개됩니다', 'diff 에서 <code>key</code>, <code>token</code>, <code>password</code> 찾기'],
+        ['라이브러리 추가 · 버전 바꾸기', '팀원 PC 에서 안 돌게 됩니다', '<code>requirements.txt</code> · <code>package.json</code> 의 diff'],
+        ['"고쳤습니다" 라고 말했지만 실제로는 안 고침', '믿고 넘어가면 그대로 배포됩니다', '바뀐 줄을 내 눈으로 확인 · 직접 실행']
+      ] }, caption: 'AI 의 설명이 아니라 실제로 바뀐 줄을 봅니다' },
+      { callout: 'danger', title: '원칙 — 내가 읽지 않은 줄은 커밋하지 않는다', body: 'AI 가 만든 코드라도 커밋하는 순간 <b>내 코드</b>가 됩니다. 무엇이 바뀌었는지 모른 채 올리면 오류가 났을 때 어디를 고쳐야 할지도 모릅니다. 그래서 AI 를 쓸수록 <b>git(무엇이 바뀌었나 기록)</b> 과 <b>비교 도구(어떻게 바뀌었나 보기)</b> 가 꼭 필요합니다.' },
+      { flow: {
+        nodes: [
+          { n: 1, t: '폴더 정하기', s: '프로젝트 폴더 하나' },
+          { n: 2, t: '기준점 커밋', s: '+ AI 브랜치', hot: true },
+          { n: 3, t: 'AI 에게 맡기기', s: '그 폴더 안에서만' },
+          { n: 4, t: '비교하기', s: 'diff · Beyond Compare', hot: true },
+          { n: 5, t: '골라 담기', s: '커밋 또는 버리기' }
+        ],
+        arrows: [{ to: 'git init · commit' }, { to: 'git switch -c' }, { to: 'git status · difftool' }, { to: 'restore · add · commit' }]
+      }, caption: 'AI 를 쓰는 안전한 순서. 기준점이 있으니 언제든 돌아올 수 있습니다' },
+
+      { h2: 'Beyond Compare 설치하기' },
+      '<b>Beyond Compare</b>(Scooter Software)는 두 파일 · 두 폴더를 나란히 놓고 다른 곳을 색으로 보여 주는 비교 도구입니다. 폴더 전체를 한 번에 비교하고, 다른 덩어리를 화살표 한 번으로 이쪽저쪽 옮길 수 있어서 AI 가 바꾼 결과를 검토하기에 알맞습니다. 이 단계는 <b>내 PC</b> 에서 합니다.',
+      { steps: [
+        { t: '내려받기', d: '<a href="https://www.scootersoftware.com/download" target="_blank" rel="noopener">scootersoftware.com/download</a> 에서 내 운영체제용 Beyond Compare 5 를 받습니다. 한국어 화면을 고를 수 있습니다.' },
+        { t: '설치', d: 'Windows 는 설치 파일을 실행해 기본값으로 설치합니다. 설치 폴더는 보통 <code>C:\\Program Files\\Beyond Compare 5</code> 입니다. macOS 는 앱을 응용 프로그램 폴더로 옮긴 뒤, 메뉴 <b>Beyond Compare → Install Command Line Tools</b> 를 누릅니다.' },
+        { t: '체험판 · 라이선스', d: '설치 후 30일 동안 모든 기능을 쓸 수 있는 체험판으로 동작합니다. 계속 쓰려면 라이선스가 필요합니다(Standard · Pro). 3-way 병합은 Pro 기능입니다. 학교 라이선스가 있는지 먼저 확인하세요.' },
+        { t: '처음 실행', d: '<b>폴더 비교(Folder Compare)</b> 를 열어 왼쪽 · 오른쪽에 아무 폴더 둘을 넣어 봅니다. 같은 파일은 회색, 다른 파일은 빨간색, 한쪽에만 있는 파일은 보라색(또는 파란색)으로 표시됩니다.' }
+      ] },
+      { callout: 'info', title: '무료로 쓰고 싶다면', body: '같은 일을 하는 무료 도구도 있습니다. Windows 는 <b>WinMerge</b>(<code>git config --global diff.tool winmerge</code>), 모든 운영체제에서 <b>VS Code</b> 의 비교 화면(<a href="#ref4">부록 D</a>)과 <b>Meld</b> 를 쓸 수 있습니다. 이 강의의 흐름은 어떤 도구를 써도 같습니다.' },
+
+      { h2: 'git 과 연결하기 — difftool · mergetool' },
+      'git 에게 "차이를 볼 때는 Beyond Compare 를 써라" 라고 알려 두면 <code>git difftool</code> 한 줄로 비교 창이 열립니다. 처음 한 번만 설정합니다.',
+      { code: '# Windows (경로는 설치 폴더에 맞게)\ngit config --global diff.tool bc\ngit config --global difftool.bc.path "C:/Program Files/Beyond Compare 5/BComp.exe"\ngit config --global difftool.prompt false\ngit config --global merge.tool bc\ngit config --global mergetool.bc.path "C:/Program Files/Beyond Compare 5/BComp.exe"\n\n# macOS · Linux (명령줄 도구 bcomp 가 PATH 에 있으면 경로 설정 없이)\ngit config --global diff.tool bc\ngit config --global merge.tool bc', lang: 'bash', run: false },
+      { code: 'git config --global --get diff.tool', lang: 'bash', run: false },
+      { out: 'bc' },
+      { table: { head: ['명령', '보여 주는 것'], rows: [
+        ['<code>git difftool</code>', '커밋하지 않은 변경을 <b>파일 하나씩</b> 비교 창으로'],
+        ['<code>git difftool -d</code>', '바뀐 파일 전체를 <b>폴더 비교</b> 한 화면으로 (<code>--dir-diff</code>)'],
+        ['<code>git difftool -d HEAD</code>', '마지막 커밋 ↔ 지금 작업 폴더 (스테이징한 것까지)'],
+        ['<code>git difftool -d main ai-menu</code>', '두 브랜치 사이의 차이 (AI 브랜치를 main 에 합치기 전에)'],
+        ['<code>git mergetool</code>', '병합 충돌을 Beyond Compare 의 병합 화면에서 풀기 (L08)']
+      ] } },
+      { callout: 'tip', title: '폴더 비교 창에서 고치면 작업 폴더에 반영됩니다', body: '<code>git difftool -d</code> 로 연 비교 창에서 <b>작업 폴더 쪽</b>(보통 오른쪽) 파일을 고치고 저장하면, 창을 닫을 때 git 이 그 내용을 작업 폴더로 되돌려 넣습니다. AI 가 바꾼 덩어리 중 원하지 않는 것만 화살표로 되돌리는 데 쓸 수 있습니다. 고친 뒤에는 <code>git status</code> 로 다시 확인합니다.' },
+      { callout: 'info', title: '이 사이트의 실습 터미널에서는', body: '브라우저 속 가상 터미널은 외부 프로그램을 띄울 수 없어서 <code>git difftool</code> 이 동작하지 않습니다. 아래 실습은 <code>git status</code> · <code>git diff</code> 로 같은 확인을 하고, 내 PC 에서는 같은 자리에서 <code>git difftool -d</code> 를 함께 씁니다.' },
+
+      { h2: '실습 1 · 프로젝트 폴더를 정하고 기준점 만들기' },
+      'AI 에게 일을 맡기기 전에 두 가지를 정합니다. <b>어느 폴더에서</b> 일하게 할지, 그리고 <b>돌아올 기준점</b>이 어디인지.',
+      { table: { head: ['폴더 정하기 규칙', '까닭'], rows: [
+        ['프로젝트마다 폴더 하나 (예: <code>C:\\ai-lab\\menu-app</code>, <code>~/ai-lab/menu-app</code>)', 'AI 가 고친 범위가 그 폴더 안으로 한정되고, git 이 그 안을 모두 추적합니다'],
+        ['코딩 에이전트는 <b>그 폴더에서</b> 실행', 'Claude Code · Gemini CLI · Codex 는 실행한 폴더를 작업 공간으로 삼습니다. 홈 폴더나 바탕 화면에서 실행하면 엉뚱한 파일까지 읽고 고칠 수 있습니다'],
+        ['폴더 이름에 한글 · 공백 피하기', '명령줄 도구와 경로 오류를 줄입니다'],
+        ['비밀 파일은 폴더 밖에, 또는 <code>.gitignore</code> 로', 'AI 에게 보이는 파일이 곧 AI 에게 보내지는 파일입니다']
+      ] } },
+      'menu-app 폴더에는 첫 커밋이 있습니다. 내가 손으로 고친 것(영업 시간 한 줄)이 있다면 AI 에게 맡기기 <b>전에</b> 커밋해 두고, AI 전용 브랜치로 옮깁니다.',
+      { file: { path: '~/menu-app/index.html', content: INDEX_MINE } },
+      { code: 'cd ~/menu-app\ngit status --short\ngit add index.html\ngit commit -m "영업 시간 추가"\ngit switch -c ai-menu\ngit log --oneline --all' },
+      { out: '* 3b1f0aa (HEAD -> ai-menu, main) 영업 시간 추가\n* 9c2d41e 첫 화면' },
+      { callout: 'tip', title: '왜 브랜치까지 만드나요', body: 'AI 결과가 마음에 안 들면 <code>main</code> 으로 돌아와 브랜치를 지우기만 하면 됩니다(실습 4). 여러 AI 에게 같은 일을 시켜 비교할 때도 <code>ai-claude</code>, <code>ai-gemini</code> 처럼 브랜치를 나눕니다.' },
+      { mission: 'm1' },
+
+      { h2: '실습 2 · AI 로 코드 만들기' },
+      '이제 AI 에게 일을 맡깁니다. <b>내 PC</b> 에서 둘 중 하나로 합니다. 요청에는 <b>어느 파일을, 무엇만</b> 고칠지 분명히 적습니다.',
+      { table: { head: ['', '코딩 에이전트 (Claude Code · Gemini CLI · Codex)', '채팅 AI (ChatGPT · Claude · Gemini 웹)'], rows: [
+        ['어디서', '터미널에서 <code>cd</code> 로 menu-app 에 들어가 실행 (<code>claude</code>, <code>gemini</code>, <code>codex</code>)', '웹 브라우저'],
+        ['파일 바꾸기', 'AI 가 폴더의 파일을 직접 고칩니다', '내가 답을 복사해 파일에 붙여 넣습니다'],
+        ['위험', '부탁하지 않은 파일까지 고치거나 새로 만들 수 있음', '붙여 넣다가 기존 코드를 덮어쓸 수 있음'],
+        ['확인', '끝나면 바로 <code>git status</code>', '붙여 넣은 뒤 바로 <code>git status</code>']
+      ] } },
+      { code: 'menu-app 폴더의 카페 메뉴 페이지에 메뉴 목록을 표시하는 기능을 만들어줘.\n- app.js 에 메뉴 3개(이름, 가격)와 화면에 그리는 render 함수를 만들어줘\n- index.html 에는 app.js 를 불러오는 script 한 줄만 추가해줘\n- 다른 파일은 고치지 말고, 새 파일도 만들지 마\n- 끝나면 바꾼 파일과 바꾼 이유를 목록으로 알려줘', lang: 'text', run: false },
+      { callout: 'warn', title: '"다른 파일은 고치지 마" 라고 해도 확인은 내가 합니다', body: 'AI 는 지시를 잘 따르는 편이지만 늘 그런 것은 아닙니다. AI 가 알려 준 "바꾼 파일 목록" 과 <code>git status</code> 가 보여 주는 목록이 같은지 대조하는 것부터 검토가 시작됩니다.' },
+      '이 사이트에서는 AI 가 일을 마친 상태를 미션 2 의 "상황 만들기" 로 재현합니다. AI 는 부탁대로 <code>app.js</code> 와 <code>index.html</code> 을 고쳤지만, 부탁하지 않은 <code>style.css</code> 를 통째로 바꾸고 <code>debug.log</code> 와 <code>ai-notes.md</code> 를 새로 만들었습니다.',
+
+      { h2: '실습 3 · 무엇이 바뀌었나 찾기' },
+      '확인은 넓은 것에서 좁은 것으로 합니다. ① 어떤 파일이 → ② 얼마나 → ③ 어떻게.',
+      { code: 'git status\ngit diff --stat\ngit diff style.css', run: false },
+      { out: 'On branch ai-menu\nChanges not staged for commit:\n\tmodified:   app.js\n\tmodified:   index.html\n\tmodified:   style.css\n\nUntracked files:\n\tai-notes.md\n\tdebug.log\n\n app.js     | 14 ++++++++++++--\n index.html |  1 +\n style.css  | 15 ++++++++++++---\n 3 files changed, 27 insertions(+), 5 deletions(-)' },
+      { table: { head: ['보이는 것', '판단'], rows: [
+        ['<code>app.js</code> · <code>index.html</code> 변경', '부탁한 것. 줄 단위로 읽고 남깁니다'],
+        ['<code>style.css</code> 변경', '<b>부탁하지 않은 것</b>. 어두운 테마로 통째로 바뀌었습니다 → 되돌립니다'],
+        ['<code>debug.log</code> · <code>ai-notes.md</code> (Untracked)', 'AI 가 만든 찌꺼기 → 지웁니다']
+      ] } },
+      '내 PC 에서는 여기서 <code>git difftool -d</code> 를 엽니다. Beyond Compare 폴더 비교에 바뀐 세 파일이 빨간색으로 나오고, 파일을 두 번 누르면 줄 비교 화면이 열립니다. <code>app.js</code> 는 새 줄을 한 줄씩 읽고, <code>style.css</code> 는 오른쪽(작업 폴더)에서 덩어리마다 화살표로 왼쪽(원래) 내용을 가져오면 됩니다. 터미널에서 한 번에 되돌리려면 아래처럼 합니다.',
+      { code: 'git restore style.css\ngit clean -n\ngit clean -f\ngit status --short', run: false },
+      { out: 'Would remove ai-notes.md\nWould remove debug.log\nRemoving ai-notes.md\nRemoving debug.log\n M app.js\n M index.html' },
+      { callout: 'warn', title: 'git clean 은 -n 으로 먼저', body: '<code>git clean -f</code> 는 추적하지 않는 파일을 되찾을 수 없게 지웁니다. 내가 아직 add 하지 않은 새 파일도 함께 지워지므로 <code>-n</code>(미리 보기)으로 목록부터 봅니다(L05).' },
+
+      { h2: '실습 4 · 골라 담아 커밋하기' },
+      '남긴 변경을 직접 실행해 확인한 뒤 커밋합니다. 메시지에는 <b>AI 를 썼다는 것</b>과 <b>무엇을 부탁했는지</b>를 남깁니다. 나중에 이 커밋을 볼 사람(미래의 나 포함)이 어디를 더 의심해야 할지 알 수 있습니다.',
+      { code: 'git add app.js index.html\ngit commit -m "AI: 메뉴 목록 표시 기능" -m "Claude Code 로 생성 · app.js 와 index.html 만 검토 후 반영. style.css 변경과 로그 파일은 버림"\ngit log --oneline -n 3', run: false },
+      { table: { head: ['그다음', '명령'], rows: [
+        ['main 에 합치기 전에 한 번 더 전체 보기', '<code>git diff main..ai-menu --stat</code> · 내 PC 에서는 <code>git difftool -d main ai-menu</code>'],
+        ['합치기', '<code>git switch main</code> → <code>git merge ai-menu</code> (팀이면 풀 리퀘스트로, L15)'],
+        ['다 쓴 브랜치 지우기', '<code>git branch -d ai-menu</code>']
+      ] } },
+      { mission: 'm2' },
+
+      { h2: '실습 5 · 망친 AI 시도를 버리기' },
+      'AI 가 여러 번 고치는 동안 오히려 더 망가질 때가 있습니다. 기준점과 브랜치가 있으면 고민할 것이 없습니다. <b>main 으로 돌아와 그 브랜치를 지우면</b> AI 가 손대기 전으로 돌아갑니다.',
+      { code: 'git switch main\ngit branch -D ai-try\ngit log --oneline --all', run: false },
+      { callout: 'info', title: '-d 가 아니라 -D 인 까닭', body: '<code>ai-try</code> 의 커밋은 main 에 합쳐지지 않았으므로 <code>-d</code> 는 지우기를 거절합니다. "합치지 않은 커밋을 버린다" 는 뜻으로 <code>-D</code> 를 씁니다. 그래도 며칠 동안은 <code>git reflog</code> 로 되찾을 수 있습니다(L04).' },
+      { callout: 'tip', title: '브랜치를 안 만들었다면', body: 'AI 가 main 에서 바로 고쳤고 아직 커밋하지 않았다면 <code>git restore .</code> 과 <code>git clean -f</code> 로 기준점 커밋 상태로 돌아갑니다. 이미 커밋했다면 <code>git reset --hard 기준점커밋</code> (push 전) 또는 <code>git revert</code> (push 후). 기준점 커밋이 없었다면 돌아갈 곳이 없습니다 — 그래서 실습 1 이 가장 중요합니다.' },
+      { mission: 'm3' },
+
+      { h2: 'AI 와 일할 때의 규칙' },
+      { callout: 'check', title: '매번 확인할 것', body: '<ul><li>AI 에게 맡기기 전에 <b>커밋</b>하고, AI 작업은 <b>브랜치</b>에서 한다</li><li>코딩 에이전트는 <b>프로젝트 폴더에서</b> 실행한다</li><li>요청에 고칠 파일과 고치지 말 것을 적는다</li><li>끝나면 <code>git status</code> → <code>git diff --stat</code> → Beyond Compare 로 <b>모든 줄</b>을 본다</li><li>부탁하지 않은 변경 · 새 파일 · 비밀 값 · 의존성 변경을 찾는다</li><li>직접 실행해 보고, 이해하지 못한 줄은 AI 에게 "이 줄은 왜 필요해?" 라고 묻는다</li><li>커밋 메시지에 AI 사용과 부탁한 내용을 남긴다</li><li>망쳤으면 브랜치를 버리고 기준점에서 다시 시작한다</li></ul>' }
+    ],
+    missions: [
+      {
+        id: 'm1', title: 'AI 에게 맡기기 전 기준점 만들기',
+        desc: '<p><code>menu-app</code> 저장소의 <code>index.html</code> 에 내가 손으로 영업 시간 한 줄을 넣었고, 아직 커밋하지 않았습니다.</p><p>이제 AI 에게 메뉴 기능을 맡기려 합니다. 내 변경을 먼저 커밋해 기준점을 남기고, <code>ai-menu</code> 라는 AI 전용 브랜치를 만들어 그 브랜치로 옮기세요.</p>',
+        setup: base.concat([k => { k.write('menu-app/index.html', INDEX_MINE); }]),
+        hints: [
+          '<code>git status</code> 로 고친 파일을 확인하세요',
+          '<code>git add index.html</code> → <code>git commit -m "영업 시간 추가"</code>',
+          '<code>git switch -c ai-menu</code> 로 만들면서 옮깁니다'
+        ],
+        answer: ['git add index.html', 'git commit -m "영업 시간 추가"', 'git switch -c ai-menu'],
+        check: k => {
+          const r = k.repo('menu-app');
+          if (!r) return 'menu-app 저장소가 없습니다. 미션을 다시 시작하세요';
+          if (!/영업 시간/.test(k.tree(r, 'main')['index.html'] || '')) return 'main 의 마지막 커밋에 영업 시간 줄이 없습니다. AI 에게 맡기기 전에 커밋해야 합니다';
+          if (!k.clean(r)) return '아직 커밋하지 않은 변경이 있습니다. 기준점은 깨끗한 상태여야 합니다';
+          if (!k.hasBranch(r, 'ai-menu')) return 'ai-menu 브랜치가 없습니다';
+          if (k.branch(r) !== 'ai-menu') return '지금 브랜치가 ' + k.branch(r) + ' 입니다. ai-menu 로 옮기세요';
+          if (k.sha(r, 'ai-menu') !== k.sha(r, 'main')) return 'ai-menu 는 기준점(main 의 마지막 커밋)에서 시작해야 합니다';
+          return true;
+        }
+      },
+      {
+        id: 'm2', title: 'AI 가 바꾼 것 중 원하는 것만 담기',
+        desc: '<p><code>ai-menu</code> 브랜치에서 AI 가 메뉴 기능을 만들었습니다. 부탁한 것은 <code>app.js</code> 와 <code>index.html</code> 뿐이었는데, AI 가 <code>style.css</code> 도 통째로 바꾸고 <code>debug.log</code>, <code>ai-notes.md</code> 를 새로 만들었습니다.</p><p>부탁한 두 파일의 변경만 커밋하세요. <code>style.css</code> 는 원래대로 되돌리고, AI 가 만든 두 파일은 지워서 작업 폴더를 깨끗하게 만드세요.</p>',
+        setup: base.concat([
+          k => { k.write('menu-app/index.html', INDEX_MINE); },
+          'git add .', 'git commit -m "영업 시간 추가"', 'git switch -c ai-menu',
+          k => {
+            k.write('menu-app/index.html', INDEX_MINE.replace('</body>', '  <script src="app.js"><\/script>\n</body>'));
+            k.write('menu-app/app.js', APP_AI);
+            k.write('menu-app/style.css', STYLE_AI);
+            k.write('menu-app/debug.log', LOG_AI);
+            k.write('menu-app/ai-notes.md', NOTES_AI);
+          }
+        ]),
+        hints: [
+          '<code>git status</code> 와 <code>git diff --stat</code> 으로 바뀐 파일과 새 파일을 나눠 보세요',
+          '부탁하지 않은 변경은 <code>git restore style.css</code>, 새 파일은 <code>git clean -n</code> 으로 확인한 뒤 <code>git clean -f</code>',
+          '<code>git add app.js index.html</code> → <code>git commit -m "AI: 메뉴 목록 표시 기능"</code>'
+        ],
+        answer: ['git status', 'git diff --stat', 'git restore style.css', 'git clean -n', 'git clean -f', 'git add app.js index.html', 'git commit -m "AI: 메뉴 목록 표시 기능"'],
+        check: k => {
+          const r = k.repo('menu-app');
+          if (!r) return 'menu-app 저장소가 없습니다. 미션을 다시 시작하세요';
+          if (k.branch(r) !== 'ai-menu') return 'ai-menu 브랜치에서 작업하세요';
+          const c = k.commits(r);
+          if (c.length < 3 || /영업 시간/.test(c[0].subject)) return 'AI 의 변경을 담은 새 커밋이 없습니다';
+          const files = c[0].files.slice().sort().join(',');
+          if (files !== 'app.js,index.html') return '마지막 커밋에 들어간 파일이 ' + c[0].files.join(', ') + ' 입니다. app.js 와 index.html 만 담아야 합니다';
+          const t = k.tree(r);
+          if (!/render/.test(t['app.js'] || '')) return 'app.js 에 AI 가 만든 render 함수가 없습니다';
+          if (!/app\.js/.test(t['index.html'] || '')) return 'index.html 에 app.js 를 불러오는 줄이 없습니다';
+          if ((k.file('menu-app/style.css') || '') !== STYLE || t['style.css'] !== STYLE) return 'style.css 가 원래와 다릅니다. 부탁하지 않은 변경은 되돌리세요';
+          if (k.exists('menu-app/debug.log') || k.exists('menu-app/ai-notes.md')) return 'AI 가 만든 debug.log 나 ai-notes.md 가 아직 작업 폴더에 있습니다';
+          if (!k.clean(r)) return '아직 커밋하지 않은 변경이 있습니다';
+          return true;
+        }
+      },
+      {
+        id: 'm3', title: '망친 AI 시도를 통째로 버리기',
+        desc: '<p><code>ai-try</code> 브랜치에서 AI 에게 "전체를 정리해줘" 라고 맡겼더니 커밋이 두 개 생겼고, 페이지가 아예 열리지 않게 됐습니다. 이 시도는 버리기로 했습니다.</p><p><code>main</code> 으로 돌아가 <code>ai-try</code> 브랜치를 지우세요. <code>main</code> 은 AI 가 손대기 전 그대로여야 합니다.</p>',
+        setup: base.concat([
+          'git switch -c ai-try',
+          k => { k.write('menu-app/index.html', '<html><body><h1>메뉴</h1><script src="main.js"><\/script>\n'); k.write('menu-app/app.js', '// 전체 정리함\n'); },
+          'git add .', 'git commit -m "AI: 전체 정리"',
+          k => { k.write('menu-app/main.js', 'render(); // 오류 수정 시도\n'); },
+          'git add .', 'git commit -m "AI: 오류 수정 시도"'
+        ]),
+        hints: [
+          '<code>git log --oneline --all</code> 로 main 과 ai-try 가 어디에 있는지 보세요',
+          '먼저 <code>git switch main</code>',
+          '합치지 않은 브랜치는 <code>git branch -D ai-try</code> 로 지웁니다'
+        ],
+        answer: ['git log --oneline --all', 'git switch main', 'git branch -D ai-try'],
+        check: k => {
+          const r = k.repo('menu-app');
+          if (!r) return 'menu-app 저장소가 없습니다. 미션을 다시 시작하세요';
+          if (k.branch(r) !== 'main') return '지금 브랜치가 ' + k.branch(r) + ' 입니다. main 으로 돌아오세요';
+          if (k.hasBranch(r, 'ai-try')) return 'ai-try 브랜치가 아직 있습니다';
+          if (k.count(r) !== 1) return 'main 의 커밋이 ' + k.count(r) + '개입니다. main 은 첫 커밋 그대로여야 합니다';
+          if ((k.file('menu-app/index.html') || '') !== INDEX) return '작업 폴더의 index.html 이 기준점과 다릅니다';
+          if (k.exists('menu-app/main.js')) return 'AI 가 만든 main.js 가 작업 폴더에 남아 있습니다';
+          if (!k.clean(r)) return '커밋하지 않은 변경이 남아 있습니다';
+          return true;
+        }
+      }
+    ],
+    summary: [
+      '생성형 AI 는 부탁하지 않은 파일을 고치고, 새 파일을 만들고, 바꾼 것을 틀리게 설명할 수 있습니다. 내가 읽지 않은 줄은 커밋하지 않습니다',
+      'AI 에게 맡기기 전에 프로젝트 폴더를 정하고, 기준점 커밋과 AI 전용 브랜치를 만듭니다',
+      '확인은 <code>git status</code>(어떤 파일) → <code>git diff --stat</code>(얼마나) → <code>git diff</code> · Beyond Compare(어떻게) 순서로 합니다',
+      'Beyond Compare 는 <code>diff.tool bc</code> 로 연결하고 <code>git difftool -d</code> 로 폴더 비교를 엽니다',
+      '원하지 않는 변경은 <code>git restore</code>, AI 가 만든 찌꺼기는 <code>git clean -n</code> → <code>-f</code>, 원하는 것만 <code>git add</code> 해서 커밋합니다',
+      '망친 시도는 main 으로 돌아와 <code>git branch -D</code> 로 통째로 버립니다'
+    ],
+    terms: [
+      ['Beyond Compare', 'Scooter Software 의 파일 · 폴더 비교 도구. 다른 곳을 색으로 보여 주고 덩어리 단위로 옮길 수 있습니다'],
+      ['git difftool', '설정한 외부 비교 도구로 git diff 의 내용을 여는 명령. -d(--dir-diff) 는 바뀐 파일 전체를 폴더 비교로 엽니다'],
+      ['git mergetool', '병합 충돌을 설정한 외부 도구의 병합 화면에서 푸는 명령'],
+      ['기준점 커밋', 'AI 에게 일을 맡기기 직전에 남기는 커밋. 언제든 이 상태로 돌아올 수 있습니다'],
+      ['AI 전용 브랜치', 'AI 의 작업만 담는 브랜치. 결과가 좋으면 합치고, 나쁘면 통째로 버립니다'],
+      ['코딩 에이전트', 'Claude Code · Gemini CLI · Codex 처럼 터미널에서 실행되어 폴더의 파일을 직접 읽고 고치는 AI 도구']
+    ],
+    quiz: [
+      { q: 'AI 코딩 에이전트에게 일을 맡기기 직전에 가장 먼저 할 일은?', options: ['AI 에게 "조심해서 고쳐줘" 라고 부탁한다', '지금 상태를 커밋해 기준점을 만들고 AI 전용 브랜치로 옮긴다', 'Beyond Compare 를 연다'], answer: 1, why: '기준점이 있어야 AI 가 무엇을 바꿨는지 비교할 수 있고, 망쳤을 때 돌아올 수 있습니다.' },
+      { q: 'AI 가 끝났다고 말한 뒤 <b>어떤 파일</b>이 바뀌고 새로 생겼는지 가장 먼저 보는 명령은?', options: ['<code>git status</code>', '<code>git log</code>', '<code>git push</code>'], answer: 0, why: 'status 는 고친 파일과 추적하지 않는 새 파일을 모두 보여 줍니다. 그다음 diff --stat, diff 순서로 좁혀 갑니다.' },
+      { q: 'AI 가 부탁하지 않은 <code>style.css</code> 를 바꿨습니다. 아직 add 하지 않았다면 원래대로 돌리는 명령은?', options: ['<code>git restore style.css</code>', '<code>git clean -f</code>', '<code>git branch -D</code>'], answer: 0, why: 'restore 는 작업 폴더의 변경을 마지막 커밋 상태로 되돌립니다. clean 은 추적하지 않는 새 파일을 지웁니다.' },
+      { q: 'Beyond Compare 를 git 과 연결한 뒤, 바뀐 파일 전체를 폴더 비교 한 화면으로 보는 명령은?', options: ['<code>git diff --stat</code>', '<code>git difftool -d</code>', '<code>git mergetool</code>'], answer: 1, why: '-d(--dir-diff) 는 바뀐 파일을 모아 외부 도구의 폴더 비교로 엽니다.' },
+      { q: 'AI 결과가 마음에 들지 않아 <code>ai-try</code> 브랜치를 버리려 합니다. main 에 합친 적이 없다면?', options: ['<code>git branch -d ai-try</code>', 'main 에서 <code>git branch -D ai-try</code>', '<code>git push --force</code>'], answer: 1, why: '합치지 않은 브랜치는 -d 가 거절합니다. 버리겠다는 뜻으로 -D 를 씁니다.' }
+    ],
+    links: [
+      ['Beyond Compare 내려받기', 'https://www.scootersoftware.com/download'],
+      ['Beyond Compare 와 버전 관리 도구 연결 (Git)', 'https://www.scootersoftware.com/kb/vcs'],
+      ['git difftool 문서', 'https://git-scm.com/docs/git-difftool']
     ]
   });
 })();

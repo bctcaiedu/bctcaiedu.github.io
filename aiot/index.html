@@ -275,6 +275,7 @@
         <li><input type="checkbox" aria-label="완료"><a href="https://git-scm.com/downloads" target="_blank" rel="noopener">Git</a>(Windows 는 Git Bash 포함), <a href="https://cli.github.com/" target="_blank" rel="noopener">GitHub CLI(gh)</a>, GitHub 계정 — 연습은 <a href="../git/">Git · GitHub 실습</a></li>
         <li><input type="checkbox" aria-label="완료"><a href="https://www.docker.com/products/docker-desktop/" target="_blank" rel="noopener">Docker Desktop</a> — <code>docker version</code> 이 Server 까지 보이면 준비 완료. 연습은 <a href="../docker/">Docker 쉽게 배우기</a></li>
         <li><input type="checkbox" aria-label="완료">VS Code (선택) — 저장소 폴더를 열고 커밋 · 브랜치를 버튼으로 다룰 수 있음</li>
+        <li><input type="checkbox" aria-label="완료"><a href="https://www.scootersoftware.com/download" target="_blank" rel="noopener">Beyond Compare</a>(또는 무료 WinMerge) — AI 가 바꾼 코드를 줄 단위로 비교, <code>git config --global diff.tool bc</code> (<a href="../git/#l23">Git L23</a>)</li>
         <li><input type="checkbox" aria-label="완료">설치 없이 브라우저로: <a href="https://wokwi.com/projects/new/esp32" target="_blank" rel="noopener">Wokwi</a>(ESP32 시뮬레이터), <a href="https://www.hivemq.com/demos/websocket-client/" target="_blank" rel="noopener">HiveMQ 웹 클라이언트</a> — LAB 2-A · 2-B</li>
         <li><input type="checkbox" aria-label="완료">(실제 ESP32 보드를 쓰면) Arduino IDE 2.x, ESP32 보드 패키지, CP210x/CH340 드라이버</li>
       </ul>
@@ -749,6 +750,7 @@ ANTHROPIC_API_KEY=</code></pre></div>
             <tr><td>main 에는 풀 리퀘스트로만, 리뷰 1명</td><td>본문에 <code>Closes #3</code></td><td>Git L15 · L16</td></tr>
             <tr><td>비밀 값은 .env 에만</td><td>ThingSpeak · API 키, Wi-Fi 비밀번호</td><td>Git L21 · <a href="#security">IoT 보안</a></td></tr>
             <tr><td>결과물 증빙은 docs/log.md 에</td><td>스크린샷 · 10초 영상 링크, 한 것 · 막힌 것 · 다음 할 것</td><td>—</td></tr>
+            <tr><td>AI 코드는 비교한 뒤에만 커밋</td><td>맡기기 전 커밋 → <code>ai-…</code> 브랜치 → <code>git diff</code> · Beyond Compare → 골라 담기, 메시지는 <code>AI: …</code></td><td><a href="../git/#l23">Git L23</a></td></tr>
           </tbody>
         </table>
       </div>
@@ -839,6 +841,7 @@ docker compose version</code></pre></div>
 코드 한 줄마다 무슨 일을 하는지 주석으로 설명해 줘.
 {"temp":24.1,"hum":44.7,"light":1793}</pre></div>
       <p>나온 코드를 그대로 쓰지 말고, 한 줄씩 읽고 내 말로 설명해 봅니다. LAB 2에서 이 코드를 MQTT에 붙입니다.</p>
+      <div class="warn"><p><b>AI 가 만든 코드는 무엇이 바뀌었는지 반드시 비교합니다.</b> 코딩 에이전트는 부탁하지 않은 파일을 고치거나 새 파일을 만들기도 합니다. AI 에게 맡기기 전에 팀 저장소에서 <b>커밋해 기준점</b>을 남기고 AI 전용 브랜치에서 작업한 뒤, <code>git status</code> · <code>git diff --stat</code> 과 Beyond Compare(<code>git difftool -d</code>)로 모든 줄을 확인하고 원하는 변경만 커밋하세요. 실습은 <a href="../git/#l23">Git L23 · AI 가 만든 코드 검토하기</a>.</p></div>
 
       <details class="full">
         <summary>심화 과제 · ESP32로 실제 센서 읽기</summary>
