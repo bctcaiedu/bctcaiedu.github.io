@@ -1,6 +1,6 @@
 # digital36 — 「디지털리터러시」 36시간 과정
 
-`bctcaiedu.github.io`의 **physicalai48**과 같은 구조로 만든 정적 강의 사이트입니다.
+`bctcaiedu.github.io`에 올리는 정적 강의 사이트입니다.
 단원마다 **강의 슬라이드(나레이션) · 차시별 교안 · 실습지 · 퀴즈** 4종이 만들어지고,
 과정 전체의 **교과 운영계획서**(운영계획서 표 양식)가 함께 만들어집니다.
 
@@ -157,7 +157,6 @@ HTML을 직접 고치지 마세요. **`_src/unitN.js`만 고치고 다시 빌드
 ```
 bctcaiedu.github.io/
 ├── linux70/
-├── physicalai48/
 └── digital36/     ← 이 폴더
 ```
 
