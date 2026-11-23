@@ -61,7 +61,7 @@
       <div><label class="f" for="devId">디바이스 번호</label><input type="text" id="devId" placeholder="예: s01w" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
     </div>
     <div style="margin-top:10px"><button class="btn primary" id="saveBtn" type="button">적용</button></div>
-    <p class="muted">브로커: <code>wss://broker.hivemq.com:8884/mqtt</code> · 구독: <code id="subT">-</code></p>
+    <p class="muted">브로커: <code id="brokerT">wss://broker.hivemq.com:8884/mqtt</code> · 구독: <code id="subT">-</code></p>
     <p class="muted">Wokwi ESP32는 <code>s01w</code>처럼 번호 뒤에 <code>w</code>, 휴대폰 시뮬레이터는 <code>s01</code>처럼 번호만 씁니다.</p>
   </section>
 
@@ -127,7 +127,11 @@
   $('prefix').value = prefix; $('devId').value = dev;
 
   if (typeof mqtt === 'undefined') { $('status').textContent = 'MQTT 라이브러리를 불러오지 못함 (인터넷 확인)'; return; }
-  const client = mqtt.connect('wss://broker.hivemq.com:8884/mqtt', { clientId: 'aiot-dash-' + Math.random().toString(16).slice(2, 10), reconnectPeriod: 2000 });
+  // ?broker=ws://localhost:9001 처럼 다른 브로커를 줄 수 있음 (Docker 과정의 로컬 Mosquitto). https 페이지에서는 wss:// 만 됩니다.
+  const qb = q.get('broker') || '';
+  const BROKER = /^wss?:\/\/[^\s"'<>]+$/.test(qb) ? qb : 'wss://broker.hivemq.com:8884/mqtt';
+  $('brokerT').textContent = BROKER;
+  const client = mqtt.connect(BROKER, { clientId: 'aiot-dash-' + Math.random().toString(16).slice(2, 10), reconnectPeriod: 2000 });
   function setStatus(on, t) { $('dot').classList.toggle('on', on); $('status').textContent = t; }
   function resetView() {
     ['ledState', 'servoState'].forEach((id) => { $(id).textContent = '?'; });
@@ -141,7 +145,7 @@
     // 상태가 오지 않으면 안내 (휴대폰 시뮬레이터는 상태를 보내지 않음)
     setTimeout(() => { if ($('ledState').textContent === '?') $('ledHint').textContent = '— 상태를 보내지 않는 디바이스이거나 꺼져 있음'; }, 8000);
   }
-  client.on('connect', () => { setStatus(true, '브로커에 연결됨'); log('broker.hivemq.com 연결됨', 'ok'); subscribe(); });
+  client.on('connect', () => { setStatus(true, '브로커에 연결됨'); log(BROKER.replace(/^wss?:\/\//, '').split('/')[0] + ' 연결됨', 'ok'); subscribe(); });
   client.on('reconnect', () => setStatus(false, '다시 연결하는 중…'));
   client.on('close', () => setStatus(false, '연결 끊김'));
   client.on('error', (e) => log('오류: ' + e.message, 'err'));

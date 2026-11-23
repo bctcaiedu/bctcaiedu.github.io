@@ -94,6 +94,7 @@
   .c-rea{--c1:#312e81;--c2:#0f766e;--c1d:#8b93ff}
   .c-git{--c1:#f05133;--c2:#24292f;--c1d:#ff8a6e}
   .c-aiot{--c1:#0e7490;--c2:#6d28d9;--c1d:#4fd1e8}
+  .c-docker{--c1:#1d63ed;--c2:#0b214a;--c1d:#6ea8ff}
   .c-intv{--c1:#3b5bdb;--c2:#1c8f66;--c1d:#7f9cff}
   .c-vibe{--c1:#7c3aed;--c2:#db2777;--c1d:#b794ff}
 
@@ -124,7 +125,7 @@
       <span class="kicker"><i></i>AI응용소프트웨어과 실습 강의실</span>
       <h1>직접 만들며 배우는<br><span>AI 소프트웨어</span></h1>
       <p>리눅스 서버부터 피지컬 AI, 생성형 AI 활용, AI 에이전트까지. 모든 과정은 브라우저에서 바로 열리는 슬라이드와 실습 가이드로 진행됩니다.</p>
-      <div class="stack"><span>Linux</span><span>LLM Serving</span><span>Computer Vision</span><span>Robotics · RL</span><span>Generative AI</span><span>AI Agent</span><span>Cloud</span><span>AIoT</span></div>
+      <div class="stack"><span>Linux</span><span>LLM Serving</span><span>Computer Vision</span><span>Robotics · RL</span><span>Generative AI</span><span>AI Agent</span><span>Cloud</span><span>AIoT</span><span>Docker</span></div>
     </div>
   </div>
 </header>
@@ -180,6 +181,23 @@ git add · commit · push
         <h3>Git · GitHub 실습</h3>
         <p>명령을 치면 커밋 그래프가 그려지는 가상 터미널로 배웁니다. 내 GitHub 계정을 연결하면 실습이 실제 저장소에 그대로 반영됩니다. TortoiseGit · VS Code 로 쓰는 법은 부록에 있습니다.</p>
         <div class="topics"><span>git</span><span>브랜치 · 병합</span><span>GitHub</span><span>Actions · Pages</span><span>gh CLI</span></div>
+        <div class="go"><b>실습 강좌</b><span class="arrow">→</span></div>
+      </div>
+    </a>
+
+    <a class="course c-docker" href="docker/">
+      <div class="art">
+        <span class="new">NEW</span>
+        <span class="emo">🐳</span>
+        <span class="code">$ docker build -t aiot-app .
+$ docker compose up -d
+→ 팀원 PC · 라즈베리파이에서 똑같이</span>
+      </div>
+      <div class="body">
+        <div class="field">실습 · 17장 + AIoT 적용 2장</div>
+        <h3>Docker 쉽게 배우기</h3>
+        <p>설치 없이 브라우저 속 가상 터미널로 컨테이너 · 이미지 · 네트워크 · 볼륨 · Compose 를 익히고, AIoT 프로젝트의 MQTT 브로커와 자동화 앱을 이미지로 묶어 GitHub Actions 로 배포합니다.</p>
+        <div class="topics"><span>docker run</span><span>Dockerfile</span><span>Compose</span><span>GHCR · Actions</span><span>Mosquitto</span><span>쿠버네티스 입문</span></div>
         <div class="go"><b>실습 강좌</b><span class="arrow">→</span></div>
       </div>
     </a>
