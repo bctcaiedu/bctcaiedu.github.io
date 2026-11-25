@@ -65,6 +65,7 @@
   .sec{font:700 12px var(--mono);color:var(--accent);margin:0 0 4px}
   h2{font-size:24px;line-height:1.35;margin:0 0 14px;padding-bottom:8px;border-bottom:2px solid var(--line);letter-spacing:-.01em}
   h3{font-size:18.5px;margin:30px 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  h4{font-size:16px;margin:24px 0 6px;color:var(--accent)}
   h3::before{content:'';width:5px;height:18px;border-radius:3px;background:var(--accent)}
   h3 .n{font:600 12px var(--mono);color:var(--accent2);background:var(--accent2-soft);border-radius:5px;padding:1px 7px}
   .lead{font-size:16px;margin:0 0 8px}
@@ -628,6 +629,177 @@
       </div>
       <div class="ask"><p>A는 B가 받았는지 어떻게 알 수 있을까요? 발행자는 받는 쪽을 모른다는 점을 떠올려 보고, "받았다"는 답을 받으려면 토픽을 어떻게 하나 더 만들면 될지 생각해 봅니다. (힌트: <a href="#remote">LAB 2-B</a>의 <code>led/state</code>)</p></div>
       <div class="tip"><p>점이 계속 빨간색이면 Port 8884와 SSL 체크를 확인합니다. 학교 네트워크가 막는다면 휴대폰 핫스폿으로 시험합니다. 메시지가 안 오면 두 사람의 토픽을 한 글자씩 대조합니다. 대소문자와 번호까지 같아야 합니다. 이 체험은 <a href="#lab2">LAB 2</a>에서 휴대폰 센서와 Python 코드로 그대로 이어집니다.</p></div>
+
+      <h3 id="pc2phone">실습 예제 · PC가 발행하고 폰이 구독하기</h3>
+      <p>이번에는 실제 기기에 역할을 나눠 줍니다. <b>PC가 발행자</b>, <b>HiveMQ 공개 브로커가 브로커</b>, <b>휴대폰이 구독자</b>입니다. PC에서 <code>ON</code>을 보내면 휴대폰 화면의 가상 LED가 켜집니다. PC와 휴대폰은 같은 Wi-Fi에 있지 않아도 됩니다. 둘 다 인터넷으로 브로커에 접속할 뿐이고, 서로의 주소는 전혀 모릅니다.</p>
+
+      <figure>
+        <div class="diagram">
+          <svg viewBox="0 0 760 250" role="img" aria-label="PC가 1883 포트로 브로커에 발행하고, 휴대폰이 8884 포트 WebSocket으로 브로커에 구독해 메시지를 받습니다">
+            <defs><marker id="ahpp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="ah" d="M0 0L10 5L0 10z"/></marker></defs>
+            <text class="t" x="120" y="22">발행자</text><text class="t" x="380" y="22">브로커</text><text class="t" x="640" y="22">구독자</text>
+            <rect class="bx" x="20" y="60" width="200" height="100" rx="10"/>
+            <text class="t" x="120" y="90">💻 PC</text>
+            <text class="s" x="120" y="112">웹 클라이언트 · Explorer · Python</text>
+            <text class="s" x="120" y="132">mqtt:// 1883 또는 wss:// 8884</text>
+            <rect class="bx main" x="290" y="60" width="180" height="100" rx="10"/>
+            <text class="t" x="380" y="95">broker.hivemq.com</text>
+            <text class="s" x="380" y="117">HiveMQ 공개 브로커</text>
+            <text class="s" x="380" y="137">가입 · 비밀번호 없음</text>
+            <rect class="bx" x="540" y="60" width="200" height="100" rx="10"/>
+            <text class="t" x="640" y="90">📱 휴대폰</text>
+            <text class="s" x="640" y="112">시뮬레이터 (브라우저)</text>
+            <text class="s" x="640" y="132">wss:// 8884 (WebSocket + TLS)</text>
+            <path class="ln" d="M222 95H286" marker-end="url(#ahpp)"/><text class="s" x="254" y="86">③ 발행</text>
+            <path class="ln" d="M538 135H474" marker-end="url(#ahpp)"/><text class="s" x="506" y="152">② 구독</text>
+            <path class="ln" d="M472 95H536" marker-end="url(#ahpp)"/><text class="s" x="504" y="86">④ 전달</text>
+            <text class="e" x="20" y="196">① 두 기기가 각자 브로커에 접속(CONNECT)  ② 폰이 aiot-kt2611/s01/led 구독 신청(SUBSCRIBE)</text>
+            <text class="e" x="20" y="218">③ PC가 같은 토픽으로 ON 발행(PUBLISH)  ④ 브로커가 토픽이 맞는 폰에게 그대로 전달 → 가상 LED 켜짐</text>
+          </svg>
+        </div>
+        <figcaption>PC와 휴대폰이 쓰는 포트가 달라도 같은 브로커이므로 메시지가 오갑니다. 휴대폰 시뮬레이터는 https 페이지라서 브라우저용 <code>wss://</code> 8884 포트만 쓸 수 있습니다.</figcaption>
+      </figure>
+
+      <h4>준비 · 토픽 하나 정하기</h4>
+      <p>발행자와 구독자를 이어 주는 것은 토픽 이름뿐이므로, 시작하기 전에 둘이 쓸 토픽을 먼저 정해 종이에 적어 둡니다. 아래 예는 반 코드 <code>aiot-kt2611</code>, 휴대폰 번호 <code>s01</code>입니다. 자기 것으로 바꿔 쓰세요.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>토픽</th><th>보내는 쪽 → 받는 쪽</th><th>메시지</th><th>폰에서 일어나는 일</th></tr></thead>
+          <tbody>
+            <tr><td><code>aiot-kt2611/s01/led</code></td><td>PC → 폰</td><td><code>ON</code> · <code>OFF</code> · <code>TOGGLE</code> · <code>#00aaff</code></td><td>가상 LED가 켜짐 · 꺼짐 · 반전 · 그 색으로 켜짐</td></tr>
+            <tr><td><code>aiot-kt2611/s01/cmd</code></td><td>PC → 폰</td><td><code>BEEP</code> · <code>VIBRATE</code></td><td>삑 소리 · 진동(안드로이드만)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>1단계 · 구독자(휴대폰) 연결하기</h4>
+      <p>구독자를 <b>먼저</b> 연결합니다. 구독하기 전에 발행된 메시지는 받을 수 없기 때문입니다(5분 체험 2번).</p>
+      <div class="launch">
+        <b>📱 휴대폰에서 열 주소</b>
+        <span><code>https://bctcaiedu.github.io/aiot/phone/?prefix=aiot-kt2611&amp;id=s01</code> — 강사가 나눠 준 QR 코드를 찍어도 같은 주소가 열립니다.</span>
+        <a class="btn primary" href="phone/?prefix=aiot-kt2611&amp;id=s01" target="_blank" rel="noopener">열기 →</a>
+      </div>
+      <div class="mission">
+        <div class="mh"><span class="mn">PHONE</span><b>접속하고, 구독을 확인하기</b></div>
+        <ol>
+          <li><b>주소 열기</b> — 휴대폰 브라우저(크롬 · 사파리 · 삼성 인터넷)로 위 주소를 엽니다. 화면 맨 위 오른쪽 이름이 <code>s01</code>(내 번호)인지 봅니다. 주소의 <code>prefix=</code>가 토픽 앞부분, <code>id=</code>가 번호가 됩니다.</li>
+          <li><b>토픽 확인</b> — <b>가상 LED</b> 칸 아래 두 줄이 <code>구독: aiot-kt2611/s01/led</code>, <code>구독: aiot-kt2611/s01/cmd</code>인지 봅니다. 이 두 줄을 PC에 그대로 옮겨 적습니다. 다르면 <b>설정</b>을 펼쳐 <b>토픽 앞부분</b>과 <b>내 번호</b>를 고치고 <b>저장하고 다시 연결</b>을 누릅니다.</li>
+          <li><b>센서 시작</b> — 누르고 움직임 센서 · 마이크를 허용합니다. LED만 볼 거라면 건너뛰어도 되지만, <code>BEEP</code> 소리는 이 버튼을 누른 뒤부터 납니다(브라우저는 사용자가 한 번 누르기 전에는 소리를 막습니다).</li>
+          <li><b>연결</b> — 누르면 상태가 <b>연결 안 됨 → 연결 중 → 연결됨</b>으로 바뀝니다. 보통 1~3초 걸립니다.</li>
+          <li><b>기록 확인</b> — 맨 아래 <b>기록</b>에 <code>연결 wss://broker.hivemq.com:8884/mqtt</code>가 찍히면 구독까지 끝난 것입니다.</li>
+          <li><b>화면 켜 두기</b> — 화면이 꺼지거나 다른 앱으로 가면 연결이 끊깁니다. 실습 동안 이 페이지를 앞에 켜 둡니다.</li>
+        </ol>
+      </div>
+      <details class="full">
+        <summary>"연결" 을 누를 때 안에서 일어나는 일</summary>
+        <div class="inner">
+          <ol>
+            <li>휴대폰이 <code>broker.hivemq.com</code>의 8884 포트에 암호화된 WebSocket(<code>wss://</code>) 연결을 엽니다.</li>
+            <li>그 위로 MQTT <b>CONNECT</b> 패킷을 보냅니다. 이름표인 Client ID는 <code>phone-s01-a3f9c1</code>처럼 뒤에 무작위 글자가 붙어서, 같은 번호로 두 번 열어도 서로 끊기지 않습니다.</li>
+            <li>브로커가 <b>CONNACK</b>(접속 허락)으로 답하면 상태가 <b>연결됨</b>이 됩니다.</li>
+            <li>곧바로 <b>SUBSCRIBE</b>로 <code>…/s01/led</code>, <code>…/s01/cmd</code> 두 토픽을 신청하고, 브로커가 <b>SUBACK</b>으로 받아들입니다. 이제 브로커는 "이 토픽 메시지는 이 휴대폰에게 보낸다"는 것을 기억합니다.</li>
+            <li>연결이 끊기면 시뮬레이터가 3초마다 스스로 다시 접속합니다(상태: <b>다시 연결 중</b>). 다시 접속할 때 구독도 다시 신청합니다.</li>
+          </ol>
+          <p>시뮬레이터는 이와 별도로 2초마다 센서값을 <code>…/s01/sensor</code>에 <b>발행</b>도 합니다. 한 기기가 발행자이자 구독자일 수 있다는 뜻입니다. 이 예제에서는 구독 쪽만 봅니다.</p>
+        </div>
+      </details>
+
+      <h4>2단계 · 발행자(PC) 연결하기</h4>
+      <p>PC에서는 아래 세 방법 중 <b>하나</b>를 고릅니다. 처음이면 설치가 필요 없는 <b>방법 A</b>로 시작하고, 수업에서 MQTT Explorer를 설치했다면 <b>B</b>, 코드로 보내 보고 싶으면 <b>C</b>를 씁니다.</p>
+
+      <div class="mission">
+        <div class="mh"><span class="mn">PC · A</span><b>HiveMQ 웹 클라이언트 (설치 없음, 포트 8884)</b></div>
+        <ol>
+          <li>PC 브라우저로 <a href="https://www.hivemq.com/demos/websocket-client/" target="_blank" rel="noopener">HiveMQ 웹 클라이언트</a>를 엽니다. 위쪽 광고는 무시합니다.</li>
+          <li><b>Connection</b> 칸에서 Host <code>broker.hivemq.com</code>, Port <code>8884</code>, <b>SSL</b> 체크 상태를 확인합니다. ClientID는 자동으로 만들어진 값을 그대로 두고, Username · Password는 비워 둡니다.</li>
+          <li><b>Connect</b>를 누릅니다. 오른쪽 위 빨간 점이 초록색으로 바뀌면 PC도 브로커에 접속한 것입니다(CONNECT → CONNACK).</li>
+          <li><b>Publish</b> 칸의 Topic에 <code>aiot-kt2611/s01/led</code>, Message에 <code>ON</code>을 쓰고 QoS 0 · Retain 체크 해제 상태로 <b>Publish</b>를 누릅니다.</li>
+          <li>휴대폰 LED가 빨갛게 켜지는지 봅니다. 이어서 <code>OFF</code>, <code>#00aaff</code>, <code>TOGGLE</code>을 차례로 보내 봅니다.</li>
+          <li>Topic을 <code>aiot-kt2611/s01/cmd</code>로 바꾸고 <code>BEEP</code>을 보내 휴대폰에서 소리가 나는지 확인합니다.</li>
+        </ol>
+      </div>
+
+      <div class="mission">
+        <div class="mh"><span class="mn">PC · B</span><b>MQTT Explorer (설치 프로그램, 포트 1883)</b></div>
+        <ol>
+          <li>MQTT Explorer를 실행하고 왼쪽 위 <b>+</b>(새 연결)를 누릅니다.</li>
+          <li>Name <code>hivemq</code>, Protocol <code>mqtt://</code>, Host <code>broker.hivemq.com</code>, Port <code>1883</code>을 넣습니다. <b>Validate certificate</b> · <b>Encryption (tls)</b>는 끄고, Username · Password는 비워 둡니다.</li>
+          <li>(선택) <b>ADVANCED</b>에서 기본 구독 <code>#</code>을 지우고 <code>aiot-kt2611/#</code>을 추가한 뒤 <b>BACK</b>을 누릅니다. 공개 브로커의 전 세계 메시지가 한꺼번에 쏟아지는 것을 막습니다.</li>
+          <li><b>SAVE</b> → <b>CONNECT</b>. 왼쪽에 <code>aiot-kt2611</code> 토픽 트리가 나타나면 접속된 것입니다. 휴대폰이 보내는 <code>s01/sensor</code>도 여기서 보입니다.</li>
+          <li>오른쪽 <b>Publish</b> 칸의 Topic에 <code>aiot-kt2611/s01/led</code>, 형식 <b>raw</b>, 내용 <code>ON</code>을 쓰고 <b>PUBLISH</b>를 누릅니다.</li>
+          <li>방금 보낸 <code>led</code> 토픽이 왼쪽 트리에도 생기고, 동시에 휴대폰 LED가 켜집니다. 같은 메시지를 PC(구독 <code>aiot-kt2611/#</code>)와 휴대폰이 함께 받는 1 : N입니다.</li>
+        </ol>
+      </div>
+
+      <div class="mission">
+        <div class="mh"><span class="mn">PC · C</span><b>Python 코드 (포트 1883)</b></div>
+        <ol>
+          <li>터미널에서 <code>pip install paho-mqtt</code>로 라이브러리를 설치합니다(2.x 버전 기준 코드).</li>
+          <li>아래 코드를 <code>pc_publish_led.py</code>로 저장하고, <code>PREFIX</code>와 <code>TARGET</code>을 휴대폰 화면의 토픽에 맞게 고칩니다.</li>
+          <li><code>python pc_publish_led.py</code>로 실행하고 휴대폰을 봅니다. 2초마다 LED가 켜짐 → 꺼짐 → 파란색 → 꺼짐으로 바뀌고 마지막에 삑 소리가 납니다.</li>
+        </ol>
+      </div>
+      <div class="code"><span class="lang">Python · pc_publish_led.py</span><pre><code>import time
+import paho.mqtt.client as mqtt
+
+BROKER = "broker.hivemq.com"
+PREFIX = "aiot-kt2611"   # 반 코드
+TARGET = "s01"           # 구독자(휴대폰)의 번호
+
+def on_connect(client, userdata, flags, reason_code, properties):
+    # CONNACK 을 받으면 불림. Success 가 찍히면 접속 성공
+    print("브로커 접속:", reason_code)
+
+client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)   # Client ID 는 자동 생성
+client.on_connect = on_connect
+client.connect(BROKER, 1883)   # ① CONNECT
+client.loop_start()            # 네트워크 처리를 뒤에서 돌림
+time.sleep(1)                  # CONNACK 을 기다림
+
+led = f"{PREFIX}/{TARGET}/led"
+for msg in ["ON", "OFF", "#00aaff", "OFF"]:
+    client.publish(led, msg).wait_for_publish()   # ③ PUBLISH
+    print("발행:", led, msg)
+    time.sleep(2)
+
+client.publish(f"{PREFIX}/{TARGET}/cmd", "BEEP").wait_for_publish()
+print("발행:", f"{PREFIX}/{TARGET}/cmd", "BEEP")
+
+client.loop_stop()
+client.disconnect()</code></pre></div>
+      <div class="code term"><span class="lang">한 줄로 보내기 (mosquitto-clients 가 있을 때)</span><pre><code>mosquitto_pub -h broker.hivemq.com -p 1883 -t aiot-kt2611/s01/led -m ON</code></pre></div>
+
+      <h4>3단계 · 결과 확인과 연결 순서 정리</h4>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>순서</th><th>누가 → 누구</th><th>MQTT 패킷</th><th>화면에서 확인하는 곳</th></tr></thead>
+          <tbody>
+            <tr><td>①-폰</td><td>휴대폰 → 브로커</td><td>CONNECT / CONNACK</td><td>휴대폰 상태 <b>연결됨</b></td></tr>
+            <tr><td>②</td><td>휴대폰 → 브로커</td><td>SUBSCRIBE / SUBACK</td><td>휴대폰 <b>구독:</b> 두 줄, 기록의 <b>연결</b></td></tr>
+            <tr><td>①-PC</td><td>PC → 브로커</td><td>CONNECT / CONNACK</td><td>웹 클라이언트 초록 점 · Explorer 토픽 트리 · <code>브로커 접속: Success</code></td></tr>
+            <tr><td>③</td><td>PC → 브로커</td><td>PUBLISH <code>…/s01/led</code> = <code>ON</code></td><td>PC의 Publish 버튼 · <code>발행: …</code> 출력</td></tr>
+            <tr><td>④</td><td>브로커 → 휴대폰</td><td>PUBLISH (같은 내용)</td><td>휴대폰 가상 LED 켜짐, 기록에 <b>LED ON</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="ok"><p>PC에서 Publish를 누르고 1초 안에 휴대폰 LED가 바뀌면 성공입니다. PC는 휴대폰의 IP 주소를 몰랐고, 휴대폰도 PC가 누구인지 몰랐습니다. 둘이 공유한 것은 <code>aiot-kt2611/s01/led</code>라는 토픽 이름 하나뿐입니다.</p></div>
+
+      <div class="ask"><p>더 해 보기 — ① 휴대폰에서 <b>연결</b>을 끊은 상태(페이지를 닫음)에서 PC가 <code>ON</code>을 보내고, 다시 열어 연결하면 LED가 켜져 있을까요? ② 이번에는 PC에서 <b>Retain</b>을 체크하고 <code>ON</code>을 보낸 뒤 같은 실험을 해 봅니다. 무엇이 달라지나요? 실험 뒤에는 같은 토픽에 빈 메시지 + Retain으로 한 번 보내 보관된 값을 지웁니다. ③ 짝의 번호(<code>s02</code>)로 토픽을 바꿔 짝의 휴대폰 LED를 켜 봅니다.</p></div>
+
+      <div class="tbl">
+        <table>
+          <thead><tr><th>증상</th><th>원인</th><th>해결</th></tr></thead>
+          <tbody>
+            <tr><td>휴대폰이 <b>연결 중</b> · <b>다시 연결 중</b>에서 멈춤</td><td>학교 Wi-Fi가 8884 포트를 막음</td><td>휴대폰 Wi-Fi를 끄고 LTE · 5G 데이터로 연결</td></tr>
+            <tr><td>휴대폰 상태가 <b>라이브러리 없음</b></td><td>MQTT 라이브러리를 인터넷에서 못 받음</td><td>인터넷 연결 확인 후 새로고침</td></tr>
+            <tr><td>MQTT Explorer · Python 접속 실패, 시간 초과</td><td>학교 네트워크가 1883 포트를 막음</td><td>방법 A(웹 클라이언트, 8884)로 바꾸거나 PC를 휴대폰 핫스폿에 연결</td></tr>
+            <tr><td>PC는 보냈는데 LED가 그대로</td><td>토픽 오타 (대소문자, 반 코드, 번호, <code>/</code> 위치)</td><td>휴대폰 화면의 <b>구독:</b> 줄을 한 글자씩 PC 토픽과 대조</td></tr>
+            <tr><td>LED는 켜지는데 <code>BEEP</code> 소리가 안 남</td><td>센서 시작을 안 누름 · 무음 모드</td><td><b>센서 시작</b>을 누르고 휴대폰 볼륨 확인</td></tr>
+            <tr><td>내가 안 보냈는데 LED가 바뀜</td><td>다른 사람이 같은 토픽을 씀</td><td>반 코드 · 번호가 남과 겹치지 않는지 확인</td></tr>
+            <tr><td>Python 이 <code>발행:</code> 만 찍고 접속 메시지가 없음</td><td>1초 안에 CONNACK 이 오지 않음</td><td><code>time.sleep(1)</code>을 3으로 늘리고, 그래도 안 되면 포트 차단 확인</td></tr>
+          </tbody>
+        </table>
+      </div>
 
       <h3>확인 퀴즈</h3>
       <details class="full">
