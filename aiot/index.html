@@ -598,6 +598,37 @@
       </div>
       <div class="warn"><p>토픽은 대소문자를 구분합니다(<code>Temp</code> ≠ <code>temp</code>). 공백과 한글보다는 영어 소문자를 쓰고, 맨 앞에 <code>/</code>를 붙이지 않습니다.</p></div>
 
+      <h3>5분 체험 · 발행 · 구독 직접 해 보기</h3>
+      <p>설치 없이 브라우저만으로 위 그림의 세 역할을 직접 맡아 봅니다. 짝과 둘이 하고, 혼자라면 <b>탭 두 개</b>를 열어 한쪽은 발행자, 한쪽은 구독자로 씁니다.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>역할</th><th>이 체험에서</th></tr></thead>
+          <tbody>
+            <tr><td><b>📤 발행자</b></td><td>짝 A의 웹 클라이언트 (Publish 칸)</td></tr>
+            <tr><td><b>📮 브로커</b></td><td><code>broker.hivemq.com</code> — 둘 다 여기에 접속하고, 서로에게 직접 연결하지 않습니다</td></tr>
+            <tr><td><b>📥 구독자</b></td><td>짝 B의 웹 클라이언트 (Subscriptions 칸)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="launch">
+        <b>🔗 HiveMQ 웹 클라이언트</b>
+        <span><code>https://www.hivemq.com/demos/websocket-client/</code> — 위쪽 광고(Get your free account)는 무시합니다.</span>
+        <a class="btn primary" href="https://www.hivemq.com/demos/websocket-client/" target="_blank" rel="noopener">열기 →</a>
+      </div>
+      <div class="mission">
+        <div class="mh"><span class="mn">5 MIN</span><b>연결 → 구독 → 발행 → 전달</b></div>
+        <ol>
+          <li><b>연결</b> — 두 사람 모두 Host <code>broker.hivemq.com</code>(기본값 <code>mqtt-dashboard.com</code>도 같은 브로커), Port <code>8884</code>, SSL 체크 그대로 두고 <b>Connect</b>. 점이 초록색이면 접속된 것입니다. Client ID는 자동으로 다르게 만들어집니다.</li>
+          <li><b>먼저 발행해 보기</b> — A가 Publish에서 Topic <code>aiot-kt2611/s01/hello</code>(<code>s01</code>은 A의 번호), Message <code>first</code>를 보냅니다. 아직 아무도 구독하지 않았으니 B에게는 아무것도 오지 않습니다.</li>
+          <li><b>구독 신청</b> — B가 <b>Add New Topic Subscription</b> → Topic <code>aiot-kt2611/s01/hello</code> → <b>Subscribe</b>.</li>
+          <li><b>발행 · 전달</b> — A가 같은 토픽으로 <code>hi</code>를 보냅니다. B의 <b>Messages</b>에 바로 도착하면 발행자 → 브로커 → 구독자가 이어진 것입니다. 2번의 <code>first</code>는 끝내 오지 않습니다(퀴즈 Q3).</li>
+          <li><b>와일드카드</b> — B가 구독을 <code>aiot-kt2611/+/hello</code>로 바꿉니다. 이제 반 전체가 보내는 hello가 모두 보입니다(N : 1).</li>
+          <li><b>역할 바꾸기</b> — B가 발행자, A가 구독자가 되어 다시 해 봅니다. 한 클라이언트가 발행과 구독을 함께 할 수도 있습니다. 내 토픽을 구독한 채로 내가 발행하면, 메시지가 브로커를 한 바퀴 돌아 나에게도 옵니다.</li>
+        </ol>
+      </div>
+      <div class="ask"><p>A는 B가 받았는지 어떻게 알 수 있을까요? 발행자는 받는 쪽을 모른다는 점을 떠올려 보고, "받았다"는 답을 받으려면 토픽을 어떻게 하나 더 만들면 될지 생각해 봅니다. (힌트: <a href="#remote">LAB 2-B</a>의 <code>led/state</code>)</p></div>
+      <div class="tip"><p>점이 계속 빨간색이면 Port 8884와 SSL 체크를 확인합니다. 학교 네트워크가 막는다면 휴대폰 핫스폿으로 시험합니다. 메시지가 안 오면 두 사람의 토픽을 한 글자씩 대조합니다. 대소문자와 번호까지 같아야 합니다. 이 체험은 <a href="#lab2">LAB 2</a>에서 휴대폰 센서와 Python 코드로 그대로 이어집니다.</p></div>
+
       <h3>확인 퀴즈</h3>
       <details class="full">
         <summary>Q1. <code>school/room2/temp</code>로 27.1을 발행하면, 위 그림의 구독자 중 누가 받을까요?</summary>
