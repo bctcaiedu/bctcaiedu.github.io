@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QR 배포 시트 · AIoT 프로젝트</title>
+<meta name="description" content="학생 번호(s01~sNN)별 시뮬레이터 · 대시보드 QR 코드를 한 장에 모아 인쇄합니다.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔳</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<style>
+/* 강사용 인쇄 시트: 위쪽 설정 패널(화면 전용) + 아래 QR 카드 격자(A4 인쇄). 인쇄물은 항상 흰 바탕 검정 QR */
+:root {
+  --bg: #eef1f0; --panel: #fff; --ink: #17201e; --muted: #5d6b67; --line: #d5dcda; --accent: #0f6b5c;
+  --font-body: 'Pretendard Variable', Pretendard, -apple-system, 'Segoe UI', 'Malgun Gothic', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1000px; margin: 0 auto; padding: 16px 16px 40px; display: grid; gap: 16px; }
+.back { font-size: 13px; color: var(--muted); text-decoration: none; }
+.back:hover { color: var(--accent); }
+h1 { font-size: 22px; margin: 0; }
+.lead { margin: 4px 0 0; color: var(--muted); }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 12px; }
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+input, select { font: inherit; color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 7px 9px; width: 100%; min-width: 0; }
+input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+button { font: inherit; font-weight: 600; border-radius: 8px; padding: 8px 16px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+button.ghost { background: transparent; color: var(--accent); }
+.hint { font-size: 13px; color: var(--muted); margin: 0; }
+code { font-family: var(--font-mono); font-size: .92em; }
+
+.sheet { background: #fff; color: #000; border-radius: 12px; border: 1px solid var(--line); padding: 10mm; }
+.sheet-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; border-bottom: 1px solid #000; padding-bottom: 4px; margin-bottom: 6mm; font-size: 12px; }
+.sheet-head b { font-size: 15px; }
+.grid { display: grid; grid-template-columns: repeat(var(--cols, 4), 1fr); gap: 0; }
+.card { border: 1px dashed #999; padding: 4mm 3mm 3mm; display: grid; justify-items: center; gap: 2mm; break-inside: avoid; page-break-inside: avoid; text-align: center; }
+.card svg { width: 100%; max-width: 38mm; height: auto; display: block; }
+.card .id { font-family: var(--font-mono); font-size: 20px; font-weight: 600; line-height: 1; }
+.card .kind { font-size: 11px; }
+.card .url { font-family: var(--font-mono); font-size: 7.5px; color: #444; word-break: break-all; line-height: 1.3; }
+.err { color: #c0392b; font-weight: 600; }
+
+@media print {
+  @page { size: A4; margin: 10mm; }
+  body { background: #fff; }
+  .wrap { max-width: none; padding: 0; }
+  .no-print { display: none !important; }
+  .sheet { border: 0; border-radius: 0; padding: 0; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="no-print">
+    <a class="back" href="../">← AIoT 프로젝트 교안</a>
+    <h1>QR 배포 시트</h1>
+    <p class="lead">학생 번호마다 QR 코드를 만들어 한 장에 모읍니다. 인쇄해서 잘라 나눠 주면, 학생은 찍기만 하면 자기 번호로 시뮬레이터(또는 대시보드)가 열립니다.</p>
+  </header>
+
+  <section class="panel no-print" aria-label="설정">
+    <div class="fields">
+      <label>대상
+        <select id="target">
+          <option value="phone">📱 휴대폰 시뮬레이터 (LAB 1~)</option>
+          <option value="dashboard">🖥️ 강의실 대시보드</option>
+        </select>
+      </label>
+      <label>반 코드 (prefix)
+        <input id="prefix" value="aiot-kt2611" spellcheck="false">
+      </label>
+      <label>번호 앞글자
+        <input id="pre" value="s" spellcheck="false">
+      </label>
+      <label>시작 번호
+        <input id="from" type="number" min="0" value="1">
+      </label>
+      <label>끝 번호
+        <input id="to" type="number" min="0" value="30">
+      </label>
+      <label>번호 뒤글자 <small>(Wokwi ESP32는 <code>w</code>)</small>
+        <input id="suf" value="" spellcheck="false" placeholder="비움">
+      </label>
+      <label>한 줄 칸 수
+        <select id="cols"><option>3</option><option selected>4</option><option>5</option><option>6</option></select>
+      </label>
+      <label>사이트 주소
+        <input id="base" spellcheck="false">
+      </label>
+    </div>
+    <div class="row">
+      <button id="print" type="button">🖨️ 인쇄 / PDF 저장</button>
+      <button id="copy" type="button" class="ghost">주소 목록 복사</button>
+      <span id="msg" class="hint" role="status"></span>
+    </div>
+    <p class="hint">설정은 이 페이지 주소에도 저장됩니다(예: <code>?prefix=aiot-kt2611&amp;from=1&amp;to=24</code>). 주소를 즐겨찾기해 두면 다음 학기에도 그대로 씁니다. 인쇄 창에서 <b>배경 그래픽</b>은 꺼도 됩니다.</p>
+  </section>
+
+  <section class="sheet" aria-label="QR 시트">
+    <div class="sheet-head"><b id="title"></b><span id="sub"></span></div>
+    <div class="grid" id="grid"></div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const F = ["target", "prefix", "pre", "from", "to", "suf", "cols", "base"];
+  // 기본 사이트 주소: 지금 열린 aiot/ 폴더 (로컬 미리보기 중이면 공개 주소로)
+  const here = new URL("../", location.href).href;
+  const defBase = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || location.protocol === "file:"
+    ? "https://bctcaiedu.github.io/aiot/" : here;
+  $("base").value = defBase;
+
+  const q = new URLSearchParams(location.search);
+  F.forEach((k) => { if (q.has(k)) $(k).value = q.get(k); });
+
+  const pad = (n, w) => String(n).padStart(w, "0");
+  function ids() {
+    let a = parseInt($("from").value, 10), b = parseInt($("to").value, 10);
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return [];
+    if (a > b) [a, b] = [b, a];
+    b = Math.min(b, a + 199);                       // 한 번에 최대 200장
+    const w = Math.max(2, String(b).length);
+    const out = [];
+    for (let n = a; n <= b; n++) out.push($("pre").value.trim() + pad(n, w) + $("suf").value.trim());
+    return out;
+  }
+  function urlFor(id) {
+    let base = $("base").value.trim() || defBase;
+    if (!base.endsWith("/")) base += "/";
+    const p = new URLSearchParams();
+    p.set("id", id);
+    const pf = $("prefix").value.trim();
+    if (pf) p.set("prefix", pf);
+    return base + $("target").value + "/?" + p.toString();
+  }
+  function qrSvg(text) {
+    const qr = qrcode(0, "M");                      // 버전 자동, 오류 정정 M
+    qr.addData(text, "Byte");
+    qr.make();
+    return qr.createSvgTag({ cellSize: 4, margin: 4, scalable: true });
+  }
+
+  function render() {
+    const grid = $("grid");
+    $("grid").style.setProperty("--cols", $("cols").value);
+    const kind = $("target").value === "phone" ? "📱 휴대폰 시뮬레이터" : "🖥️ 강의실 대시보드";
+    $("title").textContent = "AIoT 프로젝트 · " + kind;
+    $("sub").textContent = "반 코드 " + ($("prefix").value.trim() || "(기본)");
+    if (typeof qrcode !== "function") {
+      grid.innerHTML = '<p class="err">QR 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침하세요.</p>';
+      return;
+    }
+    const list = ids();
+    grid.innerHTML = list.map((id) => {
+      const u = urlFor(id);
+      return '<div class="card">' + qrSvg(u) +
+        '<div class="id">' + esc(id) + '</div><div class="kind">' + kind + '</div>' +
+        '<div class="url">' + esc(u) + '</div></div>';
+    }).join("");
+    // 설정을 이 페이지 주소에 저장
+    const s = new URLSearchParams();
+    F.forEach((k) => { if (k !== "base" || $("base").value.trim() !== defBase) s.set(k, $(k).value); });
+    history.replaceState(null, "", "?" + s.toString());
+  }
+  function esc(s) { return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+  F.forEach((k) => $(k).addEventListener("input", render));
+  $("print").addEventListener("click", () => window.print());
+  $("copy").addEventListener("click", async () => {
+    const text = ids().map((id) => id + "\t" + urlFor(id)).join("\n");
+    try { await navigator.clipboard.writeText(text); $("msg").textContent = "복사했습니다 (번호⇥주소, 스프레드시트에 붙여 넣기 가능)."; }
+    catch { $("msg").textContent = "복사하지 못했습니다. 브라우저 권한을 확인하세요."; }
+  });
+  render();
+})();
+</script>
+</body>
+</html>

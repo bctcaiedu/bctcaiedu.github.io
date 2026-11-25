@@ -957,7 +957,7 @@ mqtt.publish(topic(<span class="s">"sensor"</span>).c_str(), json);</pre>
     <h4>교수 노트</h4>
     <ul>
       <li>안 될 때 진단법: 웹 클라이언트로 <code>aiot-kt2611/s01w/#</code> 구독 → 명령이 안 보이면 대시보드 문제, 명령은 보이는데 상태가 없으면 ESP32 문제.</li>
-      <li>강의실 대시보드 주소에 <code>?prefix=aiot-kt2611&amp;id=s01w</code>를 붙여 QR로 나눠 주면 빠릅니다.</li>
+      <li>강의실 대시보드 주소에 <code>?prefix=aiot-kt2611&amp;id=s01w</code>를 붙여 QR로 나눠 주면 빠릅니다. <code>aiot/qr/</code>에서 대상 “대시보드”, 뒤글자 <code>w</code>로 한 장에 인쇄할 수 있습니다.</li>
       <li>대시보드 상태가 <code>?</code>로만 보이면 ESP32가 아직 state를 한 번도 보내지 않은 것 — Wokwi를 다시 실행.</li>
     </ul>
   </aside>
