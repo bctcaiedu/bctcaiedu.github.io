@@ -343,7 +343,7 @@
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 14px 0; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); }
   .card .ic { font-size: 24px; }
-  .card b { display: block; margin: 4px 0 2px; font-size: 15.5px; }
+  .card > b { display: block; margin: 4px 0 2px; font-size: 15.5px; }
   .card p { margin: 0; font-size: 14px; color: var(--muted); }
   .card a.btn { margin-top: 10px; }
   .vcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin: 14px 0; }
@@ -1269,7 +1269,7 @@ void loop() {
     ai: '다이어그램 리뷰 → 수정 → 코드 순서를 지킵니다. 코드 속 상태 이름과 전환 조건이 다이어그램과 같은지 대조합니다.',
     checks: ['상태 다이어그램을 그렸다', '막다른 곳에서 빠져나온다', '현재 상태를 Serial로 출력해 확인했다'],
     tn: '실습실 예제 4번이 기본형입니다. 상태가 바뀔 때만 Serial로 출력하게 하면 로그로 행동을 분석하기 좋습니다.' },
-  { n: 0, m: 'mr2', env: 'rb', req: 'code', sim: 'world=line&mode=code&ex=line', t: '라인 트레이서 ① 규칙 기반',
+  { n: 0, m: 'mr2', env: 'rb', req: 'code', sim: 'world=line&mode=code&ex=line', guide: 'linerule', t: '라인 트레이서 ① 규칙 기반',
     goals: ['라인 센서 3개의 조합으로 방향을 정할 수 있다', '규칙표를 만들고 코드로 옮길 수 있다'],
     concepts: ['라인 센서: 검은 선 위면 1, 바닥이면 0 (<code>lineLeft()</code> · <code>lineCenter()</code> · <code>lineRight()</code>)', '규칙표: 센서 8가지 조합 → 동작', '선을 놓쳤을 때(0 0 0)의 행동이 실력 차이를 만든다'],
     mission: '라인 트랙 맵에서 선을 따라 한 바퀴를 완주합니다. 센서 조합 규칙표를 먼저 채우고, 랩 타임을 기록합니다.',
@@ -1277,7 +1277,7 @@ void loop() {
     ai: '규칙표는 내가 만들고, AI에게는 그 표를 코드로 옮기는 일만 맡깁니다.',
     checks: ['규칙표 8칸을 채웠다', '트랙을 한 바퀴 완주했다', '랩 타임을 기록했다'],
     tn: '실습실 예제 5번은 약 46초에 한 바퀴를 돕니다. 이 기록을 기준선으로 삼게 하세요.' },
-  { n: 0, m: 'mr2', env: 'rb', req: 'code', sim: 'world=line&mode=code&ex=pctrl', t: '라인 트레이서 ② 비례 제어(P 제어)',
+  { n: 0, m: 'mr2', env: 'rb', req: 'code', sim: 'world=line&mode=code&ex=pctrl', guide: 'pid', t: '라인 트레이서 ② 비례 제어(P 제어)',
     goals: ['오차와 비례 제어의 개념을 설명할 수 있다', '게인 값을 실험으로 튜닝할 수 있다'],
     concepts: ['오차(error): 로봇이 선에서 벗어난 정도 — (오른쪽 − 왼쪽) ÷ (켜진 센서 수)', 'P 제어: 보정량 = Kp × 오차 → 왼쪽 = 기본속도 + 보정, 오른쪽 = 기본속도 − 보정', 'Kp가 작으면 굼뜨게 따라가고, 크면 좌우로 흔들린다 (PID의 P)'],
     mission: '규칙 기반 코드를 P 제어로 바꾸고, Kp와 기본 속도를 바꿔 가며 랩 타임을 표로 기록해 가장 빠르고 안정적인 값을 찾습니다.',
@@ -4617,6 +4617,245 @@ function robotIotGuide() {
     <div class="table-wrap"><table><tr><th>차시</th><th>내용</th><th>로봇 × IoT 관점</th></tr>${road.map(([a, b, c]) => `<tr class="link" data-go="l${a}"><td><span class="no">${a}</span></td><td><b>${b}</b></td><td>${c}</td></tr>`).join('')}</table></div>`;
 }
 
+/* 라인 트레이서: 규칙 기반 제어 · 비례(P) 제어 · PID 제어 해설 */
+function lineSensorSVG() {
+  // 세 장면: 선이 왼쪽 / 가운데 / 오른쪽에 있을 때 센서 값과 로봇의 행동
+  const scene = (cx, lineX, vals, title, act, rot) => {
+    const sx = [-24, 0, 24];
+    return `<g transform="translate(${cx} 0)">
+      <rect x="-90" y="40" width="180" height="170" rx="10" fill="var(--card2)" stroke="var(--line)"/>
+      <rect x="${lineX - 9}" y="40" width="18" height="170" fill="#1f1f1f"/>
+      <g transform="translate(0 150) rotate(${rot})">
+        <rect x="-34" y="-30" width="68" height="70" rx="10" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2"/>
+        <rect x="-44" y="-6" width="10" height="30" rx="3" fill="#3a3a3a"/><rect x="34" y="-6" width="10" height="30" rx="3" fill="#3a3a3a"/>
+        ${sx.map((x, i) => `<circle cx="${x}" cy="-44" r="9" fill="${vals[i] ? 'var(--danger)' : '#fff'}" stroke="var(--fg)" stroke-width="1.5"/>`).join('')}
+        <path d="M-34 -44 L34 -44" stroke="var(--fg)" stroke-width="1.5" stroke-dasharray="2 2"/>
+      </g>
+      <text x="0" y="232" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--fg)">${title}</text>
+      <text x="0" y="252" text-anchor="middle" font-size="11.5" fill="var(--muted)" font-family="var(--mono)">L C R = ${vals.join(' ')}</text>
+      <text x="0" y="272" text-anchor="middle" font-size="12" font-weight="700" fill="var(--accent2)">${act}</text>
+    </g>`;
+  };
+  return `<svg viewBox="0 0 760 290" role="img" aria-label="라인 센서 3개의 값과 로봇의 행동">
+    <text x="20" y="26" font-size="15" font-weight="800" fill="var(--fg)">센서 3개가 선을 어디서 보느냐로 방향을 정한다 (빨간 원 = 선 위 = 1)</text>
+    ${scene(140, -24, [1, 0, 0], '선이 왼쪽에 있다', '→ 왼쪽으로 꺾기', 0)}
+    ${scene(380, 0, [0, 1, 0], '선이 가운데에 있다', '→ 직진', 0)}
+    ${scene(620, 24, [0, 0, 1], '선이 오른쪽에 있다', '→ 오른쪽으로 꺾기', 0)}
+  </svg>`;
+}
+function lineRuleGuide() {
+  const rules = [
+    ['0 1 0', '선이 한가운데', '직진', '<code>motors(170, 170)</code>'],
+    ['1 0 0', '선이 왼쪽 끝 (로봇이 오른쪽으로 치우침)', '왼쪽으로 꺾기', '<code>motors(60, 170)</code>'],
+    ['0 0 1', '선이 오른쪽 끝 (로봇이 왼쪽으로 치우침)', '오른쪽으로 꺾기', '<code>motors(170, 60)</code>'],
+    ['0 0 0', '선을 놓침', '마지막으로 선을 본 쪽으로 제자리 회전', '<code>motors(-80, 140)</code> 또는 <code>motors(140, -80)</code>'],
+    ['1 1 0', '선이 살짝 왼쪽', '🤔 직접 정하기', '왼쪽 끝(1 0 0)보다 약하게 꺾으면?'],
+    ['0 1 1', '선이 살짝 오른쪽', '🤔 직접 정하기', '오른쪽 끝(0 0 1)보다 약하게 꺾으면?'],
+    ['1 1 1', '센서 모두 검정 (교차로 · 굵은 선)', '🤔 직접 정하기', '직진? 멈춤? 트랙을 보고 판단'],
+    ['1 0 1', '양쪽만 검정 (보통은 생기지 않음)', '🤔 직접 정하기', '센서 오류로 보고 직전 행동 유지?']
+  ];
+  const src = [
+    '// 라인 센서 3개: 선 위면 1',
+    'let last = 0;   // 마지막으로 선이 보인 쪽: -1 왼쪽, 1 오른쪽',
+    '',
+    'function loop() {',
+    '  const L = lineLeft(), C = lineCenter(), R = lineRight();',
+    '  if (C && !L && !R)  motors(170, 170);               // 가운데만: 직진',
+    '  else if (L)         { motors(60, 170); last = -1; } // 선이 왼쪽: 왼쪽으로',
+    '  else if (R)         { motors(170, 60); last = 1; }  // 선이 오른쪽: 오른쪽으로',
+    '  else if (last < 0)  motors(-80, 140);               // 놓쳤다: 마지막 방향으로',
+    '  else                motors(140, -80);',
+    '}'
+  ].join('\n');
+  return `
+    <h2>규칙 기반 제어란?</h2>
+    <p><b>"센서가 이렇게 보이면, 이렇게 움직여라"</b>라는 규칙을 미리 정해 두고 그대로 따르게 하는 방법입니다. 계산 없이 <code>if</code>문으로 상황을 나누고, 상황마다 바퀴 속도를 정합니다. 신호등 앞의 운전 규칙("빨간불이면 멈춘다")과 같습니다.</p>
+    <div class="figure">${lineSensorSVG()}<p class="caption">핵심 아이디어: 선이 보이는 쪽으로 핸들을 꺾는다</p></div>
+
+    <h3>로봇이 아는 것과 할 수 있는 것</h3>
+    <div class="cards">
+      <div class="card"><div class="ic">👀</div><b>입력: 라인 센서 3개</b><p>로봇 앞 바닥의 왼쪽 · 가운데 · 오른쪽. 아래가 검은 선이면 1, 흰 바닥이면 0입니다. 로봇이 아는 정보는 이 세 숫자뿐입니다.</p></div>
+      <div class="card"><div class="ic">🛞</div><b>출력: 바퀴 2개</b><p><code>motors(왼쪽, 오른쪽)</code>. 두 바퀴 속도가 같으면 직진, 왼쪽이 느리면 왼쪽으로, 오른쪽이 느리면 오른쪽으로 휩니다(차동 구동).</p></div>
+      <div class="card"><div class="ic">📋</div><b>두뇌: 규칙표</b><p>센서 3개의 조합은 2 × 2 × 2 = 8가지입니다. 8가지 상황마다 할 행동을 정한 표가 곧 프로그램입니다.</p></div>
+    </div>
+
+    <h3>규칙표 만들기 — 8가지 센서 조합</h3>
+    <p>위 4줄은 실습실 예제 5번이 쓰는 규칙입니다. 아래 4줄은 여러분이 정할 칸입니다.</p>
+    <div class="table-wrap"><table><tr><th>L C R</th><th>상황</th><th>행동</th><th>바퀴 명령 / 힌트</th></tr>${rules.map(([a, b, c, d]) => `<tr><td><code>${a}</code></td><td>${b}</td><td><b>${c}</b></td><td>${d}</td></tr>`).join('')}</table></div>
+    <div class="callout tip"><div class="ct">💡 if문의 순서도 규칙이다</div><p>예제 코드는 <code>L</code>을 <code>R</code>보다 먼저 검사합니다. 그래서 <code>1 1 1</code>이나 <code>1 0 1</code>이 들어와도 무조건 왼쪽으로 꺾습니다. 내 규칙표와 코드가 정말 같은 행동을 하는지, 8줄을 하나씩 코드에 넣어 따라가 보세요.</p></div>
+
+    <h3>예제 코드 읽기 (실습실 예제 5번)</h3>
+    ${codeBlock('규칙 기반 라인 트레이서', 'JS', src)}
+    <p><code>loop()</code>는 1초에 약 50번 반복됩니다. 매번 센서를 읽고, 규칙표에서 지금 상황에 맞는 줄을 찾아 바퀴 명령을 내립니다.</p>
+
+    <h3>선을 놓쳤을 때 — 기억이 실력 차이를 만든다</h3>
+    <p>급커브에서는 로봇이 선 밖으로 밀려나 센서 3개가 모두 0이 되는 순간이 생깁니다. 이때 로봇은 선이 어디 있는지 모릅니다. 그래서 <b>마지막으로 선을 본 방향을 변수 <code>last</code>에 기억</b>해 두었다가 그쪽으로 제자리 회전해 다시 찾습니다. 이 한 줄이 없으면 로봇은 커브에서 그대로 직진해 트랙을 벗어납니다.</p>
+
+    <h3>규칙 기반 제어의 장점과 한계</h3>
+    <div class="table-wrap"><table><tr><th>👍 장점</th><th>👎 한계</th></tr>
+      <tr><td>이해하기 쉽고, 규칙표가 곧 코드라서 왜 그렇게 움직이는지 바로 설명할 수 있다</td><td>행동이 몇 가지(직진 · 왼쪽 · 오른쪽)뿐이라 선 위에서 <b>지그재그로 흔들린다</b></td></tr>
+      <tr><td>센서가 적고 계산이 없어서 아주 작은 마이크로컨트롤러에서도 돈다</td><td>조금 벗어나도, 많이 벗어나도 <b>똑같은 세기로</b> 꺾는다</td></tr>
+      <tr><td>예상 밖의 상황에 대한 행동을 규칙 하나로 쉽게 추가할 수 있다</td><td>속도를 올리면 흔들림이 커져서 빨리 달리기 어렵다</td></tr>
+    </table></div>
+    <div class="callout info"><div class="ct">➡️ 다음 차시: 비례 제어</div><p>이렇게 "켜기 / 끄기"처럼 정해진 몇 가지 행동만 오가는 제어를 <b>On-Off 제어</b>(뱅뱅 제어)라고도 합니다. 다음 차시에서는 <b>벗어난 정도에 비례해서</b> 꺾는 비례 제어로 바꿔 흔들림을 줄이고 더 빨리 달립니다.</p></div>`;
+}
+
+function ctrlResponseSVG() {
+  // 선에서 벗어난 채로 출발한 로봇이 선으로 돌아오는 모습 (가로 = 달린 거리, 세로 = 선에서 벗어난 정도)
+  const W = 520, X0 = 210, H = 26;
+  const tri = (x) => 1 - 4 * Math.abs(((x % 1) + 1) % 1 - 0.5);
+  const rows = [
+    ['규칙 기반', '같은 세기로 꺾어 계속 지그재그', 'var(--muted)', (t) => t < 0.12 ? 0.8 * (1 - t / 0.12) : 0.3 * tri((t - 0.12) * 7 + 0.75)],
+    ['P · Kp 너무 작음', '느리게 돌아온다 → 커브에서 선을 놓침', 'var(--warn)', (t) => 0.8 * Math.exp(-2.6 * t)],
+    ['P · Kp 적당', '빠르게 돌아오고 살짝 넘친다', 'var(--ok)', (t) => 0.8 * Math.exp(-7 * t) * Math.cos(12 * t)],
+    ['P · Kp 너무 큼', '과하게 꺾어 좌우로 흔들린다', 'var(--danger)', (t) => 0.8 * Math.exp(-1.4 * t) * Math.cos(38 * t)],
+    ['PD · D 추가', '넘치기 전에 미리 핸들을 푼다', 'var(--accent2)', (t) => 0.8 * Math.exp(-11 * t) * (1 + 11 * t)]
+  ];
+  const panel = ([name, desc, col, f], i) => {
+    const y = 64 + i * 66;
+    let d = '';
+    for (let k = 0; k <= 160; k++) { const t = k / 160; d += (k ? 'L' : 'M') + (X0 + t * W).toFixed(1) + ' ' + (y - f(t) * H).toFixed(1); }
+    return `<text x="20" y="${y - 4}" font-size="12.5" font-weight="800" fill="${col}">${name}</text>
+      <text x="20" y="${y + 13}" font-size="10.5" fill="var(--muted)">${desc}</text>
+      <path d="M${X0} ${y} L${X0 + W} ${y}" stroke="#1f1f1f" stroke-width="5" opacity="0.18"/>
+      <path d="${d}" stroke="${col}" stroke-width="2.5" fill="none"/>`;
+  };
+  return `<svg viewBox="0 0 760 400" role="img" aria-label="제어 방식과 Kp 값에 따라 로봇이 선으로 돌아오는 모습">
+    <text x="20" y="26" font-size="15" font-weight="800" fill="var(--fg)">선에서 벗어난 채 출발한 로봇은 어떻게 돌아올까?</text>
+    <text x="${X0}" y="44" font-size="10.5" fill="var(--muted)">회색 띠 = 검은 선 · 색 선 = 로봇이 지나간 길 (오른쪽으로 달림)</text>
+    ${rows.map(panel).join('')}
+  </svg>`;
+}
+function pidGuide() {
+  const errRows = [
+    ['1 0 0', '−1', '−90', '60, 240', '왼쪽으로 크게'],
+    ['1 1 0', '−0.5', '−45', '105, 195', '왼쪽으로 살짝'],
+    ['0 1 0', '0', '0', '150, 150', '직진'],
+    ['0 1 1', '+0.5', '+45', '195, 105', '오른쪽으로 살짝'],
+    ['0 0 1', '+1', '+90', '240, 60', '오른쪽으로 크게']
+  ];
+  const pSrc = [
+    '// 보정량 = KP × 오차',
+    'const BASE = 150;   // 기본 속도',
+    'const KP = 90;      // 비례 게인 — 바꿔 가며 랩 타임을 비교하세요',
+    'let lastErr = 0;',
+    '',
+    'function loop() {',
+    '  const L = lineLeft(), C = lineCenter(), R = lineRight();',
+    '  let err;',
+    '  if (L + C + R === 0) err = lastErr * 2;   // 선을 놓치면 마지막 방향으로 크게',
+    '  else err = (R - L) / (L + C + R);          // 왼쪽 -1 ~ 오른쪽 +1',
+    '  const corr = KP * err;',
+    '  motors(BASE + corr, BASE - corr);',
+    '  lastErr = err;',
+    '}'
+  ].join('\n');
+  const pdSrc = [
+    'const BASE = 150;   // 기본 속도',
+    'const KP = 90;      // P: 지금 벗어난 만큼',
+    'const KD = 60;      // D: 오차가 변하는 만큼 (0부터 조금씩 늘려 보기)',
+    'let lastErr = 0;',
+    '',
+    'function loop() {',
+    '  const L = lineLeft(), C = lineCenter(), R = lineRight();',
+    '  let err;',
+    '  if (L + C + R === 0) err = lastErr < 0 ? -2 : 2;   // 선을 놓치면 마지막 쪽으로 크게',
+    '  else err = (R - L) / (L + C + R);',
+    '  const d = err - lastErr;                          // 오차의 변화량',
+    '  const corr = KP * err + KD * d;',
+    '  motors(constrain(BASE + corr, -255, 255), constrain(BASE - corr, -255, 255));',
+    '  lastErr = err;',
+    '}'
+  ].join('\n');
+  const pidSrc = [
+    'const KP = 90, KI = 0.5, KD = 60;',
+    'let lastErr = 0, sum = 0;',
+    '',
+    '// loop() 안에서 err를 구한 뒤',
+    'sum = constrain(sum + err, -100, 100);   // I: 오차를 계속 더한다 (너무 커지지 않게 제한)',
+    'const d = err - lastErr;                  // D: 오차의 변화량',
+    'const corr = KP * err + KI * sum + KD * d;',
+    'lastErr = err;'
+  ].join('\n');
+  const tune = [
+    ['150', '30', '', ''], ['150', '90', '', ''], ['150', '200', '', ''], ['200', '90', '', ''], ['200', '(내가 찾은 값)', '', '']
+  ];
+  return `
+    <h2>비례 제어(P 제어)란?</h2>
+    <p><b>선에서 많이 벗어나면 많이 꺾고, 조금 벗어나면 조금 꺾는</b> 방법입니다. P는 Proportional(비례)의 첫 글자입니다. 사람이 운전할 때 차선에서 살짝 벗어나면 핸들을 살짝, 많이 벗어나면 많이 돌리는 것과 같습니다.</p>
+    <div class="table-wrap"><table><tr><th></th><th>규칙 기반 (On-Off)</th><th>비례 제어 (P)</th></tr>
+      <tr><td><b>핸들 꺾는 법</b></td><td>왼쪽 끝 · 가운데 · 오른쪽 끝 중 하나</td><td>벗어난 만큼 꺾는다</td></tr>
+      <tr><td><b>조금 벗어났을 때</b></td><td>크게 꺾는다</td><td>살짝 꺾는다</td></tr>
+      <tr><td><b>코드 모양</b></td><td><code>if</code>문 여러 개 (규칙표)</td><td>공식 한 줄</td></tr>
+      <tr><td><b>주행 모습</b></td><td>지그재그</td><td>부드럽게 따라감</td></tr>
+    </table></div>
+
+    <h3>① 오차(error)를 숫자로 만든다</h3>
+    <p>로봇이 선에서 <b>얼마나, 어느 쪽으로</b> 벗어났는지를 숫자 하나로 나타낸 것이 오차입니다.</p>
+    <div class="callout info"><div class="ct">📐 오차 = (R − L) ÷ (L + C + R)</div><p>음수면 선이 왼쪽에 있다는 뜻이니 왼쪽으로 꺾어야 합니다. 0이면 한가운데, 양수면 오른쪽입니다. 결과는 −1 ~ +1 사이 숫자입니다.</p></div>
+
+    <h3>② 오차에 비례해 보정한다</h3>
+    <div class="callout info"><div class="ct">📐 보정량 = Kp × 오차</div><p>왼쪽 바퀴 = 기본 속도 + 보정량<br>오른쪽 바퀴 = 기본 속도 − 보정량</p></div>
+    <p><b>Kp</b>(비례 게인)는 "오차 1당 얼마나 세게 꺾을지"를 정하는 값입니다. 실습실 예제 6번(기본 속도 150, Kp 90)으로 계산하면 다음과 같습니다.</p>
+    <div class="table-wrap"><table><tr><th>L C R</th><th>오차</th><th>보정량 (90 × 오차)</th><th>바퀴 (왼, 오)</th><th>움직임</th></tr>${errRows.map((r) => `<tr><td><code>${r[0]}</code></td>${r.slice(1).map((c, i) => `<td>${i === 3 ? `<b>${c}</b>` : c}</td>`).join('')}</tr>`).join('')}</table></div>
+    <p>규칙 기반에서는 <code>1 1 0</code>과 <code>1 0 0</code>이 같은 행동이었지만, P 제어는 <b>"살짝"과 "크게"를 구분</b>합니다. 이것이 부드럽게 달리는 이유입니다.</p>
+
+    <h3>예제 코드 읽기 (실습실 예제 6번)</h3>
+    ${codeBlock('P 제어 라인 트레이서', 'JS', pSrc)}
+    <p>규칙 기반 코드의 <code>if</code>문 여러 개가 공식 한 줄(<code>corr = KP * err</code>)로 바뀌었습니다. 선을 놓쳤을 때(<code>L + C + R === 0</code>)는 마지막 오차를 키워서 그 방향으로 크게 꺾습니다. 규칙 기반의 <code>last</code>와 같은 역할입니다.</p>
+
+    <h3>Kp에 따라 달라지는 움직임</h3>
+    <div class="figure">${ctrlResponseSVG()}<p class="caption">개념 그림 — 실제 궤적은 트랙과 속도에 따라 다릅니다. 실습실에서 직접 찾아 캡처해 보세요.</p></div>
+    <div class="table-wrap"><table><tr><th>Kp</th><th>움직임</th><th>이유</th></tr>
+      <tr><td><b>너무 작음</b></td><td>굼뜨게 따라가고, 급커브에서 선을 놓친다</td><td>오차가 커도 조금만 꺾기 때문</td></tr>
+      <tr><td><b>적당함</b></td><td>빠르고 부드럽게 따라간다</td><td>오차만큼 알맞게 꺾음</td></tr>
+      <tr><td><b>너무 큼</b></td><td>좌우로 흔들린다(진동)</td><td>살짝 벗어나도 확 꺾어서 반대쪽으로 넘어가고, 다시 확 꺾기를 반복</td></tr>
+    </table></div>
+    <div class="callout warn"><div class="ct">⚠️ 기본 속도와 Kp는 함께 움직인다</div><p>빨리 달리면 같은 Kp라도 반응할 시간이 부족해 커브에서 밀려납니다. 기본 속도를 올렸다면 Kp도 다시 맞춰야 합니다. 그래서 두 값을 함께 바꿔 가며 표로 기록합니다.</p></div>
+
+    <h3>실험 기록표</h3>
+    <div class="table-wrap"><table><tr><th>기본 속도</th><th>Kp</th><th>랩 타임</th><th>관찰 (흔들림 · 이탈 · 충돌)</th></tr>${tune.map((r) => `<tr>${r.map((c) => `<td>${c || '&nbsp;'}</td>`).join('')}</tr>`).join('')}</table></div>
+    <p>한 번에 <b>한 값만</b> 바꾸세요. 두 값을 동시에 바꾸면 무엇 때문에 좋아졌는지 알 수 없습니다.</p>
+
+    <h2>PID 제어로 확장하기</h2>
+    <p>P 제어는 <b>"지금"</b> 벗어난 정도만 봅니다. 산업 현장에서 가장 많이 쓰는 <b>PID 제어</b>는 여기에 <b>"과거"</b>(I)와 <b>"미래"</b>(D)를 더합니다. 드론의 자세 유지, 자동차 크루즈 컨트롤, 보일러 온도 유지, 3D 프린터 노즐 온도가 모두 PID 제어입니다.</p>
+    <div class="callout info"><div class="ct">📐 보정량 = Kp × 오차 + Ki × 오차의 누적 + Kd × 오차의 변화량</div><p>세 항을 각각 얼마나 쓸지를 Kp · Ki · Kd 세 값으로 정합니다. 쓰지 않는 항은 게인을 0으로 두면 됩니다. 예를 들어 Ki = 0이면 PD 제어입니다.</p></div>
+    <div class="cards">
+      <div class="card"><div class="ic">📍</div><b>P · 비례 (현재)</b><p>지금 벗어난 만큼 꺾는다. 제어의 주인공입니다. 너무 크면 흔들립니다.</p></div>
+      <div class="card"><div class="ic">🧮</div><b>I · 적분 (과거)</b><p>오차를 계속 더해 둔다. 한쪽으로 <b>조금씩 계속</b> 벗어나는 버릇(예: 한쪽 모터가 약함)을 고칩니다. 너무 크면 느리게 크게 출렁입니다.</p></div>
+      <div class="card"><div class="ic">🔮</div><b>D · 미분 (미래)</b><p>오차가 <b>얼마나 빨리 변하는지</b> 본다. 선으로 빠르게 돌아오는 중이면 넘치기 전에 미리 핸들을 풉니다. 흔들림을 잡는 브레이크입니다.</p></div>
+    </div>
+    <div class="callout tip"><div class="ct">🚿 샤워 물 온도로 이해하기</div><p><b>P</b>: 물이 차가운 만큼 뜨거운 쪽으로 돌린다. <b>D</b>: 온도가 빠르게 오르고 있으니 미리 조금 덜 돌린다(데지 않기). <b>I</b>: 아까부터 계속 조금 미지근했으니 손잡이를 한 칸 더 돌려 둔다.</p></div>
+
+    <h3>라인 트레이서에 D 더하기 — PD 제어 (선택 과제)</h3>
+    <p>라인 트레이서에서는 <b>D가 특히 효과적</b>입니다. Kp를 키워 빠르게 반응하게 하면서도, D가 흔들림을 잡아 줍니다. 오차의 변화량은 <code>err − lastErr</code>로 구합니다. 예제 6번에 이미 <code>lastErr</code>가 있으니 두 줄만 더하면 됩니다.</p>
+    ${codeBlock('PD 제어 라인 트레이서', 'JS', pdSrc)}
+    <p><code>KD = 0</code>에서 시작해 조금씩 늘려 보세요. 흔들림이 줄어들면 <code>KP</code>나 <code>BASE</code>를 더 올릴 여유가 생깁니다. KD가 너무 크면 센서 값이 바뀔 때마다 로봇이 움찔거립니다.</p>
+
+    <h3>I 항은 언제 필요할까?</h3>
+    <p>I 항은 <b>작은 오차가 오래 남는 경우</b>에 씁니다. 예를 들어 한쪽 바퀴가 약해서 로봇이 늘 선의 오른쪽에 붙어 달리는 경우입니다. 오차가 작아서 P만으로는 끝내 가운데로 못 돌아오는데, I가 그 작은 오차를 계속 더해 가며 점점 세게 밀어 줍니다.</p>
+    ${codeBlock('PID 제어 (핵심 부분만)', 'JS', pidSrc)}
+    <div class="callout warn"><div class="ct">⚠️ 적분 누적(와인드업) 주의</div><p>선을 놓쳐 오차가 오래 크게 유지되면 <code>sum</code>이 엄청나게 커지고, 선을 다시 찾은 뒤에도 한참 동안 한쪽으로 꺾게 됩니다. 그래서 <code>constrain()</code>으로 누적값에 상한을 둡니다. 이 과정의 라인 트레이서처럼 센서 3개로 오차가 거칠게 나오는 경우에는 I 없이 <b>PD만으로도 충분</b>한 경우가 많습니다.</p></div>
+
+    <h3>PID 게인을 맞추는 순서</h3>
+    <div class="table-wrap"><table><tr><th>단계</th><th>할 일</th><th>멈추는 때</th></tr>
+      <tr><td><span class="no">1</span></td><td>Ki = 0, Kd = 0으로 두고 <b>Kp</b>를 올린다</td><td>선을 잘 따라가지만 살짝 흔들리기 시작할 때</td></tr>
+      <tr><td><span class="no">2</span></td><td><b>Kd</b>를 0부터 올린다</td><td>흔들림이 사라질 때 (더 올리면 움찔거림)</td></tr>
+      <tr><td><span class="no">3</span></td><td>필요하면 Kp · 기본 속도를 다시 올리고 1~2를 반복</td><td>랩 타임이 더 줄지 않을 때</td></tr>
+      <tr><td><span class="no">4</span></td><td>한쪽으로 치우치는 버릇이 남으면 <b>Ki</b>를 아주 작게 더한다</td><td>치우침이 사라질 때</td></tr>
+    </table></div>
+
+    <h3>세 가지 제어 한눈에 비교</h3>
+    <div class="table-wrap"><table><tr><th></th><th>규칙 기반 (On-Off)</th><th>P 제어</th><th>PID 제어</th></tr>
+      <tr><td><b>보는 것</b></td><td>지금 센서 조합</td><td>지금 오차</td><td>지금 · 과거 · 변화 속도</td></tr>
+      <tr><td><b>출력</b></td><td>정해진 몇 가지 행동</td><td>오차에 비례한 연속값</td><td>세 항을 더한 연속값</td></tr>
+      <tr><td><b>조정할 값</b></td><td>규칙표 · 속도</td><td>Kp · 기본 속도</td><td>Kp · Ki · Kd · 기본 속도</td></tr>
+      <tr><td><b>장점</b></td><td>쉽고 설명하기 좋다</td><td>부드럽고 코드가 짧다</td><td>빠르고 정확하며 흔들림이 적다</td></tr>
+      <tr><td><b>단점</b></td><td>지그재그, 고속에 약함</td><td>Kp가 크면 흔들림</td><td>튜닝이 어렵다</td></tr>
+      <tr><td><b>생활 속 예</b></td><td>전기 다리미 · 냉장고 온도 조절</td><td>물탱크 수위 조절</td><td>드론 · 크루즈 컨트롤 · 보일러</td></tr>
+    </table></div>`;
+}
+
 /* 40차시: 두 바퀴 로봇 3D · 바퀴와 모터의 연결 */
 function wheelMotorSVG() {
   const lab = (x, y, t, c = 'var(--fg)', a = 'middle') => `<text x="${x}" y="${y}" text-anchor="${a}" font-size="11.5" font-weight="700" fill="${c}">${t}</text>`;
@@ -4935,6 +5174,8 @@ function pageLesson(l) {
     ${l.guide === 'mqttctrl' ? mqttCtrlGuide() : ''}
     ${l.guide === 'security' ? iotSecurityGuide() : ''}
     ${l.guide === 'robotiot' ? robotIotGuide() : ''}
+    ${l.guide === 'linerule' ? lineRuleGuide() : ''}
+    ${l.guide === 'pid' ? pidGuide() : ''}
     ${l.guide === 'robot3d' ? robot3dGuide() : ''}
     ${l.guide === 'arm3d' ? arm3dGuide() : ''}
     ${l.guide === 'dog3d' ? dogGuide() : ''}
