@@ -1285,7 +1285,7 @@ void loop() {
     ai: 'AI에게 "Kp를 키우면 왜 흔들리는가"를 묻고, 실제 궤적에서 그 현상을 찾아 캡처합니다. D 제어는 AI 설명을 듣고 선택 과제로 도전합니다.',
     checks: ['Kp별 랩 타임 표를 만들었다', '흔들림이 생기는 Kp를 찾았다', '규칙 기반보다 빠르거나 부드러워졌다'],
     tn: '센서가 3개뿐이라 오차가 거칠게 나옵니다. "마지막 오차 기억하기"가 성능에 큰 영향을 준다는 점을 짚어 주세요. 기본 속도를 올리면 Kp도 함께 조정해야 합니다.' },
-  { n: 0, m: 'mr2', env: 'wk', req: 'code', code: 'robotmqtt', sim: 'world=obstacle&mode=mqtt', t: 'IoT 로봇 ① ESP32가 인터넷으로 로봇 조종',
+  { n: 0, m: 'mr2', env: 'wk', req: 'code', code: 'robotmqtt', sim: 'world=obstacle&mode=mqtt', guide: 'robotmqtt', t: 'IoT 로봇 ① ESP32가 인터넷으로 로봇 조종',
     goals: ['MQTT로 센서 값을 받고 명령을 보내는 원격 제어 구조를 만들 수 있다', '통신이 끊겼을 때의 안전 정지(워치독)를 설명할 수 있다'],
     concepts: ['디지털 트윈: 브라우저의 가상 로봇 ↔ MQTT 브로커 ↔ Wokwi의 ESP32', '토픽: <code>접두어/robot/sensors</code>(로봇 → ESP32, JSON), <code>접두어/robot/cmd</code>(ESP32 → 로봇, "왼쪽,오른쪽")', '워치독: 1초 동안 명령이 없으면 로봇이 스스로 정지 — 원격 로봇의 기본 안전 장치'],
     mission: '가상 로봇 실습실을 📡 ESP32 모드로 연결하고, Wokwi의 ESP32가 거리 센서 값을 받아 장애물 회피 명령을 보내게 합니다. Wokwi 시뮬레이션을 멈추면 로봇이 워치독으로 정지하는지 확인합니다.',
@@ -1293,7 +1293,7 @@ void loop() {
     ai: '장애물 회피 차시의 JavaScript 로직을 ESP32 C++로 옮기는 일을 AI에게 맡기고, 두 코드의 판단 규칙이 같은지 대조합니다.',
     checks: ['실습실에 "ESP32 제어 중"이 표시된다', 'ESP32 명령으로 로봇이 장애물을 피한다', 'ESP32를 멈추면 1초 안에 로봇이 정지한다'],
     tn: '통신 지연(0.1~0.5초) 때문에 코드 모드보다 반응이 느립니다. 속도를 150 이하로 낮추게 하고, 지연이 로봇 제어에 주는 영향을 토론 소재로 쓰세요. 토픽 접두어는 학생마다 반드시 다르게 정합니다.' },
-  { n: 0, m: 'mr2', env: 'wk', req: 'code', sim: 'world=obstacle&mode=mqtt', t: 'IoT 로봇 ② 원격 조종 대시보드와 모드 전환',
+  { n: 0, m: 'mr2', env: 'wk', req: 'code', sim: 'world=obstacle&mode=mqtt', guide: 'robotremote', t: 'IoT 로봇 ② 원격 조종 대시보드와 모드 전환',
     goals: ['웹 대시보드에서 로봇을 원격 조종할 수 있다', '자율 · 수동 모드를 전환하는 구조를 설계할 수 있다'],
     concepts: ['명령 경로: 스마트폰 대시보드 → <code>접두어/robot/remote</code> → ESP32 → <code>접두어/robot/cmd</code> → 로봇', 'ESP32가 최종 결정권자: 수동 명령이 와도 앞이 막혀 있으면 정지 (안전 우선)', '텔레메트리: 로봇 상태(거리 · 모드)를 대시보드에 실시간 표시'],
     mission: 'AI로 방향 버튼, 자율 / 수동 전환 버튼, 거리 표시가 있는 HTML 대시보드를 만들고, ESP32가 모드에 따라 자율 주행 또는 원격 명령을 로봇에 전달하게 합니다. 수동 모드에서도 벽 앞 20cm에서는 전진 명령을 막습니다.',
@@ -4871,6 +4871,148 @@ function pidGuide() {
     </table></div>`;
 }
 
+/* IoT 로봇 ① · ②: ESP32 ↔ MQTT ↔ 가상 로봇, 원격 조종 대시보드 */
+function robotMqttFlowSVG(withDash) {
+  const box = (x, y, w, h, fill, stroke, t1, t2, t3) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="${fill}" stroke="${stroke}" stroke-width="2"/>
+    <text x="${x + w / 2}" y="${y + 26}" text-anchor="middle" font-size="14" font-weight="800" fill="var(--fg)">${t1}</text>
+    <text x="${x + w / 2}" y="${y + 46}" text-anchor="middle" font-size="11" fill="var(--muted)">${t2}</text>
+    <text x="${x + w / 2}" y="${y + 64}" text-anchor="middle" font-size="11" fill="var(--muted)">${t3}</text>`;
+  const arrow = (x1, y1, x2, y2, col, label, ly, mk) => `<path d="M${x1} ${y1} L${x2} ${y2}" stroke="${col}" stroke-width="2.5" marker-end="url(#${mk})"/>
+    <text x="${(x1 + x2) / 2}" y="${ly}" text-anchor="middle" font-size="11" font-weight="700" fill="${col}" font-family="var(--mono)">${label}</text>`;
+  if (!withDash) {
+    return `<svg viewBox="0 0 760 250" role="img" aria-label="가상 로봇, MQTT 브로커, ESP32 사이의 메시지 흐름">${svgArrowDefs('rm-a', 'var(--accent)')}${svgArrowDefs('rm-b', 'var(--accent2)')}
+      <text x="20" y="26" font-size="15" font-weight="800" fill="var(--fg)">몸은 브라우저에, 두뇌는 Wokwi에 — 사이를 MQTT가 잇는다</text>
+      ${box(20, 80, 190, 80, 'var(--accent-soft)', 'var(--accent)', '🤖 가상 로봇 (몸)', '실습실 · 📡 ESP32 모드', '센서 측정 · 바퀴 구동')}
+      ${box(285, 80, 190, 80, 'var(--card2)', 'var(--line)', '📮 MQTT 브로커', 'broker.hivemq.com', '메시지 전달만 한다')}
+      ${box(550, 80, 190, 80, 'var(--accent2-soft)', 'var(--accent2)', '🧠 ESP32 (두뇌)', 'Wokwi · C++', '판단 · 명령')}
+      ${arrow(212, 100, 283, 100, 'var(--accent)', 'sensors', 92, 'rm-a')}${arrow(477, 100, 548, 100, 'var(--accent)', 'sensors', 92, 'rm-a')}
+      ${arrow(548, 142, 477, 142, 'var(--accent2)', 'cmd', 160, 'rm-b')}${arrow(283, 142, 212, 142, 'var(--accent2)', 'cmd', 160, 'rm-b')}
+      <text x="380" y="200" text-anchor="middle" font-size="11.5" fill="var(--muted)">청록 = 센서 값 JSON (0.2초마다) · 보라 = 바퀴 명령 "왼쪽,오른쪽"</text>
+      <text x="380" y="222" text-anchor="middle" font-size="11.5" fill="var(--danger)" font-weight="700">명령이 1초 동안 안 오면 로봇은 스스로 멈춘다 (워치독)</text>
+    </svg>`;
+  }
+  return `<svg viewBox="0 0 760 290" role="img" aria-label="대시보드, ESP32, 가상 로봇 사이의 명령 경로">${svgArrowDefs('rr-a', 'var(--accent)')}${svgArrowDefs('rr-b', 'var(--accent2)')}${svgArrowDefs('rr-c', 'var(--warn)')}
+    <text x="20" y="26" font-size="15" font-weight="800" fill="var(--fg)">사람의 명령도 반드시 ESP32를 거친다 — ESP32가 최종 결정권자</text>
+    ${box(20, 90, 190, 80, 'var(--warn-soft)', 'var(--warn)', '📱 대시보드', '방향 · 자율/수동 버튼', '거리 표시 (텔레메트리)')}
+    ${box(285, 90, 190, 80, 'var(--accent2-soft)', 'var(--accent2)', '🧠 ESP32', '모드에 따라 판단', '벽 앞 20cm 전진 금지')}
+    ${box(550, 90, 190, 80, 'var(--accent-soft)', 'var(--accent)', '🤖 가상 로봇', '받은 명령대로 구동', '센서 값 발행')}
+    ${arrow(212, 112, 283, 112, 'var(--warn)', 'remote', 104, 'rr-c')}
+    ${arrow(477, 112, 548, 112, 'var(--accent2)', 'cmd', 104, 'rr-b')}
+    ${arrow(548, 152, 477, 152, 'var(--accent)', 'sensors', 170, 'rr-a')}
+    <path d="M645 172 L645 220 L115 220 L115 174" stroke="var(--accent)" stroke-width="2.5" fill="none" marker-end="url(#rr-a)"/>
+    <text x="380" y="240" text-anchor="middle" font-size="11" font-weight="700" fill="var(--accent)" font-family="var(--mono)">sensors (대시보드도 구독해 거리를 표시)</text>
+    <text x="380" y="274" text-anchor="middle" font-size="11.5" fill="var(--muted)">대시보드는 로봇에 직접 명령하지 않는다 · 브라우저는 wss 8884, ESP32는 1883 — 주소는 달라도 같은 브로커</text>
+  </svg>`;
+}
+function robotMqttGuide() {
+  const topics = [
+    ['<code>접두어/robot/sensors</code>', '로봇 → ESP32', '센서 값 JSON, 0.2초마다', '<code>{"d":85,"dl":120,"dr":60,"l":0,"c":1,"r":0,"hit":0,"bump":0}</code>'],
+    ['<code>접두어/robot/cmd</code>', 'ESP32 → 로봇', '"왼쪽속도,오른쪽속도" 문자열 (−255 ~ 255)', '<code>140,140</code> · <code>-120,120</code> · <code>0,0</code>']
+  ];
+  const keys = [['d', '앞 거리 (cm)'], ['dl · dr', '왼쪽 · 오른쪽 60° 방향 거리'], ['l · c · r', '라인 센서 (선 위면 1)'], ['hit · bump', '충돌 · 범퍼 닿음']];
+  const steps = [
+    ['준비', '<code>setup()</code>', 'Wi-Fi <code>Wokwi-GUEST</code>에 연결하고, 브로커 <code>broker.hivemq.com:1883</code>과 메시지 처리 함수 <code>onMessage</code>를 등록한다'],
+    ['연결 · 구독', '<code>loop()</code> 앞부분', '브로커 연결이 끊겨 있으면 다시 연결하고 <code>접두어/robot/sensors</code>를 구독한다. <code>mqtt.loop()</code>가 도착한 메시지를 처리한다'],
+    ['받기', '<code>onMessage()</code>', '센서 JSON을 <code>deserializeJson</code>으로 풀어 앞 거리 <code>d</code>를 변수 <code>front</code>에 저장한다. 형식이 틀린 메시지는 무시한다'],
+    ['판단', '<code>loop()</code> 뒷부분', '0.2초마다 <code>front &lt; 40</code>이면 제자리 회전, 아니면 직진을 고른다'],
+    ['명령', '<code>drive()</code>', '<code>"140,140"</code> 같은 문자열을 만들어 <code>접두어/robot/cmd</code>로 발행한다']
+  ];
+  return `
+    <h2>로봇의 두뇌를 인터넷 너머로 옮기기</h2>
+    <p>45~48차시에서는 로봇의 두뇌가 <b>실습실 안의 JavaScript 코드</b>였습니다. 이번 차시에서는 두뇌를 <b>Wokwi의 ESP32</b>로 옮기고, 둘 사이를 <b>MQTT</b>로 연결합니다. 실습실의 로봇은 센서로 재고 바퀴를 돌리는 <b>몸</b>만 맡고, 판단은 인터넷 너머의 ESP32가 합니다.</p>
+    <div class="figure">${robotMqttFlowSVG(false)}<p class="caption">실제 로봇과 똑같이 움직이는 가상 로봇을 쓰는 방식을 디지털 트윈이라고 한다</p></div>
+
+    <h3>주고받는 메시지 — 토픽 두 개</h3>
+    <div class="table-wrap"><table><tr><th>토픽</th><th>방향</th><th>내용</th><th>예</th></tr>${topics.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}</table></div>
+    <div class="table-wrap"><table><tr><th>센서 JSON 키</th><th>뜻</th></tr>${keys.map(([a, b]) => `<tr><td><code>${a}</code></td><td>${b}</td></tr>`).join('')}</table></div>
+    <div class="callout warn"><div class="ct">⚠️ 토픽 접두어는 사람마다 달라야 한다</div><p><code>broker.hivemq.com</code>은 전 세계가 함께 쓰는 공개 브로커입니다. 옆 친구와 접두어(예: <code>bctc/kim</code>)가 같으면 <b>남의 로봇을 조종</b>하게 됩니다. 실습실 화면의 접두어와 ESP32 코드의 <code>PREFIX</code>를 똑같이 맞추고, 개인정보는 보내지 마세요.</p></div>
+
+    <h3>참고 코드의 흐름 (페이지 아래 "참고 코드")</h3>
+    <div class="table-wrap"><table><tr><th>단계</th><th>코드 위치</th><th>하는 일</th></tr>${steps.map(([a, b, c], i) => `<tr><td><span class="no">${i + 1}</span> <b>${a}</b></td><td>${b}</td><td>${c}</td></tr>`).join('')}</table></div>
+    <div class="callout tip"><div class="ct">📚 Wokwi 라이브러리 추가</div><p><code>PubSubClient.h</code> 또는 <code>ArduinoJson.h</code>를 찾을 수 없다는 오류가 나면, Wokwi 편집기의 <b>Library Manager</b> 탭에서 <b>PubSubClient</b>와 <b>ArduinoJson</b>을 추가하세요. 프로젝트의 <code>libraries.txt</code>에 두 이름이 한 줄씩 들어가면 됩니다. <code>WiFi.h</code>는 ESP32에 기본으로 들어 있어 추가하지 않습니다.</p></div>
+
+    <h3>핵심 개념 ① 워치독 — 통신이 끊기면 스스로 멈춘다</h3>
+    <p>가상 로봇은 <b>1초 동안 명령을 받지 못하면 스스로 바퀴를 멈춥니다</b>. 실습실에는 <b>⚠ 명령 없음 · 안전 정지</b>가 표시됩니다. 통신이 끊겼는데도 로봇이 마지막 명령("직진")을 계속 따르면 벽이나 사람에게 부딪힐 수 있기 때문입니다. 원격 로봇이라면 반드시 갖춰야 하는 기본 안전장치입니다.</p>
+    <p>그래서 ESP32는 상황이 바뀌지 않아도 <b>0.2초마다 명령을 다시 보냅니다</b>. 미션에서는 Wokwi 시뮬레이션을 일부러 멈춰 보고, 로봇이 1초 안에 서는지 확인합니다.</p>
+
+    <h3>핵심 개념 ② 통신 지연 — 급한 판단은 로봇 안에서</h3>
+    <p>메시지가 브로커를 거쳐 오가는 데 보통 <b>0.1~0.5초</b>가 걸립니다. 센서 값이 ESP32에 도착할 때쯤 로봇은 이미 앞으로 더 가 있습니다. 그래서 코드 모드보다 반응이 느리고, 빨리 달리면 벽 앞에서 제때 서지 못합니다.</p>
+    <div class="table-wrap"><table><tr><th>대책</th><th>이유</th></tr>
+      <tr><td>속도를 <b>150 이하</b>로 낮춘다</td><td>지연 동안 덜 움직인다</td></tr>
+      <tr><td>멈추는 거리(임계값)를 넉넉하게 잡는다</td><td>명령이 늦게 도착해도 벽까지 여유가 있다</td></tr>
+      <tr><td>실제 로봇은 충돌 방지를 <b>로봇 안</b>에서 한다</td><td>인터넷은 늦거나 끊길 수 있다 (엣지 판단)</td></tr>
+    </table></div>
+
+    <h3>장애물 회피 코드를 ESP32로 옮기기</h3>
+    <p>45차시의 장애물 회피 규칙(JavaScript)을 ESP32 C++로 옮기는 일은 AI에게 맡깁니다. 다만 <b>두 코드의 판단 규칙이 같은지</b>는 직접 대조합니다.</p>
+    <div class="table-wrap"><table><tr><th>대조할 것</th><th>실습실 코드 (JS)</th><th>ESP32 코드 (C++)</th></tr>
+      <tr><td>센서 값 읽기</td><td><code>distance()</code></td><td>JSON의 <code>d</code> (<code>front</code>)</td></tr>
+      <tr><td>바퀴 명령</td><td><code>motors(L, R)</code></td><td><code>drive(L, R)</code> → <code>"L,R"</code> 발행</td></tr>
+      <tr><td>판단 주기</td><td><code>loop()</code> 약 50번/초</td><td>0.2초마다 (5번/초)</td></tr>
+      <tr><td>임계값 · 회전 방향 · 속도</td><td colspan="2">숫자와 방향이 같은지 한 줄씩 확인</td></tr>
+    </table></div>`;
+}
+function robotRemoteGuide() {
+  const topics = [
+    ['<code>접두어/robot/remote</code>', '발행', '구독', '–', '방향 <code>F</code> <code>B</code> <code>L</code> <code>R</code> <code>S</code> · 모드 <code>AUTO</code> <code>MANUAL</code>'],
+    ['<code>접두어/robot/sensors</code>', '구독', '구독', '발행', '센서 값 JSON'],
+    ['<code>접두어/robot/cmd</code>', '–', '발행', '구독', '<code>"왼쪽,오른쪽"</code> 바퀴 속도']
+  ];
+  const src = [
+    'String mode = "AUTO";     // 현재 모드',
+    'char manualCmd = \'S\';     // 대시보드에서 마지막으로 받은 방향',
+    '',
+    '// remote 토픽 메시지가 오면',
+    '//   "AUTO" 또는 "MANUAL" → mode 바꾸기',
+    '//   "F" "B" "L" "R" "S"  → manualCmd에 저장',
+    '',
+    '// 0.2초마다',
+    'if (mode == "AUTO") {                       // 49차시 자율 주행',
+    '  if (front < 40) drive(-120, 120); else drive(140, 140);',
+    '} else {',
+    '  // 안전 우선: 벽 앞 20cm에서는 전진 금지',
+    '  if (manualCmd == \'F\' && front < 20) drive(0, 0);',
+    '  else if (manualCmd == \'F\') drive(140, 140);',
+    '  else if (manualCmd == \'B\') drive(-120, -120);',
+    '  else if (manualCmd == \'L\') drive(-110, 110);',
+    '  else if (manualCmd == \'R\') drive(110, -110);',
+    '  else drive(0, 0);',
+    '}'
+  ].join('\n');
+  return `
+    <h2>사람이 원격으로 끼어들게 하기</h2>
+    <p>49차시에서는 ESP32가 혼자 판단했습니다. 이번 차시에서는 <b>스마트폰 대시보드</b>를 더해 사람이 원격으로 조종하거나, 자율 주행으로 돌려놓을 수 있게 합니다. 이때 명령은 <b>반드시 ESP32를 거쳐서</b> 로봇에 갑니다.</p>
+    <div class="figure">${robotMqttFlowSVG(true)}<p class="caption">대시보드 → remote → ESP32 → cmd → 로봇, 그리고 로봇 → sensors → ESP32 · 대시보드</p></div>
+
+    <h3>주고받는 메시지 — 세 곳의 토픽 대조표</h3>
+    <p>이 차시에서 가장 흔한 실패 원인은 <b>세 곳의 토픽이나 메시지 형식이 서로 안 맞는 것</b>입니다. 코드를 만들기 전에 아래 같은 표를 먼저 채우고, 완성된 코드를 이 표와 한 칸씩 대조하세요.</p>
+    <div class="table-wrap"><table><tr><th>토픽</th><th>📱 대시보드</th><th>🧠 ESP32</th><th>🤖 실습실</th><th>메시지</th></tr>${topics.map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('')}</table></div>
+    <div class="callout warn"><div class="ct">⚠️ 글자 하나만 달라도 동작하지 않는다</div><p><code>robot/Remote</code>와 <code>robot/remote</code>는 다른 토픽이고, <code>"f"</code>와 <code>"F"</code>는 다른 메시지입니다. 오류 메시지도 나지 않고 그냥 아무 일도 일어나지 않으므로, 동작하지 않으면 대조표부터 확인하세요.</p></div>
+    <div class="callout info"><div class="ct">🌐 왜 주소가 두 개일까?</div><p>ESP32는 <code>broker.hivemq.com:1883</code>(일반 MQTT)으로, 브라우저의 대시보드는 <code>wss://broker.hivemq.com:8884/mqtt</code>(웹소켓)로 접속합니다. 브라우저는 일반 MQTT로 직접 접속할 수 없기 때문입니다. 접속 방법만 다를 뿐 <b>같은 브로커</b>라서 메시지는 서로 오갑니다.</p></div>
+
+    <h3>ESP32가 하는 일 — 모드에 따라 다르게</h3>
+    <div class="table-wrap"><table><tr><th>모드</th><th>ESP32의 행동</th></tr>
+      <tr><td><b>AUTO (자율)</b></td><td>49차시처럼 센서 값을 보고 스스로 장애물을 피한다. 방향 버튼 명령은 무시한다</td></tr>
+      <tr><td><b>MANUAL (수동)</b></td><td>대시보드에서 온 <code>F</code> · <code>B</code> · <code>L</code> · <code>R</code> · <code>S</code>를 바퀴 속도로 바꿔 로봇에 전달한다</td></tr>
+    </table></div>
+    ${codeBlock('모드 전환 구조 (핵심 부분만)', 'C++', src)}
+    <p>수동 모드에서도 ESP32는 <b>0.2초마다 현재 명령을 다시 보냅니다</b>. 버튼을 한 번 눌렀을 때 한 번만 보내면, 1초 뒤 로봇이 워치독으로 멈춰 버립니다.</p>
+
+    <h3>핵심 개념 ① ESP32가 최종 결정권자 — 안전 우선</h3>
+    <p>수동 모드에서 사람이 "전진"을 눌러도, <b>벽 앞 20cm 안이면 ESP32가 전진을 막습니다</b>. 사람의 명령보다 로봇 쪽의 안전 규칙이 먼저입니다. 원격 조종하는 사람은 로봇을 직접 보지 못하고, 화면의 정보도 0.1~0.5초 늦게 도착하기 때문입니다. 로봇청소기 · 배달 로봇 · 자율주행차도 같은 원칙을 씁니다.</p>
+
+    <h3>핵심 개념 ② 텔레메트리 — 원격 조종자의 눈</h3>
+    <p>로봇 상태(앞 거리, 현재 모드)를 대시보드에 <b>실시간으로 보여 주는 것</b>을 텔레메트리라고 합니다. 대시보드는 <code>접두어/robot/sensors</code>를 구독해 앞 거리를 크게 표시합니다. 현재 모드를 대시보드에 표시하는 기능은 <b>AI 없이 직접</b> 추가해 보세요.</p>
+
+    <h3>정리 — 49차시와 50차시</h3>
+    <div class="table-wrap"><table><tr><th></th><th>49차시</th><th>50차시</th></tr>
+      <tr><td><b>누가 판단하나</b></td><td>ESP32 혼자 (자율)</td><td>ESP32 + 사람 (자율 / 수동 전환)</td></tr>
+      <tr><td><b>토픽</b></td><td>sensors · cmd</td><td>sensors · cmd · <b>remote</b></td></tr>
+      <tr><td><b>안전 장치</b></td><td>워치독: 명령이 1초 없으면 정지</td><td>워치독 + 벽 앞 20cm 전진 금지</td></tr>
+      <tr><td><b>핵심 한 줄</b></td><td>두뇌를 인터넷 너머로 옮긴다</td><td>사람이 끼어들어도 최종 판단은 안전 규칙이 한다</td></tr>
+    </table></div>`;
+}
+
 /* 40차시: 두 바퀴 로봇 3D · 바퀴와 모터의 연결 */
 function wheelMotorSVG() {
   const lab = (x, y, t, c = 'var(--fg)', a = 'middle') => `<text x="${x}" y="${y}" text-anchor="${a}" font-size="11.5" font-weight="700" fill="${c}">${t}</text>`;
@@ -5191,6 +5333,8 @@ function pageLesson(l) {
     ${l.guide === 'robotiot' ? robotIotGuide() : ''}
     ${l.guide === 'linerule' ? lineRuleGuide() : ''}
     ${l.guide === 'pid' ? pidGuide() : ''}
+    ${l.guide === 'robotmqtt' ? robotMqttGuide() : ''}
+    ${l.guide === 'robotremote' ? robotRemoteGuide() : ''}
     ${l.guide === 'robot3d' ? robot3dGuide() : ''}
     ${l.guide === 'arm3d' ? arm3dGuide() : ''}
     ${l.guide === 'dog3d' ? dogGuide() : ''}
